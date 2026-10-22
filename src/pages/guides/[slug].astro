@@ -1,0 +1,50 @@
+---
+import Base from '@/layouts/Base.astro';
+import { getCollection, getEntry } from 'astro:content';
+export async function getStaticPaths() {
+  const guides = await getCollection('guides');
+  return guides.map((g) => ({ params: { slug: g.slug }, props: { entry: g } }));
+}
+const { entry } = Astro.props;
+const { Content, headings } = await entry.render();
+const related = (await Promise.all(entry.data.related.map((s: string) => getEntry('guides', s)))).filter(Boolean);
+---
+<Base title={entry.data.title} description={entry.data.description} section="guides">
+  <section class="container-x flex flex-wrap justify-center gap-14 py-12 md:py-16">
+    <article class="prose-calib flex min-w-0 flex-1 basis-[560px] max-w-[720px] flex-col gap-5">
+      <div class="flex gap-2 text-sm text-ink-soft"><a href="/guides/" class="text-ink-soft no-underline">Guides</a><span>/</span><span>Article</span></div>
+      <span class="eyebrow">Guide · {entry.data.readingTime} read · updated {entry.data.date.toISOString().slice(0, 10)}</span>
+      <h1 class="h-display m-0 text-[32px] leading-[1.08] md:text-[44px]">{entry.data.title}</h1>
+      <p class="m-0 text-lg leading-relaxed text-ink-muted md:text-[19px]">{entry.data.description}</p>
+      <Content />
+      <div class="card flex flex-col gap-2 bg-ground-alt p-5">
+        <strong class="text-[15px]">Try it</strong>
+        <span class="text-[15px] text-ink-muted">Generate a board with the geometry from this article, with OpenCV and Kalibr config files.</span>
+        <a href="/tools/generator/" class="text-[15px] font-semibold">Open the pattern generator →</a>
+      </div>
+      <div class="flex flex-wrap items-center justify-between gap-4 border-t border-line pt-5">
+        <span class="text-sm text-ink-soft">Written by {entry.data.author}. Questions? <a href="https://github.com/calibtools/calibtools/issues">Open an issue on GitHub</a>.</span>
+        <a href="/targets/" class="btn-dark">Shop targets</a>
+      </div>
+    </article>
+    <aside class="flex min-w-0 flex-none basis-[300px] flex-col gap-6 self-start">
+      {headings.length > 0 && (
+        <div class="flex flex-col gap-2.5">
+          <span class="text-[13px] font-bold uppercase tracking-[0.06em] text-ink-soft">In this guide</span>
+          {headings.filter((h) => h.depth === 2).map((h) => <a href={`#${h.slug}`} class="text-[15px] text-ink no-underline">{h.text}</a>)}
+        </div>
+      )}
+      {related.length > 0 && (
+        <div class="flex flex-col gap-2.5 border-t border-line pt-5">
+          <span class="text-[13px] font-bold uppercase tracking-[0.06em] text-ink-soft">Related</span>
+          {related.map((r) => r && <a href={`/guides/${r.slug}/`} class="text-[15px] text-ink no-underline">{r.data.title}</a>)}
+        </div>
+      )}
+      <div class="flex flex-col gap-2.5 rounded-lg bg-ink p-5 text-white">
+        <strong class="text-base">Calibrate with confidence.</strong>
+        <span class="text-sm text-[#CFCFCF]">Rigid boards, inspection report included, 2–4 days in the EU.</span>
+        <a href="/targets/" class="btn-primary !px-3.5 !py-2.5 !text-sm">Shop targets</a>
+      </div>
+    </aside>
+  </section>
+</Base>

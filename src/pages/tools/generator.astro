@@ -1,0 +1,11 @@
+---
+import Base from '@/layouts/Base.astro';
+import ToolTabs from '@/components/ToolTabs.astro';
+import Generator from '@/islands/Generator';
+---
+<Base title="Pattern generator" section="tools" description="Generate checkerboard, ChArUco and AprilGrid calibration patterns. Print-exact PDF with scale check and OpenCV / Kalibr / ROS config files. Runs in your browser.">
+  <ToolTabs current="generator" />
+  <div class="container-x py-7 md:pb-16">
+    <Generator client:load />
+  </div>
+</Base>
