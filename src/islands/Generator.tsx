@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'react';
 import { checkerboardSvg, type PatternSpec } from '@/lib/patterns';
+import { exportPdf } from '@/lib/exportPdf';
+import { exportPng } from '@/lib/exportPng';
 
 /**
  * Pattern generator — first working version.
@@ -13,6 +15,7 @@ const PAPERS: Record<string, [number, number]> = { A4: [210, 297], A3: [297, 420
 
 export default function Generator() {
   const [spec, setSpec] = useState<PatternSpec>({ type: 'ChArUco', rows: 7, cols: 10, square: 25, marker: 18, dict: 'DICT_6X6_250', paper: 'A4', startId: 0, scaleBar: true });
+  const [busy, setBusy] = useState<'pdf' | 'png' | null>(null);
   const [pw, ph] = PAPERS[spec.paper] ?? PAPERS.A4;
   const svg = useMemo(() => checkerboardSvg(spec, pw, ph), [spec, pw, ph]);
   const set = <K extends keyof PatternSpec>(k: K, v: PatternSpec[K]) => setSpec((s) => ({ ...s, [k]: v }));
@@ -64,9 +67,29 @@ export default function Generator() {
         <div className="flex flex-col gap-2.5 border-t border-line pt-4">
           <span className="text-[13px] font-semibold">Download</span>
           <div className="grid grid-cols-2 gap-2">
-            <button type="button" className="rounded bg-brand px-3 py-[11px] text-sm font-semibold text-white" title="TODO: pdf-lib export" disabled>PDF (1:1) — soon</button>
+            <button type="button" className="rounded bg-brand px-3 py-[11px] text-sm font-semibold text-white disabled:opacity-50" disabled={busy !== null} onClick={async () => {
+              setBusy('pdf');
+              try {
+                const bytes = await exportPdf({ spec, pw, ph });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(new Blob([bytes.buffer as ArrayBuffer], { type: 'application/pdf' }));
+                a.download = `${slug}.pdf`;
+                a.click();
+                URL.revokeObjectURL(a.href);
+              } finally { setBusy(null); }
+            }}>{busy === 'pdf' ? 'Generating…' : 'PDF (1:1)'}</button>
             <button type="button" className="rounded border border-ink bg-white px-3 py-[11px] text-sm font-medium" onClick={() => download(`${slug}.svg`, svg, 'image/svg+xml')}>SVG</button>
-            <button type="button" className="rounded border border-ink bg-white px-3 py-[11px] text-sm font-medium" disabled title="TODO">PNG — soon</button>
+            <button type="button" className="rounded border border-ink bg-white px-3 py-[11px] text-sm font-medium disabled:opacity-50" disabled={busy !== null} onClick={async () => {
+              setBusy('png');
+              try {
+                const blob = await exportPng({ svg, pw, ph });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = `${slug}.png`;
+                a.click();
+                URL.revokeObjectURL(a.href);
+              } finally { setBusy(null); }
+            }}>{busy === 'png' ? 'Generating…' : 'PNG (300 dpi)'}</button>
             <button type="button" className="rounded border border-ink bg-white px-3 py-[11px] text-sm font-medium" disabled title="TODO">DXF — soon</button>
           </div>
           <span className="pt-1.5 text-[13px] font-semibold">Config files</span>
