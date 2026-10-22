@@ -1,0 +1,10 @@
+---
+---
+<a href="/" class="flex items-center gap-2.5 text-ink no-underline hover:text-ink font-extrabold text-[22px] tracking-[-0.02em]" aria-label="calib.tools home">
+  <span class="inline-grid grid-cols-3 gap-[2px]" aria-hidden="true">
+    {Array.from({ length: 9 }).map((_, i) => (
+      <span class={`h-2.5 w-2.5 ${i % 2 === 0 ? 'bg-brand' : 'bg-ink'}`}></span>
+    ))}
+  </span>
+  <span>calib<span class="text-brand">.tools</span></span>
+</a>

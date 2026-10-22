@@ -1,0 +1,10 @@
+---
+interface Props { href: string; title: string; body: string; cta: string }
+const { href, title, body, cta } = Astro.props;
+---
+<div class="card flex flex-col gap-3.5 p-7">
+  <slot name="icon" />
+  <h3 class="m-0 text-xl font-bold">{title}</h3>
+  <p class="m-0 text-[15px] leading-relaxed text-ink-muted">{body}</p>
+  <a href={href} class="mt-auto text-[15px] font-semibold">{cta} →</a>
+</div>

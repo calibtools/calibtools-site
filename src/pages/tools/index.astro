@@ -1,0 +1,25 @@
+---
+import Base from '@/layouts/Base.astro';
+import ToolCard from '@/components/ToolCard.astro';
+const tools = [
+  ['/tools/generator/', 'Pattern generator', 'Checkerboard, ChArUco, AprilGrid, circles. Print-exact PDF plus OpenCV, Kalibr and ROS config files.', 'Generate', true],
+  ['/tools/fov/', 'FOV & resolution calculator', 'Sensor, lens and working distance in — field of view, mm per pixel and target size out.', 'Calculate', false],
+  ['/tools/wizard/', 'Target selection wizard', 'Five questions, one recommendation: pattern, size, material.', 'Start', false],
+  ['/tools/convert/', 'Format converter', 'OpenCV ↔ ROS camera_info ↔ Kalibr ↔ HALCON ↔ COLMAP intrinsics.', 'Convert', false],
+  ['/tools/check/', 'Detection check', 'Upload a photo of your board and see what the detector finds.', 'Check', false],
+  ['/tools/quality/', 'Calibration quality analyzer', 'Coverage heatmap, reprojection error, parameter correlation — in your browser.', 'Analyze', false],
+];
+---
+<Base title="Free calibration tools" section="tools" description="Free browser tools for camera calibration: pattern generator, FOV calculator, selection wizard, format converter, detection check and quality analyzer.">
+  <section class="container-x flex flex-col gap-9 py-12 md:py-16">
+    <div class="flex flex-col gap-2.5">
+      <span class="eyebrow">Free tools · runs in your browser · open source</span>
+      <h1 class="h-display m-0 text-[36px] md:text-[48px]">Free tools. Serious targets.</h1>
+    </div>
+    <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
+      {tools.map(([href, title, body, cta, live]) => (
+        <ToolCard href={href as string} title={title as string} body={body as string} cta={live ? (cta as string) : `${cta} (coming soon)`} />
+      ))}
+    </div>
+  </section>
+</Base>

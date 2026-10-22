@@ -1,0 +1,17 @@
+---
+const links = [
+  { href: 'https://github.com/calibtools', label: 'GitHub' },
+  { href: '/shipping/', label: 'Shipping' },
+  { href: '/returns/', label: 'Returns' },
+  { href: '/imprint/', label: 'Imprint' },
+  { href: '/privacy/', label: 'Privacy' },
+];
+---
+<footer class="border-t border-line-light">
+  <div class="container-x flex flex-wrap items-center justify-between gap-4 py-10 text-sm text-ink-soft">
+    <span>© {new Date().getFullYear()} calib.tools · Made in Germany &amp; Dongguan</span>
+    <div class="flex flex-wrap gap-6">
+      {links.map((l) => <a href={l.href} class="text-ink-soft no-underline hover:text-ink">{l.label}</a>)}
+    </div>
+  </div>
+</footer>
