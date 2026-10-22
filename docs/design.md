@@ -9,4 +9,6 @@ Product page, Pattern generator, Guide article).
 - Tagline: "Calibrate with confidence." Secondary lines: "Free tools. Serious targets.",
   "From checkerboard to certificate.", "Built flat. Measured twice. Shipped fast.", "Where calibration starts."
 - Logo: 3×3 red/black square grid + wordmark `calib.tools` (keep as one word, red ".tools").
+- Brand name: "Calib.Tools" (capital C and T) in prose, page titles, meta tags, and generated
+  file credits. Domain names, URLs, the logo wordmark, and code identifiers stay lowercase.
 - Tables: header row brand-tint background with brand-dark text (never white text on red).

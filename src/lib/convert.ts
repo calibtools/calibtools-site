@@ -59,7 +59,7 @@ export function serialize(config: CalibConfig, format: Format): string {
         marker_mm: config.marker,
         dictionary: config.dict,
         start_id: config.startId,
-        generator: 'calib.tools',
+        generator: 'Calib.Tools',
       }, null, 2) + '\n';
     case 'kalibr-yaml':
       return kalibrYaml(spec);

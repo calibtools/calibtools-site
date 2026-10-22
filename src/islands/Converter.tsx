@@ -11,7 +11,7 @@ const EXAMPLE = JSON.stringify({
   marker_mm: 18,
   dictionary: 'DICT_6X6_250',
   start_id: 0,
-  generator: 'calib.tools',
+  generator: 'Calib.Tools',
 }, null, 2);
 
 export default function Converter() {

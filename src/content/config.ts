@@ -7,7 +7,7 @@ const guides = defineCollection({
     description: z.string(),
     date: z.date(),
     readingTime: z.string().optional(),
-    author: z.string().default('calib.tools'),
+    author: z.string().default('Calib.Tools'),
     related: z.array(z.string()).default([]),
   }),
 });

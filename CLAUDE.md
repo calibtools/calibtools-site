@@ -22,6 +22,8 @@ catalogue pages from the Storefront API and links into the cart.
 - No analytics or tracking scripts. No cookies beyond what Shopify needs on its own domain.
 
 ## Conventions
+- Brand in prose = Calib.Tools; domain/URLs/logo stay lowercase calib.tools.
+- Tool metadata lives in `src/lib/tools.ts` (single source of truth for live/coming-soon status).
 - Units: mm internally; px only for screen rendering.
 - Coordinates: OpenCV (origin top-left, x right, y down). Corner order = cv.findChessboardCorners.
 - ChArUco IDs follow cv.aruco.CharucoBoard (row-major over white squares).
@@ -32,5 +34,4 @@ catalogue pages from the Storefront API and links into the cart.
 pnpm install · pnpm dev · pnpm build · pnpm test · pnpm check
 
 ## Roadmap (from docs/plan.md)
-T1 generator (PDF, DXF, PNG, Kalibr/ROS/HALCON exports) → T3 FOV calculator → T2 wizard →
-T4 converter → T5 detection check (OpenCV.js) → T6 quality analyzer → T7 capture assistant.
+All T1–T7 tools are live. See docs/plan.md for acceptance criteria.
