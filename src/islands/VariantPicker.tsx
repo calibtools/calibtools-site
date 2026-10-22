@@ -101,7 +101,7 @@ export default function VariantPicker({ product, certVariantId, fixtureVariantId
                 className={`cursor-pointer rounded border px-3.5 py-2.5 text-sm ${
                   selections[opt.name] === val
                     ? 'border-2 border-brand font-semibold'
-                    : 'border-[#CFCFCF] font-medium'
+                    : 'border-line font-medium'
                 }`}
               >
                 <input
@@ -146,7 +146,7 @@ export default function VariantPicker({ product, certVariantId, fixtureVariantId
           value={quantity}
           onChange={(e) => setQuantity(Math.max(1, +e.target.value))}
           aria-label="Quantity"
-          className="w-[72px] rounded border border-[#CFCFCF] bg-white px-3 py-3 text-center text-[15px]"
+          className="w-[72px] rounded border border-line bg-white px-3 py-3 text-center text-[15px]"
         />
         <button
           type="button"
@@ -158,6 +158,9 @@ export default function VariantPicker({ product, certVariantId, fixtureVariantId
         </button>
       </div>
 
+      {!variant && product.variants.length === 0 && (
+        <p className="m-0 text-sm text-ink-muted">Variants unavailable — please try refreshing the page.</p>
+      )}
       {error && <p className="m-0 text-sm text-brand">{error}</p>}
 
       <div className="grid grid-cols-2 gap-3 pt-2 text-sm text-ink-muted">

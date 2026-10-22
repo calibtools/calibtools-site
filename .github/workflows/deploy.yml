@@ -27,6 +27,9 @@ jobs:
       - run: pnpm test
       - run: pnpm check
       - run: pnpm build
+        env:
+          PUBLIC_SHOPIFY_DOMAIN: ${{ secrets.PUBLIC_SHOPIFY_DOMAIN }}
+          PUBLIC_SHOPIFY_STOREFRONT_TOKEN: ${{ secrets.PUBLIC_SHOPIFY_STOREFRONT_TOKEN }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist/
