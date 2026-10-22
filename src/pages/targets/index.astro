@@ -1,7 +1,9 @@
 ---
 import Base from '@/layouts/Base.astro';
 import ProductCard from '@/components/ProductCard.astro';
-import { getProducts } from '@/lib/shopify';
+import { getCollections, getProducts } from '@/lib/shopify';
+
+const collections = await getCollections();
 const products = await getProducts();
 ---
 <Base title="Calibration targets" section="targets" description="Checkerboard, ChArUco, AprilGrid, ceramic and glass calibration targets with inspection report. Ships from Germany in 2–4 days.">
@@ -10,8 +12,34 @@ const products = await getProducts();
       <span class="eyebrow">Calibration targets</span>
       <h1 class="h-display m-0 text-[36px] md:text-[48px]">From checkerboard to certificate.</h1>
     </div>
+
+    {/* Collections */}
     <div class="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
-      {products.map((p) => <ProductCard href={p.url} title={p.title} sub={p.description} from={p.priceFrom} image={p.image} />)}
+      {collections.map((c) => {
+        const firstProduct = c.products[0];
+        return (
+          <ProductCard
+            href={`/targets/collection/${c.handle}/`}
+            title={c.title}
+            sub={c.description}
+            from={firstProduct?.priceFrom ?? ''}
+            image={c.image ?? firstProduct?.image}
+            placeholder={c.title.toUpperCase()}
+          />
+        );
+      })}
     </div>
+
+    {/* All products */}
+    {products.length > 0 && (
+      <>
+        <h2 class="h-display m-0 mt-4 text-[28px]">All targets</h2>
+        <div class="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
+          {products.map((p) => (
+            <ProductCard href={p.url} title={p.title} sub={p.description} from={p.priceFrom} image={p.image} />
+          ))}
+        </div>
+      </>
+    )}
   </section>
 </Base>

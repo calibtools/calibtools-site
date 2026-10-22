@@ -1,98 +1,111 @@
 ---
 import Base from '@/layouts/Base.astro';
-// Static product page template. Until products come from Shopify, this renders the
-// composite ChArUco example from the design. Add handles to `products` as needed.
-export function getStaticPaths() {
-  return [{ params: { handle: 'charuco-composite' } }];
+import VariantPicker from '@/islands/VariantPicker';
+import { getProducts, getProductByHandle, sanitizeHtml, extractSpecsFromHtml } from '@/lib/shopify';
+
+export async function getStaticPaths() {
+  const products = await getProducts();
+  return products.map((p) => ({ params: { handle: p.handle } }));
 }
-const sizes = ['200 × 150', '300 × 200', '400 × 300', '600 × 400', '800 × 600'];
-const dicts = ['DICT_6X6_250', 'DICT_5X5_100', 'DICT_4X4_50', 'AprilTag 36h11'];
-const specs = [
-  ['Substrate', 'Aluminium / LDPE composite, 6 mm'],
-  ['Pattern', 'ChArUco 18 × 25, 15 mm squares (400 × 300)'],
-  ['Feature tolerance', '0.3 mm + 0.2 mm/m'],
-  ['Flatness', '[VALUE] mm over full length'],
-  ['Thermal expansion', '~24 µm / (°C · m)'],
-  ['Operating range', '−50 °C to +80 °C, outdoor up to 3 years'],
-  ['Mounting', '4 × M4 inserts, ¼″ fixture optional'],
-];
-const downloads = ['Datasheet (PDF)', 'Pattern file — OpenCV JSON', 'Pattern file — Kalibr target.yaml', 'Outline — DXF / STEP', 'Sample inspection report'];
+
+const { handle } = Astro.params;
+const product = await getProductByHandle(handle!);
+if (!product) return Astro.redirect('/targets/');
+
+// Specs: prefer metafields, fall back to parsing descriptionHtml table
+const metaSpecs = Object.entries(product.metafields);
+const htmlSpecs = extractSpecsFromHtml(product.descriptionHtml);
+const specs = metaSpecs.length > 0
+  ? metaSpecs.map(([k, v]) => [k.replace(/_/g, ' ').replace(/^\w/, (c) => c.toUpperCase()), v] as [string, string])
+  : htmlSpecs;
+
+// Find add-on variant IDs from all products
+const allProducts = await getProducts();
+const certProduct = allProducts.find((p) => p.handle === 'certificate-ilac');
+const fixtureProduct = allProducts.find((p) => p.handle === 'mounting-fixture');
+const certVariantId = certProduct?.variants[0]?.id;
+const fixtureVariantId = fixtureProduct?.variants[0]?.id;
+
+const cleanDescription = sanitizeHtml(product.descriptionHtml);
 ---
-<Base title="ChArUco calibration target" section="targets" description="Aluminium composite ChArUco board, 0.3 mm tolerance, inspection report and pattern files included.">
-  <div class="container-x flex gap-2 pt-5 text-sm text-ink-soft"><a href="/" class="text-ink-soft no-underline">Home</a><span>/</span><a href="/targets/" class="text-ink-soft no-underline">Calibration targets</a><span>/</span><span>ChArUco composite board</span></div>
+<Base title={product.title} section="targets" description={product.description}>
+  <div class="container-x flex gap-2 pt-5 text-sm text-ink-soft">
+    <a href="/" class="text-ink-soft no-underline">Home</a><span>/</span>
+    <a href="/targets/" class="text-ink-soft no-underline">Calibration targets</a><span>/</span>
+    <span>{product.title}</span>
+  </div>
 
   <section class="container-x flex flex-wrap gap-14 py-8 md:pb-16">
+    {/* Images */}
     <div class="flex min-w-0 flex-1 basis-[520px] flex-col gap-4">
-      <div class="aspect-[4/3] rounded-xl bg-ground-panel flex items-center justify-center font-mono text-xs text-ink-soft">[MAIN PRODUCT PHOTO]</div>
-      <div class="grid grid-cols-4 gap-3">
-        {Array.from({ length: 4 }).map((_, i) => <div class={`aspect-square rounded-lg bg-ground-panel ${i === 0 ? 'border-2 border-brand' : ''}`}></div>)}
+      <div class="aspect-[4/3] rounded-xl bg-ground-panel flex items-center justify-center overflow-hidden">
+        {product.image
+          ? <img src={product.image} alt={product.title} class="h-full w-full object-cover" />
+          : <span class="font-mono text-xs text-ink-soft">[PRODUCT PHOTO]</span>}
       </div>
+      {product.images.length > 1 && (
+        <div class="grid grid-cols-4 gap-3">
+          {product.images.slice(0, 4).map((img, i) => (
+            <div class={`aspect-square overflow-hidden rounded-lg bg-ground-panel ${i === 0 ? 'border-2 border-brand' : ''}`}>
+              <img src={img.url} alt={img.altText ?? ''} class="h-full w-full object-cover" loading="lazy" />
+            </div>
+          ))}
+        </div>
+      )}
     </div>
 
-    <form class="flex min-w-0 flex-1 basis-[420px] flex-col gap-5" action="https://shop.calib.tools/cart/add" method="post">
-      <span class="eyebrow">Composite board · In stock, ships from Germany</span>
-      <h1 class="h-display m-0 text-[32px] leading-[1.1] md:text-[40px]">ChArUco calibration target</h1>
-      <p class="m-0 text-base leading-relaxed text-ink-muted">Aluminium composite, UV-printed matte pattern, 6 mm thick. Feature tolerance 0.3 mm + 0.2 mm/m. Inspection report, datasheet, DXF and OpenCV / Kalibr pattern files included.</p>
-      <div class="flex items-baseline gap-3"><span class="text-4xl font-extrabold">€139</span><span class="text-sm text-ink-soft">excl. VAT · free EU shipping over €150</span></div>
+    {/* Product info + variant picker */}
+    <div class="flex min-w-0 flex-1 basis-[420px] flex-col gap-5">
+      <span class="eyebrow">In stock · ships from Germany</span>
+      <h1 class="h-display m-0 text-[32px] leading-[1.1] md:text-[40px]">{product.title}</h1>
+      <p class="m-0 text-base leading-relaxed text-ink-muted">{product.description}</p>
 
-      <fieldset class="flex flex-col gap-2.5 border-0 p-0">
-        <legend class="label">Size</legend>
-        <div class="flex flex-wrap gap-2">
-          {sizes.map((s, i) => (
-            <label class={`cursor-pointer rounded border px-3.5 py-2.5 text-sm ${i === 2 ? 'border-2 border-brand font-semibold' : 'border-[#CFCFCF] font-medium'}`}>
-              <input type="radio" name="size" value={s} checked={i === 2} class="sr-only" />{s}
-            </label>
-          ))}
-        </div>
-      </fieldset>
-
-      <fieldset class="flex flex-col gap-2.5 border-0 p-0">
-        <legend class="label">Dictionary</legend>
-        <div class="flex flex-wrap gap-2">
-          {dicts.map((d, i) => (
-            <label class={`cursor-pointer rounded border px-3.5 py-2.5 text-sm ${i === 0 ? 'border-2 border-brand font-semibold' : 'border-[#CFCFCF] font-medium'}`}>
-              <input type="radio" name="dict" value={d} checked={i === 0} class="sr-only" />{d}
-            </label>
-          ))}
-        </div>
-      </fieldset>
-
-      <fieldset class="flex flex-col gap-2.5 border-0 p-0">
-        <legend class="label">Add-ons</legend>
-        <label class="flex items-center gap-2.5 text-[15px]"><input type="checkbox" name="cert" class="h-[18px] w-[18px]" /> ILAC-recognised calibration certificate <span class="text-ink-soft">+ €149</span></label>
-        <label class="flex items-center gap-2.5 text-[15px]"><input type="checkbox" name="fixture" class="h-[18px] w-[18px]" /> Mounting fixture, ¼″ thread <span class="text-ink-soft">+ €39</span></label>
-      </fieldset>
-
-      <div class="flex gap-3 pt-1.5">
-        <input type="number" name="quantity" value="1" min="1" aria-label="Quantity" class="input !w-[72px]" />
-        <button type="submit" class="btn-primary flex-1 !py-3.5">Add to cart</button>
-      </div>
-      <div class="grid grid-cols-2 gap-3 pt-2 text-sm text-ink-muted">
-        <span>✓ Ships in 1–2 days, 2–4 days in EU</span><span>✓ Inspection report included</span><span>✓ 30-day returns</span><span>✓ Volume pricing from 5 pcs</span>
-      </div>
-    </form>
+      <VariantPicker
+        client:load
+        product={product}
+        certVariantId={certVariantId}
+        fixtureVariantId={fixtureVariantId}
+      />
+    </div>
   </section>
 
+  {/* Specs + description */}
   <section class="container-x flex flex-wrap gap-12 pb-16">
     <div class="flex min-w-0 flex-1 basis-[520px] flex-col gap-4">
-      <h2 class="h-display m-0 text-2xl">Specifications</h2>
-      <div class="overflow-x-auto">
-        <table class="w-full border-collapse text-[15px]">
-          <tbody>
-            {specs.map(([k, v]) => <tr class="border-t border-line last:border-b"><td class="w-2/5 py-3 text-ink-soft">{k}</td><td class="py-3">{v}</td></tr>)}
-          </tbody>
-        </table>
-      </div>
+      {specs && specs.length > 0 ? (
+        <>
+          <h2 class="h-display m-0 text-2xl">Specifications</h2>
+          <div class="overflow-x-auto">
+            <table class="w-full border-collapse text-[15px]">
+              <tbody>
+                {specs.map(([k, v]) => (
+                  <tr class="border-t border-line last:border-b">
+                    <td class="w-2/5 py-3 text-ink-soft">{k}</td>
+                    <td class="py-3">{v}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      ) : cleanDescription ? (
+        <>
+          <h2 class="h-display m-0 text-2xl">Details</h2>
+          <div class="prose" set:html={cleanDescription} />
+        </>
+      ) : null}
     </div>
+
     <div class="flex min-w-0 flex-1 basis-[320px] flex-col gap-4">
-      <h2 class="h-display m-0 text-2xl">Downloads</h2>
-      <div class="flex flex-col border-t border-line">
-        {downloads.map((d) => <a href="#" class="flex justify-between border-b border-line py-3.5 text-ink no-underline hover:text-ink"><span>{d}</span><span class="text-brand-dark">↓</span></a>)}
-      </div>
-      <div class="card mt-2 flex flex-col gap-2 bg-ground-alt p-5">
+      <div class="card flex flex-col gap-2 bg-ground-alt p-5">
         <strong class="text-[15px]">Not sure about the size?</strong>
         <span class="text-sm text-ink-muted">Run the free selection wizard with your camera and lens.</span>
         <a href="/tools/wizard/" class="text-sm font-semibold">Open wizard →</a>
+      </div>
+      <div class="card flex flex-col gap-2 bg-ground-alt p-5">
+        <strong class="text-[15px]">Need a custom pattern?</strong>
+        <span class="text-sm text-ink-muted">Generate any grid, download the PDF and order as custom.</span>
+        <a href="/tools/generator/" class="text-sm font-semibold">Open generator →</a>
       </div>
     </div>
   </section>

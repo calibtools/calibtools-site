@@ -2,8 +2,11 @@
 import Base from '@/layouts/Base.astro';
 import ProductCard from '@/components/ProductCard.astro';
 import ToolCard from '@/components/ToolCard.astro';
+import NewsletterForm from '@/islands/NewsletterForm';
 import { tools } from '@/lib/tools';
+import { getCollections } from '@/lib/shopify';
 import { getCollection } from 'astro:content';
+const collections = await getCollections();
 const guides = (await getCollection('guides')).slice(0, 3);
 const why = [
   ['Transparent pricing', 'Every size and material priced on the page. No quote forms for standard parts.'],
@@ -62,10 +65,19 @@ const why = [
       <h2 class="h-display m-0 text-[28px] md:text-[40px]">From checkerboard to certificate.</h2>
     </div>
     <div class="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
-      <ProductCard href="/targets/composite/" title="Composite boards" sub="200–1200 mm · rigid, matte, outdoor-safe" from="€79" placeholder="COMPOSITE BOARD" />
-      <ProductCard href="/targets/ceramic-glass/" title="Ceramic & glass" sub="Lithographed · ±1–2 µm · certificate option" from="€129" placeholder="CERAMIC / GLASS" />
-      <ProductCard href="/targets/lidar-image-quality/" title="LiDAR & image quality" sub="Reflectance panels · ISO 12233 charts · IR boards" from="€149" placeholder="LIDAR / TEST CHART" />
-      <ProductCard href="/targets/mounts/" title="Mounts & accessories" sub="Fixtures, stands, robot flange, hard cases" from="€39" placeholder="MOUNTS" />
+      {collections.map((c) => {
+        const firstProduct = c.products[0];
+        return (
+          <ProductCard
+            href={`/targets/collection/${c.handle}/`}
+            title={c.title}
+            sub={c.description}
+            from={firstProduct?.priceFrom ?? ''}
+            image={c.image ?? firstProduct?.image}
+            placeholder={c.title.toUpperCase()}
+          />
+        );
+      })}
     </div>
   </section>
 
@@ -100,14 +112,8 @@ const why = [
         ))}
       </div>
     </div>
-    <form class="card flex min-w-0 flex-1 basis-[360px] flex-col gap-4 self-start bg-ground-alt p-8" action="#" method="post">
-      <strong class="text-xl">New tools and targets, monthly.</strong>
-      <span class="text-[15px] text-ink-muted">No marketing fluff. One email a month, unsubscribe anytime.</span>
-      <label for="email" class="label">Work email</label>
-      <div class="flex gap-2">
-        <input id="email" name="email" type="email" required placeholder="you@company.com" class="input" />
-        <button type="submit" class="btn-primary !px-[18px] !py-3 !text-[15px]">Subscribe</button>
-      </div>
-    </form>
+    <div class="min-w-0 flex-1 basis-[360px]">
+      <NewsletterForm client:load />
+    </div>
   </section>
 </Base>
