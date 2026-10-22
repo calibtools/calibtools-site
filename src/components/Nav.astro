@@ -1,5 +1,6 @@
 ---
 import Logo from './Logo.astro';
+import CartBadge from '@/islands/CartBadge';
 interface Props { section?: string }
 const { section } = Astro.props;
 const items = [
@@ -18,7 +19,10 @@ const items = [
       ))}
     </div>
     <div class="flex items-center gap-3">
-      <a href="/targets/" class="btn btn-primary !px-5 !py-3 !text-[15px]">Shop targets</a>
+      <a href="/targets/" class="btn btn-primary relative !px-5 !py-3 !text-[15px]">
+        Shop targets
+        <span class="absolute -right-2 -top-2"><CartBadge client:load /></span>
+      </a>
       <button type="button" class="md:hidden flex h-11 w-11 items-center justify-center rounded border-[1.5px] border-ink" aria-label="Open menu" data-menu-toggle>
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
       </button>

@@ -1,0 +1,39 @@
+---
+import Base from '@/layouts/Base.astro';
+import ProductCard from '@/components/ProductCard.astro';
+import { getCollections, getCollectionProducts } from '@/lib/shopify';
+
+export async function getStaticPaths() {
+  const collections = await getCollections();
+  return collections.map((c) => ({ params: { collection: c.handle } }));
+}
+
+const { collection: handle } = Astro.params;
+const collection = await getCollectionProducts(handle!);
+if (!collection) return Astro.redirect('/targets/');
+---
+<Base title={collection.title} section="targets" description={collection.description}>
+  <section class="container-x flex flex-col gap-9 py-12 md:py-16">
+    <div class="flex flex-col gap-2.5">
+      <div class="flex gap-2 text-sm text-ink-soft">
+        <a href="/" class="text-ink-soft no-underline">Home</a><span>/</span>
+        <a href="/targets/" class="text-ink-soft no-underline">Calibration targets</a><span>/</span>
+        <span>{collection.title}</span>
+      </div>
+      <h1 class="h-display m-0 text-[36px] md:text-[48px]">{collection.title}</h1>
+      {collection.description && <p class="m-0 max-w-[600px] text-lg text-ink-muted">{collection.description}</p>}
+    </div>
+    {collection.products.length > 0 ? (
+      <div class="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
+        {collection.products.map((p) => (
+          <ProductCard href={p.url} title={p.title} sub={p.description} from={p.priceFrom} image={p.image} />
+        ))}
+      </div>
+    ) : (
+      <div class="card p-8 text-center text-ink-muted">
+        <p class="m-0">Products in this category are coming soon.</p>
+        <a href="/targets/" class="text-sm font-semibold">Back to all targets</a>
+      </div>
+    )}
+  </section>
+</Base>

@@ -1,53 +1,385 @@
 /**
- * Minimal Shopify Storefront API client.
- * The site is static: product data is fetched at build time; cart/checkout
- * lives on shop.calib.tools. Replace with @shopify/storefront-api-client when needed.
+ * Shopify Storefront API client (API version 2025-07).
+ * Build-time: getProducts, getProductByHandle, getCollections, getCollectionProducts.
+ * Client-side: cartCreate, cartLinesAdd, customerCreate.
+ * Falls back to static data when env vars are missing so builds never fail.
  */
-const domain = import.meta.env.PUBLIC_SHOPIFY_DOMAIN;
-const token = import.meta.env.PUBLIC_SHOPIFY_STOREFRONT_TOKEN;
+
+// --- Config ---
+
+const domain = import.meta.env.PUBLIC_SHOPIFY_DOMAIN ?? '';
+const token = import.meta.env.PUBLIC_SHOPIFY_STOREFRONT_TOKEN ?? '';
+
+function hasCredentials(): boolean {
+  return !!domain && !!token && token !== 'replace-me';
+}
+
+// --- Types ---
 
 export interface Product {
   handle: string;
   title: string;
   description: string;
+  descriptionHtml: string;
   priceFrom: string;
   image?: string;
+  images: Array<{ url: string; altText: string | null }>;
+  options: Array<{ name: string; values: string[] }>;
+  variants: Variant[];
+  metafields: Record<string, string>;
   url: string;
 }
 
-const PRODUCTS_QUERY = `
-query Products($first: Int!) {
-  products(first: $first) {
-    nodes {
-      handle title description onlineStoreUrl
-      priceRange { minVariantPrice { amount currencyCode } }
-      featuredImage { url altText }
-    }
-  }
-}`;
+export interface Variant {
+  id: string;
+  title: string;
+  sku: string;
+  price: string;
+  currencyCode: string;
+  availableForSale: boolean;
+  selectedOptions: Array<{ name: string; value: string }>;
+}
 
-/** Fallback used until the Storefront token is configured. */
-const FALLBACK: Product[] = [
-  { handle: 'charuco-composite', title: 'ChArUco calibration target', description: 'Aluminium composite, UV-printed matte pattern, 6 mm thick.', priceFrom: '€89', url: '/targets/charuco-composite/' },
-  { handle: 'checkerboard-composite', title: 'Checkerboard calibration target', description: 'Aluminium composite, fine or coarse pattern.', priceFrom: '€79', url: '/targets/checkerboard-composite/' },
-  { handle: 'charuco-ceramic', title: 'ChArUco ceramic target', description: 'Lithographed blue chrome on alumina, ±2 µm.', priceFrom: '€189', url: '/targets/charuco-ceramic/' },
-];
+export interface Collection {
+  handle: string;
+  title: string;
+  description: string;
+  image?: string;
+  products: Product[];
+}
 
-export async function getProducts(first = 24): Promise<Product[]> {
-  if (!domain || !token || token === 'replace-me') return FALLBACK;
+export interface CartLine {
+  merchandiseId: string;
+  quantity: number;
+}
+
+// --- GraphQL helper ---
+
+export async function storefront<T = any>(query: string, variables: Record<string, any> = {}): Promise<T> {
   const res = await fetch(`https://${domain}/api/2025-07/graphql.json`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'X-Shopify-Storefront-Access-Token': token },
-    body: JSON.stringify({ query: PRODUCTS_QUERY, variables: { first } }),
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Shopify-Storefront-Access-Token': token,
+    },
+    body: JSON.stringify({ query, variables }),
   });
-  if (!res.ok) return FALLBACK;
+  if (!res.ok) throw new Error(`Storefront API ${res.status}: ${res.statusText}`);
   const json = await res.json();
-  return json.data.products.nodes.map((n: any) => ({
+  if (json.errors?.length) throw new Error(json.errors[0].message);
+  return json.data;
+}
+
+// --- Fragments ---
+
+const PRODUCT_FIELDS = `
+  fragment ProductFields on Product {
+    handle title description descriptionHtml
+    priceRange { minVariantPrice { amount currencyCode } }
+    featuredImage { url altText }
+    images(first: 10) { nodes { url altText } }
+    options { name values }
+    variants(first: 100) {
+      nodes {
+        id title sku availableForSale
+        price { amount currencyCode }
+        selectedOptions { name value }
+      }
+    }
+    metafields(identifiers: [
+      { namespace: "specs", key: "substrate" },
+      { namespace: "specs", key: "pattern" },
+      { namespace: "specs", key: "tolerance" },
+      { namespace: "specs", key: "flatness" },
+      { namespace: "specs", key: "thermal" },
+      { namespace: "specs", key: "operating_range" },
+      { namespace: "specs", key: "mounting" }
+    ]) { key value }
+  }
+`;
+
+// --- Mappers ---
+
+export function formatPrice(amount: string, currencyCode: string): string {
+  const n = Number(amount);
+  if (currencyCode === 'EUR') return `€${Number.isInteger(n) ? n : n.toFixed(2)}`;
+  if (currencyCode === 'USD') return `$${Number.isInteger(n) ? n : n.toFixed(2)}`;
+  if (currencyCode === 'GBP') return `£${Number.isInteger(n) ? n : n.toFixed(2)}`;
+  return `${n.toFixed(2)} ${currencyCode}`;
+}
+
+function mapProduct(n: any): Product {
+  const minPrice = n.priceRange.minVariantPrice;
+  return {
     handle: n.handle,
     title: n.title,
     description: n.description,
-    priceFrom: `${n.priceRange.minVariantPrice.currencyCode === 'EUR' ? '€' : ''}${Number(n.priceRange.minVariantPrice.amount).toFixed(0)}`,
+    descriptionHtml: n.descriptionHtml ?? '',
+    priceFrom: formatPrice(minPrice.amount, minPrice.currencyCode),
     image: n.featuredImage?.url,
-    url: n.onlineStoreUrl ?? `https://${domain}/products/${n.handle}`,
-  }));
+    images: (n.images?.nodes ?? []).map((img: any) => ({ url: img.url, altText: img.altText })),
+    options: (n.options ?? []).map((o: any) => ({ name: o.name, values: o.values })),
+    variants: (n.variants?.nodes ?? []).map((v: any) => ({
+      id: v.id,
+      title: v.title,
+      sku: v.sku ?? '',
+      price: formatPrice(v.price.amount, v.price.currencyCode),
+      currencyCode: v.price.currencyCode,
+      availableForSale: v.availableForSale,
+      selectedOptions: v.selectedOptions ?? [],
+    })),
+    metafields: Object.fromEntries(
+      (n.metafields ?? []).filter(Boolean).map((m: any) => [m.key, m.value]),
+    ),
+    url: `/targets/${n.handle}/`,
+  };
 }
+
+// --- Queries ---
+
+export async function getProducts(first = 50): Promise<Product[]> {
+  if (!hasCredentials()) return FALLBACK_PRODUCTS;
+  try {
+    const data = await storefront(`
+      ${PRODUCT_FIELDS}
+      query Products($first: Int!) {
+        products(first: $first) { nodes { ...ProductFields } }
+      }
+    `, { first });
+    return data.products.nodes.map(mapProduct);
+  } catch {
+    return FALLBACK_PRODUCTS;
+  }
+}
+
+export async function getProductByHandle(handle: string): Promise<Product | null> {
+  if (!hasCredentials()) return FALLBACK_PRODUCTS.find((p) => p.handle === handle) ?? null;
+  try {
+    const data = await storefront(`
+      ${PRODUCT_FIELDS}
+      query ProductByHandle($handle: String!) {
+        product(handle: $handle) { ...ProductFields }
+      }
+    `, { handle });
+    return data.product ? mapProduct(data.product) : null;
+  } catch {
+    return FALLBACK_PRODUCTS.find((p) => p.handle === handle) ?? null;
+  }
+}
+
+export async function getCollections(): Promise<Collection[]> {
+  if (!hasCredentials()) return FALLBACK_COLLECTIONS;
+  try {
+    const data = await storefront(`
+      ${PRODUCT_FIELDS}
+      query Collections {
+        collections(first: 20) {
+          nodes {
+            handle title description
+            image { url altText }
+            products(first: 50) { nodes { ...ProductFields } }
+          }
+        }
+      }
+    `);
+    return data.collections.nodes.map((c: any) => ({
+      handle: c.handle,
+      title: c.title,
+      description: c.description,
+      image: c.image?.url,
+      products: c.products.nodes.map(mapProduct),
+    }));
+  } catch {
+    return FALLBACK_COLLECTIONS;
+  }
+}
+
+export async function getCollectionProducts(handle: string): Promise<Collection | null> {
+  if (!hasCredentials()) return FALLBACK_COLLECTIONS.find((c) => c.handle === handle) ?? null;
+  try {
+    const data = await storefront(`
+      ${PRODUCT_FIELDS}
+      query CollectionByHandle($handle: String!) {
+        collection(handle: $handle) {
+          handle title description
+          image { url altText }
+          products(first: 50) { nodes { ...ProductFields } }
+        }
+      }
+    `, { handle });
+    if (!data.collection) return null;
+    const c = data.collection;
+    return {
+      handle: c.handle, title: c.title, description: c.description,
+      image: c.image?.url,
+      products: c.products.nodes.map(mapProduct),
+    };
+  } catch {
+    return FALLBACK_COLLECTIONS.find((c) => c.handle === handle) ?? null;
+  }
+}
+
+// --- Cart (client-side) ---
+
+export async function cartCreate(lines: CartLine[]): Promise<{ cartId: string; checkoutUrl: string }> {
+  const data = await storefront(`
+    mutation CartCreate($lines: [CartLineInput!]!) {
+      cartCreate(input: { lines: $lines }) {
+        cart { id checkoutUrl }
+        userErrors { field message }
+      }
+    }
+  `, { lines });
+  const cart = data.cartCreate.cart;
+  if (!cart) throw new Error(data.cartCreate.userErrors?.[0]?.message ?? 'Cart creation failed');
+  return { cartId: cart.id, checkoutUrl: cart.checkoutUrl };
+}
+
+export async function cartLinesAdd(cartId: string, lines: CartLine[]): Promise<{ checkoutUrl: string }> {
+  const data = await storefront(`
+    mutation CartLinesAdd($cartId: ID!, $lines: [CartLineInput!]!) {
+      cartLinesAdd(cartId: $cartId, lines: $lines) {
+        cart { id checkoutUrl totalQuantity }
+        userErrors { field message }
+      }
+    }
+  `, { cartId, lines });
+  const cart = data.cartLinesAdd.cart;
+  if (!cart) throw new Error(data.cartLinesAdd.userErrors?.[0]?.message ?? 'Failed to add lines');
+  return { checkoutUrl: cart.checkoutUrl };
+}
+
+export async function getCartQuantity(cartId: string): Promise<number> {
+  try {
+    const data = await storefront(`
+      query CartQuantity($cartId: ID!) {
+        cart(id: $cartId) { totalQuantity }
+      }
+    `, { cartId });
+    return data.cart?.totalQuantity ?? 0;
+  } catch {
+    return 0;
+  }
+}
+
+// --- Newsletter (client-side) ---
+
+export async function customerCreate(email: string): Promise<{ success: boolean; message: string }> {
+  try {
+    const data = await storefront(`
+      mutation CustomerCreate($input: CustomerCreateInput!) {
+        customerCreate(input: $input) {
+          customer { id }
+          customerUserErrors { code message }
+        }
+      }
+    `, { input: { email, acceptsMarketing: true } });
+
+    const errors = data.customerCreate.customerUserErrors;
+    if (errors?.length) {
+      if (errors[0].code === 'TAKEN') return { success: true, message: 'You are already subscribed.' };
+      return { success: false, message: errors[0].message };
+    }
+    return { success: true, message: 'Subscribed! Check your inbox.' };
+  } catch (err) {
+    return { success: false, message: err instanceof Error ? err.message : 'Something went wrong.' };
+  }
+}
+
+// --- Variant helpers ---
+
+/** Find variant matching all selected options. */
+export function findVariant(variants: Variant[], selections: Record<string, string>): Variant | undefined {
+  return variants.find((v) =>
+    v.selectedOptions.every((opt) => selections[opt.name] === opt.value),
+  );
+}
+
+/** Build cart lines from selected variant + add-on variant IDs. */
+export function buildCartLines(variantId: string, quantity: number, addonVariantIds: string[]): CartLine[] {
+  const lines: CartLine[] = [{ merchandiseId: variantId, quantity }];
+  for (const id of addonVariantIds) {
+    lines.push({ merchandiseId: id, quantity });
+  }
+  return lines;
+}
+
+/** Sanitise descriptionHtml: strip script tags. */
+export function sanitizeHtml(html: string): string {
+  return html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+}
+
+/** Extract spec table rows from descriptionHtml if present. */
+export function extractSpecsFromHtml(html: string): Array<[string, string]> | null {
+  const rows: Array<[string, string]> = [];
+  const trRegex = /<tr[^>]*>([\s\S]*?)<\/tr>/gi;
+  const tdRegex = /<td[^>]*>([\s\S]*?)<\/td>/gi;
+  let trMatch;
+  while ((trMatch = trRegex.exec(html)) !== null) {
+    const tds: string[] = [];
+    let tdMatch;
+    while ((tdMatch = tdRegex.exec(trMatch[1])) !== null) {
+      tds.push(tdMatch[1].replace(/<[^>]+>/g, '').trim());
+    }
+    if (tds.length >= 2) rows.push([tds[0], tds[1]]);
+  }
+  return rows.length > 0 ? rows : null;
+}
+
+// --- Cart storage helpers (client-side) ---
+
+export function getStoredCartId(): string | null {
+  try { return localStorage.getItem('calib-cart-id'); } catch { return null; }
+}
+
+export function setStoredCartId(id: string): void {
+  try { localStorage.setItem('calib-cart-id', id); } catch { /* private browsing */ }
+}
+
+// --- Fallback data ---
+
+const FALLBACK_PRODUCTS: Product[] = [
+  {
+    handle: 'checkerboard-composite', title: 'Checkerboard calibration target',
+    description: 'Aluminium composite, fine or coarse pattern.', descriptionHtml: '',
+    priceFrom: '€79', image: undefined, images: [], options: [
+      { name: 'Size', values: ['200 × 150', '300 × 200', '400 × 300', '600 × 400', '800 × 600'] },
+      { name: 'Pattern', values: ['7×10, 25 mm', '9×6, 30 mm', '5×8, 40 mm'] },
+    ], variants: [], metafields: {}, url: '/targets/checkerboard-composite/',
+  },
+  {
+    handle: 'charuco-composite', title: 'ChArUco calibration target',
+    description: 'Aluminium composite, UV-printed matte pattern, 6 mm thick.', descriptionHtml: '',
+    priceFrom: '€89', image: undefined, images: [], options: [
+      { name: 'Size', values: ['200 × 150', '300 × 200', '400 × 300', '600 × 400', '800 × 600'] },
+      { name: 'Dictionary', values: ['DICT_6X6_250', 'DICT_5X5_100', 'DICT_4X4_50', 'AprilTag 36h11'] },
+    ], variants: [], metafields: {}, url: '/targets/charuco-composite/',
+  },
+  {
+    handle: 'charuco-ceramic', title: 'ChArUco ceramic target',
+    description: 'Lithographed blue chrome on alumina, ±2 µm.', descriptionHtml: '',
+    priceFrom: '€189', image: undefined, images: [], options: [
+      { name: 'Size', values: ['100 × 100', '150 × 150', '200 × 200'] },
+      { name: 'Dictionary', values: ['DICT_6X6_250', 'DICT_5X5_100'] },
+    ], variants: [], metafields: {}, url: '/targets/charuco-ceramic/',
+  },
+  {
+    handle: 'mounting-fixture', title: 'Mounting fixture',
+    description: '¼″ thread, aluminium, fits all boards.', descriptionHtml: '',
+    priceFrom: '€39', image: undefined, images: [], options: [], variants: [], metafields: {},
+    url: '/targets/mounting-fixture/',
+  },
+  {
+    handle: 'certificate-ilac', title: 'ILAC calibration certificate',
+    description: 'ILAC-recognised dimensional calibration certificate.', descriptionHtml: '',
+    priceFrom: '€149', image: undefined, images: [], options: [], variants: [], metafields: {},
+    url: '/targets/certificate-ilac/',
+  },
+];
+
+const FALLBACK_COLLECTIONS: Collection[] = [
+  { handle: 'composite-boards', title: 'Composite boards', description: '200–1200 mm, rigid, matte, outdoor-safe.', products: FALLBACK_PRODUCTS.filter((p) => p.handle.includes('composite')) },
+  { handle: 'ceramic-glass', title: 'Ceramic & glass', description: 'Lithographed, ±1–2 µm, certificate option.', products: FALLBACK_PRODUCTS.filter((p) => p.handle.includes('ceramic')) },
+  { handle: 'lidar-image-quality', title: 'LiDAR & image quality', description: 'Reflectance panels, ISO 12233 charts, IR boards.', products: [] },
+  { handle: 'mounts-accessories', title: 'Mounts & accessories', description: 'Fixtures, stands, robot flange, hard cases.', products: FALLBACK_PRODUCTS.filter((p) => p.handle === 'mounting-fixture' || p.handle === 'certificate-ilac') },
+];
