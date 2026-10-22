@@ -27,7 +27,7 @@ describe('kalibrYaml', () => {
   });
 
   it('contains generator attribution', () => {
-    expect(kalibrYaml(checker)).toContain('calib.tools');
+    expect(kalibrYaml(checker)).toContain('Calib.Tools');
   });
 });
 

@@ -2,6 +2,7 @@
 import Base from '@/layouts/Base.astro';
 import ProductCard from '@/components/ProductCard.astro';
 import ToolCard from '@/components/ToolCard.astro';
+import { tools } from '@/lib/tools';
 import { getCollection } from 'astro:content';
 const guides = (await getCollection('guides')).slice(0, 3);
 const why = [
@@ -47,15 +48,9 @@ const why = [
         <a href="/tools/" class="text-[15px] font-semibold">See all tools →</a>
       </div>
       <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
-        <ToolCard href="/tools/generator/" title="Pattern generator" cta="Generate a pattern" body="Checkerboard, ChArUco, AprilGrid, circles. Print-exact PDF with scale check, plus ready-made OpenCV, Kalibr and ROS config files.">
-          <svg slot="icon" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#E60012" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg>
-        </ToolCard>
-        <ToolCard href="/tools/fov/" title="FOV & resolution calculator" cta="Calculate" body="Sensor, lens and working distance in — field of view, mm per pixel and the right target size out.">
-          <svg slot="icon" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#E60012" stroke-width="1.8" aria-hidden="true"><path d="M4 7h16M4 17h16M7 4v6M17 14v6"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="7" r="2"/></svg>
-        </ToolCard>
-        <ToolCard href="/tools/wizard/" title="Target selection wizard" cta="Find my target" body="Answer five questions and get the pattern, size and material that fits your camera and accuracy goal.">
-          <svg slot="icon" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#E60012" stroke-width="1.8" aria-hidden="true"><path d="M12 3l9 5-9 5-9-5 9-5z"/><path d="M3 13l9 5 9-5"/></svg>
-        </ToolCard>
+        {tools.slice(0, 3).map((t) => (
+          <ToolCard href={t.href} title={t.title} cta={t.live ? t.cta : `${t.cta} (coming soon)`} body={t.body} />
+        ))}
       </div>
     </div>
   </section>

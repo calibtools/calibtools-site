@@ -58,7 +58,7 @@ export function checkerboardSvg(s: PatternSpec, pw: number, ph: number): string 
     const y = oy + bh + 8;
     parts.push(`<rect x="${ox}" y="${y}" width="100" height="0.6" fill="#000"/>`);
     parts.push(`<text x="${ox}" y="${y + 4}" font-family="monospace" font-size="2.6" fill="#333">100 mm scale check</text>`);
-    parts.push(`<text x="${ox + bw}" y="${y + 4}" font-family="monospace" font-size="2.6" fill="#333" text-anchor="end">${s.type.toLowerCase()} ${s.rows}x${s.cols} · ${s.square}/${s.marker} mm · ${s.dict} · calib.tools</text>`);
+    parts.push(`<text x="${ox + bw}" y="${y + 4}" font-family="monospace" font-size="2.6" fill="#333" text-anchor="end">${s.type.toLowerCase()} ${s.rows}x${s.cols} · ${s.square}/${s.marker} mm · ${s.dict} · Calib.Tools</text>`);
   }
   parts.push('</svg>');
   return parts.join('');

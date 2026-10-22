@@ -99,7 +99,7 @@ export async function exportPdf({ spec, pw, ph }: PdfExportOptions): Promise<Uin
     page.drawText('100 mm scale check', { x: tx, y: ty, size: fontSize, font: helvetica, color: rgb(0.2, 0.2, 0.2) });
 
     // Label text (right)
-    const rightText = `${spec.type.toLowerCase()} ${spec.rows}x${spec.cols} · ${spec.square}/${spec.marker} mm · ${spec.dict} · calib.tools`;
+    const rightText = `${spec.type.toLowerCase()} ${spec.rows}x${spec.cols} · ${spec.square}/${spec.marker} mm · ${spec.dict} · Calib.Tools`;
     const rightW = helvetica.widthOfTextAtSize(rightText, fontSize);
     const [rx, ry] = pt(ox + bw, sbY + 4);
     page.drawText(rightText, { x: rx - rightW, y: ry, size: fontSize, font: helvetica, color: rgb(0.2, 0.2, 0.2) });
