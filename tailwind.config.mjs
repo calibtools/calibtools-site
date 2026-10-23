@@ -8,6 +8,12 @@ export default {
         ink: { DEFAULT: '#1A1A1A', muted: '#4A4A4A', soft: '#6B6B6B' },
         line: { DEFAULT: '#E6E6E6', light: '#ECECEC' },
         ground: { DEFAULT: '#FFFFFF', alt: '#FAFAFA', panel: '#F5F5F5' },
+        collection: {
+          brand: '#E60012',
+          'slate-blue': '#475C8A',
+          amber: '#D97706',
+          grey: '#6B7280',
+        },
       },
       fontFamily: {
         sans: ['Geist', 'Geist Fallback', 'system-ui', 'sans-serif'],
