@@ -8,8 +8,29 @@ export async function getStaticPaths() {
 const { entry } = Astro.props;
 const { Content, headings } = await entry.render();
 const related = (await Promise.all(entry.data.related.map((s: string) => getEntry('guides', s)))).filter(Boolean);
+const siteUrl = 'https://calib.tools';
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: entry.data.title,
+  description: entry.data.description,
+  datePublished: entry.data.date.toISOString(),
+  dateModified: entry.data.date.toISOString(),
+  author: { '@type': 'Organization', name: entry.data.author || 'Calib.Tools', url: `${siteUrl}/about/` },
+  publisher: { '@type': 'Organization', name: 'Calib.Tools', url: siteUrl },
+  mainEntityOfPage: `${siteUrl}/guides/${entry.slug}/`,
+};
+const breadcrumbLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: siteUrl },
+    { '@type': 'ListItem', position: 2, name: 'Guides', item: `${siteUrl}/guides/` },
+    { '@type': 'ListItem', position: 3, name: entry.data.title },
+  ],
+};
 ---
-<Base title={entry.data.title} description={entry.data.description} section="guides">
+<Base title={entry.data.title} description={entry.data.description} section="guides" jsonLd={[articleLd, breadcrumbLd]}>
   <section class="container-x flex flex-wrap justify-center gap-14 py-12 md:py-16">
     <article class="prose-calib flex min-w-0 flex-1 basis-[560px] max-w-[720px] flex-col gap-5">
       <div class="flex gap-2 text-sm text-ink-soft"><a href="/guides/" class="text-ink-soft no-underline">Guides</a><span>/</span><span>Article</span></div>
@@ -23,7 +44,7 @@ const related = (await Promise.all(entry.data.related.map((s: string) => getEntr
         <a href="/tools/generator/" class="text-[15px] font-semibold">Open the pattern generator →</a>
       </div>
       <div class="flex flex-wrap items-center justify-between gap-4 border-t border-line pt-5">
-        <span class="text-sm text-ink-soft">Written by {entry.data.author}. Questions? <a href="https://github.com/calibtools/calibtools/issues">Open an issue on GitHub</a>.</span>
+        <span class="text-sm text-ink-soft">Written by <a href="/about/" class="text-ink-soft">{entry.data.author}</a>. Questions? <a href="https://github.com/calibtools/calibtools/issues">Open an issue on GitHub</a>.</span>
         <a href="/targets/" class="btn-dark">Shop targets</a>
       </div>
     </article>
