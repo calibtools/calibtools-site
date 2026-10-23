@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { axesSvg, type SvgContext } from './svgLayers';
+import { axesSvg, brandFooterSvg, type SvgContext } from './svgLayers';
 import type { PatternSpec } from './patterns';
 
 function makeCtx(specOverrides: Partial<PatternSpec> = {}): SvgContext {
@@ -75,5 +75,42 @@ describe('axesSvg', () => {
     // Parse polygon points — arrowhead is at most 3mm in any direction
     const polygons = [...svg.matchAll(/points="([^"]+)"/g)];
     expect(polygons.length).toBeGreaterThanOrEqual(2); // X and Y arrowheads
+  });
+});
+
+describe('brandFooterSvg fallback tiers', () => {
+  it('tier 1: full footer on normal A4 page', () => {
+    const ctx = makeCtx();
+    const svg = brandFooterSvg(ctx);
+    expect(svg).toContain('id="calibtools-brand"');
+    // Full footer has the wordmark "calib" text
+    expect(svg).toContain('font-size="4"');
+  });
+
+  it('tier 2: compact footer when page is tight', () => {
+    const ctx = makeCtx();
+    // patternBottom=230, scaleBarEnd=244, fullFooterY=280 (needs 290)
+    // compactY=246 (needs 252). Set ph=260: too small for full, enough for compact.
+    ctx.ph = 260;
+    const svg = brandFooterSvg(ctx);
+    // Should have brand group but with compact styling
+    expect(svg).toContain('calibtools-brand');
+    expect(svg).toContain('font-size="2"');
+  });
+
+  it('tier 3: warning when even compact does not fit', () => {
+    const ctx = makeCtx();
+    ctx.ph = ctx.oy + ctx.bh + 2; // only 2mm below — nothing fits
+    const svg = brandFooterSvg(ctx);
+    expect(svg).toContain('Brand footer omitted');
+    expect(svg).toContain('page too small');
+  });
+
+  it('tier 3 never returns empty string', () => {
+    const ctx = makeCtx();
+    ctx.ph = ctx.oy + ctx.bh; // zero space below
+    const svg = brandFooterSvg(ctx);
+    expect(svg.length).toBeGreaterThan(0);
+    expect(svg).toContain('Brand footer omitted');
   });
 });

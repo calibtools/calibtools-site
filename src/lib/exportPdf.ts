@@ -144,19 +144,19 @@ export async function exportPdf({ spec, pw, ph, fontBytes }: PdfExportOptions): 
     scaleBarBottom = sbY + 4 + 2.6; // sbY + label offset + approx text height
   }
 
-  // --- Brand footer ---
+  // --- Brand footer (3-tier fallback — never silently omitted) ---
   const patternBottom = oy + bh;
-  const footerY = Math.max(scaleBarBottom + 4, patternBottom + 2 * spec.square);
+  const fullFooterY = Math.max(scaleBarBottom + 4, patternBottom + 2 * spec.square);
 
-  if (footerY + 10 < ph) {
-    // Logo mark: 3x3 grid, 6mm total width, cellSize=1.8, gap=0.3
+  if (fullFooterY + 10 < ph) {
+    // Tier 1: Full footer
     const cellSize = 1.8;
     const gap = 0.3;
     const step = cellSize + gap;
 
     for (const cell of LOGO_CELLS) {
       const cx = ox + cell.col * step;
-      const cy = footerY + cell.row * step;
+      const cy = fullFooterY + cell.row * step;
       const fillRgb = cell.fill === '#E60012' ? BRAND_RED_RGB : BRAND_INK_RGB;
       const [rx, ry] = pt(cx, cy + cellSize);
       page.drawRectangle({
@@ -166,10 +166,9 @@ export async function exportPdf({ spec, pw, ph, fontBytes }: PdfExportOptions): 
       });
     }
 
-    // Wordmark: "calib" in BRAND_INK + ".tools" in BRAND_RED
-    const wordmarkX = ox + 6 + 2; // logo width + 2mm gap
-    const wordmarkFontSize = 4 * MM; // 4mm cap height
-    const wordmarkY = footerY + 3; // vertically centre approx with logo (logo is ~6.6mm tall)
+    const wordmarkX = ox + 6 + 2;
+    const wordmarkFontSize = 4 * MM;
+    const wordmarkY = fullFooterY + 3;
     const [wmx, wmy] = pt(wordmarkX, wordmarkY + 4);
 
     const calibWidth = fontSemiBold.widthOfTextAtSize('calib', wordmarkFontSize);
@@ -182,29 +181,70 @@ export async function exportPdf({ spec, pw, ph, fontBytes }: PdfExportOptions): 
       color: rgb(BRAND_RED_RGB.r, BRAND_RED_RGB.g, BRAND_RED_RGB.b),
     });
 
-    // Centre: pattern summary + board size
     const summary = patternSummary(spec);
     const centreText = `${summary} \u00B7 ${bw} \u00D7 ${bh} mm`;
     const centreFontSize = 2.4 * MM;
     const centreW = fontMono.widthOfTextAtSize(centreText, centreFontSize);
     const centreXPt = (ox + bw / 2) * MM - centreW / 2;
-    const centreYPt = pageH - (footerY + 3 + 2.4) * MM;
+    const centreYPt = pageH - (fullFooterY + 3 + 2.4) * MM;
     page.drawText(centreText, {
       x: centreXPt, y: centreYPt, size: centreFontSize, font: fontMono,
       color: rgb(0.4, 0.4, 0.4),
     });
 
-    // Right: "calib.tools · {YYYY-MM-DD}"
     const dateStr = new Date().toISOString().slice(0, 10);
     const rightText = `${BRAND_URL} \u00B7 ${dateStr}`;
     const rightFontSize = 2.4 * MM;
     const rightW = fontRegular.widthOfTextAtSize(rightText, rightFontSize);
     const rightXPt = (ox + bw) * MM - rightW;
-    const rightYPt = pageH - (footerY + 3 + 2.4) * MM;
+    const rightYPt = pageH - (fullFooterY + 3 + 2.4) * MM;
     page.drawText(rightText, {
       x: rightXPt, y: rightYPt, size: rightFontSize, font: fontRegular,
       color: rgb(0.4, 0.4, 0.4),
     });
+  } else {
+    // Tier 2: Compact one-line footer
+    const compactY = Math.max(scaleBarBottom + 2, patternBottom + 4);
+    if (compactY + 6 < ph) {
+      const cellSize = 1.2;
+      const gap = 0.2;
+      const step = cellSize + gap;
+
+      for (const cell of LOGO_CELLS) {
+        const cx = ox + cell.col * step;
+        const cy = compactY + cell.row * step;
+        const fillRgb = cell.fill === '#E60012' ? BRAND_RED_RGB : BRAND_INK_RGB;
+        const [rx, ry] = pt(cx, cy + cellSize);
+        page.drawRectangle({
+          x: rx, y: ry,
+          width: cellSize * MM, height: cellSize * MM,
+          color: rgb(fillRgb.r, fillRgb.g, fillRgb.b),
+        });
+      }
+
+      const logoWidth = 3 * cellSize + 2 * gap;
+      const textX = ox + logoWidth + 1.5;
+      const textY = compactY + 2.8;
+      const summary = patternSummary(spec);
+      const compactText = `${summary} \u00B7 calib.tools`;
+      const compactFontSize = 2 * MM;
+      const [tx, ty] = pt(textX, textY);
+      page.drawText(compactText, {
+        x: tx, y: ty, size: compactFontSize, font: fontMono,
+        color: rgb(0.4, 0.4, 0.4),
+      });
+    } else {
+      // Tier 3: Warning text — never silently omit
+      const warningText = 'Brand footer omitted \u2014 page too small';
+      const warningFontSize = 1.8 * MM;
+      const warningW = fontMono.widthOfTextAtSize(warningText, warningFontSize);
+      const warningXPt = (pw / 2) * MM - warningW / 2;
+      const warningYPt = pageH - (ph - 2) * MM;
+      page.drawText(warningText, {
+        x: warningXPt, y: warningYPt, size: warningFontSize, font: fontMono,
+        color: rgb(0.6, 0.6, 0.6),
+      });
+    }
   }
 
   // --- PDF metadata ---

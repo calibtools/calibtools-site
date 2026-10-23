@@ -94,16 +94,33 @@ export function axesSvg(ctx: SvgContext): string {
   return parts.join('');
 }
 
-/** Brand footer group, or empty string if it doesn't fit. */
+/** Brand footer group with 3-tier fallback. Never silently omitted. */
 export function brandFooterSvg(ctx: SvgContext): string {
-  const { spec: s, pw, ph, ox, oy, bw, bh } = ctx;
+  const { spec: s, pw, ph, oy, bh } = ctx;
   const patternBottom = oy + bh;
   const scaleBarEnd = s.scaleBar ? patternBottom + 8 + 6 : patternBottom;
-  const footerY = Math.max(scaleBarEnd + 4, patternBottom + 2 * s.square);
-  if (footerY + 10 >= ph) return '';
+
+  // Tier 1: Full footer (needs ~12mm below scaleBar or ~2*square below pattern)
+  const fullFooterY = Math.max(scaleBarEnd + 4, patternBottom + 2 * s.square);
+  if (fullFooterY + 10 < ph) {
+    return fullBrandFooter(ctx, fullFooterY);
+  }
+
+  // Tier 2: Compact one-line footer (needs ~6mm)
+  const compactY = Math.max(scaleBarEnd + 2, patternBottom + 4);
+  if (compactY + 6 < ph) {
+    return compactBrandFooter(ctx, compactY);
+  }
+
+  // Tier 3: Warning text — never silently omit
+  return `<text x="${pw / 2}" y="${ph - 2}" font-family="'Geist Mono', monospace" font-size="1.8" text-anchor="middle" fill="#999">Brand footer omitted \u2014 page too small</text>`;
+}
+
+function fullBrandFooter(ctx: SvgContext, footerY: number): string {
+  const { spec: s, pw, ox, bw } = ctx;
   const parts: string[] = [];
   const logoRects = logoSvgPaths({ x: ox, y: footerY, cellSize: 1.8, gap: 0.3 });
-  const logoWidth = 3 * 1.8 + 2 * 0.3; // 3 cells + 2 gaps = 6
+  const logoWidth = 3 * 1.8 + 2 * 0.3;
   const textX = ox + logoWidth + 2;
   const textY = footerY + 4.2;
   const summary = patternSummary({
@@ -117,6 +134,25 @@ export function brandFooterSvg(ctx: SvgContext): string {
   parts.push(`<path data-wordmark="outlined" aria-hidden="true" d=""/>`);
   parts.push(`<text x="${pw / 2}" y="${textY}" font-family="'JetBrains Mono', 'Courier New', monospace" font-size="2.4" text-anchor="middle" fill="#4A4A4A">${summary}</text>`);
   parts.push(`<text x="${ox + bw}" y="${textY}" font-family="'JetBrains Mono', 'Courier New', monospace" font-size="2.4" text-anchor="end" fill="#6B6B6B">${BRAND_URL} · ${iso}</text>`);
+  parts.push('</g>');
+  return parts.join('');
+}
+
+function compactBrandFooter(ctx: SvgContext, footerY: number): string {
+  const { spec: s, ox } = ctx;
+  const parts: string[] = [];
+  // Smaller logo: cellSize 1.2, gap 0.2
+  const logoRects = logoSvgPaths({ x: ox, y: footerY, cellSize: 1.2, gap: 0.2 });
+  const logoWidth = 3 * 1.2 + 2 * 0.2;
+  const textX = ox + logoWidth + 1.5;
+  const textY = footerY + 2.8;
+  const summary = patternSummary({
+    type: s.type, rows: s.rows, cols: s.cols, square: s.square,
+    marker: s.marker, dict: s.dict, startId: s.startId,
+  });
+  parts.push('<g id="calibtools-brand">');
+  parts.push(...logoRects);
+  parts.push(`<text x="${textX}" y="${textY}" font-family="'Geist Mono', monospace" font-size="2" fill="#666">${summary} \u00B7 calib.tools</text>`);
   parts.push('</g>');
   return parts.join('');
 }
