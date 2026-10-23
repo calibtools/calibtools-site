@@ -78,6 +78,10 @@ export function ros2Yaml(s: PatternSpec): string {
     lines.push(`  start_id: ${s.startId}`);
   }
 
+  if (s.finderMarkers) {
+    lines.push(`# Finder markers enabled (OpenCV CALIB_CB_MARKER flag)`);
+  }
+
   lines.push('');
   return lines.join('\n') + '\n';
 }
@@ -119,6 +123,11 @@ export function halconDescr(s: PatternSpec): string {
     }
   }
 
+  if (s.finderMarkers) {
+    lines.push('');
+    lines.push(`# Note: 3 circular finder markers at corners (OpenCV CALIB_CB_MARKER)`);
+  }
+
   lines.push('');
   return lines.join('\n') + '\n';
 }
@@ -128,7 +137,7 @@ export function halconDescr(s: PatternSpec): string {
  */
 export function opencvJson(s: PatternSpec): string {
   const summary = patternSummary(s);
-  return JSON.stringify({
+  const obj: Record<string, unknown> = {
     _generator: {
       name: BRAND_NAME,
       url: `https://${BRAND_URL}`,
@@ -142,5 +151,9 @@ export function opencvJson(s: PatternSpec): string {
     marker_mm: s.marker,
     dictionary: s.dict,
     start_id: s.startId,
-  }, null, 2);
+  };
+  if (s.finderMarkers) obj.marker = true;
+  if (s.radonCheckers) obj.radon = true;
+  if (s.invert) obj.inverted = true;
+  return JSON.stringify(obj, null, 2);
 }

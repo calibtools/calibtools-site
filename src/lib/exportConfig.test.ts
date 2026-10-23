@@ -144,3 +144,24 @@ describe('opencvJson', () => {
     expect(j.square_mm).toBe(25);
   });
 });
+
+describe('opencvJson checkerboard flags', () => {
+  it('includes marker:true when finderMarkers is set', () => {
+    const spec: PatternSpec = { ...checker, finderMarkers: true };
+    const j = JSON.parse(opencvJson(spec));
+    expect(j.marker).toBe(true);
+  });
+
+  it('includes radon:true when radonCheckers is set', () => {
+    const spec: PatternSpec = { ...checker, radonCheckers: true };
+    const j = JSON.parse(opencvJson(spec));
+    expect(j.radon).toBe(true);
+  });
+
+  it('omits marker/radon/inverted keys when not set', () => {
+    const j = JSON.parse(opencvJson(checker));
+    expect(j.marker).toBeUndefined();
+    expect(j.radon).toBeUndefined();
+    expect(j.inverted).toBeUndefined();
+  });
+});

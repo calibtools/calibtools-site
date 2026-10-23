@@ -96,3 +96,47 @@ describe('PatternSpec new optional fields', () => {
     expect(svg).toContain('</svg>');
   });
 });
+
+describe('checkerboard finder markers', () => {
+  it('finder markers adds 3 circles at CALIB_CB_MARKER positions', () => {
+    const spec: PatternSpec = {
+      type: 'Checkerboard', rows: 7, cols: 10, square: 25, marker: 18,
+      dict: '', paper: 'A4', startId: 0, scaleBar: false,
+      finderMarkers: true,
+    };
+    const svg = checkerboardSvg(spec, 210, 297);
+    const circles = svg.match(/<circle[^>]*class="finder-marker"[^>]*\/>/g);
+    expect(circles).toHaveLength(3);
+  });
+});
+
+describe('checkerboard invert', () => {
+  it('invert swaps which squares are black', () => {
+    const normal: PatternSpec = {
+      type: 'Checkerboard', rows: 4, cols: 4, square: 25, marker: 18,
+      dict: '', paper: 'A4', startId: 0, scaleBar: false,
+    };
+    const inverted: PatternSpec = { ...normal, invert: true };
+    const svgN = checkerboardSvg(normal, 210, 297);
+    const svgI = checkerboardSvg(inverted, 210, 297);
+    // Both should have same number of black rects (just in different positions)
+    const countN = (svgN.match(/fill="#000"/g) || []).length;
+    const countI = (svgI.match(/fill="#000"/g) || []).length;
+    expect(countN).toBe(countI);
+    // But the SVG should be different
+    expect(svgN).not.toBe(svgI);
+  });
+});
+
+describe('checkerboard Radon (rounded)', () => {
+  it('Radon checkers adds rx/ry attributes to squares', () => {
+    const spec: PatternSpec = {
+      type: 'Checkerboard', rows: 4, cols: 4, square: 25, marker: 18,
+      dict: '', paper: 'A4', startId: 0, scaleBar: false,
+      radonCheckers: true,
+    };
+    const svg = checkerboardSvg(spec, 210, 297);
+    expect(svg).toContain('rx="');
+    expect(svg).toContain('ry="');
+  });
+});
