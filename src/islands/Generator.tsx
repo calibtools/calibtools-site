@@ -4,6 +4,8 @@ import { exportPdf } from '@/lib/exportPdf';
 import { exportPng } from '@/lib/exportPng';
 import { exportDxf } from '@/lib/exportDxf';
 import { kalibrYaml, ros2Yaml, halconDescr, opencvJson } from '@/lib/exportConfig';
+import { exportZip } from '@/lib/exportZip';
+import { patternSummary } from '@/lib/brand';
 
 /**
  * Pattern generator.
@@ -87,6 +89,35 @@ export default function Generator({ initialSpec }: GeneratorProps = {}) {
         <div className="flex flex-col gap-2.5 border-t border-line pt-4">
           <span className="text-[13px] font-semibold">Download</span>
           <div className="grid grid-cols-2 gap-2">
+            <button type="button"
+              className="col-span-2 rounded bg-ink px-3 py-[11px] text-sm font-semibold text-white disabled:opacity-50"
+              disabled={busy !== null}
+              onClick={async () => {
+                setBusy('pdf');
+                try {
+                  const summary = patternSummary(spec);
+                  const pdfBytes = await exportPdf({ spec, pw, ph });
+                  const pngBlob = await exportPng({ svg, pw, ph });
+                  const dxf = exportDxf({ spec, pw, ph });
+                  const files = [
+                    { name: `${slug}.pdf`, desc: 'PDF pattern (1:1 mm scale)', data: pdfBytes },
+                    { name: `${slug}.svg`, desc: 'SVG vector pattern', data: svg },
+                    { name: `${slug}.png`, desc: 'PNG raster (300 dpi)', data: pngBlob },
+                    { name: `${slug}.dxf`, desc: 'DXF for CNC/laser fabrication', data: dxf },
+                    { name: `${slug}.opencv.json`, desc: 'OpenCV config', data: opencvJson(spec) },
+                    { name: `${slug}.kalibr.yaml`, desc: 'Kalibr config', data: kalibrYaml(spec) },
+                    { name: `${slug}.ros2.yaml`, desc: 'ROS 2 camera_calibration config', data: ros2Yaml(spec) },
+                    { name: `${slug}.halcon.descr`, desc: 'HALCON plate description', data: halconDescr(spec) },
+                  ];
+                  const blob = await exportZip({ slug, summary, files });
+                  const a = document.createElement('a');
+                  a.href = URL.createObjectURL(blob);
+                  a.download = `${slug}-calibtools.zip`;
+                  a.click();
+                  URL.revokeObjectURL(a.href);
+                } finally { setBusy(null); }
+              }}
+            >Download all (.zip)</button>
             <button type="button" className="rounded bg-brand px-3 py-[11px] text-sm font-semibold text-white disabled:opacity-50" disabled={busy !== null} onClick={async () => {
               setBusy('pdf');
               try {
