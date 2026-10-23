@@ -11,9 +11,9 @@ describe('formatPrice', () => {
 
 describe('findVariant', () => {
   const variants: Variant[] = [
-    { id: 'v1', title: '200 × 150 / 6X6', sku: 'A', price: '€89', currencyCode: 'EUR', availableForSale: true, selectedOptions: [{ name: 'Size', value: '200 × 150' }, { name: 'Dictionary', value: 'DICT_6X6_250' }] },
-    { id: 'v2', title: '300 × 200 / 6X6', sku: 'B', price: '€109', currencyCode: 'EUR', availableForSale: true, selectedOptions: [{ name: 'Size', value: '300 × 200' }, { name: 'Dictionary', value: 'DICT_6X6_250' }] },
-    { id: 'v3', title: '200 × 150 / 5X5', sku: 'C', price: '€89', currencyCode: 'EUR', availableForSale: false, selectedOptions: [{ name: 'Size', value: '200 × 150' }, { name: 'Dictionary', value: 'DICT_5X5_100' }] },
+    { id: 'v1', title: '200 × 150 / 6X6', sku: 'A', price: '€89', priceAmount: '89.00', currencyCode: 'EUR', availableForSale: true, selectedOptions: [{ name: 'Size', value: '200 × 150' }, { name: 'Dictionary', value: 'DICT_6X6_250' }] },
+    { id: 'v2', title: '300 × 200 / 6X6', sku: 'B', price: '€109', priceAmount: '109.00', currencyCode: 'EUR', availableForSale: true, selectedOptions: [{ name: 'Size', value: '300 × 200' }, { name: 'Dictionary', value: 'DICT_6X6_250' }] },
+    { id: 'v3', title: '200 × 150 / 5X5', sku: 'C', price: '€89', priceAmount: '89.00', currencyCode: 'EUR', availableForSale: false, selectedOptions: [{ name: 'Size', value: '200 × 150' }, { name: 'Dictionary', value: 'DICT_5X5_100' }] },
   ];
 
   it('finds exact match', () => {
