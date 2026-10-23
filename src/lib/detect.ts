@@ -36,6 +36,9 @@ export function expectedCount(spec: PatternSpec): number {
     // Number of markers (white squares contain markers)
     return Math.floor((spec.rows * spec.cols) / 2);
   }
+  if (spec.type === 'Marker sheet') {
+    return spec.rows * spec.cols;
+  }
   if (spec.type === 'Symmetric circles' || spec.type === 'HALCON-style dots') {
     return spec.rows * spec.cols;
   }
