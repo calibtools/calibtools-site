@@ -9,9 +9,10 @@ import { renderCharucoSvg } from './renderCharuco';
 import { renderAprilGridSvg } from './renderAprilGrid';
 import { renderCirclesSvg } from './renderCircles';
 import { renderMarkerSheetSvg } from './renderMarkerSheet';
+import { renderPuzzleBoardSvg } from './renderPuzzleBoard';
 
 export interface PatternSpec {
-  type: 'Checkerboard' | 'ChArUco' | 'AprilGrid (Kalibr)' | 'Asymmetric circles' | 'Symmetric circles' | 'ArUco grid' | 'HALCON-style dots' | 'Marker sheet';
+  type: 'Checkerboard' | 'ChArUco' | 'AprilGrid (Kalibr)' | 'Asymmetric circles' | 'Symmetric circles' | 'ArUco grid' | 'HALCON-style dots' | 'Marker sheet' | 'PuzzleBoard';
   rows: number;
   cols: number;
   square: number;   // mm
@@ -48,6 +49,10 @@ export interface PatternSpec {
 
   // Corner ID badge (Step B5)
   showCornerBadge?: boolean;  // corner ID badge when startId ≠ 0 (default true)
+
+  // PuzzleBoard options (Step C3)
+  puzzleOffsetX?: number;     // starting X position within encoding space
+  puzzleOffsetY?: number;     // starting Y position within encoding space
 }
 
 /** Inner corner coordinates (mm) for a rows×cols checkerboard, row-major, matching cv.findChessboardCorners order. */
@@ -70,7 +75,9 @@ export function checkerboardSvg(s: PatternSpec, pw: number, ph: number): string 
   const isCircles = s.type.includes('circles') || s.type.includes('dots');
   const isMarkerType = s.type === 'ChArUco' || s.type === 'ArUco grid' || s.type === 'AprilGrid (Kalibr)';
 
-  if (s.type === 'Marker sheet') {
+  if (s.type === 'PuzzleBoard') {
+    parts.push(renderPuzzleBoardSvg(s, ox, oy));
+  } else if (s.type === 'Marker sheet') {
     parts.push(renderMarkerSheetSvg(s, ox, oy));
   } else if (isCircles) {
     parts.push(renderCirclesSvg(s, ox, oy));

@@ -33,5 +33,7 @@ export function idRange(spec: PatternSpec): IdRangeResult | null {
     return { min: startId, max: startId + count - 1, count };
   }
 
+  if (type === 'PuzzleBoard') return null; // no markers
+
   return null;
 }

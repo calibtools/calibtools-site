@@ -58,6 +58,17 @@ export default function Generator({ initialSpec }: GeneratorProps = {}) {
   const [autoSize, setAutoSize] = useState(false);
   const [compactInfo, setCompactInfo] = useState(false);
   const [urlRead, setUrlRead] = useState(false);
+  const [showBeta, setShowBeta] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    setShowBeta(params.get('beta') === 'puzzle');
+  }, []);
+
+  const visiblePatterns = showBeta
+    ? [...PATTERNS, 'PuzzleBoard' as const]
+    : PATTERNS;
 
   // Read state from URL on mount
   useEffect(() => {
@@ -65,7 +76,7 @@ export default function Generator({ initialSpec }: GeneratorProps = {}) {
     const params = new URLSearchParams(window.location.search);
     const fromUrl: Partial<PatternSpec> = {};
     const strFields: (keyof PatternSpec)[] = ['type', 'dict', 'paper', 'aprilFamily', 'tagIdList'];
-    const numFields: (keyof PatternSpec)[] = ['rows', 'cols', 'square', 'marker', 'startId', 'borderBits', 'tagSpacing', 'circleDiameter', 'circleSpacingX', 'circleSpacingY'];
+    const numFields: (keyof PatternSpec)[] = ['rows', 'cols', 'square', 'marker', 'startId', 'borderBits', 'tagSpacing', 'circleDiameter', 'circleSpacingX', 'circleSpacingY', 'puzzleOffsetX', 'puzzleOffsetY'];
     const boolFields: (keyof PatternSpec)[] = ['scaleBar', 'finderMarkers', 'radonCheckers', 'invert', 'legacyLayout', 'showTagIds', 'symmetricCorners', 'showAxes', 'monochromeAxes', 'showCornerBadge'];
 
     for (const k of strFields) {
@@ -153,7 +164,7 @@ export default function Generator({ initialSpec }: GeneratorProps = {}) {
 
         <label className="flex flex-col gap-2 text-[13px] font-semibold">Pattern
           <select className={field} value={spec.type} onChange={(e) => set('type', e.target.value as PatternSpec['type'])}>
-            {PATTERNS.map((p) => <option key={p}>{p}</option>)}
+            {visiblePatterns.map((p) => <option key={p}>{p}</option>)}
           </select>
         </label>
         <div className="grid grid-cols-2 gap-3">
@@ -350,6 +361,21 @@ export default function Generator({ initialSpec }: GeneratorProps = {}) {
                 checked={spec.radonCheckers ?? false}
                 onChange={(e) => set('radonCheckers', e.target.checked)} />
               Radon (rounded) checkers
+            </label>
+          </div>
+        )}
+
+        {spec.type === 'PuzzleBoard' && (
+          <div className="grid grid-cols-2 gap-3">
+            <label className="flex flex-col gap-2 text-[13px] font-semibold">Offset X
+              <input className={field} type="number" min={0}
+                value={spec.puzzleOffsetX ?? 0}
+                onChange={(e) => set('puzzleOffsetX', Math.max(0, +e.target.value))} />
+            </label>
+            <label className="flex flex-col gap-2 text-[13px] font-semibold">Offset Y
+              <input className={field} type="number" min={0}
+                value={spec.puzzleOffsetY ?? 0}
+                onChange={(e) => set('puzzleOffsetY', Math.max(0, +e.target.value))} />
             </label>
           </div>
         )}

@@ -45,6 +45,9 @@ export function expectedCount(spec: PatternSpec): number {
   if (spec.type === 'Asymmetric circles') {
     return spec.rows * spec.cols;
   }
+  if (spec.type === 'PuzzleBoard') {
+    return (spec.rows - 1) * (spec.cols - 1); // inner corners like checkerboard
+  }
   return (spec.rows - 1) * (spec.cols - 1);
 }
 
