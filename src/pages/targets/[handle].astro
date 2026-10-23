@@ -25,6 +25,8 @@ const certProduct = allProducts.find((p) => p.handle === 'certificate-ilac');
 const fixtureProduct = allProducts.find((p) => p.handle === 'mounting-fixture');
 const certVariantId = certProduct?.variants[0]?.id;
 const fixtureVariantId = fixtureProduct?.variants[0]?.id;
+const certPrice = certProduct?.variants[0]?.price;
+const fixturePrice = fixtureProduct?.variants[0]?.price;
 
 const cleanDescription = sanitizeHtml(product.descriptionHtml);
 ---
@@ -65,6 +67,8 @@ const cleanDescription = sanitizeHtml(product.descriptionHtml);
         product={product}
         certVariantId={certVariantId}
         fixtureVariantId={fixtureVariantId}
+        certPrice={certPrice}
+        fixturePrice={fixturePrice}
       />
     </div>
   </section>

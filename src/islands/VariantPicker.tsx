@@ -11,9 +11,13 @@ interface Props {
   certVariantId?: string;
   /** Variant ID for the mounting fixture add-on. */
   fixtureVariantId?: string;
+  /** Formatted price for the certificate add-on, e.g. "€149". */
+  certPrice?: string;
+  /** Formatted price for the fixture add-on, e.g. "€39". */
+  fixturePrice?: string;
 }
 
-export default function VariantPicker({ product, certVariantId, fixtureVariantId }: Props) {
+export default function VariantPicker({ product, certVariantId, fixtureVariantId, certPrice, fixturePrice }: Props) {
   // Init selections from first variant's options
   const initSelections: Record<string, string> = {};
   if (product.variants.length > 0) {
@@ -126,35 +130,50 @@ export default function VariantPicker({ product, certVariantId, fixtureVariantId
           {certVariantId && (
             <label className="flex items-center gap-2.5 text-[15px]">
               <input type="checkbox" className="h-[18px] w-[18px]" checked={addCert} onChange={(e) => setAddCert(e.target.checked)} />
-              ILAC-recognised calibration certificate <span className="text-ink-soft">+ €149</span>
+              ILAC-recognised calibration certificate {certPrice && <span className="text-ink-soft">+ {certPrice}</span>}
             </label>
           )}
           {fixtureVariantId && (
             <label className="flex items-center gap-2.5 text-[15px]">
               <input type="checkbox" className="h-[18px] w-[18px]" checked={addFixture} onChange={(e) => setAddFixture(e.target.checked)} />
-              Mounting fixture, ¼″ thread <span className="text-ink-soft">+ €39</span>
+              Mounting fixture, ¼″ thread {fixturePrice && <span className="text-ink-soft">+ {fixturePrice}</span>}
             </label>
           )}
         </fieldset>
       )}
 
-      {/* Quantity + Add to cart */}
+      {/* Quantity + Buy now */}
       <div className="flex gap-3 pt-1.5">
-        <input
-          type="number"
-          min={1}
-          value={quantity}
-          onChange={(e) => setQuantity(Math.max(1, +e.target.value))}
-          aria-label="Quantity"
-          className="w-[72px] rounded border border-line bg-white px-3 py-3 text-center text-[15px]"
-        />
+        <div className="flex items-center rounded border border-line">
+          <button
+            type="button"
+            aria-label="Decrease quantity"
+            className="flex h-[44px] w-[44px] items-center justify-center text-lg font-semibold text-ink-muted hover:text-ink disabled:opacity-40"
+            disabled={quantity <= 1}
+            onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+          >−</button>
+          <input
+            type="number"
+            min={1}
+            value={quantity}
+            onChange={(e) => setQuantity(Math.max(1, +e.target.value))}
+            aria-label="Quantity"
+            className="h-[44px] w-[40px] border-x border-line bg-white text-center text-[15px] [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+          />
+          <button
+            type="button"
+            aria-label="Increase quantity"
+            className="flex h-[44px] w-[44px] items-center justify-center text-lg font-semibold text-ink-muted hover:text-ink"
+            onClick={() => setQuantity((q) => q + 1)}
+          >+</button>
+        </div>
         <button
           type="button"
           className="flex-1 rounded bg-brand py-3.5 text-base font-semibold text-white disabled:opacity-50"
           disabled={busy || !variant || !variant.availableForSale}
           onClick={handleAddToCart}
         >
-          {busy ? 'Adding…' : 'Add to cart'}
+          {busy ? 'Redirecting…' : 'Buy now'}
         </button>
       </div>
 
