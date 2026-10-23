@@ -10,6 +10,11 @@
 const domain = import.meta.env.PUBLIC_SHOPIFY_DOMAIN ?? '';
 const token = import.meta.env.PUBLIC_SHOPIFY_STOREFRONT_TOKEN ?? '';
 
+// Build-time diagnostic (stripped from client bundle by tree-shaking)
+if (typeof window === 'undefined') {
+  console.log(`[shopify] domain=${domain ? domain : '(empty)'}, token=${token ? token.slice(0, 6) + '…' : '(empty)'}`);
+}
+
 function hasCredentials(): boolean {
   return !!domain && !!token && token !== 'replace-me';
 }
@@ -138,7 +143,10 @@ function mapProduct(n: any): Product {
 // --- Queries ---
 
 export async function getProducts(first = 50): Promise<Product[]> {
-  if (!hasCredentials()) return FALLBACK_PRODUCTS;
+  if (!hasCredentials()) {
+    console.warn('[shopify] No credentials — using fallback products');
+    return FALLBACK_PRODUCTS;
+  }
   try {
     const data = await storefront(`
       ${PRODUCT_FIELDS}
@@ -147,13 +155,17 @@ export async function getProducts(first = 50): Promise<Product[]> {
       }
     `, { first });
     return data.products.nodes.map(mapProduct);
-  } catch {
+  } catch (err) {
+    console.error('[shopify] getProducts failed, using fallback:', err);
     return FALLBACK_PRODUCTS;
   }
 }
 
 export async function getProductByHandle(handle: string): Promise<Product | null> {
-  if (!hasCredentials()) return FALLBACK_PRODUCTS.find((p) => p.handle === handle) ?? null;
+  if (!hasCredentials()) {
+    console.warn(`[shopify] No credentials — using fallback for ${handle}`);
+    return FALLBACK_PRODUCTS.find((p) => p.handle === handle) ?? null;
+  }
   try {
     const data = await storefront(`
       ${PRODUCT_FIELDS}
@@ -162,7 +174,8 @@ export async function getProductByHandle(handle: string): Promise<Product | null
       }
     `, { handle });
     return data.product ? mapProduct(data.product) : null;
-  } catch {
+  } catch (err) {
+    console.error(`[shopify] getProductByHandle(${handle}) failed, using fallback:`, err);
     return FALLBACK_PRODUCTS.find((p) => p.handle === handle) ?? null;
   }
 }
