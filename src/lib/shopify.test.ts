@@ -107,7 +107,7 @@ describe('cartQuery', () => {
     },
   };
 
-  let fetchSpy: ReturnType<typeof vi.spyOn>;
+  let fetchSpy: any;
 
   beforeEach(() => {
     fetchSpy = vi.spyOn(globalThis, 'fetch');
@@ -150,7 +150,7 @@ describe('cartQuery', () => {
 });
 
 describe('cartLinesUpdate', () => {
-  let fetchSpy: ReturnType<typeof vi.spyOn>;
+  let fetchSpy: any;
 
   beforeEach(() => {
     fetchSpy = vi.spyOn(globalThis, 'fetch');
@@ -191,7 +191,7 @@ describe('cartLinesUpdate', () => {
 });
 
 describe('cartLinesRemove', () => {
-  let fetchSpy: ReturnType<typeof vi.spyOn>;
+  let fetchSpy: any;
 
   beforeEach(() => {
     fetchSpy = vi.spyOn(globalThis, 'fetch');

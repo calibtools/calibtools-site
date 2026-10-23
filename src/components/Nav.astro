@@ -19,10 +19,16 @@ const items = [
       ))}
     </div>
     <div class="flex items-center gap-3">
-      <a href="/targets/" class="btn btn-primary relative !px-5 !py-3 !text-[15px]">
+      <a href="/targets/" class="btn btn-primary !px-5 !py-3 !text-[15px]">
         Shop targets
-        <span class="absolute -right-2 -top-2"><CartBadge client:load /></span>
       </a>
+      <button type="button" class="relative flex h-11 w-11 items-center justify-center rounded border-[1.5px] border-line hover:border-ink" aria-label="Open cart" data-open-cart>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+        </svg>
+        <span class="absolute -right-1.5 -top-1.5"><CartBadge client:load /></span>
+      </button>
       <button type="button" class="md:hidden flex h-11 w-11 items-center justify-center rounded border-[1.5px] border-ink" aria-label="Open menu" data-menu-toggle>
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
       </button>
@@ -36,4 +42,9 @@ const items = [
   const t = document.querySelector('[data-menu-toggle]');
   const m = document.querySelector('[data-menu]');
   t?.addEventListener('click', () => { m?.classList.toggle('hidden'); m?.classList.toggle('flex'); });
+
+  const cartBtn = document.querySelector('[data-open-cart]');
+  cartBtn?.addEventListener('click', () => {
+    window.dispatchEvent(new Event('open-cart-drawer'));
+  });
 </script>
