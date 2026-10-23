@@ -338,6 +338,11 @@ export default function VariantPicker({ product, certVariantId, fixtureVariantId
         {busy === 'buy' ? 'Redirecting…' : 'Buy now'}
       </button>
 
+      {/* Selected variant part number */}
+      {variant?.sku && (
+        <span className="font-mono text-sm text-ink-muted" data-testid="variant-sku">{variant.sku}</span>
+      )}
+
       {confirmation && <p className="m-0 text-sm font-medium text-green-700">{confirmation}</p>}
       {error && <p className="m-0 text-sm text-brand">{error}</p>}
 

@@ -42,7 +42,7 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
   const json = (type: string, body: Record<string, any>, status = 200) =>
     new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });
 
-  let body: { email?: string; honeypot?: string };
+  let body: { email?: string; honeypot?: string; tag?: string };
   try {
     body = await ctx.request.json();
   } catch {
@@ -143,6 +143,22 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
 
     const consent = consentData.customerEmailMarketingConsentUpdate.customer?.emailMarketingConsent;
     const state = consent?.marketingState ?? 'SUBSCRIBED';
+
+    // Apply optional tag (e.g. "revision:charuco-composite")
+    const tag = typeof body.tag === 'string' ? body.tag.replace(/[^a-zA-Z0-9:_-]/g, '').slice(0, 64) : '';
+    if (tag && customerId) {
+      try {
+        await adminQuery(domain, token, `
+          mutation AddTag($id: ID!, $tags: [String!]!) {
+            tagsAdd(id: $id, tags: $tags) {
+              userErrors { field message }
+            }
+          }
+        `, { id: customerId, tags: [tag] });
+      } catch {
+        // Non-critical — subscription succeeded even if tagging fails
+      }
+    }
 
     return json('ok', { ok: true, state });
   } catch {

@@ -2,11 +2,14 @@
 import Base from '@/layouts/Base.astro';
 import VariantPicker from '@/islands/VariantPicker';
 import ImageGallery from '@/islands/ImageGallery';
+import DownloadPicker from '@/islands/DownloadPicker';
+import NotifyForm from '@/islands/NotifyForm';
 import ProductCard from '@/components/ProductCard.astro';
 import { getProducts, getProductByHandle, sanitizeHtml } from '@/lib/shopify';
 import { kalibrYaml, ros2Yaml, halconDescr } from '@/lib/exportConfig';
 import { checkerboardSvg, type PatternSpec } from '@/lib/patterns';
 import { getProductFaq } from '@/lib/faq';
+import { WARRANTY_TEXT, COMPLIANCE, PRODUCT_TO_COLLECTION } from '@/lib/constants';
 
 export async function getStaticPaths() {
   const products = await getProducts();
@@ -191,6 +194,12 @@ if (handle?.includes('-composite')) {
   compareProduct = allProducts.find((p) => p.handle === handle.replace('-ceramic', '-composite')) ?? null;
 }
 
+// --- Parent collection link ---
+const collectionHandle = PRODUCT_TO_COLLECTION[handle!] ?? '';
+const collectionTitle = collectionHandle
+  ? collectionHandle.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
+  : '';
+
 // --- FAQ ---
 const faqItems = getProductFaq(handle!);
 const faqJsonLd = {
@@ -294,32 +303,19 @@ const faqJsonLd = {
   {(m.datasheet_url || configFiles.length > 0) && (
     <section class="container-x flex flex-col gap-5 pb-16">
       <h2 class="h-display m-0 text-2xl">Downloads</h2>
-      <div class="flex flex-wrap gap-3">
-        {m.datasheet_url && (
-          <a href={m.datasheet_url} target="_blank" rel="noopener" class="btn-outline gap-2 text-sm no-underline">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-            Datasheet PDF{m.datasheet_rev ? ` (rev ${m.datasheet_rev})` : ''}
-          </a>
-        )}
-        <a href="/downloads/sample-inspection-report.pdf" class="btn-outline gap-2 text-sm no-underline">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 18 15 15"/></svg>
-          Sample inspection report
-        </a>
-      </div>
-      {configFiles.length > 0 && (
-        <div class="flex flex-col gap-2">
-          <span class="text-[13px] font-semibold">Config files for this target</span>
-          <div class="flex flex-wrap gap-2 font-mono text-[13px]">
-            {configFiles.map((f) => (
-              <a
-                href={`data:${f.mime};charset=utf-8,${encodeURIComponent(f.content)}`}
-                download={f.name}
-                class="rounded bg-ground-panel px-2.5 py-1.5 text-ink no-underline hover:bg-line"
-              >{f.name.split('.').slice(1).join('.')}</a>
-            ))}
-          </div>
-        </div>
-      )}
+      <DownloadPicker
+        client:load
+        files={[
+          ...(m.datasheet_url ? [{ name: `${handle}-datasheet${m.datasheet_rev ? `-rev${m.datasheet_rev}` : ''}.pdf`, url: m.datasheet_url, mime: 'application/pdf' }] : []),
+          { name: 'sample-inspection-report.pdf', url: '/downloads/sample-inspection-report.pdf', mime: 'application/pdf' },
+          ...configFiles.map((f) => ({
+            name: f.name,
+            url: `data:${f.mime};charset=utf-8,${encodeURIComponent(f.content)}`,
+            mime: f.mime,
+          })),
+        ]}
+      />
+      <NotifyForm client:load handle={handle!} />
     </section>
   )}
 
@@ -371,6 +367,38 @@ const faqJsonLd = {
         ))}
       </div>
       <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+    </section>
+  )}
+
+  {/* Warranty + Compliance */}
+  <section class="container-x grid grid-cols-1 md:grid-cols-2 gap-4 pb-16">
+    <div class="card flex gap-4 p-5">
+      <div class="shrink-0 mt-0.5">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-brand" aria-hidden="true">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+      </div>
+      <div class="flex flex-col gap-1">
+        <strong class="text-[15px]">2-year warranty</strong>
+        <p class="m-0 text-sm text-ink-muted">{WARRANTY_TEXT}</p>
+      </div>
+    </div>
+    <div class="card flex flex-col gap-3 p-5">
+      <strong class="text-[15px]">Compliance</strong>
+      <div class="flex flex-wrap gap-2">
+        {Object.values(COMPLIANCE).map((label) => (
+          <span class="badge border border-line text-ink text-[11px]">{label}</span>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  {/* Back to family page */}
+  {collectionHandle && (
+    <section class="container-x pb-16">
+      <a href={`/targets/collection/${collectionHandle}/`} class="text-sm font-semibold no-underline">
+        &uarr; All {collectionTitle.toLowerCase()}
+      </a>
     </section>
   )}
 </Base>
