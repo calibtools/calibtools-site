@@ -13,6 +13,19 @@ const PATTERNS = ['Checkerboard', 'ChArUco', 'AprilGrid (Kalibr)', 'Asymmetric c
 const DICTS = ['DICT_6X6_250', 'DICT_5X5_100', 'DICT_4X4_50', 'DICT_APRILTAG_36h11', 'DICT_ARUCO_ORIGINAL'];
 const PAPERS: Record<string, [number, number]> = { A4: [210, 297], A3: [297, 420], Letter: [215.9, 279.4] };
 
+/** Build a product URL with query params to preselect the variant. */
+function productCtaUrl(spec: PatternSpec): string {
+  const isCharuco = spec.type === 'ChArUco' || spec.type === 'ArUco grid';
+  const handle = isCharuco ? 'charuco-composite' : 'checkerboard-composite';
+  const params = new URLSearchParams();
+  // Map board dimensions to the closest available size
+  const bw = spec.cols * spec.square;
+  const bh = spec.rows * spec.square;
+  params.set('size', `${bw}x${bh}`);
+  if (isCharuco && spec.dict) params.set('dictionary', spec.dict);
+  return `/targets/${handle}/?${params.toString()}`;
+}
+
 interface GeneratorProps {
   /** Override the default pattern state for preset landing pages. */
   initialSpec?: Partial<PatternSpec>;
@@ -124,7 +137,7 @@ export default function Generator({ initialSpec }: GeneratorProps = {}) {
         </div>
         <div className="card flex flex-wrap items-center justify-between gap-3 bg-ground-alt px-5 py-4">
           <span className="text-[15px]"><strong>Want this exact pattern on a rigid board?</strong> <span className="text-ink-muted">Same geometry, 0.3 mm tolerance, ships in 2–4 days.</span></span>
-          <a href="/targets/charuco-composite/" className="rounded bg-ink px-4 py-2.5 text-sm font-semibold text-white no-underline hover:text-white">Order as composite board</a>
+          <a href={productCtaUrl(spec)} className="rounded bg-ink px-4 py-2.5 text-sm font-semibold text-white no-underline hover:text-white">Order as composite board</a>
         </div>
       </div>
     </section>

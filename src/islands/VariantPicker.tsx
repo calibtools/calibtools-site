@@ -18,7 +18,7 @@ interface Props {
 }
 
 export default function VariantPicker({ product, certVariantId, fixtureVariantId, certPrice, fixturePrice }: Props) {
-  // Init selections from first variant's options
+  // Init selections from URL query params or first variant's options
   const initSelections: Record<string, string> = {};
   if (product.variants.length > 0) {
     for (const opt of product.variants[0].selectedOptions) {
@@ -27,6 +27,19 @@ export default function VariantPicker({ product, certVariantId, fixtureVariantId
   } else {
     for (const opt of product.options) {
       if (opt.values.length > 0) initSelections[opt.name] = opt.values[0];
+    }
+  }
+  // Override from query params (e.g. ?size=300x200&dictionary=DICT_6X6_250)
+  if (typeof window !== 'undefined') {
+    const params = new URLSearchParams(window.location.search);
+    for (const opt of product.options) {
+      const qVal = params.get(opt.name.toLowerCase());
+      if (qVal) {
+        // Find matching option value (case-insensitive, × / x normalised)
+        const normalise = (s: string) => s.toLowerCase().replace(/×/g, 'x').replace(/\s+/g, '');
+        const match = opt.values.find((v) => normalise(v) === normalise(qVal));
+        if (match) initSelections[opt.name] = match;
+      }
     }
   }
 
