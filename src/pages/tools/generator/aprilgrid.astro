@@ -1,0 +1,19 @@
+---
+import Base from '@/layouts/Base.astro';
+import ToolTabs from '@/components/ToolTabs.astro';
+import ToolContent from '@/components/ToolContent.astro';
+import Generator from '@/islands/Generator';
+import { getEntry } from 'astro:content';
+import { toolJsonLd } from '@/lib/toolJsonLd';
+
+const entry = (await getEntry('tools', 'generator-aprilgrid'))!;
+const { Content } = await entry.render();
+const jsonLd = toolJsonLd(entry.data.h1, '/tools/generator/aprilgrid/', entry.data.seoDescription, entry.data.faq);
+---
+<Base title={entry.data.seoTitle} section="tools" description={entry.data.seoDescription} jsonLd={jsonLd}>
+  <ToolTabs current="generator" />
+  <div class="container-x py-7 md:pb-16">
+    <Generator client:load initialSpec={{ type: 'AprilGrid (Kalibr)', dict: 'DICT_APRILTAG_36h11' }} />
+  </div>
+  <ToolContent Content={Content} faq={entry.data.faq} />
+</Base>
