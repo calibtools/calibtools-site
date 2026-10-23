@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
-    "prebuild": "node scripts/verify-storefront.mjs",
+    "prebuild": "node scripts/verify-storefront.mjs && node scripts/generate-placeholders.mjs",
     "build": "astro build",
     "postbuild": "node scripts/check-links.mjs",
     "preview": "astro preview",
