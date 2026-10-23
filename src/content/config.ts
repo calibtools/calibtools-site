@@ -12,4 +12,14 @@ const guides = defineCollection({
   }),
 });
 
-export const collections = { guides };
+const tools = defineCollection({
+  type: 'content',
+  schema: z.object({
+    seoTitle: z.string(),
+    seoDescription: z.string(),
+    h1: z.string(),
+    faq: z.array(z.object({ q: z.string(), a: z.string() })).default([]),
+  }),
+});
+
+export const collections = { guides, tools };
