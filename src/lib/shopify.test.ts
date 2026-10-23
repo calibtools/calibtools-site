@@ -45,6 +45,15 @@ describe('buildCartLines', () => {
     expect(lines[1]).toEqual({ merchandiseId: 'cert-v1', quantity: 1 });
     expect(lines[2]).toEqual({ merchandiseId: 'fixture-v1', quantity: 1 });
   });
+
+  it('passes through line-item attributes', () => {
+    const attrs = [
+      { key: 'start_id', value: '0' },
+      { key: 'id_range', value: '0\u201334' },
+    ];
+    const lines = buildCartLines('v1', 1, [], attrs);
+    expect(lines).toEqual([{ merchandiseId: 'v1', quantity: 1, attributes: attrs }]);
+  });
 });
 
 describe('sanitizeHtml', () => {
@@ -93,6 +102,10 @@ describe('cartQuery', () => {
         {
           id: 'line-1',
           quantity: 2,
+          attributes: [
+            { key: 'start_id', value: '0' },
+            { key: 'id_range', value: '0\u201334' },
+          ],
           merchandise: {
             id: 'gid://shopify/ProductVariant/v1',
             title: '200 × 150 / DICT_6X6_250',
@@ -131,7 +144,22 @@ describe('cartQuery', () => {
     expect(cart!.totalQuantity).toBe(2);
     expect(cart!.lines).toHaveLength(1);
     expect(cart!.lines[0].merchandise.sku).toBe('CHR-200-6X6');
+    expect(cart!.lines[0].attributes).toEqual([
+      { key: 'start_id', value: '0' },
+      { key: 'id_range', value: '0\u201334' },
+    ]);
     expect(cart!.cost.subtotalAmount.amount).toBe('178.00');
+  });
+
+  it('maps empty attributes when none present', async () => {
+    const cartNoAttrs = {
+      ...mockCart,
+      lines: { nodes: [{ ...mockCart.lines.nodes[0], attributes: undefined }] },
+    };
+    fetchSpy.mockResolvedValueOnce(new Response(JSON.stringify({ data: { cart: cartNoAttrs } })));
+    const { cartQuery } = await import('./shopify');
+    const cart = await cartQuery('gid://shopify/Cart/1');
+    expect(cart!.lines[0].attributes).toEqual([]);
   });
 
   it('returns null and clears storage for expired cart', async () => {
