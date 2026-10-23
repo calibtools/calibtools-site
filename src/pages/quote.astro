@@ -1,0 +1,42 @@
+---
+import Base from '@/layouts/Base.astro';
+---
+<Base title="Request a quote" description="Request a quote or invoice/PO for Calib.Tools calibration targets.">
+  <div class="container-x py-10 md:py-16">
+    <div class="mx-auto flex max-w-[560px] flex-col gap-6">
+      <div class="flex flex-col gap-2">
+        <h1 class="h-display m-0 text-[32px] md:text-[40px]">Request a quote</h1>
+        <p class="m-0 text-base text-ink-muted">Need a formal quote, invoice or purchase order? Fill in the form and we will reply within one business day.</p>
+      </div>
+
+      <form action="/api/quote" method="POST" class="flex flex-col gap-4">
+        <div class="flex flex-col gap-1.5">
+          <label for="q-name" class="label">Name</label>
+          <input id="q-name" name="name" type="text" required class="input" />
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label for="q-company" class="label">Company</label>
+          <input id="q-company" name="company" type="text" required class="input" />
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label for="q-email" class="label">Work email</label>
+          <input id="q-email" name="email" type="email" required class="input" />
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label for="q-product" class="label">Product / SKU</label>
+          <input id="q-product" name="product" type="text" class="input" placeholder="e.g. ChArUco composite 400 × 300, DICT_6X6_250" />
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label for="q-message" class="label">Message</label>
+          <textarea id="q-message" name="message" rows={4} class="input" placeholder="Quantity, delivery address, special requirements..."></textarea>
+        </div>
+
+        {/* Honeypot */}
+        <input type="text" name="website" tabindex={-1} autocomplete="off" class="absolute -left-[9999px] h-0 w-0 overflow-hidden" aria-hidden="true" />
+
+        <button type="submit" class="btn-primary mt-2">Send quote request</button>
+        <p class="m-0 text-sm text-ink-muted">We reply within one business day. You can also email <a href="mailto:hello@calib.tools">hello@calib.tools</a> directly.</p>
+      </form>
+    </div>
+  </div>
+</Base>
