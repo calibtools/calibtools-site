@@ -299,6 +299,58 @@ export async function customerCreate(email: string): Promise<{ success: boolean;
   }
 }
 
+// --- Client-side product fetch (fallback when SSG data is stale) ---
+
+/** Fetch variants + add-on IDs for a product handle, client-side. */
+export async function fetchProductVariants(handle: string): Promise<{
+  variants: Variant[];
+  options: Array<{ name: string; values: string[] }>;
+  certVariantId?: string;
+  fixtureVariantId?: string;
+} | null> {
+  if (!hasCredentials()) return null;
+  try {
+    const data = await storefront(`
+      query ProductWithAddons($handle: String!) {
+        product(handle: $handle) {
+          options { name values }
+          variants(first: 100) {
+            nodes {
+              id title sku availableForSale
+              price { amount currencyCode }
+              selectedOptions { name value }
+            }
+          }
+        }
+        cert: product(handle: "certificate-ilac") {
+          variants(first: 1) { nodes { id } }
+        }
+        fixture: product(handle: "mounting-fixture") {
+          variants(first: 1) { nodes { id } }
+        }
+      }
+    `, { handle });
+    if (!data.product) return null;
+    return {
+      variants: data.product.variants.nodes.map((v: any) => ({
+        id: v.id,
+        title: v.title,
+        sku: v.sku ?? '',
+        price: formatPrice(v.price.amount, v.price.currencyCode),
+        currencyCode: v.price.currencyCode,
+        availableForSale: v.availableForSale,
+        selectedOptions: v.selectedOptions ?? [],
+      })),
+      options: data.product.options,
+      certVariantId: data.cert?.variants?.nodes?.[0]?.id,
+      fixtureVariantId: data.fixture?.variants?.nodes?.[0]?.id,
+    };
+  } catch (err) {
+    console.error('[shopify] fetchProductVariants failed:', err);
+    return null;
+  }
+}
+
 // --- Variant helpers ---
 
 /** Find variant matching all selected options. */
