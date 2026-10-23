@@ -64,6 +64,7 @@ export interface CartLineInput {
 export interface CartLineItem {
   id: string;
   quantity: number;
+  attributes: Array<{ key: string; value: string }>;
   merchandise: {
     id: string;
     title: string;
@@ -325,6 +326,7 @@ const CART_LINE_FIELDS = `
   fragment CartLineFields on BaseCartLine {
     id
     quantity
+    attributes { key value }
     merchandise {
       ... on ProductVariant {
         id title sku
@@ -415,6 +417,7 @@ function mapCart(raw: any): Cart {
     lines: (raw.lines?.nodes ?? []).map((l: any) => ({
       id: l.id,
       quantity: l.quantity,
+      attributes: (l.attributes ?? []).map((a: any) => ({ key: a.key, value: a.value })),
       merchandise: {
         id: l.merchandise.id,
         title: l.merchandise.title,
@@ -455,9 +458,6 @@ export function buildCartLines(
   }
   return lines;
 }
-
-// TODO(2b): Cart drawer should display line-item attributes (start_id, id_range).
-// When building the drawer, read cart.lines[].attributes and show them in the line title.
 
 /** Sanitise descriptionHtml: strip script tags. */
 export function sanitizeHtml(html: string): string {

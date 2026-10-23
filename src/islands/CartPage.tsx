@@ -166,8 +166,13 @@ function CartLineRow({
           <a href={`/targets/${merchandise.product.handle}/`} className="text-sm font-semibold text-ink no-underline hover:text-brand">
             {merchandise.product.title}
           </a>
-          <span className="text-xs text-ink-muted">{merchandise.title}</span>
-          {merchandise.sku && <span className="spec text-xs text-ink-soft">{merchandise.sku}</span>}
+          <span className="text-xs text-ink-muted">
+            {merchandise.title}
+            {line.attributes.find(a => a.key === 'id_range') && (
+              <> · IDs {line.attributes.find(a => a.key === 'id_range')!.value}</>
+            )}
+          </span>
+          {merchandise.sku && <span className="font-mono text-xs text-ink-soft">{merchandise.sku}</span>}
           <button type="button" onClick={onRemove} disabled={busy} className="mt-1 w-fit text-xs text-ink-soft hover:text-brand disabled:opacity-40">
             Remove
           </button>

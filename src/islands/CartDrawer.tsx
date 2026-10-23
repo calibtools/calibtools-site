@@ -243,9 +243,14 @@ function CartLine({
         <a href={`/targets/${merchandise.product.handle}/`} className="text-sm font-semibold text-ink no-underline hover:text-brand">
           {merchandise.product.title}
         </a>
-        <span className="text-xs text-ink-muted">{merchandise.title}</span>
+        <span className="text-xs text-ink-muted">
+          {merchandise.title}
+          {line.attributes.find(a => a.key === 'id_range') && (
+            <> · IDs {line.attributes.find(a => a.key === 'id_range')!.value}</>
+          )}
+        </span>
         {merchandise.sku && (
-          <span className="spec text-xs text-ink-soft">{merchandise.sku}</span>
+          <span className="font-mono text-xs text-ink-soft">{merchandise.sku}</span>
         )}
         <span className="spec text-sm text-ink-muted">{unitPrice} each</span>
 
