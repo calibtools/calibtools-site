@@ -5,6 +5,7 @@
  */
 import type { PatternSpec } from './patterns';
 import { BRAND_URL, LOGO_CELLS, patternSummary, brandLine } from './brand';
+import { idRange } from './idRange';
 
 export interface DxfExportOptions {
   spec: PatternSpec;
@@ -232,6 +233,16 @@ function entitiesSection(spec: PatternSpec, pw: number, ph: number): string {
   const rightText = `${BRAND_URL} · ${iso}`;
   const rightX = ox + bw;
   parts.push(textRight('CALIBTOOLS_BRAND', rightX, textBaseY, 2.4, rightText));
+
+  // --- Corner ID badge ---
+  if (spec.startId !== 0 && spec.showCornerBadge !== false) {
+    const range = idRange(spec);
+    if (range) {
+      const badgeX = ox - 1.5 * spec.square;
+      const badgeYDxf = dxfY(oy - 1.5 * spec.square + 10, ph);
+      parts.push(text('CALIBTOOLS_BRAND', badgeX, badgeYDxf, 10, `#${spec.startId}`));
+    }
+  }
 
   // --- Axes ---
   if (spec.showAxes !== false) {

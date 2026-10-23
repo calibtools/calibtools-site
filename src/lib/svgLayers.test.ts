@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { axesSvg, brandFooterSvg, type SvgContext } from './svgLayers';
+import { axesSvg, brandFooterSvg, cornerIdBadgeSvg, type SvgContext } from './svgLayers';
 import type { PatternSpec } from './patterns';
 
 function makeCtx(specOverrides: Partial<PatternSpec> = {}): SvgContext {
@@ -112,5 +112,35 @@ describe('brandFooterSvg fallback tiers', () => {
     const svg = brandFooterSvg(ctx);
     expect(svg.length).toBeGreaterThan(0);
     expect(svg).toContain('Brand footer omitted');
+  });
+});
+
+describe('corner ID badge', () => {
+  it('draws badge when startId != 0', () => {
+    const ctx = makeCtx({ startId: 50 });
+    const svg = cornerIdBadgeSvg(ctx);
+    expect(svg).toContain('#50');
+    expect(svg).toContain('class="corner-id-badge"');
+  });
+
+  it('returns empty string when startId is 0', () => {
+    expect(cornerIdBadgeSvg(makeCtx({ startId: 0 }))).toBe('');
+  });
+
+  it('returns empty string when showCornerBadge is false', () => {
+    expect(cornerIdBadgeSvg(makeCtx({ startId: 50, showCornerBadge: false }))).toBe('');
+  });
+
+  it('badge x position is >= 1.5 squares left of pattern origin', () => {
+    const ctx = makeCtx({ startId: 10 });
+    const svg = cornerIdBadgeSvg(ctx);
+    const xMatch = svg.match(/x="([^"]+)"/);
+    expect(xMatch).not.toBeNull();
+    const badgeX = parseFloat(xMatch![1]);
+    expect(badgeX).toBeLessThanOrEqual(ctx.ox - 1.5 * ctx.spec.square + 0.01);
+  });
+
+  it('returns empty string for Checkerboard (no markers)', () => {
+    expect(cornerIdBadgeSvg(makeCtx({ type: 'Checkerboard', startId: 5 }))).toBe('');
   });
 });

@@ -2,7 +2,7 @@
  * Pattern geometry — v0. Units: millimetres. Origin top-left, x right, y down (OpenCV convention).
  * This file is the seed of packages/core; keep it free of DOM and framework code.
  */
-import { svgOpen, svgClose, scaleBarSvg, axesSvg, brandFooterSvg } from './svgLayers';
+import { svgOpen, svgClose, scaleBarSvg, axesSvg, cornerIdBadgeSvg, brandFooterSvg } from './svgLayers';
 import type { SvgContext } from './svgLayers';
 import { renderCheckerboardSvg } from './renderCheckerboard';
 import { renderCharucoSvg } from './renderCharuco';
@@ -44,6 +44,9 @@ export interface PatternSpec {
   // Axes options (Step 7b)
   showAxes?: boolean;        // default true — draw coordinate-frame axes
   monochromeAxes?: boolean;  // solid/dashed instead of coloured (for ceramic/glass)
+
+  // Corner ID badge (Step B5)
+  showCornerBadge?: boolean;  // corner ID badge when startId ≠ 0 (default true)
 }
 
 /** Inner corner coordinates (mm) for a rows×cols checkerboard, row-major, matching cv.findChessboardCorners order. */
@@ -80,6 +83,7 @@ export function checkerboardSvg(s: PatternSpec, pw: number, ph: number): string 
 
   parts.push(scaleBarSvg(ctx));
   parts.push(axesSvg(ctx));
+  parts.push(cornerIdBadgeSvg(ctx));
   parts.push(brandFooterSvg(ctx));
   parts.push(svgClose());
   return parts.join('');

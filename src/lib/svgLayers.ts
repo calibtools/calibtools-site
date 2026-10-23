@@ -6,6 +6,7 @@ import {
   BRAND_RED, BRAND_INK, BRAND_URL, patternSummary, logoSvgPaths,
 } from './brand';
 import type { PatternSpec } from './patterns';
+import { idRange } from './idRange';
 
 export interface SvgContext {
   spec: PatternSpec;
@@ -92,6 +93,27 @@ export function axesSvg(ctx: SvgContext): string {
 
   parts.push('</g>');
   return parts.join('');
+}
+
+/**
+ * Corner ID badge: "#N" in the top-left quiet zone when startId ≠ 0.
+ * Geist Mono, 10 mm cap height, ≥ 1.5 squares from the nearest pattern square.
+ */
+export function cornerIdBadgeSvg(ctx: SvgContext): string {
+  const { spec: s, ox, oy } = ctx;
+  // Only show when startId is non-zero and badge not explicitly disabled
+  if (s.startId === 0 || s.showCornerBadge === false) return '';
+
+  const range = idRange(s);
+  if (!range) return '';
+
+  // Position: top-left quiet zone, >= 1.5 squares from nearest pattern square
+  const minGap = 1.5 * s.square;
+  const badgeX = ox - minGap;
+  const badgeY = oy - minGap + 10; // 10mm cap height — baseline at this Y
+  const text = `#${s.startId}`;
+
+  return `<text x="${badgeX}" y="${badgeY}" class="corner-id-badge" font-family="'Geist Mono', monospace" font-size="10" font-weight="700" fill="#333">${text}</text>`;
 }
 
 /** Brand footer group with 3-tier fallback. Never silently omitted. */

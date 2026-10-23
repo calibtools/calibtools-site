@@ -63,7 +63,7 @@ export default function Generator({ initialSpec }: GeneratorProps = {}) {
     const fromUrl: Partial<PatternSpec> = {};
     const strFields: (keyof PatternSpec)[] = ['type', 'dict', 'paper', 'aprilFamily', 'tagIdList'];
     const numFields: (keyof PatternSpec)[] = ['rows', 'cols', 'square', 'marker', 'startId', 'borderBits', 'tagSpacing', 'circleDiameter', 'circleSpacingX', 'circleSpacingY'];
-    const boolFields: (keyof PatternSpec)[] = ['scaleBar', 'finderMarkers', 'radonCheckers', 'invert', 'legacyLayout', 'showTagIds', 'symmetricCorners', 'showAxes', 'monochromeAxes'];
+    const boolFields: (keyof PatternSpec)[] = ['scaleBar', 'finderMarkers', 'radonCheckers', 'invert', 'legacyLayout', 'showTagIds', 'symmetricCorners', 'showAxes', 'monochromeAxes', 'showCornerBadge'];
 
     for (const k of strFields) {
       const v = params.get(k);
@@ -188,6 +188,14 @@ export default function Generator({ initialSpec }: GeneratorProps = {}) {
               checked={spec.monochromeAxes ?? false}
               onChange={(e) => set('monochromeAxes', e.target.checked)} />
             Monochrome axes (for ceramic/glass)
+          </label>
+        )}
+        {(spec.type === 'ChArUco' || spec.type === 'ArUco grid' || spec.type === 'AprilGrid (Kalibr)') && (
+          <label className="flex items-center gap-2.5 text-sm font-normal">
+            <input type="checkbox" className="h-[18px] w-[18px]"
+              checked={spec.showCornerBadge ?? true}
+              onChange={(e) => set('showCornerBadge', e.target.checked)} />
+            Corner ID badge (when start ID ≠ 0)
           </label>
         )}
         {(spec.type === 'ChArUco' || spec.type === 'ArUco grid') && (
