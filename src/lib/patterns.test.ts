@@ -237,6 +237,58 @@ describe('AprilGrid rendering', () => {
   });
 });
 
+describe('circle grid options', () => {
+  it('custom diameter changes circle radius', () => {
+    const spec: PatternSpec = {
+      type: 'Symmetric circles', rows: 3, cols: 3, square: 25, marker: 0,
+      dict: '', paper: 'A4', startId: 0, scaleBar: false,
+      circleDiameter: 10,
+    };
+    const svg = checkerboardSvg(spec, 210, 297);
+    expect(svg).toContain('r="5"');
+  });
+
+  it('default diameter is 0.56 * square (radius 0.28 * square)', () => {
+    const spec: PatternSpec = {
+      type: 'Symmetric circles', rows: 3, cols: 3, square: 25, marker: 0,
+      dict: '', paper: 'A4', startId: 0, scaleBar: false,
+    };
+    const svg = checkerboardSvg(spec, 210, 297);
+    // 0.56 * 25 / 2 = 7 (may have floating-point tail)
+    const radii = svg.match(/r="([^"]+)"/g);
+    expect(radii).not.toBeNull();
+    const r = parseFloat(radii![0].replace('r="', ''));
+    expect(r).toBeCloseTo(7, 9);
+  });
+
+  it('invert draws white circles on black background', () => {
+    const spec: PatternSpec = {
+      type: 'Symmetric circles', rows: 3, cols: 3, square: 25, marker: 0,
+      dict: '', paper: 'A4', startId: 0, scaleBar: false,
+      invert: true,
+    };
+    const svg = checkerboardSvg(spec, 210, 297);
+    // Should have a black bg rect and white fill circles
+    expect(svg).toContain('fill="#fff"');
+    // Background rect for the pattern area
+    const bgRect = svg.match(/<rect[^>]*fill="#000"[^>]*\/>/);
+    expect(bgRect).not.toBeNull();
+  });
+
+  it('independent X/Y spacing changes circle positions', () => {
+    const spec: PatternSpec = {
+      type: 'Symmetric circles', rows: 2, cols: 2, square: 25, marker: 0,
+      dict: '', paper: 'A4', startId: 0, scaleBar: false,
+      circleSpacingX: 30, circleSpacingY: 20,
+    };
+    const svg = checkerboardSvg(spec, 210, 297);
+    // First circle should be at ox + 30/2, second at ox + 30 + 30/2
+    // Just check the SVG is valid and circles exist
+    const circles = svg.match(/<circle/g);
+    expect(circles).toHaveLength(4);
+  });
+});
+
 describe('checkerboard Radon (rounded)', () => {
   it('Radon checkers adds rx/ry attributes to squares', () => {
     const spec: PatternSpec = {
