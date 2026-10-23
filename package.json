@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
-    "prebuild": "node scripts/verify-storefront.mjs && node scripts/generate-placeholders.mjs",
+    "prebuild": "node scripts/verify-storefront.mjs && tsx scripts/generate-placeholders.ts",
     "build": "astro build",
     "postbuild": "node scripts/check-links.mjs",
     "preview": "astro preview",
@@ -30,6 +30,7 @@
     "@resvg/resvg-js": "^2.6.2",
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",
+    "tsx": "^4.23.15",
     "typescript": "^5.8.0",
     "vitest": "^3.1.0"
   }
