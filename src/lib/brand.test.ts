@@ -140,7 +140,7 @@ describe('patternSummary', () => {
       dict: 'DICT_6X6_250',
       startId: 0,
     });
-    expect(s).toBe('ChArUco 7×10 · 25/18 mm · DICT_6X6_250 · id 0');
+    expect(s).toBe('ChArUco 7\u00D710 \u00B7 25/18 mm \u00B7 DICT_6X6_250 \u00B7 IDs 0\u201334');
   });
 
   it('uses × (U+00D7) not x', () => {
@@ -164,14 +164,14 @@ describe('patternSummary', () => {
       dict: 'DICT_4X4_50',
       startId: 10,
     });
-    expect(s).toBe('ChArUco 5×8 · 30/20 mm · DICT_4X4_50 · id 10');
+    expect(s).toBe('ChArUco 5\u00D78 \u00B7 30/20 mm \u00B7 DICT_4X4_50 \u00B7 IDs 10\u201329');
   });
 });
 
 describe('brandLine', () => {
   it('includes the summary text', () => {
-    const line = brandLine({ summary: 'ChArUco 7×10 · 25/18 mm · DICT_6X6_250 · id 0' });
-    expect(line).toContain('ChArUco 7×10 · 25/18 mm · DICT_6X6_250 · id 0');
+    const line = brandLine({ summary: 'ChArUco 7\u00D710 \u00B7 25/18 mm \u00B7 DICT_6X6_250 \u00B7 IDs 0\u201334' });
+    expect(line).toContain('ChArUco 7\u00D710 \u00B7 25/18 mm \u00B7 DICT_6X6_250 \u00B7 IDs 0\u201334');
   });
 
   it('includes the domain URL', () => {
@@ -198,9 +198,35 @@ describe('brandLine', () => {
   });
 
   it('matches full expected format', () => {
-    const line = brandLine({ summary: 'ChArUco 7×10 · 25/18 mm · DICT_6X6_250 · id 0', date: '2025-01-01' });
+    const line = brandLine({ summary: 'ChArUco 7\u00D710 \u00B7 25/18 mm \u00B7 DICT_6X6_250 \u00B7 IDs 0\u201334', date: '2025-01-01' });
     expect(line).toBe(
-      'ChArUco 7×10 · 25/18 mm · DICT_6X6_250 · id 0 · generated 2025-01-01 · calib.tools · Patterns and files © Calib.Tools, free to use; targets available at calib.tools/targets'
+      'ChArUco 7\u00D710 \u00B7 25/18 mm \u00B7 DICT_6X6_250 \u00B7 IDs 0\u201334 \u00B7 generated 2025-01-01 \u00B7 calib.tools \u00B7 Patterns and files \u00A9 Calib.Tools, free to use; targets available at calib.tools/targets'
     );
+  });
+});
+
+describe('patternSummary with ID ranges', () => {
+  it('ChArUco shows "IDs 0\u201334" instead of "id 0"', () => {
+    const s = patternSummary({
+      type: 'ChArUco', rows: 7, cols: 10, square: 25,
+      marker: 18, dict: 'DICT_6X6_250', startId: 0,
+    });
+    expect(s).toContain('IDs 0\u201334');
+    expect(s).not.toContain('id 0');
+  });
+
+  it('ChArUco with startId=10 shows "IDs 10\u201344"', () => {
+    const s = patternSummary({
+      type: 'ChArUco', rows: 7, cols: 10, square: 25,
+      marker: 18, dict: 'DICT_6X6_250', startId: 10,
+    });
+    expect(s).toContain('IDs 10\u201344');
+  });
+
+  it('Checkerboard has no ID in summary', () => {
+    const s = patternSummary({
+      type: 'Checkerboard', rows: 7, cols: 10, square: 25,
+    });
+    expect(s).not.toContain('ID');
   });
 });
