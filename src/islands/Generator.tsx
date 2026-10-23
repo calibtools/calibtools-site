@@ -13,7 +13,11 @@ import { patternSummary } from '@/lib/brand';
  * config file downloads (OpenCV, Kalibr, ROS 2, HALCON).
  */
 const PATTERNS = ['Checkerboard', 'ChArUco', 'AprilGrid (Kalibr)', 'Asymmetric circles', 'Symmetric circles', 'ArUco grid', 'HALCON-style dots'] as const;
-const DICTS = ['DICT_6X6_250', 'DICT_5X5_100', 'DICT_4X4_50', 'DICT_APRILTAG_36h11', 'DICT_ARUCO_ORIGINAL'];
+const DICTS = [
+  'DICT_4X4_50', 'DICT_5X5_100', 'DICT_6X6_250', 'DICT_7X7_1000',
+  'DICT_ARUCO_ORIGINAL', 'DICT_ARUCO_MIP_36h12',
+  'DICT_APRILTAG_36h11',
+];
 const PAPERS: Record<string, [number, number]> = { A4: [210, 297], A3: [297, 420], Letter: [215.9, 279.4] };
 
 /** Build a product URL with query params to preselect the variant. */
@@ -85,6 +89,14 @@ export default function Generator({ initialSpec }: GeneratorProps = {}) {
           <label className="flex flex-col gap-2 text-[13px] font-semibold">Start ID<input className={field} type="number" min={0} value={spec.startId} onChange={(e) => set('startId', +e.target.value)} /></label>
         </div>
         <label className="flex items-center gap-2.5 text-sm font-normal"><input type="checkbox" className="h-[18px] w-[18px]" checked={spec.scaleBar} onChange={(e) => set('scaleBar', e.target.checked)} /> Add 100 mm scale bar and config QR</label>
+        {(spec.type === 'ChArUco' || spec.type === 'ArUco grid') && (
+          <label className="flex items-center gap-2.5 text-sm font-normal">
+            <input type="checkbox" className="h-[18px] w-[18px]"
+              checked={spec.legacyLayout ?? false}
+              onChange={(e) => set('legacyLayout', e.target.checked)} />
+            OpenCV &le; 4.5 legacy layout
+          </label>
+        )}
 
         <div className="flex flex-col gap-2.5 border-t border-line pt-4">
           <span className="text-[13px] font-semibold">Download</span>
