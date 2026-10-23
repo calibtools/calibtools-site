@@ -1,11 +1,19 @@
 ---
 import Base from '@/layouts/Base.astro';
 import ToolTabs from '@/components/ToolTabs.astro';
+import ToolContent from '@/components/ToolContent.astro';
 import Converter from '@/islands/Converter';
+import { getEntry } from 'astro:content';
+import { toolJsonLd } from '@/lib/toolJsonLd';
+
+const entry = (await getEntry('tools', 'convert'))!;
+const { Content } = await entry.render();
+const jsonLd = toolJsonLd(entry.data.h1, '/tools/convert/', entry.data.seoDescription, entry.data.faq);
 ---
-<Base title="Format converter" section="tools" description="Convert calibration configs between OpenCV JSON, Kalibr YAML, ROS 2 YAML, and HALCON .descr formats. Paste, convert, download. Runs in your browser.">
+<Base title={entry.data.seoTitle} section="tools" description={entry.data.seoDescription} jsonLd={jsonLd}>
   <ToolTabs current="convert" />
   <div class="container-x py-7 md:pb-16">
     <Converter client:load />
   </div>
+  <ToolContent Content={Content} faq={entry.data.faq} />
 </Base>

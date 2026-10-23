@@ -1,11 +1,19 @@
 ---
 import Base from '@/layouts/Base.astro';
 import ToolTabs from '@/components/ToolTabs.astro';
+import ToolContent from '@/components/ToolContent.astro';
 import QualityAnalyzer from '@/islands/QualityAnalyzer';
+import { getEntry } from 'astro:content';
+import { toolJsonLd } from '@/lib/toolJsonLd';
+
+const entry = (await getEntry('tools', 'quality'))!;
+const { Content } = await entry.render();
+const jsonLd = toolJsonLd(entry.data.h1, '/tools/quality/', entry.data.seoDescription, entry.data.faq);
 ---
-<Base title="Quality analyzer" section="tools" description="Analyze your camera calibration results: intrinsics, distortion, reprojection errors, and outlier detection. Paste OpenCV JSON and get an instant quality score.">
+<Base title={entry.data.seoTitle} section="tools" description={entry.data.seoDescription} jsonLd={jsonLd}>
   <ToolTabs current="quality" />
   <div class="container-x py-7 md:pb-16">
     <QualityAnalyzer client:load />
   </div>
+  <ToolContent Content={Content} faq={entry.data.faq} />
 </Base>
