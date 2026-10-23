@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { kalibrYaml, ros2Yaml, halconDescr } from './exportConfig';
+import { kalibrYaml, ros2Yaml, halconDescr, opencvJson } from './exportConfig';
 import type { PatternSpec } from './patterns';
 
 const checker: PatternSpec = {
@@ -83,5 +83,64 @@ describe('halconDescr', () => {
     expect(posLines).toHaveLength(54);
     expect(posLines[0]).toBe('0 0');
     expect(posLines[posLines.length - 1]).toBe('5 8');
+  });
+});
+
+describe('config brand headers', () => {
+  it('kalibrYaml has 3-line brand header at top', () => {
+    const y = kalibrYaml(checker);
+    const lines = y.split('\n');
+    expect(lines[0]).toMatch(/^# .+ · generated \d{4}-\d{2}-\d{2} · calib\.tools$/);
+    expect(lines[1]).toMatch(/^# Patterns and files © Calib\.Tools/);
+    expect(lines[2]).toBe('#');
+  });
+
+  it('kalibrYaml still parses (data lines present)', () => {
+    const y = kalibrYaml(checker);
+    const dataLines = y.split('\n').filter(l => !l.startsWith('#') && l.trim());
+    expect(dataLines.some(l => l.startsWith("target_type:"))).toBe(true);
+  });
+
+  it('ros2Yaml has 3-line brand header at top', () => {
+    const y = ros2Yaml(checker);
+    const lines = y.split('\n');
+    expect(lines[0]).toMatch(/^# .+ · generated \d{4}-\d{2}-\d{2} · calib\.tools$/);
+  });
+
+  it('ros2Yaml still parses', () => {
+    const y = ros2Yaml(checker);
+    const dataLines = y.split('\n').filter(l => !l.startsWith('#') && l.trim());
+    expect(dataLines.some(l => l.includes('square_size:'))).toBe(true);
+  });
+
+  it('halconDescr has 3-line brand header at top', () => {
+    const d = halconDescr(checker);
+    const lines = d.split('\n');
+    expect(lines[0]).toMatch(/^# .+ · generated \d{4}-\d{2}-\d{2} · calib\.tools$/);
+  });
+
+  it('halconDescr still has all inner corner positions', () => {
+    const d = halconDescr(checker);
+    const posLines = d.split('\n').filter(l => /^\d+ \d+$/.test(l));
+    expect(posLines).toHaveLength(54);
+  });
+});
+
+describe('opencvJson', () => {
+  it('has _generator object', () => {
+    const j = JSON.parse(opencvJson(charuco));
+    expect(j._generator).toBeDefined();
+    expect(j._generator.name).toBe('Calib.Tools');
+    expect(j._generator.url).toBe('https://calib.tools');
+    expect(j._generator.generated).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    expect(j._generator.pattern).toContain('ChArUco');
+  });
+
+  it('still has pattern fields', () => {
+    const j = JSON.parse(opencvJson(charuco));
+    expect(j.pattern).toBe('ChArUco');
+    expect(j.rows).toBe(7);
+    expect(j.cols).toBe(10);
+    expect(j.square_mm).toBe(25);
   });
 });
