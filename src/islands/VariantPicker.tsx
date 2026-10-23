@@ -179,6 +179,8 @@ export default function VariantPicker({ product, certVariantId, fixtureVariantId
 
       {error && <p className="m-0 text-sm text-brand">{error}</p>}
 
+      <a href="/quote/" className="text-sm text-ink-soft no-underline hover:text-ink">Need a quote or invoice/PO? →</a>
+
       <div className="grid grid-cols-2 gap-3 pt-2 text-sm text-ink-muted">
         <span>✓ Ships in 1–2 days, 2–4 days in EU</span>
         <span>✓ Inspection report included</span>
