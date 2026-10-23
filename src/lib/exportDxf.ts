@@ -124,7 +124,7 @@ function tablesSection(): string {
     gc(2, 'TABLES') +
     gc(0, 'TABLE') +
     gc(2, 'LAYER') +
-    gc(70, 2) +
+    gc(70, 3) +
     // Layer "0"
     gc(0, 'LAYER') +
     gc(2, '0') +
@@ -134,6 +134,12 @@ function tablesSection(): string {
     // Layer "CALIBTOOLS_BRAND"
     gc(0, 'LAYER') +
     gc(2, 'CALIBTOOLS_BRAND') +
+    gc(70, 0) +
+    gc(62, 1) +   // color red
+    gc(6, 'CONTINUOUS') +
+    // Layer "AXES"
+    gc(0, 'LAYER') +
+    gc(2, 'AXES') +
     gc(70, 0) +
     gc(62, 1) +   // color red
     gc(6, 'CONTINUOUS') +
@@ -226,6 +232,48 @@ function entitiesSection(spec: PatternSpec, pw: number, ph: number): string {
   const rightText = `${BRAND_URL} · ${iso}`;
   const rightX = ox + bw;
   parts.push(textRight('CALIBTOOLS_BRAND', rightX, textBaseY, 2.4, rightText));
+
+  // --- Axes ---
+  if (spec.showAxes !== false) {
+    const isKalibr = spec.type === 'AprilGrid (Kalibr)' && spec.symmetricCorners;
+    const shorter = Math.min(bw, bh);
+    const arrowLen = Math.max(15, Math.min(40, shorter * 0.15));
+    const headLen = Math.min(3, arrowLen * 0.2);
+    const axGap = 0.5 * spec.square;
+
+    // Origin in pattern coords (y-down)
+    const axOriginX = ox - axGap;
+    const axOriginYDown = isKalibr ? oy + bh + axGap : oy - axGap;
+
+    // Convert to DXF y-up
+    const axOriginYDxf = dxfY(axOriginYDown, ph);
+
+    // X arrow: pointing right (same in both coord systems)
+    const xEndX = axOriginX + arrowLen;
+    parts.push(
+      gc(0, 'LINE') + gc(8, 'AXES') +
+      gc(10, f(axOriginX)) + gc(20, f(axOriginYDxf)) +
+      gc(11, f(xEndX - headLen)) + gc(21, f(axOriginYDxf))
+    );
+    parts.push(text('AXES', xEndX + 1, axOriginYDxf, 2.5, 'X'));
+
+    // Y arrow: in DXF y-up, OpenCV Y-down becomes DXF negative-Y, Kalibr Y-up becomes DXF positive-Y
+    const yDirDxf = isKalibr ? 1 : -1;
+    const yEndDxf = axOriginYDxf + yDirDxf * arrowLen;
+    parts.push(
+      gc(0, 'LINE') + gc(8, 'AXES') +
+      gc(10, f(axOriginX)) + gc(20, f(axOriginYDxf)) +
+      gc(11, f(axOriginX)) + gc(21, f(yEndDxf - yDirDxf * headLen))
+    );
+    parts.push(text('AXES', axOriginX + 1.5, yEndDxf + yDirDxf * 2.5, 2.5, 'Y'));
+
+    // Origin dot as tiny circle
+    parts.push(circle('AXES', axOriginX, axOriginYDxf, 0.8));
+
+    // Caption
+    const captionText = isKalibr ? 'Kalibr frame - origin bottom-left' : 'OpenCV frame - origin top-left';
+    parts.push(text('AXES', axOriginX + 3, axOriginYDxf + (isKalibr ? -3 : 2), 1.8, captionText));
+  }
 
   parts.push(gc(0, 'ENDSEC'));
   return parts.join('');
