@@ -29,6 +29,18 @@ const certPrice = certProduct?.variants[0]?.price;
 const fixturePrice = fixtureProduct?.variants[0]?.price;
 
 const cleanDescription = sanitizeHtml(product.descriptionHtml);
+
+// Eyebrow: lead_time metafield > availableForSale > "Made to order"
+// Never show "In stock" for certificate-ilac (it's a service, not physical stock)
+const leadTime = product.metafields.lead_time;
+const anyAvailable = product.variants.some((v) => v.availableForSale);
+const eyebrow = leadTime
+  ? leadTime
+  : handle === 'certificate-ilac'
+    ? 'Made to order'
+    : anyAvailable
+      ? 'In stock \u00B7 ships in 1\u20132 days from Germany'
+      : 'Made to order';
 ---
 <Base title={product.title} section="targets" description={product.description}>
   <div class="container-x flex gap-2 pt-5 text-sm text-ink-soft">
@@ -58,7 +70,7 @@ const cleanDescription = sanitizeHtml(product.descriptionHtml);
 
     {/* Product info + variant picker */}
     <div class="flex min-w-0 flex-1 basis-[420px] flex-col gap-5">
-      <span class="eyebrow">In stock · ships from Germany</span>
+      <span class="eyebrow">{eyebrow}</span>
       <h1 class="h-display m-0 text-[32px] leading-[1.1] md:text-[40px]">{product.title}</h1>
       <p class="m-0 text-base leading-relaxed text-ink-muted">{product.description}</p>
 
