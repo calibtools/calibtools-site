@@ -1,17 +1,30 @@
 ---
-const links = [
-  { href: 'https://github.com/calibtools', label: 'GitHub' },
+const shop = [
+  { href: '/targets/', label: 'Calibration targets' },
+  { href: '/tools/', label: 'Free tools' },
+  { href: '/guides/', label: 'Knowledge base' },
   { href: '/shipping/', label: 'Shipping' },
   { href: '/returns/', label: 'Returns' },
+];
+const company = [
   { href: '/imprint/', label: 'Imprint' },
   { href: '/privacy/', label: 'Privacy' },
+  { href: 'https://github.com/calibtools', label: 'GitHub' },
 ];
 ---
 <footer class="border-t border-line-light">
-  <div class="container-x flex flex-wrap items-center justify-between gap-4 py-10 text-sm text-ink-soft">
-    <span>© 2026 Calib.Tools · Munich, Germany</span>
-    <div class="flex flex-wrap gap-6">
-      {links.map((l) => <a href={l.href} class="text-ink-soft no-underline hover:text-ink">{l.label}</a>)}
+  <div class="container-x flex flex-wrap gap-10 py-10 md:py-14">
+    <div class="flex min-w-0 flex-1 basis-[240px] flex-col gap-3">
+      <span class="text-[15px] font-bold">Shop</span>
+      {shop.map((l) => <a href={l.href} class="text-sm text-ink-soft no-underline hover:text-ink">{l.label}</a>)}
     </div>
+    <div class="flex min-w-0 flex-1 basis-[240px] flex-col gap-3">
+      <span class="text-[15px] font-bold">Company</span>
+      {company.map((l) => <a href={l.href} class="text-sm text-ink-soft no-underline hover:text-ink">{l.label}</a>)}
+      <a href="mailto:hello@calib.tools" class="text-sm text-ink-soft no-underline hover:text-ink">hello@calib.tools</a>
+    </div>
+  </div>
+  <div class="container-x border-t border-line-light py-6">
+    <span class="text-sm text-ink-soft">&copy; 2026 Calib.Tools &middot; Munich, Germany</span>
   </div>
 </footer>
