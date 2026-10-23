@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { checkerboardSvg, type PatternSpec } from '@/lib/patterns';
 import { exportPdf } from '@/lib/exportPdf';
 import { exportPng } from '@/lib/exportPng';
@@ -18,7 +18,10 @@ const DICTS = [
   'DICT_ARUCO_ORIGINAL', 'DICT_ARUCO_MIP_36h12',
   'DICT_APRILTAG_36h11',
 ];
-const PAPERS: Record<string, [number, number]> = { A4: [210, 297], A3: [297, 420], Letter: [215.9, 279.4] };
+const PAPERS: Record<string, [number, number]> = {
+  A4: [210, 297], A3: [297, 420], A2: [420, 594], A1: [594, 841], A0: [841, 1189],
+  Letter: [215.9, 279.4], Tabloid: [279.4, 431.8],
+};
 
 /** Build a product URL with query params to preselect the variant. */
 function productCtaUrl(spec: PatternSpec): string {
@@ -38,14 +41,86 @@ interface GeneratorProps {
   initialSpec?: Partial<PatternSpec>;
 }
 
+function mmToIn(mm: number): string {
+  return (mm / 25.4).toFixed(2);
+}
+
+// Product sizes we sell (width x height in mm)
+const PRODUCT_SIZES: [number, number][] = [[200,200],[300,200],[300,300],[400,300],[400,400],[500,300],[500,400]];
+
 export default function Generator({ initialSpec }: GeneratorProps = {}) {
   const defaultSpec: PatternSpec = { type: 'ChArUco', rows: 7, cols: 10, square: 25, marker: 18, dict: 'DICT_6X6_250', paper: 'A4', startId: 0, scaleBar: true };
   const [spec, setSpec] = useState<PatternSpec>({ ...defaultSpec, ...initialSpec });
   const [busy, setBusy] = useState<'pdf' | 'png' | null>(null);
+  const [autoSize, setAutoSize] = useState(false);
+  const [compactInfo, setCompactInfo] = useState(false);
+  const [urlRead, setUrlRead] = useState(false);
+
+  // Read state from URL on mount
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    const fromUrl: Partial<PatternSpec> = {};
+    const strFields: (keyof PatternSpec)[] = ['type', 'dict', 'paper', 'aprilFamily', 'tagIdList'];
+    const numFields: (keyof PatternSpec)[] = ['rows', 'cols', 'square', 'marker', 'startId', 'borderBits', 'tagSpacing', 'circleDiameter', 'circleSpacingX', 'circleSpacingY'];
+    const boolFields: (keyof PatternSpec)[] = ['scaleBar', 'finderMarkers', 'radonCheckers', 'invert', 'legacyLayout', 'showTagIds', 'symmetricCorners', 'showAxes', 'monochromeAxes'];
+
+    for (const k of strFields) {
+      const v = params.get(k);
+      if (v !== null) (fromUrl as any)[k] = v;
+    }
+    for (const k of numFields) {
+      const v = params.get(k);
+      if (v !== null && !isNaN(+v)) (fromUrl as any)[k] = +v;
+    }
+    for (const k of boolFields) {
+      const v = params.get(k);
+      if (v !== null) (fromUrl as any)[k] = v === 'true';
+    }
+
+    if (Object.keys(fromUrl).length > 0) {
+      setSpec(s => ({ ...s, ...fromUrl }));
+    }
+    setUrlRead(true);
+  }, []);
+
+  // Write state to URL on change (only after initial read)
+  useEffect(() => {
+    if (!urlRead || typeof window === 'undefined') return;
+    const params = new URLSearchParams();
+    const entries = Object.entries(spec) as [string, unknown][];
+    for (const [k, v] of entries) {
+      if (v !== undefined && v !== '' && v !== false && v !== null) {
+        params.set(k, String(v));
+      }
+    }
+    window.history.replaceState(null, '', `${window.location.pathname}?${params.toString()}`);
+  }, [spec, urlRead]);
+
   const [pw, ph] = PAPERS[spec.paper] ?? PAPERS.A4;
   const svg = useMemo(() => checkerboardSvg(spec, pw, ph), [spec, pw, ph]);
   const set = <K extends keyof PatternSpec>(k: K, v: PatternSpec[K]) => setSpec((s) => ({ ...s, [k]: v }));
   const boardW = spec.cols * spec.square, boardH = spec.rows * spec.square;
+  const productMatch = PRODUCT_SIZES.find(([pw2,ph2]) =>
+    Math.abs(boardW - pw2) <= 2 && Math.abs(boardH - ph2) <= 2
+  );
+
+  // Auto-size paper: pick smallest standard page that fits
+  useEffect(() => {
+    if (!autoSize) return;
+    const quietZone = spec.square;
+    const needW = boardW + 2 * quietZone;
+    const needH = boardH + 2 * quietZone + 20;
+    const isInch = spec.paper === 'Letter' || spec.paper === 'Tabloid';
+    const candidates = isInch
+      ? (['Letter', 'Tabloid'] as const).map(n => [n, PAPERS[n]] as const)
+      : (['A4', 'A3', 'A2', 'A1', 'A0'] as const).map(n => [n, PAPERS[n]] as const);
+    const fit = candidates.find(([, [w, h]]) => w >= needW && h >= needH);
+    if (fit && fit[0] !== spec.paper) {
+      set('paper', fit[0] as string);
+    }
+  }, [autoSize, boardW, boardH, spec.square]);
+
   const corners = (spec.rows - 1) * (spec.cols - 1);
   const markers = Math.floor((spec.rows * spec.cols) / 2);
   const margin = 10;
@@ -88,7 +163,19 @@ export default function Generator({ initialSpec }: GeneratorProps = {}) {
           </label>
           <label className="flex flex-col gap-2 text-[13px] font-semibold">Start ID<input className={field} type="number" min={0} value={spec.startId} onChange={(e) => set('startId', +e.target.value)} /></label>
         </div>
+        <label className="flex items-center gap-2.5 text-sm font-normal">
+          <input type="checkbox" className="h-[18px] w-[18px]"
+            checked={autoSize}
+            onChange={(e) => setAutoSize(e.target.checked)} />
+          Auto board size
+        </label>
         <label className="flex items-center gap-2.5 text-sm font-normal"><input type="checkbox" className="h-[18px] w-[18px]" checked={spec.scaleBar} onChange={(e) => set('scaleBar', e.target.checked)} /> Add 100 mm scale bar and config QR</label>
+        <label className="flex items-center gap-2.5 text-sm font-normal">
+          <input type="checkbox" className="h-[18px] w-[18px]"
+            checked={compactInfo}
+            onChange={(e) => setCompactInfo(e.target.checked)} />
+          Compact info (hide parameter line)
+        </label>
         {(spec.type === 'ChArUco' || spec.type === 'ArUco grid') && (
           <label className="flex items-center gap-2.5 text-sm font-normal">
             <input type="checkbox" className="h-[18px] w-[18px]"
@@ -274,8 +361,13 @@ export default function Generator({ initialSpec }: GeneratorProps = {}) {
 
       <div className="flex min-w-0 flex-1 basis-[520px] flex-col gap-4">
         <div className="flex flex-wrap justify-between gap-3 text-sm text-ink-muted">
-          <span>Preview · {spec.paper} · {spec.rows} × {spec.cols} {spec.type}, {spec.square} mm squares</span>
-          <span className="font-mono">Board {boardW} × {boardH} mm · {corners} corners · {markers} markers</span>
+          {!compactInfo && (
+            <span>Preview · {spec.paper} · {spec.rows} × {spec.cols} {spec.type}, {spec.square} mm squares</span>
+          )}
+          <span className="font-mono">Board {boardW} × {boardH} mm <span className="text-ink-soft">({mmToIn(boardW)} × {mmToIn(boardH)} in)</span> · {corners} corners · {markers} markers</span>
+          {productMatch && (
+            <span className="text-sm font-medium text-green-700">Matches product size {productMatch[0]} × {productMatch[1]} mm</span>
+          )}
         </div>
         {!fits && (
           <div role="alert" className="rounded border border-brand bg-brand-tint px-4 py-3 text-sm text-brand-dark">
