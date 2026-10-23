@@ -106,6 +106,57 @@ if (hasPatternData) {
   }
 }
 
+// --- JSON-LD ---
+const siteUrl = 'https://calib.tools';
+
+const breadcrumbLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: siteUrl },
+    { '@type': 'ListItem', position: 2, name: 'Calibration targets', item: `${siteUrl}/targets/` },
+    { '@type': 'ListItem', position: 3, name: product.title },
+  ],
+};
+
+const productLd: Record<string, any> = {
+  '@context': 'https://schema.org',
+  '@type': 'ProductGroup',
+  name: product.title,
+  description: product.description,
+  url: `${siteUrl}${product.url}`,
+  brand: { '@type': 'Brand', name: 'Calib.Tools' },
+  image: product.images.length > 0 ? product.images.map((img) => img.url) : undefined,
+};
+
+if (product.variants.length > 0) {
+  productLd.hasVariant = product.variants.map((v) => ({
+    '@type': 'Product',
+    name: `${product.title} — ${v.title}`,
+    sku: v.sku || undefined,
+    offers: {
+      '@type': 'Offer',
+      price: v.priceAmount,
+      priceCurrency: v.currencyCode,
+      availability: v.availableForSale
+        ? 'https://schema.org/InStock'
+        : 'https://schema.org/OutOfStock',
+      url: `${siteUrl}${product.url}?variant=${encodeURIComponent(v.id)}`,
+      seller: { '@type': 'Organization', name: 'Calib.Tools' },
+    },
+  }));
+} else {
+  productLd.offers = {
+    '@type': 'AggregateOffer',
+    lowPrice: product.priceMinAmount,
+    priceCurrency: product.priceMinCurrency,
+    availability: 'https://schema.org/InStock',
+    url: `${siteUrl}${product.url}`,
+  };
+}
+
+const ogImage = product.images[0]?.url ?? undefined;
+
 // --- FAQ ---
 const faqItems = getProductFaq(handle!);
 const faqJsonLd = {
@@ -118,7 +169,7 @@ const faqJsonLd = {
   })),
 };
 ---
-<Base title={product.title} section="targets" description={product.description}>
+<Base title={product.title} section="targets" description={product.description} jsonLd={[breadcrumbLd, productLd]} ogImage={ogImage}>
   <div class="container-x flex gap-2 pt-5 text-sm text-ink-soft">
     <a href="/" class="text-ink-soft no-underline">Home</a><span>/</span>
     <a href="/targets/" class="text-ink-soft no-underline">Calibration targets</a><span>/</span>
