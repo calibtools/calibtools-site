@@ -113,8 +113,8 @@ export default function Generator() {
             <button type="button" className="font-semibold underline" onClick={() => set('square', maxSquare)}>Set {maxSquare} mm</button>
           </div>
         )}
-        <div className="flex justify-center rounded-xl bg-ground-panel p-6 md:p-10">
-          <div className="w-full max-w-[560px] bg-white shadow-[0_12px_40px_rgba(0,0,0,0.12)]" dangerouslySetInnerHTML={{ __html: svg }} />
+        <div className="flex justify-center overflow-hidden rounded-xl bg-ground-panel p-6 md:p-10">
+          <div className="w-full max-w-[560px] overflow-hidden bg-white shadow-[0_12px_40px_rgba(0,0,0,0.12)] [&>svg]:h-auto [&>svg]:w-full" dangerouslySetInnerHTML={{ __html: svg }} />
         </div>
         <div className="card flex flex-wrap items-center justify-between gap-3 bg-ground-alt px-5 py-4">
           <span className="text-[15px]"><strong>Want this exact pattern on a rigid board?</strong> <span className="text-ink-muted">Same geometry, 0.3 mm tolerance, ships in 2–4 days.</span></span>
