@@ -145,6 +145,33 @@ describe('opencvJson', () => {
   });
 });
 
+describe('id_range in configs', () => {
+  it('opencvJson includes id_range for ChArUco', () => {
+    const j = JSON.parse(opencvJson(charuco));
+    expect(j.id_range).toEqual([0, 34]);
+  });
+
+  it('opencvJson omits id_range for Checkerboard', () => {
+    const j = JSON.parse(opencvJson(checker));
+    expect(j.id_range).toBeUndefined();
+  });
+
+  it('kalibrYaml includes id range comment for AprilGrid', () => {
+    const y = kalibrYaml(aprilgrid);
+    expect(y).toContain('# id_range: 0-');
+  });
+
+  it('ros2Yaml includes id_range for ChArUco', () => {
+    const y = ros2Yaml(charuco);
+    expect(y).toContain('id_range');
+  });
+
+  it('halconDescr includes id range comment for ChArUco', () => {
+    const d = halconDescr(charuco);
+    expect(d).toContain('id_range');
+  });
+});
+
 describe('opencvJson checkerboard flags', () => {
   it('includes marker:true when finderMarkers is set', () => {
     const spec: PatternSpec = { ...checker, finderMarkers: true };

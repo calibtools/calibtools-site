@@ -4,6 +4,7 @@
  */
 import type { PatternSpec } from './patterns';
 import { BRAND_NAME, BRAND_URL, patternSummary } from './brand';
+import { idRange } from './idRange';
 
 function brandHeader(s: PatternSpec, commentChar = '#'): string {
   const summary = patternSummary(s);
@@ -48,6 +49,11 @@ export function kalibrYaml(s: PatternSpec): string {
     lines.push(`colSpacingMeters: ${(s.square / 1000).toFixed(6)}`);
   }
 
+  const range = idRange(s);
+  if (range) {
+    lines.push(`# id_range: ${range.min}-${range.max} (${range.count} markers)`);
+  }
+
   return lines.join('\n') + '\n';
 }
 
@@ -78,6 +84,11 @@ export function ros2Yaml(s: PatternSpec): string {
     lines.push(`  marker_size: ${(s.marker / 1000).toFixed(6)}  # metres`);
     lines.push(`  dictionary: ${s.dict}`);
     lines.push(`  start_id: ${s.startId}`);
+  }
+
+  const range = idRange(s);
+  if (range) {
+    lines.push(`  # id_range: ${range.min}-${range.max} (${range.count} markers)`);
   }
 
   if (s.finderMarkers) {
@@ -119,6 +130,12 @@ export function halconDescr(s: PatternSpec): string {
     `# mark positions (row col) — inner corners, row-major`,
   ];
 
+  const range = idRange(s);
+  if (range) {
+    lines.push(`# id_range: ${range.min}-${range.max} (${range.count} markers)`);
+    lines.push('');
+  }
+
   for (let r = 0; r < s.rows - 1; r++) {
     for (let c = 0; c < s.cols - 1; c++) {
       lines.push(`${r} ${c}`);
@@ -154,6 +171,10 @@ export function opencvJson(s: PatternSpec): string {
     dictionary: s.dict,
     start_id: s.startId,
   };
+  const range = idRange(s);
+  if (range) {
+    obj.id_range = [range.min, range.max];
+  }
   if (s.finderMarkers) obj.marker = true;
   if (s.radonCheckers) obj.radon = true;
   if (s.invert) obj.inverted = true;
