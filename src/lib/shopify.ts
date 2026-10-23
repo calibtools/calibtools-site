@@ -22,6 +22,10 @@ export interface Product {
   description: string;
   descriptionHtml: string;
   priceFrom: string;
+  /** Raw min price amount for JSON-LD (e.g. "89.00"). */
+  priceMinAmount: string;
+  /** ISO 4217 currency code (e.g. "EUR"). */
+  priceMinCurrency: string;
   image?: string;
   images: Array<{ url: string; altText: string | null }>;
   options: Array<{ name: string; values: string[] }>;
@@ -35,6 +39,8 @@ export interface Variant {
   title: string;
   sku: string;
   price: string;
+  /** Raw numeric price (e.g. "89.00") for JSON-LD. */
+  priceAmount: string;
   currencyCode: string;
   availableForSale: boolean;
   selectedOptions: Array<{ name: string; value: string }>;
@@ -77,7 +83,7 @@ const PRODUCT_FIELDS = `
     handle title description descriptionHtml
     priceRange { minVariantPrice { amount currencyCode } }
     featuredImage { url altText }
-    images(first: 10) { nodes { url altText } }
+    images(first: 8) { nodes { url altText } }
     options { name values }
     variants(first: 100) {
       nodes {
@@ -87,13 +93,28 @@ const PRODUCT_FIELDS = `
       }
     }
     metafields(identifiers: [
-      { namespace: "specs", key: "substrate" },
+      { namespace: "specs", key: "material" },
+      { namespace: "specs", key: "thickness_mm" },
+      { namespace: "specs", key: "size_mm" },
       { namespace: "specs", key: "pattern" },
-      { namespace: "specs", key: "tolerance" },
+      { namespace: "specs", key: "squares" },
+      { namespace: "specs", key: "square_size_mm" },
+      { namespace: "specs", key: "marker_size_mm" },
+      { namespace: "specs", key: "dictionary" },
+      { namespace: "specs", key: "start_id" },
+      { namespace: "specs", key: "feature_tolerance" },
       { namespace: "specs", key: "flatness" },
-      { namespace: "specs", key: "thermal" },
-      { namespace: "specs", key: "operating_range" },
-      { namespace: "specs", key: "mounting" }
+      { namespace: "specs", key: "cte" },
+      { namespace: "specs", key: "operating_temp" },
+      { namespace: "specs", key: "weight_g" },
+      { namespace: "specs", key: "finish" },
+      { namespace: "specs", key: "corner_radius_mm" },
+      { namespace: "specs", key: "lead_time" },
+      { namespace: "specs", key: "files_included" },
+      { namespace: "specs", key: "datasheet_url" },
+      { namespace: "specs", key: "datasheet_rev" },
+      { namespace: "specs", key: "hs_code" },
+      { namespace: "specs", key: "origin" }
     ]) { key value }
   }
 `;
@@ -116,6 +137,8 @@ function mapProduct(n: any): Product {
     description: n.description,
     descriptionHtml: n.descriptionHtml ?? '',
     priceFrom: formatPrice(minPrice.amount, minPrice.currencyCode),
+    priceMinAmount: minPrice.amount,
+    priceMinCurrency: minPrice.currencyCode,
     image: n.featuredImage?.url,
     images: (n.images?.nodes ?? []).map((img: any) => ({ url: img.url, altText: img.altText })),
     options: (n.options ?? []).map((o: any) => ({ name: o.name, values: o.values })),
@@ -124,6 +147,7 @@ function mapProduct(n: any): Product {
       title: v.title,
       sku: v.sku ?? '',
       price: formatPrice(v.price.amount, v.price.currencyCode),
+      priceAmount: v.price.amount,
       currencyCode: v.price.currencyCode,
       availableForSale: v.availableForSale,
       selectedOptions: v.selectedOptions ?? [],
@@ -350,7 +374,8 @@ const FALLBACK_PRODUCTS: Product[] = [
   {
     handle: 'checkerboard-composite', title: 'Checkerboard calibration target',
     description: 'Aluminium composite, fine or coarse pattern.', descriptionHtml: '',
-    priceFrom: '€79', image: undefined, images: [], options: [
+    priceFrom: '€79', priceMinAmount: '79.00', priceMinCurrency: 'EUR',
+    image: undefined, images: [], options: [
       { name: 'Size', values: ['200 × 150', '300 × 200', '400 × 300', '600 × 400', '800 × 600'] },
       { name: 'Pattern', values: ['7×10, 25 mm', '9×6, 30 mm', '5×8, 40 mm'] },
     ], variants: [], metafields: {}, url: '/targets/checkerboard-composite/',
@@ -358,7 +383,8 @@ const FALLBACK_PRODUCTS: Product[] = [
   {
     handle: 'charuco-composite', title: 'ChArUco calibration target',
     description: 'Aluminium composite, UV-printed matte pattern, 6 mm thick.', descriptionHtml: '',
-    priceFrom: '€89', image: undefined, images: [], options: [
+    priceFrom: '€89', priceMinAmount: '89.00', priceMinCurrency: 'EUR',
+    image: undefined, images: [], options: [
       { name: 'Size', values: ['200 × 150', '300 × 200', '400 × 300', '600 × 400', '800 × 600'] },
       { name: 'Dictionary', values: ['DICT_6X6_250', 'DICT_5X5_100', 'DICT_4X4_50', 'AprilTag 36h11'] },
     ], variants: [], metafields: {}, url: '/targets/charuco-composite/',
@@ -366,7 +392,8 @@ const FALLBACK_PRODUCTS: Product[] = [
   {
     handle: 'charuco-ceramic', title: 'ChArUco ceramic target',
     description: 'Lithographed blue chrome on alumina, ±2 µm.', descriptionHtml: '',
-    priceFrom: '€189', image: undefined, images: [], options: [
+    priceFrom: '€189', priceMinAmount: '189.00', priceMinCurrency: 'EUR',
+    image: undefined, images: [], options: [
       { name: 'Size', values: ['100 × 100', '150 × 150', '200 × 200'] },
       { name: 'Dictionary', values: ['DICT_6X6_250', 'DICT_5X5_100'] },
     ], variants: [], metafields: {}, url: '/targets/charuco-ceramic/',
@@ -374,13 +401,15 @@ const FALLBACK_PRODUCTS: Product[] = [
   {
     handle: 'mounting-fixture', title: 'Mounting fixture',
     description: '¼″ thread, aluminium, fits all boards.', descriptionHtml: '',
-    priceFrom: '€39', image: undefined, images: [], options: [], variants: [], metafields: {},
+    priceFrom: '€39', priceMinAmount: '39.00', priceMinCurrency: 'EUR',
+    image: undefined, images: [], options: [], variants: [], metafields: {},
     url: '/targets/mounting-fixture/',
   },
   {
     handle: 'certificate-ilac', title: 'ILAC calibration certificate',
     description: 'ILAC-recognised dimensional calibration certificate.', descriptionHtml: '',
-    priceFrom: '€149', image: undefined, images: [], options: [], variants: [], metafields: {},
+    priceFrom: '€149', priceMinAmount: '149.00', priceMinCurrency: 'EUR',
+    image: undefined, images: [], options: [], variants: [], metafields: {},
     url: '/targets/certificate-ilac/',
   },
 ];
