@@ -159,6 +159,52 @@ export default function Generator({ initialSpec }: GeneratorProps = {}) {
           </>
         )}
 
+        {(spec.type === 'Symmetric circles' || spec.type === 'Asymmetric circles' || spec.type === 'HALCON-style dots') && (
+          <div className="grid grid-cols-2 gap-3">
+            <label className="flex flex-col gap-2 text-[13px] font-semibold">Circle diameter (mm)
+              <input className={field} type="number" min={1} step={0.5}
+                value={spec.circleDiameter ?? +(spec.square * 0.56).toFixed(1)}
+                onChange={(e) => set('circleDiameter', +e.target.value)} />
+            </label>
+            <label className="flex flex-col gap-2 text-[13px] font-semibold">X spacing (mm)
+              <input className={field} type="number" min={1}
+                value={spec.circleSpacingX ?? spec.square}
+                onChange={(e) => set('circleSpacingX', +e.target.value)} />
+            </label>
+            <label className="flex flex-col gap-2 text-[13px] font-semibold">Y spacing (mm)
+              <input className={field} type="number" min={1}
+                value={spec.circleSpacingY ?? spec.square}
+                onChange={(e) => set('circleSpacingY', +e.target.value)} />
+            </label>
+          </div>
+        )}
+
+        {spec.type === 'Checkerboard' && (
+          <div className="flex flex-col gap-2">
+            <label className="flex items-center gap-2.5 text-sm font-normal">
+              <input type="checkbox" className="h-[18px] w-[18px]"
+                checked={spec.finderMarkers ?? false}
+                onChange={(e) => set('finderMarkers', e.target.checked)} />
+              Finder markers (CALIB_CB_MARKER)
+            </label>
+            <label className="flex items-center gap-2.5 text-sm font-normal">
+              <input type="checkbox" className="h-[18px] w-[18px]"
+                checked={spec.radonCheckers ?? false}
+                onChange={(e) => set('radonCheckers', e.target.checked)} />
+              Radon (rounded) checkers
+            </label>
+          </div>
+        )}
+
+        {(spec.type === 'Checkerboard' || spec.type.includes('circles') || spec.type.includes('dots')) && (
+          <label className="flex items-center gap-2.5 text-sm font-normal">
+            <input type="checkbox" className="h-[18px] w-[18px]"
+              checked={spec.invert ?? false}
+              onChange={(e) => set('invert', e.target.checked)} />
+            Invert (swap black / white)
+          </label>
+        )}
+
         <div className="flex flex-col gap-2.5 border-t border-line pt-4">
           <span className="text-[13px] font-semibold">Download</span>
           <div className="grid grid-cols-2 gap-2">
