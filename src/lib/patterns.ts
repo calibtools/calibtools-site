@@ -8,9 +8,10 @@ import { renderCheckerboardSvg } from './renderCheckerboard';
 import { renderCharucoSvg } from './renderCharuco';
 import { renderAprilGridSvg } from './renderAprilGrid';
 import { renderCirclesSvg } from './renderCircles';
+import { renderMarkerSheetSvg } from './renderMarkerSheet';
 
 export interface PatternSpec {
-  type: 'Checkerboard' | 'ChArUco' | 'AprilGrid (Kalibr)' | 'Asymmetric circles' | 'Symmetric circles' | 'ArUco grid' | 'HALCON-style dots';
+  type: 'Checkerboard' | 'ChArUco' | 'AprilGrid (Kalibr)' | 'Asymmetric circles' | 'Symmetric circles' | 'ArUco grid' | 'HALCON-style dots' | 'Marker sheet';
   rows: number;
   cols: number;
   square: number;   // mm
@@ -69,7 +70,9 @@ export function checkerboardSvg(s: PatternSpec, pw: number, ph: number): string 
   const isCircles = s.type.includes('circles') || s.type.includes('dots');
   const isMarkerType = s.type === 'ChArUco' || s.type === 'ArUco grid' || s.type === 'AprilGrid (Kalibr)';
 
-  if (isCircles) {
+  if (s.type === 'Marker sheet') {
+    parts.push(renderMarkerSheetSvg(s, ox, oy));
+  } else if (isCircles) {
     parts.push(renderCirclesSvg(s, ox, oy));
   } else if (isMarkerType) {
     if (s.type === 'AprilGrid (Kalibr)') {

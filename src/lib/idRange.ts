@@ -28,7 +28,7 @@ export function idRange(spec: PatternSpec): IdRangeResult | null {
     return { min: startId, max: startId + count - 1, count };
   }
 
-  if ((type as string) === 'Marker sheet') {
+  if (type === 'Marker sheet') {
     const count = rows * cols;
     return { min: startId, max: startId + count - 1, count };
   }

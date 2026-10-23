@@ -13,7 +13,7 @@ import { computeSetBoards, buildSetManifest, setBoardFilename } from '@/lib/expo
  * Renders calibration patterns as SVG with PDF, PNG, SVG export and
  * config file downloads (OpenCV, Kalibr, ROS 2, HALCON).
  */
-const PATTERNS = ['Checkerboard', 'ChArUco', 'AprilGrid (Kalibr)', 'Asymmetric circles', 'Symmetric circles', 'ArUco grid', 'HALCON-style dots'] as const;
+const PATTERNS = ['Checkerboard', 'ChArUco', 'AprilGrid (Kalibr)', 'Asymmetric circles', 'Symmetric circles', 'ArUco grid', 'HALCON-style dots', 'Marker sheet'] as const;
 const DICTS = [
   'DICT_4X4_50', 'DICT_5X5_100', 'DICT_6X6_250', 'DICT_7X7_1000',
   'DICT_ARUCO_ORIGINAL', 'DICT_ARUCO_MIP_36h12',
@@ -198,7 +198,7 @@ export default function Generator({ initialSpec }: GeneratorProps = {}) {
             Monochrome axes (for ceramic/glass)
           </label>
         )}
-        {(spec.type === 'ChArUco' || spec.type === 'ArUco grid' || spec.type === 'AprilGrid (Kalibr)') && (
+        {(spec.type === 'ChArUco' || spec.type === 'ArUco grid' || spec.type === 'AprilGrid (Kalibr)' || spec.type === 'Marker sheet') && (
           <label className="flex items-center gap-2.5 text-sm font-normal">
             <input type="checkbox" className="h-[18px] w-[18px]"
               checked={spec.showCornerBadge ?? true}
@@ -273,6 +273,47 @@ export default function Generator({ initialSpec }: GeneratorProps = {}) {
               }))}>
               Kalibr preset
             </button>
+          </>
+        )}
+
+        {spec.type === 'Marker sheet' && (
+          <>
+            <label className="flex flex-col gap-2 text-[13px] font-semibold">Tag family (optional)
+              <select className={field} value={spec.aprilFamily ?? ''}
+                onChange={(e) => set('aprilFamily', e.target.value || undefined)}>
+                <option value="">Use ArUco dictionary</option>
+                <option value="16h5">16h5 (30 tags)</option>
+                <option value="25h9">25h9 (35 tags)</option>
+                <option value="36h11">36h11 (587 tags)</option>
+                <option value="41h12">41h12 (2115 tags)</option>
+                <option value="52h13">52h13 (48714 tags)</option>
+              </select>
+            </label>
+            {spec.aprilFamily && (
+              <label className="flex flex-col gap-2 text-[13px] font-semibold">Border bits
+                <select className={field} value={spec.borderBits ?? 2}
+                  onChange={(e) => set('borderBits', +e.target.value)}>
+                  <option value={1}>1 (AprilTag 3)</option>
+                  <option value={2}>2</option>
+                </select>
+              </label>
+            )}
+            <label className="flex flex-col gap-2 text-[13px] font-semibold">Specify tag IDs
+              <span className="text-[11px] font-normal text-ink-muted">Start ID, or comma/range list (e.g. 0-9,15,20-24)</span>
+              <input className={field} type="text" placeholder={String(spec.startId)}
+                value={spec.tagIdList ?? ''}
+                onChange={(e) => {
+                  const v = e.target.value.trim();
+                  set('tagIdList', v || undefined);
+                  if (/^\d+$/.test(v)) set('startId', +v);
+                }} />
+            </label>
+            <label className="flex items-center gap-2.5 text-sm font-normal">
+              <input type="checkbox" className="h-[18px] w-[18px]"
+                checked={spec.showTagIds ?? false}
+                onChange={(e) => set('showTagIds', e.target.checked)} />
+              Display tag IDs
+            </label>
           </>
         )}
 
