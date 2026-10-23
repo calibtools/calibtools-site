@@ -6,6 +6,7 @@ import { exportDxf } from '@/lib/exportDxf';
 import { kalibrYaml, ros2Yaml, halconDescr, opencvJson } from '@/lib/exportConfig';
 import { exportZip } from '@/lib/exportZip';
 import { patternSummary } from '@/lib/brand';
+import { computeSetBoards, buildSetManifest, setBoardFilename } from '@/lib/exportSet';
 
 /**
  * Pattern generator.
@@ -52,6 +53,8 @@ export default function Generator({ initialSpec }: GeneratorProps = {}) {
   const defaultSpec: PatternSpec = { type: 'ChArUco', rows: 7, cols: 10, square: 25, marker: 18, dict: 'DICT_6X6_250', paper: 'A4', startId: 0, scaleBar: true };
   const [spec, setSpec] = useState<PatternSpec>({ ...defaultSpec, ...initialSpec });
   const [busy, setBusy] = useState<'pdf' | 'png' | null>(null);
+  const [boardCount, setBoardCount] = useState(1);
+  const [boardStartIds, setBoardStartIds] = useState<number[]>([]);
   const [autoSize, setAutoSize] = useState(false);
   const [compactInfo, setCompactInfo] = useState(false);
   const [urlRead, setUrlRead] = useState(false);
@@ -135,6 +138,11 @@ export default function Generator({ initialSpec }: GeneratorProps = {}) {
     URL.revokeObjectURL(a.href);
   };
   const slug = `${spec.type.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${spec.rows}x${spec.cols}-${spec.square}mm`;
+
+  const boards = useMemo(() => {
+    if (boardCount <= 1) return null;
+    return computeSetBoards(spec, boardCount, boardStartIds.length >= boardCount ? boardStartIds : undefined);
+  }, [spec, boardCount, boardStartIds]);
 
   const field = 'w-full rounded border border-[#CFCFCF] bg-white px-3 py-[11px] text-[15px]';
   return (
@@ -314,6 +322,47 @@ export default function Generator({ initialSpec }: GeneratorProps = {}) {
           </label>
         )}
 
+        {(spec.type === 'ChArUco' || spec.type === 'ArUco grid' || spec.type === 'AprilGrid (Kalibr)') && (
+          <div className="flex flex-col gap-3 border-t border-line pt-4">
+            <label className="flex flex-col gap-2 text-[13px] font-semibold">Number of boards
+              <input className={field} type="number" min={1} max={16}
+                value={boardCount}
+                onChange={(e) => {
+                  const n = Math.max(1, Math.min(16, +e.target.value));
+                  setBoardCount(n);
+                  setBoardStartIds([]);
+                }} />
+            </label>
+            {boards && boards.length >= 2 && (
+              <div className="rounded border border-line bg-ground-panel p-3">
+                <table className="w-full text-sm">
+                  <thead><tr className="text-left text-[12px] text-ink-muted">
+                    <th className="pb-1 pr-2">Board</th>
+                    <th className="pb-1 pr-2">Start ID</th>
+                    <th className="pb-1">ID Range</th>
+                  </tr></thead>
+                  <tbody>{boards.map(b => (
+                    <tr key={b.index}>
+                      <td className="py-0.5 pr-2">{b.index + 1}</td>
+                      <td className="pr-2">
+                        <input type="number" min={0}
+                          className="w-20 rounded border border-line bg-white px-2 py-1 text-sm font-mono"
+                          value={b.startId}
+                          onChange={(e) => {
+                            const ids = boards.map(bb => bb.startId);
+                            ids[b.index] = Math.max(0, +e.target.value);
+                            setBoardStartIds(ids);
+                          }} />
+                      </td>
+                      <td className="font-mono text-ink-muted">{b.idRange.min}&#x2013;{b.idRange.max}</td>
+                    </tr>
+                  ))}</tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
+
         <div className="flex flex-col gap-2.5 border-t border-line pt-4">
           <span className="text-[13px] font-semibold">Download</span>
           <div className="grid grid-cols-2 gap-2">
@@ -346,6 +395,31 @@ export default function Generator({ initialSpec }: GeneratorProps = {}) {
                 } finally { setBusy(null); }
               }}
             >Download all (.zip)</button>
+            {boards && boards.length >= 2 && (
+              <button type="button"
+                className="col-span-2 rounded bg-brand px-3 py-[11px] text-sm font-semibold text-white disabled:opacity-50"
+                disabled={busy !== null}
+                onClick={async () => {
+                  setBusy('pdf');
+                  try {
+                    const JSZip = (await import('jszip')).default;
+                    const zip = new JSZip();
+                    for (const board of boards) {
+                      const bytes = await exportPdf({ spec: board.spec, pw, ph });
+                      zip.file(setBoardFilename(spec, board.startId), bytes);
+                    }
+                    zip.file('set-manifest.json', buildSetManifest(spec, boards));
+                    const blob = await zip.generateAsync({ type: 'blob' });
+                    const a = document.createElement('a');
+                    a.href = URL.createObjectURL(blob);
+                    a.download = `${slug}-set-${boardCount}boards.zip`;
+                    a.click();
+                    URL.revokeObjectURL(a.href);
+                  } finally { setBusy(null); }
+                }}>
+                Export set ({boardCount} boards .zip)
+              </button>
+            )}
             <button type="button" className="rounded bg-brand px-3 py-[11px] text-sm font-semibold text-white disabled:opacity-50" disabled={busy !== null} onClick={async () => {
               setBusy('pdf');
               try {
