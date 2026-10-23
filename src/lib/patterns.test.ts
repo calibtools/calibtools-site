@@ -280,6 +280,7 @@ describe('circle grid options', () => {
       type: 'Symmetric circles', rows: 2, cols: 2, square: 25, marker: 0,
       dict: '', paper: 'A4', startId: 0, scaleBar: false,
       circleSpacingX: 30, circleSpacingY: 20,
+      showAxes: false,
     };
     const svg = checkerboardSvg(spec, 210, 297);
     // First circle should be at ox + 30/2, second at ox + 30 + 30/2

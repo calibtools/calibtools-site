@@ -176,6 +176,20 @@ export default function Generator({ initialSpec }: GeneratorProps = {}) {
             onChange={(e) => setCompactInfo(e.target.checked)} />
           Compact info (hide parameter line)
         </label>
+        <label className="flex items-center gap-2.5 text-sm font-normal">
+          <input type="checkbox" className="h-[18px] w-[18px]"
+            checked={spec.showAxes ?? true}
+            onChange={(e) => set('showAxes', e.target.checked)} />
+          Show coordinate axes
+        </label>
+        {(spec.showAxes ?? true) && (
+          <label className="flex items-center gap-2.5 text-sm font-normal">
+            <input type="checkbox" className="h-[18px] w-[18px]"
+              checked={spec.monochromeAxes ?? false}
+              onChange={(e) => set('monochromeAxes', e.target.checked)} />
+            Monochrome axes (for ceramic/glass)
+          </label>
+        )}
         {(spec.type === 'ChArUco' || spec.type === 'ArUco grid') && (
           <label className="flex items-center gap-2.5 text-sm font-normal">
             <input type="checkbox" className="h-[18px] w-[18px]"

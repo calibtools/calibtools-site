@@ -2,7 +2,7 @@
  * Pattern geometry — v0. Units: millimetres. Origin top-left, x right, y down (OpenCV convention).
  * This file is the seed of packages/core; keep it free of DOM and framework code.
  */
-import { svgOpen, svgClose, scaleBarSvg, brandFooterSvg } from './svgLayers';
+import { svgOpen, svgClose, scaleBarSvg, axesSvg, brandFooterSvg } from './svgLayers';
 import type { SvgContext } from './svgLayers';
 import { renderCheckerboardSvg } from './renderCheckerboard';
 import { renderCharucoSvg } from './renderCharuco';
@@ -79,6 +79,7 @@ export function checkerboardSvg(s: PatternSpec, pw: number, ph: number): string 
   }
 
   parts.push(scaleBarSvg(ctx));
+  parts.push(axesSvg(ctx));
   parts.push(brandFooterSvg(ctx));
   parts.push(svgClose());
   return parts.join('');

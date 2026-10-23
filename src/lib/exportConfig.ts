@@ -157,5 +157,12 @@ export function opencvJson(s: PatternSpec): string {
   if (s.finderMarkers) obj.marker = true;
   if (s.radonCheckers) obj.radon = true;
   if (s.invert) obj.inverted = true;
+  if (s.showAxes !== false) {
+    const isKalibr = s.type === 'AprilGrid (Kalibr)' && s.symmetricCorners;
+    obj.axes = {
+      frame: isKalibr ? 'kalibr' : 'opencv',
+      origin: isKalibr ? 'bottom-left' : 'top-left',
+    };
+  }
   return JSON.stringify(obj, null, 2);
 }

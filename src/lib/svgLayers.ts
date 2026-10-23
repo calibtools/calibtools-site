@@ -37,6 +37,63 @@ export function scaleBarSvg(ctx: SvgContext): string {
   return parts.join('');
 }
 
+/**
+ * Coordinate-frame axes group.
+ * X = brand red #E60012 pointing right, Y = green #1BA55A pointing down (OpenCV).
+ * For Kalibr preset: origin bottom-left, Y up.
+ * Axes in quiet zone, start >= 0.5 square from first pattern square.
+ * Arrowhead <= 3 mm. Shaft 0.4 mm.
+ */
+export function axesSvg(ctx: SvgContext): string {
+  const { spec: s, ox, oy, bw, bh } = ctx;
+  if (s.showAxes === false) return '';
+
+  const mono = s.monochromeAxes ?? false;
+  const isKalibr = s.type === 'AprilGrid (Kalibr)' && s.symmetricCorners;
+
+  // Arrow length: 15% of shorter board side, clamped [15, 40] mm
+  const shorter = Math.min(bw, bh);
+  const arrowLen = Math.max(15, Math.min(40, shorter * 0.15));
+  const shaft = 0.4;
+  const headLen = Math.min(3, arrowLen * 0.2);
+  const headW = headLen * 0.6;
+
+  // Origin: 0.5 squares before pattern top-left (OpenCV) or bottom-left (Kalibr)
+  const gap = 0.5 * s.square;
+  const originX = ox - gap;
+  const originY = isKalibr ? oy + bh + gap : oy - gap;
+
+  const xColor = mono ? '#000' : '#E60012';
+  const yColor = mono ? '#000' : '#1BA55A';
+  const yDash = mono ? ' stroke-dasharray="2,1.5"' : '';
+
+  const parts: string[] = [];
+  parts.push('<g id="calibtools-axes">');
+
+  // X arrow: pointing right
+  const xEnd = originX + arrowLen;
+  parts.push(`<line x1="${originX}" y1="${originY}" x2="${xEnd - headLen}" y2="${originY}" stroke="${xColor}" stroke-width="${shaft}"/>`);
+  parts.push(`<polygon points="${xEnd},${originY} ${xEnd - headLen},${originY - headW} ${xEnd - headLen},${originY + headW}" fill="${xColor}"/>`);
+  parts.push(`<text x="${xEnd + 1}" y="${originY + 1}" font-family="'Geist Mono', monospace" font-size="2.5" fill="${xColor}">X</text>`);
+
+  // Y arrow: pointing down (OpenCV) or up (Kalibr)
+  const yDir = isKalibr ? -1 : 1;
+  const yEnd = originY + yDir * arrowLen;
+  parts.push(`<line x1="${originX}" y1="${originY}" x2="${originX}" y2="${yEnd - yDir * headLen}" stroke="${yColor}" stroke-width="${shaft}"${yDash}/>`);
+  parts.push(`<polygon points="${originX},${yEnd} ${originX - headW},${yEnd - yDir * headLen} ${originX + headW},${yEnd - yDir * headLen}" fill="${yColor}"/>`);
+  parts.push(`<text x="${originX + 1.5}" y="${yEnd + yDir * 2.5}" font-family="'Geist Mono', monospace" font-size="2.5" fill="${yColor}">Y</text>`);
+
+  // Origin dot
+  parts.push(`<circle cx="${originX}" cy="${originY}" r="0.8" fill="#000"/>`);
+
+  // Caption
+  const caption = isKalibr ? 'Kalibr frame \u00B7 origin bottom-left' : 'OpenCV frame \u00B7 origin top-left';
+  parts.push(`<text x="${originX + 3}" y="${originY + (isKalibr ? 3 : -2)}" font-family="'Geist Mono', monospace" font-size="1.8" fill="#666">${caption}</text>`);
+
+  parts.push('</g>');
+  return parts.join('');
+}
+
 /** Brand footer group, or empty string if it doesn't fit. */
 export function brandFooterSvg(ctx: SvgContext): string {
   const { spec: s, pw, ph, ox, oy, bw, bh } = ctx;
