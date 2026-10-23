@@ -3,6 +3,8 @@
  * Used by all export formats (PDF, SVG, PNG, DXF, config files, zip).
  */
 
+import { idRange } from './idRange';
+
 // ---------------------------------------------------------------------------
 // Colour constants
 // ---------------------------------------------------------------------------
@@ -98,7 +100,13 @@ export function patternSummary(opts: PatternSummaryOpts): string {
   const hasDict = dict !== undefined && dict !== '';
 
   if (hasMarker && hasDict) {
-    return `${type} ${grid} · ${square}/${marker} mm · ${dict} · id ${startId ?? 0}`;
+    // Compute ID range for display
+    const range = idRange({
+      type: type as any, rows, cols, square, marker, dict,
+      paper: '', startId: startId ?? 0, scaleBar: false,
+    });
+    const idStr = range ? `IDs ${range.min}\u2013${range.max}` : `id ${startId ?? 0}`;
+    return `${type} ${grid} · ${square}/${marker} mm · ${dict} · ${idStr}`;
   }
   return `${type} ${grid} · ${square} mm`;
 }
