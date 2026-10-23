@@ -4,6 +4,7 @@ import VariantPicker from '@/islands/VariantPicker';
 import ImageGallery from '@/islands/ImageGallery';
 import DownloadPicker from '@/islands/DownloadPicker';
 import NotifyForm from '@/islands/NotifyForm';
+import StickyBottomBar from '@/islands/StickyBottomBar';
 import ProductCard from '@/components/ProductCard.astro';
 import { getProducts, getProductByHandle, sanitizeHtml } from '@/lib/shopify';
 import { kalibrYaml, ros2Yaml, halconDescr } from '@/lib/exportConfig';
@@ -213,11 +214,14 @@ const faqJsonLd = {
 };
 ---
 <Base title={product.title} section="targets" description={product.description} jsonLd={[breadcrumbLd, productLd]} ogImage={ogImage}>
-  <div class="container-x flex gap-2 pt-5 text-sm text-ink-soft">
-    <a href="/" class="text-ink-soft no-underline">Home</a><span>/</span>
-    <a href="/targets/" class="text-ink-soft no-underline">Calibration targets</a><span>/</span>
-    <span>{product.title}</span>
-  </div>
+  <nav class="container-x flex gap-2 overflow-x-auto whitespace-nowrap pt-5 text-sm text-ink-soft scrollbar-none" aria-label="Breadcrumb">
+    <a href="/" class="text-ink-soft no-underline shrink-0">Home</a><span>/</span>
+    <a href="/targets/" class="text-ink-soft no-underline shrink-0">Calibration targets</a><span>/</span>
+    {collectionHandle && (
+      <><a href={`/targets/collection/${collectionHandle}/`} class="text-ink-soft no-underline shrink-0">{collectionTitle}</a><span>/</span></>
+    )}
+    <span class="text-ink shrink-0">{product.title}</span>
+  </nav>
 
   <section class="container-x flex flex-wrap gap-14 py-8 md:pb-16">
     {/* Images */}
@@ -231,7 +235,7 @@ const faqJsonLd = {
     </div>
 
     {/* Product info + variant picker */}
-    <div class="flex min-w-0 flex-1 basis-[420px] flex-col gap-5">
+    <div class="flex min-w-0 flex-1 basis-[420px] flex-col gap-5" data-buy-box>
       <div class="flex flex-wrap gap-2">
         <span class="badge bg-brand/10 text-brand-dark">{eyebrow}</span>
         {m.feature_tolerance && (
@@ -401,4 +405,7 @@ const faqJsonLd = {
       </a>
     </section>
   )}
+
+  {/* Mobile sticky bottom bar */}
+  <StickyBottomBar client:load defaultPrice={product.priceFrom} />
 </Base>
