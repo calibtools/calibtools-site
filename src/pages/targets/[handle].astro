@@ -1,9 +1,10 @@
 ---
 import Base from '@/layouts/Base.astro';
 import VariantPicker from '@/islands/VariantPicker';
+import ImageGallery from '@/islands/ImageGallery';
 import { getProducts, getProductByHandle, sanitizeHtml } from '@/lib/shopify';
 import { kalibrYaml, ros2Yaml, halconDescr } from '@/lib/exportConfig';
-import type { PatternSpec } from '@/lib/patterns';
+import { checkerboardSvg, type PatternSpec } from '@/lib/patterns';
 import { getProductFaq } from '@/lib/faq';
 
 export async function getStaticPaths() {
@@ -106,6 +107,26 @@ if (hasPatternData) {
   }
 }
 
+// --- Placeholder render from product geometry ---
+let placeholderSvg = '';
+if (product.images.length === 0 && hasPatternData) {
+  const [pRows, pCols] = (m.squares ?? '').split(/[x×]/).map((s: string) => Number(s.trim()));
+  const pSquare = Number(m.square_size_mm ?? 0);
+  const pMarker = Number(m.marker_size_mm ?? 0);
+  const pDict = m.dictionary ?? '';
+  const pType = pDict ? 'ChArUco' : 'Checkerboard';
+  if (pRows > 0 && pCols > 0 && pSquare > 0) {
+    const previewSpec: PatternSpec = {
+      type: pType as PatternSpec['type'],
+      rows: pRows, cols: pCols, square: pSquare, marker: pMarker, dict: pDict,
+      paper: 'A4', startId: Number(m.start_id ?? 0), scaleBar: false,
+    };
+    const pw = pCols * pSquare + 20;
+    const ph = pRows * pSquare + 20;
+    placeholderSvg = checkerboardSvg(previewSpec, pw, ph);
+  }
+}
+
 // --- JSON-LD ---
 const siteUrl = 'https://calib.tools';
 
@@ -179,20 +200,12 @@ const faqJsonLd = {
   <section class="container-x flex flex-wrap gap-14 py-8 md:pb-16">
     {/* Images */}
     <div class="flex min-w-0 flex-1 basis-[520px] flex-col gap-4">
-      <div class="aspect-[4/3] rounded-xl bg-ground-panel flex items-center justify-center overflow-hidden">
-        {product.image
-          ? <img src={product.image} alt={product.title} class="h-full w-full object-cover" />
-          : <span class="font-mono text-xs text-ink-soft">[PRODUCT PHOTO]</span>}
-      </div>
-      {product.images.length > 1 && (
-        <div class="grid grid-cols-4 gap-3">
-          {product.images.slice(0, 4).map((img, i) => (
-            <div class={`aspect-square overflow-hidden rounded-lg bg-ground-panel ${i === 0 ? 'border-2 border-brand' : ''}`}>
-              <img src={img.url} alt={img.altText ?? ''} class="h-full w-full object-cover" loading="lazy" />
-            </div>
-          ))}
-        </div>
-      )}
+      <ImageGallery
+        client:load
+        images={product.images}
+        placeholderSvg={placeholderSvg}
+        title={product.title}
+      />
     </div>
 
     {/* Product info + variant picker */}
