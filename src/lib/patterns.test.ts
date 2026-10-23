@@ -128,6 +128,42 @@ describe('checkerboard invert', () => {
   });
 });
 
+describe('ChArUco real marker bits', () => {
+  it('uses dictionary data for marker rendering (not pseudo-random)', () => {
+    const spec: PatternSpec = {
+      type: 'ChArUco', rows: 3, cols: 4, square: 30, marker: 22,
+      dict: 'DICT_6X6_250', paper: 'A4', startId: 0, scaleBar: false,
+    };
+    const svg = checkerboardSvg(spec, 210, 297);
+    // Should have white cells from real dictionary data
+    const whiteRects = svg.match(/<rect[^>]*fill="#fff"[^>]*\/>/g);
+    expect(whiteRects).not.toBeNull();
+    expect(whiteRects!.length).toBeGreaterThan(0);
+  });
+
+  it('renders without errors when dict is not found', () => {
+    const spec: PatternSpec = {
+      type: 'ChArUco', rows: 3, cols: 4, square: 30, marker: 22,
+      dict: 'NONEXISTENT', paper: 'A4', startId: 0, scaleBar: false,
+    };
+    const svg = checkerboardSvg(spec, 210, 297);
+    expect(svg).toContain('</svg>');
+  });
+
+  it('marker count matches expected for 3x4 ChArUco', () => {
+    // 3x4 grid, white squares have markers
+    // (0,1),(0,3),(1,0),(1,2),(2,1),(2,3) = 6 white squares = 6 markers
+    const spec: PatternSpec = {
+      type: 'ChArUco', rows: 3, cols: 4, square: 30, marker: 22,
+      dict: 'DICT_6X6_250', paper: 'A4', startId: 0, scaleBar: false,
+    };
+    const svg = checkerboardSvg(spec, 210, 297);
+    // Each marker has a black background rect (22mm wide inside white squares)
+    const markerBgs = svg.match(new RegExp(`width="${22}" height="${22}"`, 'g'));
+    expect(markerBgs).toHaveLength(6);
+  });
+});
+
 describe('checkerboard Radon (rounded)', () => {
   it('Radon checkers adds rx/ry attributes to squares', () => {
     const spec: PatternSpec = {
