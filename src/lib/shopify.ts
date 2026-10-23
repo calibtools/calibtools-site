@@ -10,11 +10,6 @@
 const domain = import.meta.env.PUBLIC_SHOPIFY_DOMAIN ?? '';
 const token = import.meta.env.PUBLIC_SHOPIFY_STOREFRONT_TOKEN ?? '';
 
-// Build-time diagnostic (stripped from client bundle by tree-shaking)
-if (typeof window === 'undefined') {
-  console.log(`[shopify] domain=${domain ? domain : '(empty)'}, token=${token ? token.slice(0, 6) + '…' : '(empty)'}`);
-}
-
 function hasCredentials(): boolean {
   return !!domain && !!token && token !== 'replace-me';
 }
@@ -144,7 +139,7 @@ function mapProduct(n: any): Product {
 
 export async function getProducts(first = 50): Promise<Product[]> {
   if (!hasCredentials()) {
-    console.warn('[shopify] No credentials — using fallback products');
+    console.warn('\n⚠️  USING FALLBACK DATA — no Storefront credentials. Variants will be empty, cart will be disabled.\n');
     return FALLBACK_PRODUCTS;
   }
   try {
@@ -155,15 +150,15 @@ export async function getProducts(first = 50): Promise<Product[]> {
       }
     `, { first });
     return data.products.nodes.map(mapProduct);
-  } catch (err) {
-    console.error('[shopify] getProducts failed, using fallback:', err);
+  } catch {
+    console.warn('\n⚠️  USING FALLBACK DATA — Storefront API query failed. No variants, cart will be disabled.\n');
     return FALLBACK_PRODUCTS;
   }
 }
 
 export async function getProductByHandle(handle: string): Promise<Product | null> {
   if (!hasCredentials()) {
-    console.warn(`[shopify] No credentials — using fallback for ${handle}`);
+    console.warn('\n⚠️  USING FALLBACK DATA — no Storefront credentials. No variants, cart will be disabled.\n');
     return FALLBACK_PRODUCTS.find((p) => p.handle === handle) ?? null;
   }
   try {
@@ -174,8 +169,8 @@ export async function getProductByHandle(handle: string): Promise<Product | null
       }
     `, { handle });
     return data.product ? mapProduct(data.product) : null;
-  } catch (err) {
-    console.error(`[shopify] getProductByHandle(${handle}) failed, using fallback:`, err);
+  } catch {
+    console.warn(`\n⚠️  USING FALLBACK DATA — Storefront API query failed for "${handle}". No variants, cart will be disabled.\n`);
     return FALLBACK_PRODUCTS.find((p) => p.handle === handle) ?? null;
   }
 }
@@ -296,58 +291,6 @@ export async function customerCreate(email: string): Promise<{ success: boolean;
     return { success: true, message: 'Subscribed! Check your inbox.' };
   } catch (err) {
     return { success: false, message: err instanceof Error ? err.message : 'Something went wrong.' };
-  }
-}
-
-// --- Client-side product fetch (fallback when SSG data is stale) ---
-
-/** Fetch variants + add-on IDs for a product handle, client-side. */
-export async function fetchProductVariants(handle: string): Promise<{
-  variants: Variant[];
-  options: Array<{ name: string; values: string[] }>;
-  certVariantId?: string;
-  fixtureVariantId?: string;
-} | null> {
-  if (!hasCredentials()) return null;
-  try {
-    const data = await storefront(`
-      query ProductWithAddons($handle: String!) {
-        product(handle: $handle) {
-          options { name values }
-          variants(first: 100) {
-            nodes {
-              id title sku availableForSale
-              price { amount currencyCode }
-              selectedOptions { name value }
-            }
-          }
-        }
-        cert: product(handle: "certificate-ilac") {
-          variants(first: 1) { nodes { id } }
-        }
-        fixture: product(handle: "mounting-fixture") {
-          variants(first: 1) { nodes { id } }
-        }
-      }
-    `, { handle });
-    if (!data.product) return null;
-    return {
-      variants: data.product.variants.nodes.map((v: any) => ({
-        id: v.id,
-        title: v.title,
-        sku: v.sku ?? '',
-        price: formatPrice(v.price.amount, v.price.currencyCode),
-        currencyCode: v.price.currencyCode,
-        availableForSale: v.availableForSale,
-        selectedOptions: v.selectedOptions ?? [],
-      })),
-      options: data.product.options,
-      certVariantId: data.cert?.variants?.nodes?.[0]?.id,
-      fixtureVariantId: data.fixture?.variants?.nodes?.[0]?.id,
-    };
-  } catch (err) {
-    console.error('[shopify] fetchProductVariants failed:', err);
-    return null;
   }
 }
 

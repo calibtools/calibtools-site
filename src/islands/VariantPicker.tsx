@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {
   findVariant, buildCartLines, cartCreate, cartLinesAdd,
-  getStoredCartId, setStoredCartId, fetchProductVariants,
-  type Product, type Variant,
+  getStoredCartId, setStoredCartId,
+  type Product,
 } from '@/lib/shopify';
 
 interface Props {
@@ -13,39 +13,7 @@ interface Props {
   fixtureVariantId?: string;
 }
 
-export default function VariantPicker({ product, certVariantId: initialCertId, fixtureVariantId: initialFixtureId }: Props) {
-  const [variants, setVariants] = useState<Variant[]>(product.variants);
-  const [options, setOptions] = useState(product.options);
-  const [certVariantId, setCertVariantId] = useState(initialCertId);
-  const [fixtureVariantId, setFixtureVariantId] = useState(initialFixtureId);
-  const [loading, setLoading] = useState(product.variants.length === 0);
-
-  // Client-side fetch when SSG data has no variants (fallback data)
-  useEffect(() => {
-    if (product.variants.length > 0) return;
-    let cancelled = false;
-    fetchProductVariants(product.handle).then((result) => {
-      if (cancelled || !result) {
-        setLoading(false);
-        return;
-      }
-      setVariants(result.variants);
-      setOptions(result.options);
-      if (result.certVariantId) setCertVariantId(result.certVariantId);
-      if (result.fixtureVariantId) setFixtureVariantId(result.fixtureVariantId);
-      // Init selections from first fetched variant
-      if (result.variants.length > 0) {
-        const sel: Record<string, string> = {};
-        for (const opt of result.variants[0].selectedOptions) {
-          sel[opt.name] = opt.value;
-        }
-        setSelections(sel);
-      }
-      setLoading(false);
-    });
-    return () => { cancelled = true; };
-  }, [product.handle, product.variants.length]);
-
+export default function VariantPicker({ product, certVariantId, fixtureVariantId }: Props) {
   // Init selections from first variant's options
   const initSelections: Record<string, string> = {};
   if (product.variants.length > 0) {
@@ -65,7 +33,7 @@ export default function VariantPicker({ product, certVariantId: initialCertId, f
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
 
-  const variant = findVariant(variants, selections);
+  const variant = findVariant(product.variants, selections);
 
   const handleSelect = (name: string, value: string) => {
     setSelections((prev) => ({ ...prev, [name]: value }));
@@ -123,7 +91,7 @@ export default function VariantPicker({ product, certVariantId: initialCertId, f
       </div>
 
       {/* Option selectors */}
-      {options.map((opt) => (
+      {product.options.map((opt) => (
         <fieldset key={opt.name} className="flex flex-col gap-2.5 border-0 p-0">
           <legend className="text-[13px] font-semibold">{opt.name}</legend>
           <div className="flex flex-wrap gap-2">
@@ -183,10 +151,10 @@ export default function VariantPicker({ product, certVariantId: initialCertId, f
         <button
           type="button"
           className="flex-1 rounded bg-brand py-3.5 text-base font-semibold text-white disabled:opacity-50"
-          disabled={busy || loading || !variant || !variant.availableForSale}
+          disabled={busy || !variant || !variant.availableForSale}
           onClick={handleAddToCart}
         >
-          {loading ? 'Loading…' : busy ? 'Adding…' : 'Add to cart'}
+          {busy ? 'Adding…' : 'Add to cart'}
         </button>
       </div>
 
