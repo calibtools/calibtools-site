@@ -1,0 +1,36 @@
+---
+import Base from '@/layouts/Base.astro';
+---
+<Base title="About" description="Who builds Calib.Tools, where we are, how we inspect, and why calibration matters.">
+  <div class="container-x py-10 md:py-16">
+    <div class="prose-calib mx-auto flex max-w-[720px] flex-col gap-8">
+      <h1 class="h-display m-0 text-[32px] md:text-[40px]">About Calib.Tools</h1>
+
+      <section class="flex flex-col gap-3">
+        <h2>Who</h2>
+        <p>[WHO WE ARE — founding team, background in machine vision and metrology, based in Munich.]</p>
+      </section>
+
+      <section class="flex flex-col gap-3">
+        <h2>Where</h2>
+        <p>[WHERE WE WORK — Munich, Germany. EU-based manufacturing and fulfilment. Shipping worldwide.]</p>
+      </section>
+
+      <section class="flex flex-col gap-3">
+        <h2>How we inspect</h2>
+        <p>[HOW WE INSPECT — every board gets a dimensional inspection before shipping. Feature positions measured with [EQUIPMENT]. Inspection report included. ILAC-recognised calibration certificate available as an add-on for traceable uncertainty.]</p>
+      </section>
+
+      <section class="flex flex-col gap-3">
+        <h2>Why</h2>
+        <p>[WHY WE BUILT THIS — calibration targets should be affordable, well-documented and shipped with the files you actually need. The free tools exist because a good target paired with a bad setup wastes money. We want every team — from a PhD student to a production line — to calibrate with confidence.]</p>
+      </section>
+
+      <div class="flex flex-wrap gap-3 border-t border-line pt-6">
+        <a href="/targets/" class="btn-primary">Shop targets</a>
+        <a href="/tools/" class="btn-outline">Open free tools</a>
+        <a href="mailto:hello@calib.tools" class="btn-outline">hello@calib.tools</a>
+      </div>
+    </div>
+  </div>
+</Base>
