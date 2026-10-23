@@ -57,6 +57,7 @@ export interface Collection {
 export interface CartLineInput {
   merchandiseId: string;
   quantity: number;
+  attributes?: Array<{ key: string; value: string }>;
 }
 
 /** A line item returned from a cart query. */
@@ -442,13 +443,21 @@ export function findVariant(variants: Variant[], selections: Record<string, stri
 }
 
 /** Build cart lines from selected variant + add-on variant IDs. */
-export function buildCartLines(variantId: string, quantity: number, addonVariantIds: string[]): CartLineInput[] {
-  const lines: CartLineInput[] = [{ merchandiseId: variantId, quantity }];
+export function buildCartLines(
+  variantId: string,
+  quantity: number,
+  addonVariantIds: string[],
+  attributes?: Array<{ key: string; value: string }>,
+): CartLineInput[] {
+  const lines: CartLineInput[] = [{ merchandiseId: variantId, quantity, attributes }];
   for (const id of addonVariantIds) {
     lines.push({ merchandiseId: id, quantity });
   }
   return lines;
 }
+
+// TODO(2b): Cart drawer should display line-item attributes (start_id, id_range).
+// When building the drawer, read cart.lines[].attributes and show them in the line title.
 
 /** Sanitise descriptionHtml: strip script tags. */
 export function sanitizeHtml(html: string): string {

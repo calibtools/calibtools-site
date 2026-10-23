@@ -1,9 +1,10 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import {
   findVariant, buildCartLines, cartCreate, cartLinesAdd,
   getStoredCartId, setStoredCartId, dispatchCartUpdated,
   type Product,
 } from '@/lib/shopify';
+import { computeSetBoards } from '@/lib/exportSet';
 
 interface Props {
   product: Product;
@@ -51,8 +52,30 @@ export default function VariantPicker({ product, certVariantId, fixtureVariantId
   const [error, setError] = useState('');
   const [confirmation, setConfirmation] = useState('');
   const confirmTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const [boardCount, setBoardCount] = useState(1);
+  const [boardStartIds, setBoardStartIds] = useState<number[]>([]);
 
   const variant = findVariant(product.variants, selections);
+
+  // Determine if this is a board-set-eligible product
+  const isBoardProduct = product.handle.includes('charuco') || product.handle.includes('aprilgrid') || product.handle.includes('aruco');
+
+  // Compute boards using product metafields for pattern params
+  const boards = useMemo(() => {
+    if (!isBoardProduct || boardCount <= 1) return null;
+    const squares = product.metafields.squares ?? '10x7';
+    const cols = parseInt(squares.split('x')[0], 10) || 10;
+    const rows = parseInt(squares.split('x')[1], 10) || 7;
+    const spec = {
+      type: 'ChArUco' as const,
+      rows, cols,
+      square: parseFloat(product.metafields.square_size_mm ?? '25'),
+      marker: parseFloat(product.metafields.marker_size_mm ?? '18'),
+      dict: product.metafields.dictionary ?? 'DICT_6X6_250',
+      paper: 'A4', startId: 0, scaleBar: true,
+    };
+    return computeSetBoards(spec, boardCount, boardStartIds.length >= boardCount ? boardStartIds : undefined);
+  }, [boardCount, boardStartIds, product.metafields, isBoardProduct]);
 
   // Clear confirmation timer on unmount
   useEffect(() => () => { if (confirmTimer.current) clearTimeout(confirmTimer.current); }, []);
@@ -101,11 +124,51 @@ export default function VariantPicker({ product, certVariantId, fixtureVariantId
     setError('');
     setConfirmation('');
     try {
-      const { totalQuantity } = await addToCart();
-      setConfirmation(`Added — ${totalQuantity} item${totalQuantity !== 1 ? 's' : ''} in cart`);
-      if (confirmTimer.current) clearTimeout(confirmTimer.current);
-      confirmTimer.current = setTimeout(() => setConfirmation(''), 3000);
-      window.dispatchEvent(new Event('open-cart-drawer'));
+      if (boardCount >= 2 && boards && variant) {
+        // Multi-board: add each board as a separate line with attributes
+        const existingCartId = getStoredCartId();
+        if (!existingCartId) {
+          // Create cart with first board
+          const attrs = [
+            { key: 'start_id', value: String(boards[0].startId) },
+            { key: 'id_range', value: `${boards[0].idRange.min}\u2013${boards[0].idRange.max}` },
+          ];
+          const lines = buildCartLines(variant.id, quantity, [], attrs);
+          const result = await cartCreate(lines);
+          setStoredCartId(result.cartId);
+
+          // Add remaining boards
+          for (let i = 1; i < boards.length; i++) {
+            const boardAttrs = [
+              { key: 'start_id', value: String(boards[i].startId) },
+              { key: 'id_range', value: `${boards[i].idRange.min}\u2013${boards[i].idRange.max}` },
+            ];
+            const boardLines = buildCartLines(variant.id, quantity, [], boardAttrs);
+            await cartLinesAdd(result.cartId, boardLines);
+          }
+        } else {
+          for (const board of boards) {
+            const attrs = [
+              { key: 'start_id', value: String(board.startId) },
+              { key: 'id_range', value: `${board.idRange.min}\u2013${board.idRange.max}` },
+            ];
+            const boardLines = buildCartLines(variant.id, quantity, [], attrs);
+            await cartLinesAdd(existingCartId, boardLines);
+          }
+        }
+        dispatchCartUpdated();
+        setConfirmation(`Added ${boards.length} boards to cart`);
+        if (confirmTimer.current) clearTimeout(confirmTimer.current);
+        confirmTimer.current = setTimeout(() => setConfirmation(''), 3000);
+        window.dispatchEvent(new Event('open-cart-drawer'));
+      } else {
+        // Single board — existing flow
+        const { totalQuantity } = await addToCart();
+        setConfirmation(`Added — ${totalQuantity} item${totalQuantity !== 1 ? 's' : ''} in cart`);
+        if (confirmTimer.current) clearTimeout(confirmTimer.current);
+        confirmTimer.current = setTimeout(() => setConfirmation(''), 3000);
+        window.dispatchEvent(new Event('open-cart-drawer'));
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to add to cart');
     } finally {
@@ -165,6 +228,53 @@ export default function VariantPicker({ product, certVariantId, fixtureVariantId
           </div>
         </fieldset>
       ))}
+
+      {/* Board set */}
+      {isBoardProduct && (
+        <fieldset className="flex flex-col gap-2.5 border-0 p-0">
+          <legend className="text-[13px] font-semibold">Board set</legend>
+          <div className="flex flex-wrap gap-2">
+            {[1, 2, 3, 4].map(n => (
+              <label key={n} className={`cursor-pointer rounded border px-3.5 py-2.5 text-sm ${
+                boardCount === n ? 'border-2 border-brand font-semibold' : 'border-line font-medium'
+              }`}>
+                <input type="radio" name="boardCount" value={n}
+                  checked={boardCount === n}
+                  onChange={() => { setBoardCount(n); setBoardStartIds([]); }}
+                  className="sr-only" />
+                {n === 1 ? '1 board' : `${n} boards`}
+              </label>
+            ))}
+            <input type="number" min={5} max={16}
+              placeholder="5+"
+              className={`w-16 rounded border px-2 py-2.5 text-center text-sm ${boardCount > 4 ? 'border-2 border-brand font-semibold' : 'border-line'}`}
+              value={boardCount > 4 ? boardCount : ''}
+              onChange={(e) => {
+                const n = Math.max(1, Math.min(16, +e.target.value));
+                setBoardCount(n);
+                setBoardStartIds([]);
+              }} />
+          </div>
+          {boards && boards.length >= 2 && (
+            <div className="rounded border border-line bg-ground-panel p-3 text-sm">
+              {boards.map(b => (
+                <div key={b.index} className="flex items-center justify-between gap-3 py-0.5">
+                  <span>Board {b.index + 1}</span>
+                  <input type="number" min={0}
+                    className="w-16 rounded border border-line bg-white px-1.5 py-0.5 text-center text-sm font-mono"
+                    value={b.startId}
+                    onChange={(e) => {
+                      const ids = boards.map(bb => bb.startId);
+                      ids[b.index] = Math.max(0, +e.target.value);
+                      setBoardStartIds(ids);
+                    }} />
+                  <span className="font-mono text-ink-muted">IDs {b.idRange.min}{'\u2013'}{b.idRange.max}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </fieldset>
+      )}
 
       {/* Add-ons */}
       {(certVariantId || fixtureVariantId) && (
