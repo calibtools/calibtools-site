@@ -2,6 +2,7 @@
 import Base from '@/layouts/Base.astro';
 import VariantPicker from '@/islands/VariantPicker';
 import ImageGallery from '@/islands/ImageGallery';
+import ProductCard from '@/components/ProductCard.astro';
 import { getProducts, getProductByHandle, sanitizeHtml } from '@/lib/shopify';
 import { kalibrYaml, ros2Yaml, halconDescr } from '@/lib/exportConfig';
 import { checkerboardSvg, type PatternSpec } from '@/lib/patterns';
@@ -178,6 +179,18 @@ if (product.variants.length > 0) {
 
 const ogImage = product.images[0]?.url ?? undefined;
 
+// --- Pairs with / Compare ---
+const isAccessory = handle === 'mounting-fixture' || handle === 'certificate-ilac';
+const pairsWith = isAccessory ? [] : [fixtureProduct, certProduct].filter(Boolean);
+
+// Compare: swap composite↔ceramic in the handle
+let compareProduct: typeof product | null = null;
+if (handle?.includes('-composite')) {
+  compareProduct = allProducts.find((p) => p.handle === handle.replace('-composite', '-ceramic')) ?? null;
+} else if (handle?.includes('-ceramic')) {
+  compareProduct = allProducts.find((p) => p.handle === handle.replace('-ceramic', '-composite')) ?? null;
+}
+
 // --- FAQ ---
 const faqItems = getProductFaq(handle!);
 const faqJsonLd = {
@@ -301,6 +314,38 @@ const faqJsonLd = {
           </div>
         </div>
       )}
+    </section>
+  )}
+
+  {/* Pairs with */}
+  {pairsWith.length > 0 && (
+    <section class="container-x flex flex-col gap-5 pb-16">
+      <h2 class="h-display m-0 text-2xl">Pairs with</h2>
+      <div class="grid grid-cols-2 gap-4 md:grid-cols-4">
+        {pairsWith.map((p) => p && (
+          <ProductCard
+            href={p.url}
+            title={p.title}
+            sub={p.description}
+            from={p.priceFrom}
+            image={p.image}
+            placeholder={p.title.toUpperCase()}
+          />
+        ))}
+      </div>
+    </section>
+  )}
+
+  {/* Compare */}
+  {compareProduct && (
+    <section class="container-x pb-16">
+      <div class="card flex flex-wrap items-center justify-between gap-4 bg-ground-alt px-6 py-5">
+        <div class="flex flex-col gap-1">
+          <strong class="text-[15px]">Compare with {compareProduct.title}</strong>
+          <span class="text-sm text-ink-muted">{handle?.includes('composite') ? 'Higher accuracy, smaller sizes' : 'Larger sizes, more affordable'}</span>
+        </div>
+        <a href={compareProduct.url} class="text-sm font-semibold">View {compareProduct.title} →</a>
+      </div>
     </section>
   )}
 
