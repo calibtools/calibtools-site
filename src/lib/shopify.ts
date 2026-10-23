@@ -432,30 +432,6 @@ export function dispatchCartUpdated(): void {
   if (typeof window !== 'undefined') window.dispatchEvent(new Event('cart-updated'));
 }
 
-// --- Newsletter (client-side) ---
-
-export async function customerCreate(email: string): Promise<{ success: boolean; message: string }> {
-  try {
-    const data = await storefront(`
-      mutation CustomerCreate($input: CustomerCreateInput!) {
-        customerCreate(input: $input) {
-          customer { id }
-          customerUserErrors { code message }
-        }
-      }
-    `, { input: { email, acceptsMarketing: true } });
-
-    const errors = data.customerCreate.customerUserErrors;
-    if (errors?.length) {
-      if (errors[0].code === 'TAKEN') return { success: true, message: 'You are already subscribed.' };
-      return { success: false, message: errors[0].message };
-    }
-    return { success: true, message: 'Subscribed! Check your inbox.' };
-  } catch (err) {
-    return { success: false, message: err instanceof Error ? err.message : 'Something went wrong.' };
-  }
-}
-
 // --- Variant helpers ---
 
 /** Find variant matching all selected options. */

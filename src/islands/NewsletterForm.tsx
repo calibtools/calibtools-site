@@ -1,9 +1,8 @@
 import { useState, useRef } from 'react';
-import { customerCreate } from '@/lib/shopify';
 
 /**
  * Newsletter signup form.
- * Uses Shopify Storefront customerCreate with acceptsMarketing: true.
+ * Posts to /api/subscribe (Cloudflare Pages Function → Shopify Admin API).
  * Honeypot field to reduce spam.
  */
 export default function NewsletterForm() {
@@ -18,15 +17,36 @@ export default function NewsletterForm() {
     // Honeypot check
     if (honeypotRef.current?.value) return;
 
-    if (!email.trim()) return;
+    const trimmed = email.trim();
+    if (!trimmed) return;
 
     setStatus('busy');
     setMessage('');
 
-    const result = await customerCreate(email.trim());
-    setStatus(result.success ? 'success' : 'error');
-    setMessage(result.message);
-    if (result.success) setEmail('');
+    try {
+      const res = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: trimmed, honeypot: honeypotRef.current?.value ?? '' }),
+      });
+      const data = await res.json();
+
+      if (data.ok) {
+        setStatus('success');
+        setMessage(
+          data.state === 'PENDING'
+            ? 'Check your inbox to confirm your subscription.'
+            : 'Subscribed! You\'ll hear from us monthly.',
+        );
+        setEmail('');
+      } else {
+        setStatus('error');
+        setMessage(data.message || 'Something went wrong.');
+      }
+    } catch {
+      setStatus('error');
+      setMessage('Something went wrong. Please try again.');
+    }
   };
 
   return (
