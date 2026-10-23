@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { formatPrice, findVariant, buildCartLines, sanitizeHtml, extractSpecsFromHtml, type Variant } from './shopify';
 
 describe('formatPrice', () => {
@@ -79,6 +79,148 @@ describe('extractSpecsFromHtml', () => {
     const html = '<table><tr><td><strong>Material</strong></td><td>6 mm <em>composite</em></td></tr></table>';
     const specs = extractSpecsFromHtml(html);
     expect(specs).toEqual([['Material', '6 mm composite']]);
+  });
+});
+
+describe('cartQuery', () => {
+  const mockCart = {
+    id: 'gid://shopify/Cart/1',
+    checkoutUrl: 'https://shop.calib.tools/cart/c/1',
+    totalQuantity: 2,
+    cost: { subtotalAmount: { amount: '178.00', currencyCode: 'EUR' } },
+    lines: {
+      nodes: [
+        {
+          id: 'line-1',
+          quantity: 2,
+          merchandise: {
+            id: 'gid://shopify/ProductVariant/v1',
+            title: '200 × 150 / DICT_6X6_250',
+            sku: 'CHR-200-6X6',
+            product: { title: 'ChArUco calibration target', handle: 'charuco-composite' },
+            price: { amount: '89.00', currencyCode: 'EUR' },
+            image: { url: 'https://cdn.shopify.com/img.jpg', altText: 'ChArUco' },
+          },
+          cost: { totalAmount: { amount: '178.00', currencyCode: 'EUR' } },
+        },
+      ],
+    },
+  };
+
+  let fetchSpy: ReturnType<typeof vi.spyOn>;
+
+  beforeEach(() => {
+    fetchSpy = vi.spyOn(globalThis, 'fetch');
+    // Set env vars so hasCredentials() returns true
+    (import.meta as any).env = {
+      ...(import.meta as any).env,
+      PUBLIC_SHOPIFY_DOMAIN: 'shop.calib.tools',
+      PUBLIC_SHOPIFY_STOREFRONT_TOKEN: 'test-token',
+    };
+  });
+
+  afterEach(() => {
+    fetchSpy.mockRestore();
+  });
+
+  it('returns mapped cart on success', async () => {
+    fetchSpy.mockResolvedValueOnce(new Response(JSON.stringify({ data: { cart: mockCart } })));
+    const { cartQuery } = await import('./shopify');
+    const cart = await cartQuery('gid://shopify/Cart/1');
+    expect(cart).not.toBeNull();
+    expect(cart!.totalQuantity).toBe(2);
+    expect(cart!.lines).toHaveLength(1);
+    expect(cart!.lines[0].merchandise.sku).toBe('CHR-200-6X6');
+    expect(cart!.cost.subtotalAmount.amount).toBe('178.00');
+  });
+
+  it('returns null and clears storage for expired cart', async () => {
+    fetchSpy.mockResolvedValueOnce(new Response(JSON.stringify({ data: { cart: null } })));
+    const { cartQuery } = await import('./shopify');
+    const cart = await cartQuery('gid://shopify/Cart/expired');
+    expect(cart).toBeNull();
+  });
+
+  it('returns null on network error', async () => {
+    fetchSpy.mockRejectedValueOnce(new Error('Network error'));
+    const { cartQuery } = await import('./shopify');
+    const cart = await cartQuery('gid://shopify/Cart/1');
+    expect(cart).toBeNull();
+  });
+});
+
+describe('cartLinesUpdate', () => {
+  let fetchSpy: ReturnType<typeof vi.spyOn>;
+
+  beforeEach(() => {
+    fetchSpy = vi.spyOn(globalThis, 'fetch');
+    (import.meta as any).env = {
+      ...(import.meta as any).env,
+      PUBLIC_SHOPIFY_DOMAIN: 'shop.calib.tools',
+      PUBLIC_SHOPIFY_STOREFRONT_TOKEN: 'test-token',
+    };
+  });
+
+  afterEach(() => {
+    fetchSpy.mockRestore();
+  });
+
+  it('returns updated cart', async () => {
+    const updatedCart = {
+      id: 'gid://shopify/Cart/1',
+      checkoutUrl: 'https://shop.calib.tools/cart/c/1',
+      totalQuantity: 3,
+      cost: { subtotalAmount: { amount: '267.00', currencyCode: 'EUR' } },
+      lines: { nodes: [] },
+    };
+    fetchSpy.mockResolvedValueOnce(
+      new Response(JSON.stringify({ data: { cartLinesUpdate: { cart: updatedCart, userErrors: [] } } })),
+    );
+    const { cartLinesUpdate } = await import('./shopify');
+    const cart = await cartLinesUpdate('gid://shopify/Cart/1', [{ id: 'line-1', quantity: 3 }]);
+    expect(cart.totalQuantity).toBe(3);
+  });
+
+  it('throws on user error', async () => {
+    fetchSpy.mockResolvedValueOnce(
+      new Response(JSON.stringify({ data: { cartLinesUpdate: { cart: null, userErrors: [{ field: 'lines', message: 'Invalid line' }] } } })),
+    );
+    const { cartLinesUpdate } = await import('./shopify');
+    await expect(cartLinesUpdate('gid://shopify/Cart/1', [{ id: 'bad', quantity: 1 }])).rejects.toThrow('Invalid line');
+  });
+});
+
+describe('cartLinesRemove', () => {
+  let fetchSpy: ReturnType<typeof vi.spyOn>;
+
+  beforeEach(() => {
+    fetchSpy = vi.spyOn(globalThis, 'fetch');
+    (import.meta as any).env = {
+      ...(import.meta as any).env,
+      PUBLIC_SHOPIFY_DOMAIN: 'shop.calib.tools',
+      PUBLIC_SHOPIFY_STOREFRONT_TOKEN: 'test-token',
+    };
+  });
+
+  afterEach(() => {
+    fetchSpy.mockRestore();
+  });
+
+  it('returns cart with line removed', async () => {
+    const updatedCart = {
+      id: 'gid://shopify/Cart/1',
+      checkoutUrl: 'https://shop.calib.tools/cart/c/1',
+      totalQuantity: 0,
+      cost: { subtotalAmount: { amount: '0.00', currencyCode: 'EUR' } },
+      lines: { nodes: [] },
+    };
+    fetchSpy.mockResolvedValueOnce(
+      new Response(JSON.stringify({ data: { cartLinesRemove: { cart: updatedCart, userErrors: [] } } })),
+    );
+    const { cartLinesRemove } = await import('./shopify');
+    const cart = await cartLinesRemove('gid://shopify/Cart/1', ['line-1']);
+    expect(cart.totalQuantity).toBe(0);
+    expect(cart.lines).toHaveLength(0);
   });
 });
 
