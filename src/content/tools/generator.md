@@ -13,6 +13,8 @@ faq:
     a: "No. Everything runs in your browser. No images, files or parameters leave your machine."
   - q: "What is the Start ID field?"
     a: "Start ID sets the first ArUco marker ID on the board. Use it when you need multiple boards with non-overlapping IDs in the same scene."
+  - q: "Ordering several boards for one rig?"
+    a: "Use the \"Board set\" option on the product page to select how many boards you need. Each board gets consecutive marker IDs so they work together in multi-board calibration. You can also override start IDs for each board."
 ---
 
 ## What it does
