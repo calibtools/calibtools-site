@@ -179,7 +179,7 @@ export default function CartDrawer() {
           <div className="border-t border-line px-5 py-4">
             <div className="flex items-center justify-between pb-2">
               <span className="font-semibold">Subtotal</span>
-              <span className="text-lg font-bold" data-testid="cart-subtotal">
+              <span className="spec text-lg font-bold" data-testid="cart-subtotal">
                 {formatPrice(cart.cost.subtotalAmount.amount, cart.cost.subtotalAmount.currencyCode)}
               </span>
             </div>
@@ -245,9 +245,9 @@ function CartLine({
         </a>
         <span className="text-xs text-ink-muted">{merchandise.title}</span>
         {merchandise.sku && (
-          <span className="font-mono text-xs text-ink-soft">{merchandise.sku}</span>
+          <span className="spec text-xs text-ink-soft">{merchandise.sku}</span>
         )}
-        <span className="text-sm text-ink-muted">{unitPrice} each</span>
+        <span className="spec text-sm text-ink-muted">{unitPrice} each</span>
 
         <div className="mt-1.5 flex items-center gap-3">
           {/* Quantity stepper */}
@@ -282,7 +282,7 @@ function CartLine({
             Remove
           </button>
 
-          <span className="ml-auto text-sm font-semibold">{lineTotal}</span>
+          <span className="spec ml-auto text-sm font-semibold">{lineTotal}</span>
         </div>
       </div>
     </li>
