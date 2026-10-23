@@ -57,6 +57,18 @@ export default function VariantPicker({ product, certVariantId, fixtureVariantId
 
   const variant = findVariant(product.variants, selections);
 
+  // Dispatch variant-changed for StickyBottomBar
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    window.dispatchEvent(new CustomEvent('variant-changed', {
+      detail: {
+        variantId: variant?.id,
+        price: variant?.price ?? product.priceFrom,
+        available: variant?.availableForSale ?? false,
+      },
+    }));
+  }, [variant?.id, variant?.price, variant?.availableForSale, product.priceFrom]);
+
   // Determine if this is a board-set-eligible product
   const isBoardProduct = product.handle.includes('charuco') || product.handle.includes('aprilgrid') || product.handle.includes('aruco');
 
