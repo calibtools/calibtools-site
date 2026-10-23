@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { checkerboardSvg, type PatternSpec } from '@/lib/patterns';
 import { exportPdf } from '@/lib/exportPdf';
 import { exportPng } from '@/lib/exportPng';
-import { kalibrYaml, ros2Yaml, halconDescr } from '@/lib/exportConfig';
+import { kalibrYaml, ros2Yaml, halconDescr, opencvJson } from '@/lib/exportConfig';
 
 /**
  * Pattern generator.
@@ -113,7 +113,7 @@ export default function Generator({ initialSpec }: GeneratorProps = {}) {
           </div>
           <span className="pt-1.5 text-[13px] font-semibold">Config files</span>
           <div className="flex flex-wrap gap-2 font-mono text-[13px]">
-            <button type="button" className="rounded bg-ground-panel px-2.5 py-1.5" onClick={() => download(`${slug}.opencv.json`, JSON.stringify({ pattern: spec.type, rows: spec.rows, cols: spec.cols, square_mm: spec.square, marker_mm: spec.marker, dictionary: spec.dict, start_id: spec.startId, generator: 'Calib.Tools' }, null, 2), 'application/json')}>opencv.json</button>
+            <button type="button" className="rounded bg-ground-panel px-2.5 py-1.5" onClick={() => download(`${slug}.opencv.json`, opencvJson(spec), 'application/json')}>opencv.json</button>
             <button type="button" className="rounded bg-ground-panel px-2.5 py-1.5" onClick={() => download(`${slug}.kalibr.yaml`, kalibrYaml(spec), 'text/yaml')}>kalibr.yaml</button>
             <button type="button" className="rounded bg-ground-panel px-2.5 py-1.5" onClick={() => download(`${slug}.ros2.yaml`, ros2Yaml(spec), 'text/yaml')}>ros2.yaml</button>
             <button type="button" className="rounded bg-ground-panel px-2.5 py-1.5" onClick={() => download(`${slug}.halcon.descr`, halconDescr(spec), 'text/plain')}>halcon.descr</button>
