@@ -1,0 +1,9 @@
+---
+import Base from '@/layouts/Base.astro';
+import CartPage from '@/islands/CartPage';
+---
+<Base title="Cart" section="targets">
+  <section class="container-x py-12">
+    <CartPage client:load />
+  </section>
+</Base>

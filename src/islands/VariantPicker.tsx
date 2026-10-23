@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   findVariant, buildCartLines, cartCreate, cartLinesAdd,
-  getStoredCartId, setStoredCartId,
+  getStoredCartId, setStoredCartId, dispatchCartUpdated,
   type Product,
 } from '@/lib/shopify';
 
@@ -34,51 +34,81 @@ export default function VariantPicker({ product, certVariantId, fixtureVariantId
   const [quantity, setQuantity] = useState(1);
   const [addCert, setAddCert] = useState(false);
   const [addFixture, setAddFixture] = useState(false);
-  const [busy, setBusy] = useState(false);
+  const [busy, setBusy] = useState<'add' | 'buy' | false>(false);
   const [error, setError] = useState('');
+  const [confirmation, setConfirmation] = useState('');
+  const confirmTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   const variant = findVariant(product.variants, selections);
+
+  // Clear confirmation timer on unmount
+  useEffect(() => () => { if (confirmTimer.current) clearTimeout(confirmTimer.current); }, []);
 
   const handleSelect = (name: string, value: string) => {
     setSelections((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleAddToCart = async () => {
-    if (!variant) return;
-    setBusy(true);
-    setError('');
+  /** Shared logic: add lines to existing or new cart. Returns checkoutUrl + totalQuantity. */
+  const addToCart = async () => {
+    if (!variant) throw new Error('No variant selected');
+    const addons: string[] = [];
+    if (addCert && certVariantId) addons.push(certVariantId);
+    if (addFixture && fixtureVariantId) addons.push(fixtureVariantId);
+    const lines = buildCartLines(variant.id, quantity, addons);
 
-    try {
-      const addons: string[] = [];
-      if (addCert && certVariantId) addons.push(certVariantId);
-      if (addFixture && fixtureVariantId) addons.push(fixtureVariantId);
-      const lines = buildCartLines(variant.id, quantity, addons);
+    const existingCartId = getStoredCartId();
+    let checkoutUrl: string;
+    let totalQuantity: number;
 
-      const existingCartId = getStoredCartId();
-      let checkoutUrl: string;
-
-      if (existingCartId) {
-        try {
-          const result = await cartLinesAdd(existingCartId, lines);
-          checkoutUrl = result.checkoutUrl;
-        } catch {
-          // Cart expired, create new one
-          const result = await cartCreate(lines);
-          setStoredCartId(result.cartId);
-          checkoutUrl = result.checkoutUrl;
-        }
-      } else {
+    if (existingCartId) {
+      try {
+        const result = await cartLinesAdd(existingCartId, lines);
+        checkoutUrl = result.checkoutUrl;
+        totalQuantity = result.totalQuantity;
+      } catch {
         const result = await cartCreate(lines);
         setStoredCartId(result.cartId);
+        // Re-fetch to get totalQuantity
         checkoutUrl = result.checkoutUrl;
+        totalQuantity = quantity + addons.length * quantity;
       }
+    } else {
+      const result = await cartCreate(lines);
+      setStoredCartId(result.cartId);
+      checkoutUrl = result.checkoutUrl;
+      totalQuantity = quantity + addons.length * quantity;
+    }
 
-      // Dispatch event so CartBadge updates
-      window.dispatchEvent(new Event('cart-updated'));
-      window.location.href = checkoutUrl;
+    dispatchCartUpdated();
+    return { checkoutUrl, totalQuantity };
+  };
+
+  const handleAddToCart = async () => {
+    setBusy('add');
+    setError('');
+    setConfirmation('');
+    try {
+      const { totalQuantity } = await addToCart();
+      setConfirmation(`Added — ${totalQuantity} item${totalQuantity !== 1 ? 's' : ''} in cart`);
+      if (confirmTimer.current) clearTimeout(confirmTimer.current);
+      confirmTimer.current = setTimeout(() => setConfirmation(''), 3000);
+      window.dispatchEvent(new Event('open-cart-drawer'));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to add to cart');
     } finally {
+      setBusy(false);
+    }
+  };
+
+  const handleBuyNow = async () => {
+    setBusy('buy');
+    setError('');
+    setConfirmation('');
+    try {
+      const { checkoutUrl } = await addToCart();
+      window.location.href = checkoutUrl;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to add to cart');
       setBusy(false);
     }
   };
@@ -142,7 +172,7 @@ export default function VariantPicker({ product, certVariantId, fixtureVariantId
         </fieldset>
       )}
 
-      {/* Quantity + Buy now */}
+      {/* Quantity + buttons */}
       <div className="flex gap-3 pt-1.5">
         <div className="flex items-center rounded border border-line">
           <button
@@ -170,13 +200,22 @@ export default function VariantPicker({ product, certVariantId, fixtureVariantId
         <button
           type="button"
           className="flex-1 rounded bg-brand py-3.5 text-base font-semibold text-white disabled:opacity-50"
-          disabled={busy || !variant || !variant.availableForSale}
+          disabled={!!busy || !variant || !variant.availableForSale}
           onClick={handleAddToCart}
         >
-          {busy ? 'Redirecting…' : 'Buy now'}
+          {busy === 'add' ? 'Adding…' : 'Add to cart'}
         </button>
       </div>
+      <button
+        type="button"
+        className="rounded border-2 border-brand py-3 text-base font-semibold text-brand disabled:opacity-50"
+        disabled={!!busy || !variant || !variant.availableForSale}
+        onClick={handleBuyNow}
+      >
+        {busy === 'buy' ? 'Redirecting…' : 'Buy now'}
+      </button>
 
+      {confirmation && <p className="m-0 text-sm font-medium text-green-700">{confirmation}</p>}
       {error && <p className="m-0 text-sm text-brand">{error}</p>}
 
       <a href="/quote/" className="text-sm text-ink-soft no-underline hover:text-ink">Need a quote or invoice/PO? →</a>
