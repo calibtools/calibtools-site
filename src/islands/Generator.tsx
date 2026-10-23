@@ -98,6 +98,67 @@ export default function Generator({ initialSpec }: GeneratorProps = {}) {
           </label>
         )}
 
+        {spec.type === 'AprilGrid (Kalibr)' && (
+          <>
+            <label className="flex flex-col gap-2 text-[13px] font-semibold">Tag family
+              <select className={field} value={spec.aprilFamily ?? '36h11'}
+                onChange={(e) => set('aprilFamily', e.target.value)}>
+                <option value="16h5">16h5 (30 tags)</option>
+                <option value="25h9">25h9 (35 tags)</option>
+                <option value="36h11">36h11 (587 tags)</option>
+                <option value="41h12">41h12 (2115 tags)</option>
+                <option value="52h13">52h13 (48714 tags)</option>
+              </select>
+            </label>
+            <div className="grid grid-cols-2 gap-3">
+              <label className="flex flex-col gap-2 text-[13px] font-semibold">Border bits
+                <select className={field} value={spec.borderBits ?? 2}
+                  onChange={(e) => set('borderBits', +e.target.value)}>
+                  <option value={1}>1 (AprilTag 3)</option>
+                  <option value={2}>2</option>
+                </select>
+              </label>
+              <label className="flex flex-col gap-2 text-[13px] font-semibold">Tag spacing
+                <input className={field} type="number" min={0.05} max={1} step={0.05}
+                  value={spec.tagSpacing ?? 0.3}
+                  onChange={(e) => set('tagSpacing', +e.target.value)} />
+                <span className="text-[11px] font-normal text-ink-muted">{((spec.tagSpacing ?? 0.3) * spec.square).toFixed(1)} mm</span>
+              </label>
+            </div>
+            <label className="flex flex-col gap-2 text-[13px] font-semibold">Specify tag IDs
+              <span className="text-[11px] font-normal text-ink-muted">Start ID, or comma/range list (e.g. 0-9,15,20-24)</span>
+              <input className={field} type="text" placeholder={String(spec.startId)}
+                value={spec.tagIdList ?? ''}
+                onChange={(e) => {
+                  const v = e.target.value.trim();
+                  set('tagIdList', v || undefined);
+                  if (/^\d+$/.test(v)) set('startId', +v);
+                }} />
+            </label>
+            <div className="flex flex-col gap-2">
+              <label className="flex items-center gap-2.5 text-sm font-normal">
+                <input type="checkbox" className="h-[18px] w-[18px]"
+                  checked={spec.showTagIds ?? false}
+                  onChange={(e) => set('showTagIds', e.target.checked)} />
+                Display tag IDs
+              </label>
+              <label className="flex items-center gap-2.5 text-sm font-normal">
+                <input type="checkbox" className="h-[18px] w-[18px]"
+                  checked={spec.symmetricCorners ?? false}
+                  onChange={(e) => set('symmetricCorners', e.target.checked)} />
+                Symmetric corner squares
+              </label>
+            </div>
+            <button type="button"
+              className="rounded border border-line bg-ground-panel px-3 py-2 text-sm font-medium"
+              onClick={() => setSpec(s => ({
+                ...s, aprilFamily: '36h11', borderBits: 2, tagSpacing: 0.3, symmetricCorners: true,
+              }))}>
+              Kalibr preset
+            </button>
+          </>
+        )}
+
         <div className="flex flex-col gap-2.5 border-t border-line pt-4">
           <span className="text-[13px] font-semibold">Download</span>
           <div className="grid grid-cols-2 gap-2">

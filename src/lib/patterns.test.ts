@@ -164,6 +164,79 @@ describe('ChArUco real marker bits', () => {
   });
 });
 
+describe('parseTagIdList', () => {
+  it('returns sequential IDs from startId when input is undefined', async () => {
+    const { parseTagIdList } = await import('./renderAprilGrid');
+    expect(parseTagIdList(undefined, 5, 4)).toEqual([5, 6, 7, 8]);
+  });
+
+  it('parses "0-9,15,20-24" correctly', async () => {
+    const { parseTagIdList } = await import('./renderAprilGrid');
+    const ids = parseTagIdList('0-9,15,20-24', 0, 16);
+    expect(ids).toEqual([0,1,2,3,4,5,6,7,8,9,15,20,21,22,23,24]);
+  });
+
+  it('pads with sequential IDs if list is too short', async () => {
+    const { parseTagIdList } = await import('./renderAprilGrid');
+    const ids = parseTagIdList('5,10', 0, 5);
+    expect(ids).toEqual([5, 10, 11, 12, 13]);
+  });
+
+  it('plain number string uses that as start ID', async () => {
+    const { parseTagIdList } = await import('./renderAprilGrid');
+    expect(parseTagIdList('10', 0, 3)).toEqual([10, 11, 12]);
+  });
+});
+
+describe('AprilGrid rendering', () => {
+  it('renders tag-bg rects for each grid position', () => {
+    const spec: PatternSpec = {
+      type: 'AprilGrid (Kalibr)', rows: 3, cols: 4, square: 30, marker: 22,
+      dict: '', paper: 'A4', startId: 0, scaleBar: false,
+      aprilFamily: '36h11', borderBits: 2, tagSpacing: 0.3,
+    };
+    const svg = checkerboardSvg(spec, 210, 297);
+    const tagBgs = svg.match(/class="tag-bg"/g);
+    expect(tagBgs).toHaveLength(12); // 3×4 tags
+  });
+
+  it('showTagIds adds text labels', () => {
+    const spec: PatternSpec = {
+      type: 'AprilGrid (Kalibr)', rows: 2, cols: 3, square: 30, marker: 22,
+      dict: '', paper: 'A4', startId: 0, scaleBar: false,
+      aprilFamily: '36h11', borderBits: 2, tagSpacing: 0.3, showTagIds: true,
+    };
+    const svg = checkerboardSvg(spec, 210, 297);
+    const idLabels = svg.match(/class="tag-id"/g);
+    expect(idLabels).not.toBeNull();
+    expect(idLabels!.length).toBe(6); // 2×3 tags
+  });
+
+  it('symmetric corners adds corner-square rects', () => {
+    const spec: PatternSpec = {
+      type: 'AprilGrid (Kalibr)', rows: 2, cols: 3, square: 30, marker: 22,
+      dict: '', paper: 'A4', startId: 0, scaleBar: false,
+      aprilFamily: '36h11', borderBits: 2, tagSpacing: 0.3, symmetricCorners: true,
+    };
+    const svg = checkerboardSvg(spec, 210, 297);
+    const corners = svg.match(/class="corner-square"/g);
+    // (rows+1) × (cols+1) = 3 × 4 = 12 corner squares
+    expect(corners).toHaveLength(12);
+  });
+
+  it('Kalibr preset values produce valid SVG', () => {
+    const spec: PatternSpec = {
+      type: 'AprilGrid (Kalibr)', rows: 6, cols: 6, square: 30, marker: 22,
+      dict: '', paper: 'A3', startId: 0, scaleBar: true,
+      aprilFamily: '36h11', borderBits: 2, tagSpacing: 0.3, symmetricCorners: true,
+    };
+    const svg = checkerboardSvg(spec, 297, 420);
+    expect(svg).toContain('</svg>');
+    const tagBgs = svg.match(/class="tag-bg"/g);
+    expect(tagBgs).toHaveLength(36);
+  });
+});
+
 describe('checkerboard Radon (rounded)', () => {
   it('Radon checkers adds rx/ry attributes to squares', () => {
     const spec: PatternSpec = {

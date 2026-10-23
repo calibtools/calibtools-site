@@ -36,7 +36,9 @@ export function kalibrYaml(s: PatternSpec): string {
     lines.push(`tagRows: ${s.rows}`);
     lines.push(`tagCols: ${s.cols}`);
     lines.push(`tagSize: ${(s.square / 1000).toFixed(6)}`);
-    lines.push(`tagSpacing: ${(s.marker / s.square).toFixed(6)}`);
+    lines.push(`tagSpacing: ${(s.tagSpacing ?? s.marker / s.square).toFixed(6)}`);
+    if (s.aprilFamily) lines.push(`# tagFamily: ${s.aprilFamily}`);
+    if (s.borderBits) lines.push(`# borderBits: ${s.borderBits}`);
   } else {
     // ChArUco and others: use checkerboard representation
     lines.push('target_type: \'checkerboard\'');
