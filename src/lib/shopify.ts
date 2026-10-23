@@ -54,9 +54,33 @@ export interface Collection {
   products: Product[];
 }
 
-export interface CartLine {
+export interface CartLineInput {
   merchandiseId: string;
   quantity: number;
+}
+
+/** A line item returned from a cart query. */
+export interface CartLineItem {
+  id: string;
+  quantity: number;
+  merchandise: {
+    id: string;
+    title: string;
+    sku: string;
+    product: { title: string; handle: string };
+    price: { amount: string; currencyCode: string };
+    image: { url: string; altText: string | null } | null;
+  };
+  cost: { totalAmount: { amount: string; currencyCode: string } };
+}
+
+/** Full cart object returned by cartQuery. */
+export interface Cart {
+  id: string;
+  checkoutUrl: string;
+  totalQuantity: number;
+  cost: { subtotalAmount: { amount: string; currencyCode: string } };
+  lines: CartLineItem[];
 }
 
 // --- GraphQL helper ---
@@ -253,7 +277,7 @@ export async function getCollectionProducts(handle: string): Promise<Collection 
 
 // --- Cart (client-side) ---
 
-export async function cartCreate(lines: CartLine[]): Promise<{ cartId: string; checkoutUrl: string }> {
+export async function cartCreate(lines: CartLineInput[]): Promise<{ cartId: string; checkoutUrl: string }> {
   const data = await storefront(`
     mutation CartCreate($lines: [CartLineInput!]!) {
       cartCreate(input: { lines: $lines }) {
@@ -267,7 +291,7 @@ export async function cartCreate(lines: CartLine[]): Promise<{ cartId: string; c
   return { cartId: cart.id, checkoutUrl: cart.checkoutUrl };
 }
 
-export async function cartLinesAdd(cartId: string, lines: CartLine[]): Promise<{ checkoutUrl: string }> {
+export async function cartLinesAdd(cartId: string, lines: CartLineInput[]): Promise<{ checkoutUrl: string; totalQuantity: number }> {
   const data = await storefront(`
     mutation CartLinesAdd($cartId: ID!, $lines: [CartLineInput!]!) {
       cartLinesAdd(cartId: $cartId, lines: $lines) {
@@ -278,7 +302,7 @@ export async function cartLinesAdd(cartId: string, lines: CartLine[]): Promise<{
   `, { cartId, lines });
   const cart = data.cartLinesAdd.cart;
   if (!cart) throw new Error(data.cartLinesAdd.userErrors?.[0]?.message ?? 'Failed to add lines');
-  return { checkoutUrl: cart.checkoutUrl };
+  return { checkoutUrl: cart.checkoutUrl, totalQuantity: cart.totalQuantity };
 }
 
 export async function getCartQuantity(cartId: string): Promise<number> {
@@ -292,6 +316,120 @@ export async function getCartQuantity(cartId: string): Promise<number> {
   } catch {
     return 0;
   }
+}
+
+// --- Cart query & mutations (client-side) ---
+
+const CART_LINE_FIELDS = `
+  fragment CartLineFields on BaseCartLine {
+    id
+    quantity
+    merchandise {
+      ... on ProductVariant {
+        id title sku
+        product { title handle }
+        price { amount currencyCode }
+        image { url altText }
+      }
+    }
+    cost { totalAmount { amount currencyCode } }
+  }
+`;
+
+const CART_FIELDS = `
+  ${CART_LINE_FIELDS}
+  fragment CartFields on Cart {
+    id checkoutUrl totalQuantity
+    cost { subtotalAmount { amount currencyCode } }
+    lines(first: 100) { nodes { ...CartLineFields } }
+  }
+`;
+
+/** Fetch full cart. Returns null for expired/invalid carts (clears localStorage). */
+export async function cartQuery(cartId: string): Promise<Cart | null> {
+  try {
+    const data = await storefront(`
+      ${CART_FIELDS}
+      query CartQuery($cartId: ID!) { cart(id: $cartId) { ...CartFields } }
+    `, { cartId });
+    if (!data.cart) {
+      clearStoredCart();
+      return null;
+    }
+    return mapCart(data.cart);
+  } catch {
+    clearStoredCart();
+    return null;
+  }
+}
+
+/** Update quantities on existing lines. */
+export async function cartLinesUpdate(
+  cartId: string,
+  lines: Array<{ id: string; quantity: number }>,
+): Promise<Cart> {
+  const data = await storefront(`
+    ${CART_FIELDS}
+    mutation CartLinesUpdate($cartId: ID!, $lines: [CartLineUpdateInput!]!) {
+      cartLinesUpdate(cartId: $cartId, lines: $lines) {
+        cart { ...CartFields }
+        userErrors { field message }
+      }
+    }
+  `, { cartId, lines });
+  const cart = data.cartLinesUpdate.cart;
+  if (!cart) throw new Error(data.cartLinesUpdate.userErrors?.[0]?.message ?? 'Failed to update lines');
+  dispatchCartUpdated();
+  return mapCart(cart);
+}
+
+/** Remove lines from cart. */
+export async function cartLinesRemove(cartId: string, lineIds: string[]): Promise<Cart> {
+  const data = await storefront(`
+    ${CART_FIELDS}
+    mutation CartLinesRemove($cartId: ID!, $lineIds: [ID!]!) {
+      cartLinesRemove(cartId: $cartId, lineIds: $lineIds) {
+        cart { ...CartFields }
+        userErrors { field message }
+      }
+    }
+  `, { cartId, lineIds });
+  const cart = data.cartLinesRemove.cart;
+  if (!cart) throw new Error(data.cartLinesRemove.userErrors?.[0]?.message ?? 'Failed to remove lines');
+  dispatchCartUpdated();
+  return mapCart(cart);
+}
+
+function mapCart(raw: any): Cart {
+  return {
+    id: raw.id,
+    checkoutUrl: raw.checkoutUrl,
+    totalQuantity: raw.totalQuantity,
+    cost: {
+      subtotalAmount: {
+        amount: raw.cost.subtotalAmount.amount,
+        currencyCode: raw.cost.subtotalAmount.currencyCode,
+      },
+    },
+    lines: (raw.lines?.nodes ?? []).map((l: any) => ({
+      id: l.id,
+      quantity: l.quantity,
+      merchandise: {
+        id: l.merchandise.id,
+        title: l.merchandise.title,
+        sku: l.merchandise.sku ?? '',
+        product: { title: l.merchandise.product.title, handle: l.merchandise.product.handle },
+        price: { amount: l.merchandise.price.amount, currencyCode: l.merchandise.price.currencyCode },
+        image: l.merchandise.image ? { url: l.merchandise.image.url, altText: l.merchandise.image.altText } : null,
+      },
+      cost: { totalAmount: { amount: l.cost.totalAmount.amount, currencyCode: l.cost.totalAmount.currencyCode } },
+    })),
+  };
+}
+
+/** Dispatch cart-updated event (call from islands after mutations). */
+export function dispatchCartUpdated(): void {
+  if (typeof window !== 'undefined') window.dispatchEvent(new Event('cart-updated'));
 }
 
 // --- Newsletter (client-side) ---
@@ -328,8 +466,8 @@ export function findVariant(variants: Variant[], selections: Record<string, stri
 }
 
 /** Build cart lines from selected variant + add-on variant IDs. */
-export function buildCartLines(variantId: string, quantity: number, addonVariantIds: string[]): CartLine[] {
-  const lines: CartLine[] = [{ merchandiseId: variantId, quantity }];
+export function buildCartLines(variantId: string, quantity: number, addonVariantIds: string[]): CartLineInput[] {
+  const lines: CartLineInput[] = [{ merchandiseId: variantId, quantity }];
   for (const id of addonVariantIds) {
     lines.push({ merchandiseId: id, quantity });
   }
@@ -366,6 +504,10 @@ export function getStoredCartId(): string | null {
 
 export function setStoredCartId(id: string): void {
   try { localStorage.setItem('calib-cart-id', id); } catch { /* private browsing */ }
+}
+
+export function clearStoredCart(): void {
+  try { localStorage.removeItem('calib-cart-id'); } catch { /* private browsing */ }
 }
 
 // --- Fallback data ---
