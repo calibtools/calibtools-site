@@ -4,7 +4,16 @@
  * 1 PDF point = 1/72 inch. 1 mm = 72/25.4 pt ≈ 2.8346 pt.
  */
 import { PDFDocument, rgb } from 'pdf-lib';
+import fontkit from '@pdf-lib/fontkit';
 import type { PatternSpec } from './patterns';
+import {
+  BRAND_RED_RGB,
+  BRAND_INK_RGB,
+  BRAND_NAME,
+  BRAND_URL,
+  LOGO_CELLS,
+  patternSummary,
+} from './brand';
 
 /** Conversion factor: millimetres → PDF points. */
 export const MM = 72 / 25.4;
@@ -15,14 +24,35 @@ export interface PdfExportOptions {
   pw: number;
   /** Page height in mm */
   ph: number;
+  /** Pre-loaded font bytes for Node/test environments. Browser loads via fetch if omitted. */
+  fontBytes?: {
+    regular: ArrayBuffer;
+    semiBold: ArrayBuffer;
+    mono: ArrayBuffer;
+  };
+}
+
+/** Load font bytes — uses provided bytes or fetches from assets in browser. */
+async function loadFontBytes(
+  fontBytes: PdfExportOptions['fontBytes'],
+): Promise<{ regular: ArrayBuffer; semiBold: ArrayBuffer; mono: ArrayBuffer }> {
+  if (fontBytes) return fontBytes;
+
+  const [regular, semiBold, mono] = await Promise.all([
+    fetch(new URL('../assets/fonts/Geist-Regular.ttf', import.meta.url)).then(r => r.arrayBuffer()),
+    fetch(new URL('../assets/fonts/Geist-SemiBold.ttf', import.meta.url)).then(r => r.arrayBuffer()),
+    fetch(new URL('../assets/fonts/GeistMono-Regular.ttf', import.meta.url)).then(r => r.arrayBuffer()),
+  ]);
+  return { regular, semiBold, mono };
 }
 
 /**
  * Generate a 1:1 millimetre-accurate PDF of the calibration pattern.
  * Returns raw PDF bytes (Uint8Array).
  */
-export async function exportPdf({ spec, pw, ph }: PdfExportOptions): Promise<Uint8Array> {
+export async function exportPdf({ spec, pw, ph, fontBytes }: PdfExportOptions): Promise<Uint8Array> {
   const doc = await PDFDocument.create();
+  doc.registerFontkit(fontkit);
   const page = doc.addPage([pw * MM, ph * MM]);
   const pageH = ph * MM;
 
@@ -36,6 +66,12 @@ export async function exportPdf({ spec, pw, ph }: PdfExportOptions): Promise<Uin
 
   const isMarkerType = spec.type === 'ChArUco' || spec.type === 'ArUco grid' || spec.type === 'AprilGrid (Kalibr)';
   const isCircles = spec.type.includes('circles') || spec.type.includes('dots');
+
+  // --- Embed fonts ---
+  const fonts = await loadFontBytes(fontBytes);
+  const fontRegular = await doc.embedFont(fonts.regular, { subset: true });
+  const fontSemiBold = await doc.embedFont(fonts.semiBold, { subset: true });
+  const fontMono = await doc.embedFont(fonts.mono, { subset: true });
 
   // Draw pattern squares / circles
   for (let r = 0; r < spec.rows; r++) {
@@ -86,24 +122,106 @@ export async function exportPdf({ spec, pw, ph }: PdfExportOptions): Promise<Uin
   }
 
   // Scale bar
+  let scaleBarBottom = 0;
   if (spec.scaleBar) {
     const sbY = oy + bh + 8;
     const [sx, sy] = pt(ox, sbY);
     // 100 mm horizontal line, 0.6 mm thick
     page.drawRectangle({ x: sx, y: sy - 0.6 * MM, width: 100 * MM, height: 0.6 * MM, color: rgb(0, 0, 0) });
 
-    // Label text (left)
-    const helvetica = await doc.embedFont('Helvetica' as any);
+    // Label text (left) — use Geist Mono
     const fontSize = 2.6 * MM;
     const [tx, ty] = pt(ox, sbY + 4);
-    page.drawText('100 mm scale check', { x: tx, y: ty, size: fontSize, font: helvetica, color: rgb(0.2, 0.2, 0.2) });
+    page.drawText('100 mm scale check', { x: tx, y: ty, size: fontSize, font: fontMono, color: rgb(0.2, 0.2, 0.2) });
 
-    // Label text (right)
-    const rightText = `${spec.type.toLowerCase()} ${spec.rows}x${spec.cols} · ${spec.square}/${spec.marker} mm · ${spec.dict} · Calib.Tools`;
-    const rightW = helvetica.widthOfTextAtSize(rightText, fontSize);
+    // Label text (right) — use patternSummary + brand
+    const summary = patternSummary(spec);
+    const rightText = `${summary} \u00B7 ${BRAND_NAME}`;
+    const rightW = fontMono.widthOfTextAtSize(rightText, fontSize);
     const [rx, ry] = pt(ox + bw, sbY + 4);
-    page.drawText(rightText, { x: rx - rightW, y: ry, size: fontSize, font: helvetica, color: rgb(0.2, 0.2, 0.2) });
+    page.drawText(rightText, { x: rx - rightW, y: ry, size: fontSize, font: fontMono, color: rgb(0.2, 0.2, 0.2) });
+
+    scaleBarBottom = sbY + 4 + 2.6; // sbY + label offset + approx text height
   }
+
+  // --- Brand footer ---
+  const patternBottom = oy + bh;
+  const footerY = Math.max(scaleBarBottom + 4, patternBottom + 2 * spec.square);
+
+  if (footerY + 10 < ph) {
+    // Logo mark: 3x3 grid, 6mm total width, cellSize=1.8, gap=0.3
+    const cellSize = 1.8;
+    const gap = 0.3;
+    const step = cellSize + gap;
+
+    for (const cell of LOGO_CELLS) {
+      const cx = ox + cell.col * step;
+      const cy = footerY + cell.row * step;
+      const fillRgb = cell.fill === '#E60012' ? BRAND_RED_RGB : BRAND_INK_RGB;
+      const [rx, ry] = pt(cx, cy + cellSize);
+      page.drawRectangle({
+        x: rx, y: ry,
+        width: cellSize * MM, height: cellSize * MM,
+        color: rgb(fillRgb.r, fillRgb.g, fillRgb.b),
+      });
+    }
+
+    // Wordmark: "calib" in BRAND_INK + ".tools" in BRAND_RED
+    const wordmarkX = ox + 6 + 2; // logo width + 2mm gap
+    const wordmarkFontSize = 4 * MM; // 4mm cap height
+    const wordmarkY = footerY + 3; // vertically centre approx with logo (logo is ~6.6mm tall)
+    const [wmx, wmy] = pt(wordmarkX, wordmarkY + 4);
+
+    const calibWidth = fontSemiBold.widthOfTextAtSize('calib', wordmarkFontSize);
+    page.drawText('calib', {
+      x: wmx, y: wmy, size: wordmarkFontSize, font: fontSemiBold,
+      color: rgb(BRAND_INK_RGB.r, BRAND_INK_RGB.g, BRAND_INK_RGB.b),
+    });
+    page.drawText('.tools', {
+      x: wmx + calibWidth, y: wmy, size: wordmarkFontSize, font: fontSemiBold,
+      color: rgb(BRAND_RED_RGB.r, BRAND_RED_RGB.g, BRAND_RED_RGB.b),
+    });
+
+    // Centre: pattern summary + board size
+    const summary = patternSummary(spec);
+    const centreText = `${summary} \u00B7 ${bw} \u00D7 ${bh} mm`;
+    const centreFontSize = 2.4 * MM;
+    const centreW = fontMono.widthOfTextAtSize(centreText, centreFontSize);
+    const centreXPt = (ox + bw / 2) * MM - centreW / 2;
+    const centreYPt = pageH - (footerY + 3 + 2.4) * MM;
+    page.drawText(centreText, {
+      x: centreXPt, y: centreYPt, size: centreFontSize, font: fontMono,
+      color: rgb(0.4, 0.4, 0.4),
+    });
+
+    // Right: "calib.tools · {YYYY-MM-DD}"
+    const dateStr = new Date().toISOString().slice(0, 10);
+    const rightText = `${BRAND_URL} \u00B7 ${dateStr}`;
+    const rightFontSize = 2.4 * MM;
+    const rightW = fontRegular.widthOfTextAtSize(rightText, rightFontSize);
+    const rightXPt = (ox + bw) * MM - rightW;
+    const rightYPt = pageH - (footerY + 3 + 2.4) * MM;
+    page.drawText(rightText, {
+      x: rightXPt, y: rightYPt, size: rightFontSize, font: fontRegular,
+      color: rgb(0.4, 0.4, 0.4),
+    });
+  }
+
+  // --- PDF metadata ---
+  const summary = patternSummary(spec);
+  doc.setTitle(`${summary} \u2014 ${BRAND_NAME} pattern`);
+  doc.setAuthor(BRAND_NAME);
+  doc.setSubject('Camera calibration pattern');
+  doc.setKeywords([
+    spec.type,
+    `${spec.rows}x${spec.cols}`,
+    `${spec.square}mm`,
+    spec.dict,
+    'calibration',
+    BRAND_NAME,
+  ]);
+  doc.setProducer(`${BRAND_NAME} pdf-lib`);
+  doc.setCreator(BRAND_URL);
 
   return doc.save();
 }
