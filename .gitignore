@@ -6,3 +6,4 @@ dist
 !.env.example
 .gstack/
 test-output/
+.venv/
