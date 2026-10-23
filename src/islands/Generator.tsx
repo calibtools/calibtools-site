@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { checkerboardSvg, type PatternSpec } from '@/lib/patterns';
 import { exportPdf } from '@/lib/exportPdf';
 import { exportPng } from '@/lib/exportPng';
+import { exportDxf } from '@/lib/exportDxf';
 import { kalibrYaml, ros2Yaml, halconDescr, opencvJson } from '@/lib/exportConfig';
 
 /**
@@ -109,7 +110,7 @@ export default function Generator({ initialSpec }: GeneratorProps = {}) {
                 URL.revokeObjectURL(a.href);
               } finally { setBusy(null); }
             }}>{busy === 'png' ? 'Generating…' : 'PNG (300 dpi)'}</button>
-            <button type="button" className="rounded border border-ink bg-white px-3 py-[11px] text-sm font-medium" disabled title="DXF export planned">DXF</button>
+            <button type="button" className="rounded border border-ink bg-white px-3 py-[11px] text-sm font-medium" onClick={() => download(`${slug}.dxf`, exportDxf({ spec, pw, ph }), 'application/dxf')}>DXF</button>
           </div>
           <span className="pt-1.5 text-[13px] font-semibold">Config files</span>
           <div className="flex flex-wrap gap-2 font-mono text-[13px]">
