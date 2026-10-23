@@ -1,11 +1,19 @@
 ---
 import Base from '@/layouts/Base.astro';
 import ToolTabs from '@/components/ToolTabs.astro';
+import ToolContent from '@/components/ToolContent.astro';
 import Wizard from '@/islands/Wizard';
+import { getEntry } from 'astro:content';
+import { toolJsonLd } from '@/lib/toolJsonLd';
+
+const entry = (await getEntry('tools', 'wizard'))!;
+const { Content } = await entry.render();
+const jsonLd = toolJsonLd(entry.data.h1, '/tools/wizard/', entry.data.seoDescription, entry.data.faq);
 ---
-<Base title="Selection wizard" section="tools" description="Answer five questions about your camera setup and get a calibration pattern recommendation. Covers OpenCV, Kalibr, ROS, HALCON, and MATLAB workflows.">
+<Base title={entry.data.seoTitle} section="tools" description={entry.data.seoDescription} jsonLd={jsonLd}>
   <ToolTabs current="wizard" />
   <div class="container-x py-7 md:pb-16">
     <Wizard client:load />
   </div>
+  <ToolContent Content={Content} faq={entry.data.faq} />
 </Base>

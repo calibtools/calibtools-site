@@ -1,11 +1,19 @@
 ---
 import Base from '@/layouts/Base.astro';
 import ToolTabs from '@/components/ToolTabs.astro';
+import ToolContent from '@/components/ToolContent.astro';
 import FovCalculator from '@/islands/FovCalculator';
+import { getEntry } from 'astro:content';
+import { toolJsonLd } from '@/lib/toolJsonLd';
+
+const entry = (await getEntry('tools', 'fov'))!;
+const { Content } = await entry.render();
+const jsonLd = toolJsonLd(entry.data.h1, '/tools/fov/', entry.data.seoDescription, entry.data.faq);
 ---
-<Base title="FOV calculator" section="tools" description="Calculate field of view, coverage area and ground sample distance for any camera and lens combination. Sensor presets for common machine vision cameras.">
+<Base title={entry.data.seoTitle} section="tools" description={entry.data.seoDescription} jsonLd={jsonLd}>
   <ToolTabs current="fov" />
   <div class="container-x py-7 md:pb-16">
     <FovCalculator client:load />
   </div>
+  <ToolContent Content={Content} faq={entry.data.faq} />
 </Base>

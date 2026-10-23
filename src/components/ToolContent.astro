@@ -1,0 +1,32 @@
+---
+/**
+ * Renders tool SEO content below the island: prose body + FAQ as <details>.
+ */
+interface FaqItem { q: string; a: string }
+interface Props {
+  Content: any;
+  faq: FaqItem[];
+}
+const { Content, faq } = Astro.props;
+---
+<section class="container-x pb-16">
+  <div class="prose-calib mx-auto max-w-[800px] flex flex-col gap-5">
+    <Content />
+  </div>
+  {faq.length > 0 && (
+    <div class="mx-auto mt-10 max-w-[800px]">
+      <h2 class="h-display m-0 pb-4 text-2xl">Frequently asked questions</h2>
+      <div class="flex flex-col divide-y divide-line border-y border-line">
+        {faq.map((item) => (
+          <details class="group py-4">
+            <summary class="flex cursor-pointer list-none items-center justify-between gap-4 text-[15px] font-semibold [&::-webkit-details-marker]:hidden">
+              {item.q}
+              <span class="shrink-0 text-ink-soft transition-transform group-open:rotate-45">+</span>
+            </summary>
+            <p class="m-0 pt-3 text-[15px] leading-relaxed text-ink-muted">{item.a}</p>
+          </details>
+        ))}
+      </div>
+    </div>
+  )}
+</section>
