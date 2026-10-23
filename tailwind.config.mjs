@@ -10,8 +10,9 @@ export default {
         ground: { DEFAULT: '#FFFFFF', alt: '#FAFAFA', panel: '#F5F5F5' },
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
+        sans: ['Geist', 'Geist Fallback', 'system-ui', 'sans-serif'],
+        mono: ['Geist Mono', 'ui-monospace', 'SFMono-Regular', 'monospace'],
+        pixel: ['Geist Pixel', 'Geist Mono', 'monospace'],
       },
       borderRadius: { DEFAULT: '6px', lg: '10px', xl: '12px' },
     },

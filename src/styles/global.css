@@ -2,33 +2,51 @@
 @tailwind components;
 @tailwind utilities;
 
+/* --- Geist Sans (variable, wght 100–900) --- */
 @font-face {
-  font-family: 'Inter';
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/GeistVariable.woff2') format('woff2-variations'),
+       url('/fonts/GeistVariable.woff2') format('woff2');
+}
+
+/* --- Geist Mono (variable, wght 100–900) --- */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/GeistMonoVariable.woff2') format('woff2-variations'),
+       url('/fonts/GeistMonoVariable.woff2') format('woff2');
+}
+
+/* --- Geist Pixel (static Square variant, 400 only) --- */
+@font-face {
+  font-family: 'Geist Pixel';
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url('/fonts/inter-400.woff2') format('woff2');
+  src: url('/fonts/GeistPixel-Square.woff2') format('woff2');
 }
+
+/* --- Geist Fallback (layout-matched Arial for CLS reduction) ---
+   Metrics computed from Geist Sans vs Arial:
+   size-adjust:      99.6%
+   ascent-override:  97.5%
+   descent-override: 24.0%
+   line-gap-override: 0%
+*/
 @font-face {
-  font-family: 'Inter';
+  font-family: 'Geist Fallback';
   font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url('/fonts/inter-600.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'Inter';
-  font-style: normal;
-  font-weight: 800;
-  font-display: swap;
-  src: url('/fonts/inter-800.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'JetBrains Mono';
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: url('/fonts/jetbrains-mono-500.woff2') format('woff2');
+  font-weight: 100 900;
+  src: local('Arial');
+  size-adjust: 99.6%;
+  ascent-override: 97.5%;
+  descent-override: 24.0%;
+  line-gap-override: 0%;
 }
 
 @layer base {
@@ -42,11 +60,17 @@
   .btn-primary { @apply btn bg-brand text-white hover:bg-brand-dark hover:text-white px-7 py-4 text-base; }
   .btn-outline { @apply btn border-[1.5px] border-ink bg-white text-ink hover:text-ink hover:bg-ground-panel px-7 py-4 text-base; }
   .btn-dark { @apply btn bg-ink text-white hover:text-white hover:bg-black px-4 py-2.5 text-sm; }
-  .eyebrow { @apply font-mono text-[13px] uppercase tracking-[0.08em] text-brand-dark; }
-  .h-display { @apply font-extrabold tracking-[-0.03em]; }
   .card { @apply rounded-lg border border-line bg-white; }
   .input { @apply w-full rounded border border-[#CFCFCF] bg-white px-3 py-[11px] text-[15px] focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand; }
   .label { @apply text-[13px] font-semibold; }
+
+  /* Geist Pixel accent utilities */
+  .font-pixel { font-family: 'Geist Pixel', 'Geist Mono', monospace; font-variation-settings: 'ELSH' 1; -webkit-font-smoothing: auto; }
+  .eyebrow   { @apply font-pixel text-[13px] uppercase tracking-[0.04em] text-brand-dark; }
+  .badge     { @apply font-pixel text-[12px] uppercase tracking-[0.04em] rounded px-2.5 py-1.5; }
+  .spec      { @apply font-mono text-[15px] tabular-nums; }
+  .stat      { @apply font-pixel text-[48px] leading-none; }
+  .h-display { @apply font-extrabold tracking-[-0.03em]; }
 }
 
 @layer components {
