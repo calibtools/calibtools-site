@@ -6,8 +6,9 @@
  * Run as part of prebuild.
  */
 
-import { writeFileSync, mkdirSync } from 'node:fs';
+import { writeFileSync, mkdirSync, readFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { Resvg } from '@resvg/resvg-js';
 
 const ROOT = resolve('public');
 
@@ -54,6 +55,12 @@ const ogSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630"
 
 writeFileSync(resolve(ROOT, 'og/default.svg'), ogSvg);
 console.log('[placeholders] Generated public/og/default.svg (1200×630)');
+
+// Render SVG → PNG for social crawlers
+const resvg = new Resvg(ogSvg, { fitTo: { mode: 'width', value: 1200 } });
+const pngData = resvg.render();
+writeFileSync(resolve(ROOT, 'og/default.png'), pngData.asPng());
+console.log('[placeholders] Generated public/og/default.png (1200×630)');
 
 // --- 2. Inspection report PDF ---
 
@@ -131,3 +138,36 @@ page.drawText('hello@calib.tools', {
 const pdfBytes = await doc.save();
 writeFileSync(resolve(ROOT, 'downloads/sample-inspection-report.pdf'), Buffer.from(pdfBytes));
 console.log('[placeholders] Generated public/downloads/sample-inspection-report.pdf');
+
+// --- 3. Per-product OG images ---
+
+// Generate a placeholder OG PNG for each product handle (only when Shopify has no images)
+const productHandles = [
+  { handle: 'checkerboard-composite', title: 'Checkerboard calibration target' },
+  { handle: 'charuco-composite', title: 'ChArUco calibration target' },
+  { handle: 'charuco-ceramic', title: 'ChArUco ceramic target' },
+  { handle: 'mounting-fixture', title: 'Mounting fixture' },
+  { handle: 'certificate-ilac', title: 'Calibration certificate' },
+];
+
+for (const { handle, title } of productHandles) {
+  const outPath = resolve(ROOT, `og/${handle}.png`);
+  // Generate a product-specific OG image with the product title
+  const productOgSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#FFFFFF"/>
+  <g opacity="0.5">
+    ${patternRects.join('\n    ')}
+  </g>
+  <g>
+    ${logoGrid}
+  </g>
+  <text x="540" y="280" font-family="Inter, system-ui, sans-serif" font-size="48" font-weight="800" fill="#1A1A1A">Calib</text>
+  <text x="710" y="280" font-family="Inter, system-ui, sans-serif" font-size="48" font-weight="800" fill="#E60012">.Tools</text>
+  <text x="600" y="340" font-family="Inter, system-ui, sans-serif" font-size="28" font-weight="700" fill="#1A1A1A" text-anchor="middle">${title.replace(/&/g, '&amp;')}</text>
+  <text x="600" y="380" font-family="Inter, system-ui, sans-serif" font-size="18" fill="#6B6B6B" text-anchor="middle">Precision calibration target</text>
+  <text x="600" y="580" font-family="monospace" font-size="16" fill="#9A9A9A" text-anchor="middle">calib.tools</text>
+</svg>`;
+  const productResvg = new Resvg(productOgSvg, { fitTo: { mode: 'width', value: 1200 } });
+  writeFileSync(outPath, productResvg.render().asPng());
+  console.log(`[placeholders] Generated public/og/${handle}.png`);
+}

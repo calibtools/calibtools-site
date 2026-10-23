@@ -177,7 +177,7 @@ if (product.variants.length > 0) {
   };
 }
 
-const ogImage = product.images[0]?.url ?? undefined;
+const ogImage = product.images[0]?.url ?? `/og/${handle}.png`;
 
 // --- Pairs with / Compare ---
 const isAccessory = handle === 'mounting-fixture' || handle === 'certificate-ilac';
