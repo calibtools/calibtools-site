@@ -47,9 +47,11 @@ for (const file of htmlFiles) {
     // Resolve against dist/
     const target = resolve(DIST, clean.startsWith('/') ? clean.slice(1) : clean);
 
-    // Check: exact file, or directory with index.html
+    // Check: exact file in dist/, directory with index.html, or static file in public/
+    const publicTarget = resolve('public', clean.startsWith('/') ? clean.slice(1) : clean);
     const exists = existsSync(target) ||
-      existsSync(join(target, 'index.html'));
+      existsSync(join(target, 'index.html')) ||
+      existsSync(publicTarget);
 
     if (!exists) {
       const relFile = file.replace(DIST + '/', '');
