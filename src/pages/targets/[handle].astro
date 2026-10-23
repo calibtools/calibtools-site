@@ -4,6 +4,7 @@ import VariantPicker from '@/islands/VariantPicker';
 import { getProducts, getProductByHandle, sanitizeHtml } from '@/lib/shopify';
 import { kalibrYaml, ros2Yaml, halconDescr } from '@/lib/exportConfig';
 import type { PatternSpec } from '@/lib/patterns';
+import { getProductFaq } from '@/lib/faq';
 
 export async function getStaticPaths() {
   const products = await getProducts();
@@ -104,6 +105,18 @@ if (hasPatternData) {
     ];
   }
 }
+
+// --- FAQ ---
+const faqItems = getProductFaq(handle!);
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqItems.map((item) => ({
+    '@type': 'Question',
+    name: item.question,
+    acceptedAnswer: { '@type': 'Answer', text: item.answer },
+  })),
+};
 ---
 <Base title={product.title} section="targets" description={product.description}>
   <div class="container-x flex gap-2 pt-5 text-sm text-ink-soft">
@@ -224,6 +237,25 @@ if (hasPatternData) {
           </div>
         </div>
       )}
+    </section>
+  )}
+
+  {/* FAQ */}
+  {faqItems.length > 0 && (
+    <section class="container-x flex flex-col gap-5 pb-16">
+      <h2 class="h-display m-0 text-2xl">Frequently asked questions</h2>
+      <div class="flex flex-col divide-y divide-line border-y border-line">
+        {faqItems.map((item) => (
+          <details class="group py-4">
+            <summary class="flex cursor-pointer list-none items-center justify-between gap-4 text-[15px] font-semibold [&::-webkit-details-marker]:hidden">
+              {item.question}
+              <span class="shrink-0 text-ink-soft transition-transform group-open:rotate-45">+</span>
+            </summary>
+            <p class="m-0 pt-3 text-[15px] leading-relaxed text-ink-muted">{item.answer}</p>
+          </details>
+        ))}
+      </div>
+      <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
     </section>
   )}
 </Base>
