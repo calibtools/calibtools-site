@@ -7,7 +7,10 @@ import { tools } from '@/lib/tools';
 import { getCollections } from '@/lib/shopify';
 import { getCollection } from 'astro:content';
 const collections = await getCollections();
-const guides = (await getCollection('guides')).slice(0, 3);
+const allGuides = await getCollection('guides');
+/** Hide guides whose body still contains placeholder copy. */
+const isReady = (g: typeof allGuides[number]) => !g.body?.includes('[BODY COPY');
+const guides = allGuides.filter(isReady).slice(0, 3);
 const why = [
   ['Transparent pricing', 'Every size and material priced on the page. No quote forms for standard parts.'],
   ['EU stock, 2–4 days', 'Core targets ship from Germany. DDP to the US on request.'],
@@ -50,8 +53,8 @@ const why = [
         </div>
         <a href="/tools/" class="text-[15px] font-semibold">See all tools →</a>
       </div>
-      <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
-        {tools.slice(0, 3).map((t) => (
+      <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-4">
+        {tools.map((t) => (
           <ToolCard href={t.href} title={t.title} cta={t.live ? t.cta : `${t.cta} (coming soon)`} body={t.body} />
         ))}
       </div>
@@ -101,17 +104,19 @@ const why = [
 
   <!-- Learn + subscribe -->
   <section id="learn" class="container-x flex flex-wrap gap-12 py-12 md:py-[72px]">
-    <div class="flex min-w-0 flex-1 basis-[520px] flex-col gap-5">
-      <span class="eyebrow">Knowledge base</span>
-      <h2 class="h-display m-0 text-[26px] md:text-[32px]">Where calibration starts.</h2>
-      <div class="flex flex-col border-t border-line">
-        {guides.map((g) => (
-          <a href={`/guides/${g.slug}/`} class="flex justify-between gap-4 border-b border-line py-4 text-ink no-underline hover:text-ink">
-            <span class="font-semibold">{g.data.title}</span><span class="text-brand-dark">→</span>
-          </a>
-        ))}
+    {guides.length > 0 && (
+      <div class="flex min-w-0 flex-1 basis-[520px] flex-col gap-5">
+        <span class="eyebrow">Knowledge base</span>
+        <h2 class="h-display m-0 text-[26px] md:text-[32px]">Where calibration starts.</h2>
+        <div class="flex flex-col border-t border-line">
+          {guides.map((g) => (
+            <a href={`/guides/${g.slug}/`} class="flex justify-between gap-4 border-b border-line py-4 text-ink no-underline hover:text-ink">
+              <span class="font-semibold">{g.data.title}</span><span class="text-brand-dark">→</span>
+            </a>
+          ))}
+        </div>
       </div>
-    </div>
+    )}
     <div class="min-w-0 flex-1 basis-[360px]">
       <NewsletterForm client:load />
     </div>
