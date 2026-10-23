@@ -22,4 +22,17 @@ const tools = defineCollection({
   }),
 });
 
-export const collections = { guides, tools };
+const collections_ = defineCollection({
+  type: 'content',
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    sellingPoints: z.array(z.string()).length(2),
+    color: z.enum(['brand', 'slate-blue', 'amber', 'grey']),
+    pairsWith: z.array(z.string()).default([]),
+    specsTable: z.array(z.object({ label: z.string(), value: z.string() })).default([]),
+    founderQuote: z.string().optional(),
+  }),
+});
+
+export const collections = { guides, tools, collections: collections_ };
