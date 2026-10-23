@@ -94,8 +94,7 @@ describe('exportPdf', () => {
       type: 'ChArUco', rows: 7, cols: 10, square: 25, marker: 18,
       dict: 'DICT_6X6_250', paper: 'A4', startId: 0, scaleBar: true,
     };
-    const pw = 210, ph = 297;
-    const bw = spec.cols * spec.square; // 250
+    const ph = 297;
     const bh = spec.rows * spec.square; // 175
     const oy = (ph - bh) / 2 - (spec.scaleBar ? 6 : 0); // (297-175)/2 - 6 = 55
     const patternBottom = oy + bh; // 55 + 175 = 230
