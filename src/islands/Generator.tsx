@@ -13,8 +13,14 @@ const PATTERNS = ['Checkerboard', 'ChArUco', 'AprilGrid (Kalibr)', 'Asymmetric c
 const DICTS = ['DICT_6X6_250', 'DICT_5X5_100', 'DICT_4X4_50', 'DICT_APRILTAG_36h11', 'DICT_ARUCO_ORIGINAL'];
 const PAPERS: Record<string, [number, number]> = { A4: [210, 297], A3: [297, 420], Letter: [215.9, 279.4] };
 
-export default function Generator() {
-  const [spec, setSpec] = useState<PatternSpec>({ type: 'ChArUco', rows: 7, cols: 10, square: 25, marker: 18, dict: 'DICT_6X6_250', paper: 'A4', startId: 0, scaleBar: true });
+interface GeneratorProps {
+  /** Override the default pattern state for preset landing pages. */
+  initialSpec?: Partial<PatternSpec>;
+}
+
+export default function Generator({ initialSpec }: GeneratorProps = {}) {
+  const defaultSpec: PatternSpec = { type: 'ChArUco', rows: 7, cols: 10, square: 25, marker: 18, dict: 'DICT_6X6_250', paper: 'A4', startId: 0, scaleBar: true };
+  const [spec, setSpec] = useState<PatternSpec>({ ...defaultSpec, ...initialSpec });
   const [busy, setBusy] = useState<'pdf' | 'png' | null>(null);
   const [pw, ph] = PAPERS[spec.paper] ?? PAPERS.A4;
   const svg = useMemo(() => checkerboardSvg(spec, pw, ph), [spec, pw, ph]);
