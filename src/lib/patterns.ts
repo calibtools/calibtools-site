@@ -19,6 +19,31 @@ export interface PatternSpec {
   paper: string;
   startId: number;
   scaleBar: boolean;
+
+  // Checkerboard options (Step 1)
+  finderMarkers?: boolean;   // OpenCV CALIB_CB_MARKER layout — 3 circles
+  radonCheckers?: boolean;   // Radon (rounded) checkers
+  invert?: boolean;          // swap black/white
+
+  // ChArUco options (Step 2)
+  legacyLayout?: boolean;    // OpenCV ≤ 4.5 legacy ChArUco marker order
+
+  // AprilGrid options (Step 3)
+  aprilFamily?: string;      // tag family: '16h5' | '25h9' | '36h11' | '41h12' | '52h13'
+  borderBits?: number;       // 1 (AprilTag 3) or 2
+  tagSpacing?: number;       // ratio of spacing/tagSize (e.g. 0.3)
+  showTagIds?: boolean;      // display ID labels under each tag
+  symmetricCorners?: boolean; // symmetric corner squares for sub-pixel refinement
+  tagIdList?: string;        // explicit comma/range list e.g. "0-9,15,20-24"
+
+  // Circle options (Step 5)
+  circleDiameter?: number;   // mm, default square × 0.56
+  circleSpacingX?: number;   // mm, override square for X spacing
+  circleSpacingY?: number;   // mm, override square for Y spacing
+
+  // Axes options (Step 7b)
+  showAxes?: boolean;        // default true — draw coordinate-frame axes
+  monochromeAxes?: boolean;  // solid/dashed instead of coloured (for ceramic/glass)
 }
 
 /** Inner corner coordinates (mm) for a rows×cols checkerboard, row-major, matching cv.findChessboardCorners order. */

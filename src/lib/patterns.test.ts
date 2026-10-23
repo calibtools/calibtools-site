@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { innerCorners, checkerboardSvg } from './patterns';
+import { innerCorners, checkerboardSvg, type PatternSpec } from './patterns';
 
 describe('innerCorners', () => {
   it('matches OpenCV count and order for 7x10, 25 mm', () => {
@@ -59,5 +59,40 @@ describe('checkerboardSvg brand group', () => {
     const patternRects = [...svg.matchAll(/<rect x="[^"]*" y="[^"]*" width="[^"]*" height="[^"]*" fill="#000"/g)];
     const lastPatternRect = patternRects[patternRects.length - 1];
     expect(brandStart).toBeGreaterThan(lastPatternRect.index!);
+  });
+});
+
+describe('PatternSpec new optional fields', () => {
+  it('new optional fields default to undefined when not provided', () => {
+    const spec: PatternSpec = {
+      type: 'Checkerboard', rows: 7, cols: 10, square: 25, marker: 18,
+      dict: 'DICT_6X6_250', paper: 'A4', startId: 0, scaleBar: true,
+    };
+    expect(spec.finderMarkers).toBeUndefined();
+    expect(spec.radonCheckers).toBeUndefined();
+    expect(spec.invert).toBeUndefined();
+    expect(spec.legacyLayout).toBeUndefined();
+    expect(spec.aprilFamily).toBeUndefined();
+    expect(spec.borderBits).toBeUndefined();
+    expect(spec.tagSpacing).toBeUndefined();
+    expect(spec.showTagIds).toBeUndefined();
+    expect(spec.symmetricCorners).toBeUndefined();
+    expect(spec.tagIdList).toBeUndefined();
+    expect(spec.circleDiameter).toBeUndefined();
+    expect(spec.circleSpacingX).toBeUndefined();
+    expect(spec.circleSpacingY).toBeUndefined();
+    expect(spec.showAxes).toBeUndefined();
+    expect(spec.monochromeAxes).toBeUndefined();
+  });
+
+  it('existing code still works when new fields are set', () => {
+    const spec: PatternSpec = {
+      type: 'Checkerboard', rows: 4, cols: 4, square: 25, marker: 18,
+      dict: '', paper: 'A4', startId: 0, scaleBar: false,
+      finderMarkers: true, radonCheckers: true, invert: true,
+    };
+    // Should not throw — renderers should tolerate these fields
+    const svg = checkerboardSvg(spec, 210, 297);
+    expect(svg).toContain('</svg>');
   });
 });
