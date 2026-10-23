@@ -8,9 +8,9 @@ export default defineConfig({
     headless: true,
   },
   webServer: {
-    command: 'pnpm dev',
+    command: 'pnpm build && pnpm preview',
     port: 4321,
     reuseExistingServer: true,
-    timeout: 20_000,
+    timeout: 60_000,
   },
 });

@@ -13,7 +13,7 @@ test('add to cart navigates to Shopify checkout', async ({ page }) => {
 
   // Click Add to cart and wait for Shopify checkout redirect
   await addBtn.click();
-  await page.waitForURL(/\/cart\/c\/|checkout/, { timeout: 15_000 });
+  await page.waitForURL(/\/cart\/c\/|checkout/, { timeout: 20_000, waitUntil: 'commit' });
   expect(page.url()).toMatch(/shop\.calib\.tools/);
 });
 
@@ -37,6 +37,6 @@ test('add-ons appear and can be checked', async ({ page }) => {
 
   // Add to cart with add-ons
   await addBtn.click();
-  await page.waitForURL(/\/cart\/c\/|checkout/, { timeout: 15_000 });
+  await page.waitForURL(/\/cart\/c\/|checkout/, { timeout: 20_000, waitUntil: 'commit' });
   expect(page.url()).toMatch(/shop\.calib\.tools/);
 });
