@@ -109,7 +109,7 @@ export default function CartPage() {
       <div className="flex flex-col items-end gap-4 border-t border-line pt-6">
         <div className="flex items-center gap-4">
           <span className="text-lg font-semibold">Subtotal</span>
-          <span className="text-2xl font-bold" data-testid="cart-subtotal">
+          <span className="spec text-2xl font-bold" data-testid="cart-subtotal">
             {formatPrice(cart!.cost.subtotalAmount.amount, cart!.cost.subtotalAmount.currencyCode)}
           </span>
         </div>
@@ -167,7 +167,7 @@ function CartLineRow({
             {merchandise.product.title}
           </a>
           <span className="text-xs text-ink-muted">{merchandise.title}</span>
-          {merchandise.sku && <span className="font-mono text-xs text-ink-soft">{merchandise.sku}</span>}
+          {merchandise.sku && <span className="spec text-xs text-ink-soft">{merchandise.sku}</span>}
           <button type="button" onClick={onRemove} disabled={busy} className="mt-1 w-fit text-xs text-ink-soft hover:text-brand disabled:opacity-40">
             Remove
           </button>
@@ -175,7 +175,7 @@ function CartLineRow({
       </div>
 
       {/* Unit price */}
-      <span className="hidden text-center text-sm md:block">{unitPrice}</span>
+      <span className="spec hidden text-center text-sm md:block">{unitPrice}</span>
 
       {/* Quantity stepper */}
       <div className="flex justify-center">
@@ -199,7 +199,7 @@ function CartLineRow({
       </div>
 
       {/* Line total */}
-      <span className="text-right text-sm font-semibold">{lineTotal}</span>
+      <span className="spec text-right text-sm font-semibold">{lineTotal}</span>
     </li>
   );
 }

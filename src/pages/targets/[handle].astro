@@ -223,7 +223,13 @@ const faqJsonLd = {
 
     {/* Product info + variant picker */}
     <div class="flex min-w-0 flex-1 basis-[420px] flex-col gap-5">
-      <span class="eyebrow">{eyebrow}</span>
+      <div class="flex flex-wrap gap-2">
+        <span class="badge bg-brand/10 text-brand-dark">{eyebrow}</span>
+        {m.feature_tolerance && (
+          <span class="badge border border-line text-ink">{m.feature_tolerance}</span>
+        )}
+        <span class="badge bg-ink text-white">Report included</span>
+      </div>
       <h1 class="h-display m-0 text-[32px] leading-[1.1] md:text-[40px]">{product.title}</h1>
       <p class="m-0 text-base leading-relaxed text-ink-muted">{product.description}</p>
 
@@ -253,7 +259,7 @@ const faqJsonLd = {
                     {group.rows.map((row, i) => (
                       <tr class={`border-t border-line last:border-b ${i % 2 === 1 ? 'bg-ground-alt' : ''}`}>
                         <td class="w-2/5 py-3 text-ink-soft md:table-cell">{row.label}</td>
-                        <td class="py-3">{row.value}</td>
+                        <td class="spec py-3">{row.value}</td>
                       </tr>
                     ))}
                   </tbody>

@@ -4,6 +4,7 @@ import ProductCard from '@/components/ProductCard.astro';
 import ToolCard from '@/components/ToolCard.astro';
 import NewsletterForm from '@/islands/NewsletterForm';
 import { tools } from '@/lib/tools';
+import { stats } from '@/lib/site';
 import { getCollections } from '@/lib/shopify';
 import { getCollection } from 'astro:content';
 const collections = await getCollections();
@@ -93,6 +94,14 @@ const why = [
           <div class="flex flex-col gap-2 border-t-2 border-brand pt-4">
             <strong class="text-[17px]">{t}</strong>
             <span class="text-sm leading-relaxed text-[#CFCFCF]">{b}</span>
+          </div>
+        ))}
+      </div>
+      <div class="grid grid-cols-2 gap-8 pt-4 md:grid-cols-4">
+        {stats.map((s) => (
+          <div class="flex flex-col gap-1">
+            <span class="stat text-white">{s.value}</span>
+            <span class="text-[13px] text-[#9A9A9A]">{s.caption}</span>
           </div>
         ))}
       </div>

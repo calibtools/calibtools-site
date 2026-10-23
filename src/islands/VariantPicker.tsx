@@ -117,7 +117,7 @@ export default function VariantPicker({ product, certVariantId, fixtureVariantId
     <div className="flex flex-col gap-5">
       {/* Price */}
       <div className="flex items-baseline gap-3">
-        <span className="text-4xl font-extrabold">{variant?.price ?? product.priceFrom}</span>
+        <span className="spec text-4xl font-extrabold">{variant?.price ?? product.priceFrom}</span>
         {variant && !variant.availableForSale && (
           <span className="text-sm text-brand">Out of stock</span>
         )}
