@@ -1,0 +1,31 @@
+---
+import Base from '@/layouts/Base.astro';
+---
+<Base title="Verify serial number" description="Look up an inspection report by serial number." noindex>
+  <section class="container-x flex flex-col items-center gap-6 py-16 md:py-24">
+    <div class="flex flex-col items-center gap-2.5 text-center">
+      <span class="eyebrow">Verify</span>
+      <h1 class="h-display m-0 text-[36px] md:text-[48px]">Serial number lookup</h1>
+      <p class="m-0 max-w-[480px] text-base text-ink-muted">Enter a serial number to view the inspection report for a Calib.Tools calibration target.</p>
+    </div>
+    <form id="verify-form" class="flex w-full max-w-[400px] gap-3">
+      <input
+        type="text"
+        name="sn"
+        placeholder="e.g. 000311"
+        required
+        pattern="[0-9A-Za-z\-]+"
+        class="flex-1 rounded-lg border border-line bg-ground px-4 py-3 text-base text-ink placeholder:text-ink-muted focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand spec"
+      />
+      <button type="submit" class="btn btn-primary px-6 py-3">Look up</button>
+    </form>
+  </section>
+  <script>
+    document.getElementById('verify-form')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const form = e.target as HTMLFormElement;
+      const sn = (form.elements.namedItem('sn') as HTMLInputElement).value.trim();
+      if (sn) window.location.href = `/verify/${encodeURIComponent(sn)}/`;
+    });
+  </script>
+</Base>

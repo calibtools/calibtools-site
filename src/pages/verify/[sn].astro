@@ -1,0 +1,102 @@
+---
+import Base from '@/layouts/Base.astro';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+
+interface SerialRecord {
+  sn: string;
+  part_number: string;
+  id_range: string;
+  inspected_on: string;
+  inspector: string;
+  report_url: string;
+}
+
+function loadSerials(): SerialRecord[] {
+  try {
+    return JSON.parse(readFileSync(resolve('data/serials.json'), 'utf-8'));
+  } catch {
+    return [];
+  }
+}
+
+export function getStaticPaths() {
+  const serials = loadSerials();
+  // Generate a page for each known serial + a catch-all "not-found" placeholder
+  // For unknown SNs, we generate a 404 page at /verify/unknown/
+  const paths = serials.map((s) => ({
+    params: { sn: s.sn },
+    props: { record: s, found: true },
+  }));
+  // Also generate a generic "unknown" page that the 404 can redirect to
+  paths.push({
+    params: { sn: 'unknown' },
+    props: { record: null, found: false },
+  });
+  return paths;
+}
+
+const { sn } = Astro.params;
+const { record, found } = Astro.props;
+---
+<Base
+  title={found ? `SN ${sn} — Inspection record` : `No record for serial ${sn}`}
+  description={found ? `Inspection record for serial number ${sn}.` : 'No record found for this serial number.'}
+  noindex
+>
+  <section class="container-x flex flex-col items-center gap-6 py-16 md:py-24">
+    {found && record ? (
+      <div class="flex w-full max-w-[600px] flex-col gap-6">
+        <div class="flex flex-col gap-2 text-center">
+          <span class="eyebrow">Inspection record</span>
+          <h1 class="h-display m-0 text-[32px] md:text-[40px]">SN {record.sn}</h1>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full border-collapse text-[15px]">
+            <tbody>
+              <tr class="border-t border-line">
+                <td class="py-3 px-3 font-semibold text-ink-muted">Serial number</td>
+                <td class="py-3 px-3 spec">{record.sn}</td>
+              </tr>
+              <tr class="border-t border-line bg-ground-alt">
+                <td class="py-3 px-3 font-semibold text-ink-muted">Part number</td>
+                <td class="py-3 px-3 spec">{record.part_number}</td>
+              </tr>
+              <tr class="border-t border-line">
+                <td class="py-3 px-3 font-semibold text-ink-muted">ID range</td>
+                <td class="py-3 px-3 spec">{record.id_range}</td>
+              </tr>
+              <tr class="border-t border-line bg-ground-alt">
+                <td class="py-3 px-3 font-semibold text-ink-muted">Inspected on</td>
+                <td class="py-3 px-3">{record.inspected_on}</td>
+              </tr>
+              <tr class="border-t border-line">
+                <td class="py-3 px-3 font-semibold text-ink-muted">Inspector</td>
+                <td class="py-3 px-3">{record.inspector}</td>
+              </tr>
+              <tr class="border-t border-b border-line bg-ground-alt">
+                <td class="py-3 px-3 font-semibold text-ink-muted">Report</td>
+                <td class="py-3 px-3">
+                  <a href={record.report_url} class="font-semibold text-brand no-underline hover:underline">Download PDF</a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="text-center">
+          <a href="/verify/" class="text-sm text-ink-muted no-underline hover:text-brand">&larr; Look up another serial</a>
+        </div>
+      </div>
+    ) : (
+      <div class="flex flex-col items-center gap-4 text-center">
+        <span class="eyebrow">Not found</span>
+        <h1 class="h-display m-0 text-[32px] md:text-[40px]">No record for this serial</h1>
+        <p class="m-0 max-w-[480px] text-base text-ink-muted">
+          The serial number was not found in our register. If you believe this is an error,
+          contact <a href="mailto:hello@calib.tools" class="text-brand">hello@calib.tools</a> with your serial number.
+        </p>
+        <a href="/verify/" class="btn btn-primary mt-2 px-6 py-3">Try another serial</a>
+      </div>
+    )}
+  </section>
+</Base>
