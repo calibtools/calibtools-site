@@ -1,0 +1,74 @@
+[
+  {
+    "code": "CT-DS-CHA-C",
+    "title": "ChArUco ceramic calibration target",
+    "type": "datasheet",
+    "rev": "A",
+    "date": "2026-10-24",
+    "status": "draft",
+    "family": "CHA",
+    "material": "C",
+    "sha256": "c9d38c929601e0ca4aed496d858efc0f578668dc31ed635285659c7fe08a85da",
+    "bytes": 26506
+  },
+  {
+    "code": "CT-DS-CHA-P",
+    "title": "ChArUco composite calibration target",
+    "type": "datasheet",
+    "rev": "A",
+    "date": "2026-10-24",
+    "status": "draft",
+    "family": "CHA",
+    "material": "P",
+    "sha256": "2b008f6f7146a6484dd84fddc83e4fd8a0983edf3c87b749aa78af0099378cbb",
+    "bytes": 29896
+  },
+  {
+    "code": "CT-DS-CHT-P",
+    "title": "Checkerboard composite calibration target",
+    "type": "datasheet",
+    "rev": "A",
+    "date": "2026-10-24",
+    "status": "draft",
+    "family": "CHT",
+    "material": "P",
+    "sha256": "fa78ea50f37416781c8f6a0c12dd4d63f052439e2b01b0bd643f4c8ed3a1c8ac",
+    "bytes": 26379
+  },
+  {
+    "code": "CT-IR-001",
+    "title": "Dimensional inspection report template",
+    "type": "note",
+    "rev": "A",
+    "date": "2026-10-24",
+    "status": "draft",
+    "family": null,
+    "material": null,
+    "sha256": "86ef658acb8a2c149b796470ac6ae04730348af86559e2843bc82f93334a6cc5",
+    "bytes": 24647
+  },
+  {
+    "code": "CT-PF-001",
+    "title": "Pattern files and configuration formats",
+    "type": "note",
+    "rev": "A",
+    "date": "2026-10-24",
+    "status": "draft",
+    "family": null,
+    "material": null,
+    "sha256": "36c9c818e151c412de854821eaf7bd97adf32cd93310de8f9eba486552f0785b",
+    "bytes": 25667
+  },
+  {
+    "code": "CT-UM-001",
+    "title": "Calibration target user manual",
+    "type": "manual",
+    "rev": "A",
+    "date": "2026-10-24",
+    "status": "draft",
+    "family": null,
+    "material": null,
+    "sha256": "3810683a87f646961aa830a4be3f9d49434cceb80967deb9b581132a1e54c6c0",
+    "bytes": 26967
+  }
+]
