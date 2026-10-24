@@ -1,74 +1,134 @@
 [
   {
+    "code": "CT-AN-001",
+    "title": "Pattern files and software setup",
+    "type": "note",
+    "rev": "A",
+    "date": "2026-10-24",
+    "status": "draft",
+    "family": null,
+    "material": null,
+    "sha256": "c17a75aecad3e0d9caf54900e2cd08f7f9997bfc98a55cc659dd691d55ebf155",
+    "bytes": 24432
+  },
+  {
+    "code": "CT-DS-ACC-A-FIX-14",
+    "title": "Mounting fixture, ¼″-20",
+    "type": "datasheet",
+    "rev": "A",
+    "date": "2026-10-24",
+    "status": "draft",
+    "family": "ACC",
+    "material": "A",
+    "sha256": "78c229df516a9ec497f528a1820e0d72b4a3c0fff404611735e64b98073f3e98",
+    "bytes": 26609
+  },
+  {
     "code": "CT-DS-CHA-C",
-    "title": "ChArUco ceramic calibration target",
+    "title": "ChArUco calibration target, ceramic",
     "type": "datasheet",
     "rev": "A",
     "date": "2026-10-24",
     "status": "draft",
     "family": "CHA",
     "material": "C",
-    "sha256": "a1998974d59c5df246bf4f8b61a7effedce6a209c3e2e01418794a400d5efd16",
-    "bytes": 25521
+    "sha256": "be5ef8c474fdc595819c2381128d9eff254f2ffbd3cea3bc9411244b4fcba63e",
+    "bytes": 33516
   },
   {
     "code": "CT-DS-CHA-P",
-    "title": "ChArUco composite calibration target",
+    "title": "ChArUco calibration target, composite",
     "type": "datasheet",
     "rev": "A",
     "date": "2026-10-24",
     "status": "draft",
     "family": "CHA",
     "material": "P",
-    "sha256": "9e6e1079d0eed29f4929e3ca285709f50a2c821fc6ac196949f85a97e66a9deb",
-    "bytes": 28627
+    "sha256": "924bbee3328f7bfb3eaff1b2ff05bc86c19fc1282a12091780e285185f26dce4",
+    "bytes": 35653
   },
   {
     "code": "CT-DS-CHT-P",
-    "title": "Checkerboard composite calibration target",
+    "title": "Checkerboard calibration target, composite",
     "type": "datasheet",
     "rev": "A",
     "date": "2026-10-24",
     "status": "draft",
     "family": "CHT",
     "material": "P",
-    "sha256": "d423ec643d3287ad64696df42929b47dd664259b39c9e7eecbe776f2a73271ab",
-    "bytes": 25496
+    "sha256": "41265cbdfba5d0e058b0ad0505e30e65eac9a5f1fb982a0510b52227ee65edea",
+    "bytes": 29919
   },
   {
-    "code": "CT-IR-001",
-    "title": "Dimensional inspection report template",
+    "code": "CT-IR-template",
+    "title": "Inspection report — Template",
     "type": "note",
     "rev": "A",
     "date": "2026-10-24",
     "status": "draft",
     "family": null,
     "material": null,
-    "sha256": "ad872554e5342364bf79beb9173340cfcf2c9db7048bf7de0cce237869702fc6",
-    "bytes": 23783
+    "sha256": "665cd08585b158fb4f9ecea4b6ae00ef4e6e763016a73a075acf42145c1cd85d",
+    "bytes": 30741
   },
   {
-    "code": "CT-PF-001",
-    "title": "Pattern files and configuration formats",
-    "type": "note",
+    "code": "CT-SV-CERT-ILAC",
+    "title": "ILAC-MRA certificate — Service description",
+    "type": "service",
     "rev": "A",
     "date": "2026-10-24",
     "status": "draft",
-    "family": null,
-    "material": null,
-    "sha256": "a46b5bd4bf4d2a6045b06a8bbaa3ac51a9ad58f30c2da62fd893d3867b908119",
-    "bytes": 25451
+    "family": "SVC",
+    "material": "X",
+    "sha256": "4fb039ec64ac3e0beeef1b3ce85d48ec1ab82249e0cd8f6c80aeb2d59ee58f8a",
+    "bytes": 25257
   },
   {
-    "code": "CT-UM-001",
-    "title": "Calibration target user manual",
+    "code": "CT-UM-CHA-C",
+    "title": "ChArUco ceramic target — Quick start",
+    "type": "manual",
+    "rev": "A",
+    "date": "2026-10-24",
+    "status": "draft",
+    "family": "CHA",
+    "material": "C",
+    "sha256": "3b44868514b6fab6f4c738f1b35df789a6dfffce760638dfcfc8b5f2df853d24",
+    "bytes": 25863
+  },
+  {
+    "code": "CT-UM-CHA-P",
+    "title": "ChArUco composite target — Quick start",
+    "type": "manual",
+    "rev": "A",
+    "date": "2026-10-24",
+    "status": "draft",
+    "family": "CHA",
+    "material": "P",
+    "sha256": "4d1c5dda35f3df3437d911ba77eeb21b1425c17ead9a54b6d01c5e73364e8261",
+    "bytes": 27647
+  },
+  {
+    "code": "CT-UM-CHT-P",
+    "title": "Checkerboard composite target — Quick start",
+    "type": "manual",
+    "rev": "A",
+    "date": "2026-10-24",
+    "status": "draft",
+    "family": "CHT",
+    "material": "P",
+    "sha256": "590d272c1e79337d5325a82d37ebc871ce95948dccc1587dc2a8af67cc409564",
+    "bytes": 26268
+  },
+  {
+    "code": "CT-UM-GEN",
+    "title": "Calibration targets — User manual",
     "type": "manual",
     "rev": "A",
     "date": "2026-10-24",
     "status": "draft",
     "family": null,
     "material": null,
-    "sha256": "0997e841cdf1b29433b4548d010b123fcb89a4586ab8b1e02669ae56dc5fa12b",
-    "bytes": 26572
+    "sha256": "e44385975856d896d847d940303c5d67262acab26df8821ee6bd7eaebb3017fa",
+    "bytes": 35049
   }
 ]

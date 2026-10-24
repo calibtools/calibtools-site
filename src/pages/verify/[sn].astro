@@ -12,26 +12,19 @@ interface SerialRecord {
   report_url: string;
 }
 
-function loadSerials(): SerialRecord[] {
-  try {
-    return JSON.parse(readFileSync(resolve('data/serials.json'), 'utf-8'));
-  } catch {
-    return [];
-  }
-}
-
 export function getStaticPaths() {
-  const serials = loadSerials();
-  // Generate a page for each known serial + a catch-all "not-found" placeholder
-  // For unknown SNs, we generate a 404 page at /verify/unknown/
+  let serials: SerialRecord[] = [];
+  try {
+    serials = JSON.parse(readFileSync(resolve('data/serials.json'), 'utf-8'));
+  } catch { /* empty register */ }
+
   const paths = serials.map((s) => ({
     params: { sn: s.sn },
     props: { record: s, found: true },
   }));
-  // Also generate a generic "unknown" page that the 404 can redirect to
   paths.push({
     params: { sn: 'unknown' },
-    props: { record: null, found: false },
+    props: { record: null as SerialRecord | null, found: false },
   });
   return paths;
 }
