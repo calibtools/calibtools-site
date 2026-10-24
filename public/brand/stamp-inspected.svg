@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-17 -17 34 34" width="32mm" height="32mm">
+  <style>text { font-family: 'Geist Sans', 'Geist Mono', sans-serif; fill: #E60012; }</style>
+  <!-- Outer ring -->
+  <circle cx="0" cy="0" r="16" fill="none" stroke="#E60012" stroke-width="0.4"/>
+  <!-- Inner ring -->
+  <circle cx="0" cy="0" r="14.2" fill="none" stroke="#E60012" stroke-width="0.25"/>
+  <!-- Top arc text -->
+  <defs>
+    <path id="top-arc" d="M -13.7,0 A 13.7,13.7 0 1,1 13.7,0"/>
+    <path id="bot-arc" d="M 13.7,0 A 13.7,13.7 0 1,1 -13.7,0"/>
+  </defs>
+  <text font-size="3.2" font-weight="600" text-anchor="middle" letter-spacing="0.8">
+    <textPath href="#top-arc" startOffset="50%">CALIB.TOOLS · MUNICH</textPath>
+  </text>
+  <text font-size="2.8" font-weight="600" text-anchor="middle" letter-spacing="0.6">
+    <textPath href="#bot-arc" startOffset="50%">DIMENSIONAL INSPECTION</textPath>
+  </text>
+  <!-- Centre -->
+  <text x="0" y="1" font-size="3.5" font-weight="700" text-anchor="middle" font-family="'Geist Mono', monospace">INSPECTED</text>
+  <text x="0" y="4.5" font-size="2.5" text-anchor="middle" font-family="'Geist Mono', monospace">SN ______</text>
+  <text x="0" y="7" font-size="2" text-anchor="middle" font-family="'Geist Mono', monospace">DATE ______ ___</text>
+</svg>

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 10" width="25mm" height="10mm">
+  <style>text { font-family: 'Geist Sans', 'Geist Mono', sans-serif; fill: #E60012; }</style>
+  <rect x="0" y="0" width="25" height="10" fill="none" stroke="#E60012" stroke-width="0.3"/>
+  <text x="12.5" y="4.5" font-size="2.2" font-weight="600" text-anchor="middle" letter-spacing="0.3">CALIB.TOOLS · INSPECTED</text>
+  <text x="12.5" y="7.5" font-size="1.6" text-anchor="middle" font-family="'Geist Mono', monospace">100% dimensional check · SN ______</text>
+</svg>
