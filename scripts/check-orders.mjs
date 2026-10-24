@@ -6,8 +6,9 @@
  *   node scripts/check-orders.mjs [--count 10]
  *
  * Requires environment variables (or .env):
- *   SHOPIFY_STORE_DOMAIN — e.g. shop.calib.tools
- *   SHOPIFY_ADMIN_TOKEN   — Admin API access token (shpat_...)
+ *   SHOPIFY_STORE_DOMAIN  — e.g. shop.calib.tools
+ *   SHOPIFY_CLIENT_ID     — OAuth client ID
+ *   SHOPIFY_CLIENT_SECRET — OAuth client secret
  *
  * Packing slip configuration:
  *   Shopify shows line-item properties on packing slips automatically if
@@ -43,12 +44,29 @@ try {
 } catch { /* no .env */ }
 
 const domain = process.env.SHOPIFY_STORE_DOMAIN;
-const token = process.env.SHOPIFY_ADMIN_TOKEN;
+const clientId = process.env.SHOPIFY_CLIENT_ID;
+const clientSecret = process.env.SHOPIFY_CLIENT_SECRET;
 
-if (!domain || !token) {
-  console.error('Missing SHOPIFY_STORE_DOMAIN or SHOPIFY_ADMIN_TOKEN');
+if (!domain || !clientId || !clientSecret) {
+  console.error('Missing SHOPIFY_STORE_DOMAIN, SHOPIFY_CLIENT_ID, or SHOPIFY_CLIENT_SECRET');
   process.exit(1);
 }
+
+// --- Mint token via client-credentials grant ---
+const tokenRes = await fetch(`https://${domain}/admin/oauth/access_token`, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+  body: new URLSearchParams({
+    grant_type: 'client_credentials',
+    client_id: clientId,
+    client_secret: clientSecret,
+  }),
+});
+if (!tokenRes.ok) {
+  console.error(`Token exchange failed: ${tokenRes.status} ${tokenRes.statusText}`);
+  process.exit(1);
+}
+const { access_token: token } = await tokenRes.json();
 
 const countArg = process.argv.includes('--count')
   ? Number(process.argv[process.argv.indexOf('--count') + 1])
