@@ -66,11 +66,44 @@ for (const dirName of readdirSync(ROOT)) {
   }
 }
 
+// 5. Scan src/ and docs/ for asset references whose targets don't exist on disk
+const SRC_ROOT = resolve(import.meta.dirname, '..', 'src');
+const DOCS_ROOT = resolve(import.meta.dirname, '..', 'docs');
+const SCAN_EXTS = new Set(['.astro', '.ts', '.tsx', '.md', '.mdx', '.json', '.mjs']);
+const ASSET_REF_RE = /assets\/products\/[^\s"')]+/g;
+
+function scanDir(dir) {
+  if (!existsSync(dir)) return;
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const full = join(dir, entry.name);
+    if (entry.isDirectory()) {
+      if (entry.name === 'node_modules') continue;
+      scanDir(full);
+    } else if (SCAN_EXTS.has('.' + entry.name.split('.').pop())) {
+      const content = readFileSync(full, 'utf-8');
+      for (const match of content.matchAll(ASSET_REF_RE)) {
+        const ref = match[0];
+        // Resolve relative to the project src/assets/products root
+        const refFile = ref.replace(/^.*assets\/products\//, '');
+        // Skip globs and template literals — only check concrete file paths
+        if (/[*${}]/.test(refFile)) continue;
+        const target = join(ROOT, refFile);
+        if (!existsSync(target)) {
+          errors.push(`${full}: references assets/products/${refFile} but file does not exist`);
+        }
+      }
+    }
+  }
+}
+scanDir(SRC_ROOT);
+scanDir(DOCS_ROOT);
+
 if (errors.length > 0) {
   console.error('❌ Product image validation failed:\n');
   for (const e of errors) console.error(`  • ${e}`);
-  console.error(`\n${errors.length} error(s) in ${JSON_PATH}`);
+  console.error(`\n${errors.length} error(s)`);
   process.exit(1);
 }
 
 console.log(`✓ images.json: ${catalog.length} entries validated, all files present.`);
+console.log(`✓ No broken asset references in src/ or docs/.`);

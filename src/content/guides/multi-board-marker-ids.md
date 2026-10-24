@@ -6,7 +6,7 @@ readingTime: "3 min"
 related: ["charuco-vs-checkerboard-vs-aprilgrid"]
 ---
 
-![Calib.Tools set of four ChArUco calibration boards with consecutive marker ID ranges arranged in a 2 by 2 grid, seen from above.](../../assets/products/brand/home-set.png)
+![Calib.Tools set of four ChArUco calibration boards with consecutive marker ID ranges arranged in a 2 by 2 grid, seen from above.](../../assets/products/brand/home-set.webp)
 
 ## Why boards in one rig need distinct ID ranges
 
