@@ -8,8 +8,8 @@
     "status": "draft",
     "family": "CHA",
     "material": "C",
-    "sha256": "c9d38c929601e0ca4aed496d858efc0f578668dc31ed635285659c7fe08a85da",
-    "bytes": 26506
+    "sha256": "a1998974d59c5df246bf4f8b61a7effedce6a209c3e2e01418794a400d5efd16",
+    "bytes": 25521
   },
   {
     "code": "CT-DS-CHA-P",
@@ -20,8 +20,8 @@
     "status": "draft",
     "family": "CHA",
     "material": "P",
-    "sha256": "2b008f6f7146a6484dd84fddc83e4fd8a0983edf3c87b749aa78af0099378cbb",
-    "bytes": 29896
+    "sha256": "9e6e1079d0eed29f4929e3ca285709f50a2c821fc6ac196949f85a97e66a9deb",
+    "bytes": 28627
   },
   {
     "code": "CT-DS-CHT-P",
@@ -32,8 +32,8 @@
     "status": "draft",
     "family": "CHT",
     "material": "P",
-    "sha256": "fa78ea50f37416781c8f6a0c12dd4d63f052439e2b01b0bd643f4c8ed3a1c8ac",
-    "bytes": 26379
+    "sha256": "d423ec643d3287ad64696df42929b47dd664259b39c9e7eecbe776f2a73271ab",
+    "bytes": 25496
   },
   {
     "code": "CT-IR-001",
@@ -44,8 +44,8 @@
     "status": "draft",
     "family": null,
     "material": null,
-    "sha256": "86ef658acb8a2c149b796470ac6ae04730348af86559e2843bc82f93334a6cc5",
-    "bytes": 24647
+    "sha256": "ad872554e5342364bf79beb9173340cfcf2c9db7048bf7de0cce237869702fc6",
+    "bytes": 23783
   },
   {
     "code": "CT-PF-001",
@@ -56,8 +56,8 @@
     "status": "draft",
     "family": null,
     "material": null,
-    "sha256": "36c9c818e151c412de854821eaf7bd97adf32cd93310de8f9eba486552f0785b",
-    "bytes": 25667
+    "sha256": "a46b5bd4bf4d2a6045b06a8bbaa3ac51a9ad58f30c2da62fd893d3867b908119",
+    "bytes": 25451
   },
   {
     "code": "CT-UM-001",
@@ -68,7 +68,7 @@
     "status": "draft",
     "family": null,
     "material": null,
-    "sha256": "3810683a87f646961aa830a4be3f9d49434cceb80967deb9b581132a1e54c6c0",
-    "bytes": 26967
+    "sha256": "0997e841cdf1b29433b4548d010b123fcb89a4586ab8b1e02669ae56dc5fa12b",
+    "bytes": 26572
   }
 ]

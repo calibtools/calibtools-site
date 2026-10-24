@@ -169,12 +169,12 @@ export function parseMarkdown(body: string): Block[] {
       continue;
     }
 
-    // Table
-    if (line.startsWith('| ')) {
+    // Table (lines starting with | — includes separator rows like |---|)
+    if (line.startsWith('|')) {
       flushParagraph(paraBuf);
       paraBuf = [];
       const tableLines: string[] = [];
-      while (i < lines.length && lines[i].startsWith('| ')) {
+      while (i < lines.length && lines[i].startsWith('|')) {
         tableLines.push(lines[i]);
         i++;
       }
