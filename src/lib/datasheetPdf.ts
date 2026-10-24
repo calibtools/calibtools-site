@@ -297,7 +297,9 @@ async function loadFontBytes(
  */
 export async function renderDatasheetPdf(opts: DatasheetPdfOptions): Promise<Uint8Array> {
   const { meta, blocks } = opts;
-  const doc = await PDFDocument.create();
+  const doc = await PDFDocument.create({ updateMetadata: false });
+  doc.setCreationDate(new Date(0));
+  doc.setModificationDate(new Date(0));
   doc.registerFontkit(fontkit);
 
   const fonts = await loadFontBytes(opts.fontBytes);
