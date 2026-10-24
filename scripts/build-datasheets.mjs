@@ -158,7 +158,7 @@ if (existsSync(gitignorePath)) {
 console.log(`[build-datasheets] ${built} built, ${skipped} cached, ${manifest.length} total. Manifest: public/files/datasheets/index.json`);
 
 // Print per-handle datasheet_url values for metafield CSV import
-const datasheets = manifest.filter((e) => e.type === 'datasheet' && e.family && e.material);
+const datasheets = manifest.filter((e) => (e.type === 'datasheet' || e.type === 'service') && e.family && e.material);
 if (datasheets.length > 0) {
   console.log('\n[build-datasheets] datasheet_url values for metafield CSV:');
   const HANDLE_MAP = {
@@ -166,6 +166,8 @@ if (datasheets.length > 0) {
     'CHA-C': 'charuco-ceramic',
     'CHT-P': 'checkerboard-composite',
     'CHT-C': 'checkerboard-ceramic',
+    'ACC-A': 'mounting-fixture',
+    'SVC-X': 'certificate-ilac',
   };
   for (const ds of datasheets) {
     const key = `${ds.family}-${ds.material}`;

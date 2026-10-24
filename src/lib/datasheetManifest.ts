@@ -47,6 +47,8 @@ const HANDLE_TO_FAMILY_MATERIAL: Record<string, { family: string; material: stri
   'charuco-ceramic': { family: 'CHA', material: 'C' },
   'checkerboard-composite': { family: 'CHT', material: 'P' },
   'checkerboard-ceramic': { family: 'CHT', material: 'C' },
+  'mounting-fixture': { family: 'ACC', material: 'A' },
+  'certificate-ilac': { family: 'SVC', material: 'X' },
 };
 
 /**
@@ -59,7 +61,7 @@ export function findDatasheetUrl(handle: string): string | null {
   if (!fm) return null;
 
   const entry = manifest.find(
-    (e) => e.type === 'datasheet' && e.family === fm.family && e.material === fm.material,
+    (e) => (e.type === 'datasheet' || e.type === 'service') && e.family === fm.family && e.material === fm.material,
   );
   if (!entry) return null;
 
