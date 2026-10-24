@@ -156,3 +156,21 @@ if (existsSync(gitignorePath)) {
 }
 
 console.log(`[build-datasheets] ${built} built, ${skipped} cached, ${manifest.length} total. Manifest: public/files/datasheets/index.json`);
+
+// Print per-handle datasheet_url values for metafield CSV import
+const datasheets = manifest.filter((e) => e.type === 'datasheet' && e.family && e.material);
+if (datasheets.length > 0) {
+  console.log('\n[build-datasheets] datasheet_url values for metafield CSV:');
+  const HANDLE_MAP = {
+    'CHA-P': 'charuco-composite',
+    'CHA-C': 'charuco-ceramic',
+    'CHT-P': 'checkerboard-composite',
+    'CHT-C': 'checkerboard-ceramic',
+  };
+  for (const ds of datasheets) {
+    const key = `${ds.family}-${ds.material}`;
+    const handle = HANDLE_MAP[key] || `(unknown: ${key})`;
+    console.log(`  ${handle.padEnd(30)} /files/datasheets/${ds.code}.pdf`);
+  }
+  console.log('');
+}

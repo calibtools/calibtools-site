@@ -8,6 +8,7 @@ import { cornersCount } from '@/lib/collectionSpecs';
 import { idRange } from '@/lib/idRange';
 import { COLLECTION_SIBLINGS } from '@/lib/constants';
 import { checkerboardSvg, type PatternSpec } from '@/lib/patterns';
+import { findDatasheetUrl } from '@/lib/datasheetManifest';
 
 export async function getStaticPaths() {
   const collections = await getCollections();
@@ -284,7 +285,7 @@ const breadcrumbLd = {
             </div>
 
             {/* Purchase table */}
-            <PurchaseTable client:load product={p} />
+            <PurchaseTable client:load product={p} datasheetUrl={findDatasheetUrl(p.handle) ?? undefined} />
           </div>
         );
       })

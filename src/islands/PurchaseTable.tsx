@@ -10,10 +10,12 @@ import type { PatternSpec } from '@/lib/patterns';
 
 interface Props {
   product: Product;
+  /** Fallback datasheet URL when metafield is empty. */
+  datasheetUrl?: string;
 }
 
 /** Extract display columns from a variant + product metafields. */
-function variantColumns(variant: Variant, product: Product) {
+function variantColumns(variant: Variant, product: Product, fallbackDocsUrl?: string) {
   const m = product.metafields;
   const opts = Object.fromEntries(variant.selectedOptions.map((o) => [o.name, o.value]));
 
@@ -40,12 +42,12 @@ function variantColumns(variant: Variant, product: Product) {
   }
 
   const available = availabilityLabel(m.lead_time, variant.availableForSale);
-  const docsUrl = m.datasheet_url ?? '';
+  const docsUrl = m.datasheet_url || fallbackDocsUrl || '';
 
   return { size, dictOrPattern, squares, idsLabel, available, docsUrl };
 }
 
-export default function PurchaseTable({ product }: Props) {
+export default function PurchaseTable({ product, datasheetUrl: fallbackUrl }: Props) {
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [busyVariant, setBusyVariant] = useState<string | null>(null);
 
@@ -122,7 +124,7 @@ export default function PurchaseTable({ product }: Props) {
           </thead>
           <tbody>
             {variants.map((v) => {
-              const cols = variantColumns(v, product);
+              const cols = variantColumns(v, product, fallbackUrl);
               const qty = getQty(v.id);
               const busy = busyVariant === v.id;
               return (
@@ -216,7 +218,7 @@ export default function PurchaseTable({ product }: Props) {
       {/* Mobile stacked cards */}
       <div className="md:hidden flex flex-col divide-y divide-line border-t border-line">
         {variants.map((v) => {
-          const cols = variantColumns(v, product);
+          const cols = variantColumns(v, product, fallbackUrl);
           const qty = getQty(v.id);
           const busy = busyVariant === v.id;
           return (
