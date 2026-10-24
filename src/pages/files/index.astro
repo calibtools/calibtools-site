@@ -1,0 +1,114 @@
+---
+import Base from '@/layouts/Base.astro';
+import { getAllDatasheets } from '@/lib/datasheetManifest';
+
+const entries = getAllDatasheets();
+
+const datasheets = entries.filter((e) => e.type === 'datasheet');
+const common = entries.filter((e) => e.type !== 'datasheet');
+
+function formatBytes(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  const kb = bytes / 1024;
+  return `${kb < 100 ? kb.toFixed(1) : Math.round(kb)} KB`;
+}
+
+const typeLabel: Record<string, string> = {
+  datasheet: 'Datasheet',
+  manual: 'User manual',
+  note: 'Application note',
+};
+---
+<Base title="Files and datasheets" description="Product datasheets, user manual, and application notes for Calib.Tools calibration targets.">
+  <section class="container-x flex flex-col gap-9 py-12 md:py-16">
+    <div class="flex flex-col gap-2.5">
+      <span class="eyebrow">Downloads</span>
+      <h1 class="h-display m-0 text-[36px] md:text-[48px]">Files &amp; datasheets</h1>
+      <p class="m-0 max-w-[600px] text-base text-ink-muted">Product datasheets, user manual, inspection report template, and pattern file documentation. All documents are PDF, generated from source and versioned.</p>
+    </div>
+
+    {/* Product datasheets */}
+    {datasheets.length > 0 && (
+      <div class="flex flex-col gap-5">
+        <h2 class="h-display m-0 text-[28px] md:text-[32px]">Product datasheets</h2>
+        <div class="overflow-x-auto">
+          <table class="w-full border-collapse text-[15px]">
+            <thead>
+              <tr class="bg-brand-tint text-left">
+                <th class="py-3 px-3 font-bold text-brand-dark">Code</th>
+                <th class="py-3 px-3 font-bold text-brand-dark">Title</th>
+                <th class="py-3 px-3 font-bold text-brand-dark">Rev</th>
+                <th class="py-3 px-3 font-bold text-brand-dark text-right">Size</th>
+                <th class="py-3 px-3 font-bold text-brand-dark">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {datasheets.map((ds, i) => (
+                <tr class={`border-t border-line ${i % 2 === 1 ? 'bg-ground-alt' : ''}`}>
+                  <td class="py-3 px-3 spec">{ds.code}</td>
+                  <td class="py-3 px-3">
+                    <a href={`/files/datasheets/${ds.code}.pdf`} class="font-semibold text-ink no-underline hover:text-brand">{ds.title}</a>
+                  </td>
+                  <td class="py-3 px-3 spec">{ds.rev}</td>
+                  <td class="py-3 px-3 spec text-right">{formatBytes(ds.bytes)}</td>
+                  <td class="py-3 px-3">
+                    {ds.status === 'draft'
+                      ? <span class="badge bg-brand/10 text-brand-dark">DRAFT</span>
+                      : <span class="badge bg-ink/5 text-ink">Released</span>
+                    }
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    )}
+
+    {/* Common documents */}
+    {common.length > 0 && (
+      <div class="flex flex-col gap-5">
+        <h2 class="h-display m-0 text-[28px] md:text-[32px]">Common documents</h2>
+        <div class="overflow-x-auto">
+          <table class="w-full border-collapse text-[15px]">
+            <thead>
+              <tr class="bg-brand-tint text-left">
+                <th class="py-3 px-3 font-bold text-brand-dark">Code</th>
+                <th class="py-3 px-3 font-bold text-brand-dark">Title</th>
+                <th class="py-3 px-3 font-bold text-brand-dark">Type</th>
+                <th class="py-3 px-3 font-bold text-brand-dark">Rev</th>
+                <th class="py-3 px-3 font-bold text-brand-dark text-right">Size</th>
+                <th class="py-3 px-3 font-bold text-brand-dark">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {common.map((doc, i) => (
+                <tr class={`border-t border-line ${i % 2 === 1 ? 'bg-ground-alt' : ''}`}>
+                  <td class="py-3 px-3 spec">{doc.code}</td>
+                  <td class="py-3 px-3">
+                    <a href={`/files/datasheets/${doc.code}.pdf`} class="font-semibold text-ink no-underline hover:text-brand">{doc.title}</a>
+                  </td>
+                  <td class="py-3 px-3 text-ink-muted">{typeLabel[doc.type] ?? doc.type}</td>
+                  <td class="py-3 px-3 spec">{doc.rev}</td>
+                  <td class="py-3 px-3 spec text-right">{formatBytes(doc.bytes)}</td>
+                  <td class="py-3 px-3">
+                    {doc.status === 'draft'
+                      ? <span class="badge bg-brand/10 text-brand-dark">DRAFT</span>
+                      : <span class="badge bg-ink/5 text-ink">Released</span>
+                    }
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    )}
+
+    {entries.length === 0 && (
+      <div class="card p-8 text-center text-ink-muted">
+        <p class="m-0">Datasheets are being prepared and will be available shortly.</p>
+      </div>
+    )}
+  </section>
+</Base>
