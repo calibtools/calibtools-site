@@ -6,37 +6,25 @@
  *
  * Setup required:
  * 1. Shopify custom app with scopes: read_customers, write_customers
- *    (Settings → Apps and sales channels → Develop apps → Create app →
- *    Configure Admin API scopes → Install app → copy Admin API access token)
  * 2. Cloudflare Pages encrypted secrets:
- *    - SHOPIFY_ADMIN_TOKEN: the Admin API access token (shpat_...)
+ *    - SHOPIFY_CLIENT_ID: OAuth client ID
+ *    - SHOPIFY_CLIENT_SECRET: OAuth client secret
  *    - SHOPIFY_STORE_DOMAIN: e.g. shop.calib.tools
- * 3. (Optional) KV namespace QUOTES bound for rate limiting
+ * 3. (Optional) KV namespace QUOTES bound for rate limiting / token caching
  */
 
+import { adminFetch } from '../../src/lib/shopifyAdmin';
+
 interface Env {
-  SHOPIFY_ADMIN_TOKEN?: string;
+  SHOPIFY_CLIENT_ID?: string;
+  SHOPIFY_CLIENT_SECRET?: string;
   SHOPIFY_STORE_DOMAIN?: string;
   QUOTES?: KVNamespace;
+  WEBHOOKS?: KVNamespace;
 }
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const RATE_LIMIT = 10; // per hour per IP
-
-async function adminQuery(domain: string, token: string, query: string, variables: Record<string, any> = {}) {
-  const res = await fetch(`https://${domain}/admin/api/2025-07/graphql.json`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Shopify-Access-Token': token,
-    },
-    body: JSON.stringify({ query, variables }),
-  });
-  if (!res.ok) throw new Error(`Admin API ${res.status}`);
-  const json = await res.json();
-  if (json.errors?.length) throw new Error(json.errors[0].message);
-  return json.data;
-}
 
 export const onRequestPost: PagesFunction<Env> = async (ctx) => {
   const json = (type: string, body: Record<string, any>, status = 200) =>
@@ -68,15 +56,13 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
     await ctx.env.QUOTES.put(rateKey, String(count + 1), { expirationTtl: 3600 });
   }
 
-  const domain = ctx.env.SHOPIFY_STORE_DOMAIN;
-  const token = ctx.env.SHOPIFY_ADMIN_TOKEN;
-  if (!domain || !token) {
+  if (!ctx.env.SHOPIFY_STORE_DOMAIN || !ctx.env.SHOPIFY_CLIENT_ID || !ctx.env.SHOPIFY_CLIENT_SECRET) {
     return json('error', { ok: false, message: 'Newsletter signup is temporarily unavailable.' }, 503);
   }
 
   try {
     // Find existing customer
-    const searchData = await adminQuery(domain, token, `
+    const searchData = await adminFetch(ctx.env, `
       query FindCustomer($query: String!) {
         customers(first: 1, query: $query) { nodes { id } }
       }
@@ -89,7 +75,7 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
       customerId = existing.id;
     } else {
       // Create customer
-      const createData = await adminQuery(domain, token, `
+      const createData = await adminFetch(ctx.env, `
         mutation CustomerCreate($input: CustomerInput!) {
           customerCreate(input: $input) {
             customer { id }
@@ -104,7 +90,7 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
         // Don't expose Shopify error details
         if (ue?.message?.toLowerCase().includes('taken')) {
           // Race condition — customer was just created, try search again
-          const retry = await adminQuery(domain, token, `
+          const retry = await adminFetch(ctx.env, `
             query FindCustomer($query: String!) {
               customers(first: 1, query: $query) { nodes { id } }
             }
@@ -120,7 +106,7 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
     }
 
     // Update marketing consent
-    const consentData = await adminQuery(domain, token, `
+    const consentData = await adminFetch(ctx.env, `
       mutation UpdateConsent($input: CustomerEmailMarketingConsentUpdateInput!) {
         customerEmailMarketingConsentUpdate(input: $input) {
           customer {
@@ -148,7 +134,7 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
     const tag = typeof body.tag === 'string' ? body.tag.replace(/[^a-zA-Z0-9:_-]/g, '').slice(0, 64) : '';
     if (tag && customerId) {
       try {
-        await adminQuery(domain, token, `
+        await adminFetch(ctx.env, `
           mutation AddTag($id: ID!, $tags: [String!]!) {
             tagsAdd(id: $id, tags: $tags) {
               userErrors { field message }
