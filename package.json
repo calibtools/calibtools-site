@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
-    "prebuild": "node scripts/verify-storefront.mjs && tsx scripts/generate-placeholders.ts && tsx scripts/build-datasheets.mjs",
+    "prebuild": "node scripts/verify-storefront.mjs && node scripts/validate-product-images.mjs && tsx scripts/generate-placeholders.ts && tsx scripts/build-datasheets.mjs",
     "build": "astro build",
     "postbuild": "node scripts/check-links.mjs && node scripts/check-specs.mjs",
     "preview": "astro preview",
@@ -23,6 +23,7 @@
     "pdf-lib": "^1.17.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "sharp": "^0.35.5",
     "tailwindcss": "^3.4.17"
   },
   "devDependencies": {

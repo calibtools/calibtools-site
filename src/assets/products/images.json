@@ -1,0 +1,134 @@
+[
+  {
+    "handle": "checkerboard-composite",
+    "file": "01-hero.webp",
+    "kind": "ai",
+    "alt": "Calib.Tools 300 by 240 mm white aluminium composite checkerboard calibration board standing upright at a slight angle on a seamless white background."
+  },
+  {
+    "handle": "checkerboard-composite",
+    "file": "02-angle.webp",
+    "kind": "ai",
+    "alt": "Calib.Tools checkerboard calibration board lying flat on white, photographed from the lower left to show its 3 mm edge and matte surface."
+  },
+  {
+    "handle": "checkerboard-composite",
+    "file": "03-detail.webp",
+    "kind": "ai",
+    "alt": "Calib.Tools checkerboard calibration board close-up of the bottom-left corner showing the last black squares and the printed part number line in the white margin."
+  },
+  {
+    "handle": "checkerboard-composite",
+    "file": "04-context.webp",
+    "kind": "ai",
+    "alt": "Calib.Tools checkerboard calibration board held in a clamp on a tripod facing an industrial camera on an optical breadboard in a Munich machine vision lab."
+  },
+  {
+    "handle": "checkerboard-composite",
+    "file": "05-scale.webp",
+    "kind": "ai",
+    "alt": "Calib.Tools checkerboard calibration board photographed from above next to a 300 mm steel ruler and a 1-euro coin for scale."
+  },
+  {
+    "handle": "charuco-composite",
+    "file": "01-hero.webp",
+    "kind": "ai",
+    "alt": "Calib.Tools 300 by 240 mm white aluminium composite ChArUco calibration board standing upright at a slight angle on a seamless white background."
+  },
+  {
+    "handle": "charuco-composite",
+    "file": "02-angle.webp",
+    "kind": "ai",
+    "alt": "Calib.Tools ChArUco calibration board lying flat on white, photographed from the lower left to show its 3 mm edge and matte surface."
+  },
+  {
+    "handle": "charuco-composite",
+    "file": "03-detail.webp",
+    "kind": "ai",
+    "alt": "Calib.Tools ChArUco calibration board close-up of the bottom-left corner with ArUco markers and the printed part number line."
+  },
+  {
+    "handle": "charuco-composite",
+    "file": "04-context.webp",
+    "kind": "ai",
+    "alt": "Calib.Tools ChArUco calibration board on a black aluminium frame in front of a stereo camera pair in a robotics lab with a collaborative robot arm behind."
+  },
+  {
+    "handle": "charuco-composite",
+    "file": "05-scale.webp",
+    "kind": "ai",
+    "alt": "Calib.Tools ChArUco calibration board photographed from above next to a 300 mm steel ruler and a 1-euro coin for scale."
+  },
+  {
+    "handle": "charuco-ceramic",
+    "file": "01-hero.webp",
+    "kind": "ai",
+    "alt": "Calib.Tools 200 by 150 mm white ceramic ChArUco calibration plate propped upright on a seamless white background."
+  },
+  {
+    "handle": "charuco-ceramic",
+    "file": "02-angle.webp",
+    "kind": "ai",
+    "alt": "Calib.Tools ceramic ChArUco calibration plate lying flat on white, photographed from the lower left to show its 4 mm ground edge and chamfer."
+  },
+  {
+    "handle": "charuco-ceramic",
+    "file": "03-detail.webp",
+    "kind": "ai",
+    "alt": "Calib.Tools ceramic ChArUco calibration plate close-up of the bottom-left corner showing small ArUco markers and the laser-marked part number line."
+  },
+  {
+    "handle": "charuco-ceramic",
+    "file": "04-context.webp",
+    "kind": "ai",
+    "alt": "Calib.Tools ceramic ChArUco calibration plate in a black kinematic mount on an optical table in front of a telecentric lens and machine vision camera."
+  },
+  {
+    "handle": "charuco-ceramic",
+    "file": "05-scale.webp",
+    "kind": "ai",
+    "alt": "Calib.Tools ceramic ChArUco calibration plate photographed from above on dark granite next to a 200 mm steel ruler and a 1-euro coin."
+  },
+  {
+    "handle": "mounting-fixture",
+    "file": "01-hero.webp",
+    "kind": "ai",
+    "alt": "Calib.Tools ACC-A-FIX-14 mounting fixture with two black anodised edge clamps, red thumb screws and an aluminium extrusion rail on a white background."
+  },
+  {
+    "handle": "mounting-fixture",
+    "file": "02-mounted.webp",
+    "kind": "ai",
+    "alt": "Calib.Tools mounting fixture holding a checkerboard calibration board by its top and bottom edges on a black tripod."
+  },
+  {
+    "handle": "mounting-fixture",
+    "file": "03-detail.webp",
+    "kind": "ai",
+    "alt": "Calib.Tools mounting fixture macro of a clamp with its grey rubber lip and red thumb screw gripping a board edge next to the engraved rail."
+  },
+  {
+    "handle": "certificate-ilac",
+    "file": "01-hero.webp",
+    "kind": "ai",
+    "alt": "Calib.Tools dimensional inspection report for a ceramic ChArUco plate lying on a white surface with the plate behind it."
+  },
+  {
+    "handle": "certificate-ilac",
+    "file": "02-detail.webp",
+    "kind": "ai",
+    "alt": "Calib.Tools inspection report close-up of the measurement results table beside the corner of a ceramic ChArUco plate."
+  },
+  {
+    "handle": "brand",
+    "file": "home-lab.webp",
+    "kind": "ai",
+    "alt": "Calib.Tools ChArUco calibration board in a clamp facing a camera rig in a Munich machine vision lab at the end of the day, with two engineers in the background."
+  },
+  {
+    "handle": "brand",
+    "file": "home-set.webp",
+    "kind": "ai",
+    "alt": "Calib.Tools set of four ChArUco calibration boards with consecutive marker ID ranges arranged in a 2 by 2 grid, seen from above."
+  }
+]
