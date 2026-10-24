@@ -1,10 +1,24 @@
 ---
 import Base from '@/layouts/Base.astro';
 import ProductCard from '@/components/ProductCard.astro';
+import type { ImageMetadata } from 'astro';
 import { getCollections, getProducts } from '@/lib/shopify';
+import { getProductImages } from '@/lib/product-images';
+import { getImageMetadata } from '@/lib/productImageImports';
 
 const collections = await getCollections();
 const products = await getProducts();
+
+// Build hero image map for all products
+const heroImageMap = new Map<string, ImageMetadata>();
+for (const p of products) {
+  const images = getProductImages(p.handle);
+  const hero = images.find((img) => img.file === '01-hero.webp');
+  if (hero) {
+    const meta = getImageMetadata(hero.handle, hero.file);
+    if (meta) heroImageMap.set(p.handle, meta);
+  }
+}
 ---
 <Base title="Calibration targets" section="targets" description="Checkerboard, ChArUco, AprilGrid, ceramic and glass calibration targets with inspection report. Ships from Germany in 2–4 days.">
   <section class="container-x flex flex-col gap-9 py-12 md:py-16">
@@ -17,13 +31,15 @@ const products = await getProducts();
     <div class="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
       {collections.map((c) => {
         const firstProduct = c.products[0];
+        const localHero = firstProduct ? heroImageMap.get(firstProduct.handle) : undefined;
         return (
           <ProductCard
             href={`/targets/collection/${c.handle}/`}
             title={c.title}
             sub={c.description}
             from={firstProduct?.priceFrom ?? ''}
-            image={c.image ?? firstProduct?.image}
+            localImage={localHero}
+            image={!localHero ? (c.image ?? firstProduct?.image) : undefined}
             placeholder={c.title.toUpperCase()}
           />
         );
@@ -35,9 +51,19 @@ const products = await getProducts();
       <>
         <h2 class="h-display m-0 mt-4 text-[28px]">All targets</h2>
         <div class="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
-          {products.map((p) => (
-            <ProductCard href={p.url} title={p.title} sub={p.description} from={p.priceFrom} image={p.image} />
-          ))}
+          {products.map((p) => {
+            const localHero = heroImageMap.get(p.handle);
+            return (
+              <ProductCard
+                href={p.url}
+                title={p.title}
+                sub={p.description}
+                from={p.priceFrom}
+                localImage={localHero}
+                image={!localHero ? p.image : undefined}
+              />
+            );
+          })}
         </div>
       </>
     )}

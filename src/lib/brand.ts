@@ -26,6 +26,18 @@ export const BRAND_EMAIL = 'hello@calib.tools';
 export const BRAND_LOCATION = 'Munich, Germany';
 
 // ---------------------------------------------------------------------------
+// Image honesty labels
+// ---------------------------------------------------------------------------
+
+/** Caption shown under galleries when images are AI renders or CGI. */
+export const RENDERING_DISCLAIMER =
+  'Rendering — actual product may differ';
+
+/** Extra line shown under the certificate-ilac gallery. */
+export const CERTIFICATE_DISCLAIMER =
+  'Sample inspection report. The ILAC-MRA certificate is issued by an accredited third-party laboratory and shipped with the board.';
+
+// ---------------------------------------------------------------------------
 // Logo grid — 3×3, row-major, matching Logo.astro:
 //   i % 2 === 0 → bg-brand (BRAND_RED), else bg-ink (BRAND_INK)
 // ---------------------------------------------------------------------------

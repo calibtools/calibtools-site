@@ -1,10 +1,36 @@
 ---
-interface Props { href: string; title: string; sub: string; from: string; image?: string; placeholder?: string }
-const { href, title, sub, from, image, placeholder = 'PRODUCT' } = Astro.props;
+import { Picture } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+  href: string;
+  title: string;
+  sub: string;
+  from: string;
+  /** Remote image URL (Shopify CDN). */
+  image?: string;
+  /** Local optimised image (from import.meta.glob). */
+  localImage?: ImageMetadata;
+  placeholder?: string;
+}
+const { href, title, sub, from, image, localImage, placeholder = 'PRODUCT' } = Astro.props;
 ---
 <a href={href} class="card flex flex-col overflow-hidden text-ink no-underline hover:text-ink hover:border-ink/40">
-  <div class="aspect-[4/3] bg-ground-panel flex items-center justify-center font-mono text-xs text-ink-soft">
-    {image ? <img src={image} alt="" class="h-full w-full object-cover" loading="lazy" /> : `[${placeholder}]`}
+  <div class="aspect-[4/3] bg-ground-panel flex items-center justify-center overflow-hidden font-mono text-xs text-ink-soft">
+    {localImage ? (
+      <Picture
+        src={localImage}
+        widths={[480, 800]}
+        formats={['avif', 'webp', 'jpeg']}
+        alt={title}
+        class="h-full w-full object-cover"
+        loading="lazy"
+      />
+    ) : image ? (
+      <img src={image} alt="" class="h-full w-full object-cover" loading="lazy" />
+    ) : (
+      `[${placeholder}]`
+    )}
   </div>
   <div class="flex flex-col gap-1.5 p-5">
     <strong class="text-[17px]">{title}</strong>
