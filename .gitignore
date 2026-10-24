@@ -8,3 +8,5 @@ dist
 test-output/
 .venv/
 .datasheet-cache.json
+.DS_Store
+src/assets/products/report.md
