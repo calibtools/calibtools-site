@@ -38,7 +38,7 @@ const CONTENT_W = PAGE_W - MARGIN_LEFT - MARGIN_RIGHT; // 170 mm
 export interface DatasheetMeta {
   code: string;
   title: string;
-  type: 'datasheet' | 'manual' | 'note';
+  type: 'datasheet' | 'manual' | 'note' | 'service';
   rev: string;
   date: string;
   status: 'draft' | 'released';
@@ -288,6 +288,50 @@ async function loadFontBytes(
 }
 
 // ---------------------------------------------------------------------------
+// [CHECK] marker highlight
+// ---------------------------------------------------------------------------
+
+/** Draw text, highlighting any [CHECK] markers with a yellow background. */
+function drawTextWithCheckHighlight(
+  page: PDFPage,
+  text: string,
+  x: number,
+  y: number,
+  fontSize: number,
+  font: PDFFont,
+) {
+  const CHECK = '[CHECK]';
+  const idx = text.indexOf(CHECK);
+  if (idx === -1) {
+    page.drawText(text, { x, y, size: fontSize, font, color: rgb(BRAND_INK_RGB.r, BRAND_INK_RGB.g, BRAND_INK_RGB.b) });
+    return;
+  }
+  // Draw text before [CHECK]
+  const before = text.slice(0, idx);
+  const after = text.slice(idx + CHECK.length);
+  let curX = x;
+  if (before) {
+    page.drawText(before, { x: curX, y, size: fontSize, font, color: rgb(BRAND_INK_RGB.r, BRAND_INK_RGB.g, BRAND_INK_RGB.b) });
+    curX += font.widthOfTextAtSize(before, fontSize);
+  }
+  // Yellow highlight behind [CHECK]
+  const checkW = font.widthOfTextAtSize(CHECK, fontSize);
+  const checkH = fontSize * 1.2;
+  page.drawRectangle({
+    x: curX - 0.5,
+    y: y - fontSize * 0.25,
+    width: checkW + 1,
+    height: checkH,
+    color: rgb(1, 0.95, 0), // bright yellow
+  });
+  page.drawText(CHECK, { x: curX, y, size: fontSize, font, color: rgb(BRAND_INK_RGB.r, BRAND_INK_RGB.g, BRAND_INK_RGB.b) });
+  curX += checkW;
+  if (after) {
+    page.drawText(after, { x: curX, y, size: fontSize, font, color: rgb(BRAND_INK_RGB.r, BRAND_INK_RGB.g, BRAND_INK_RGB.b) });
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Main renderer
 // ---------------------------------------------------------------------------
 
@@ -373,13 +417,8 @@ export async function renderDatasheetPdf(opts: DatasheetPdfOptions): Promise<Uin
         ensureSpace(lines.length * lineH + 2);
 
         for (const line of lines) {
-          currentPage!.drawText(line, {
-            x: xPt(MARGIN_LEFT),
-            y: yPt(cursorY),
-            size: fontSize,
-            font: fontRegular,
-            color: rgb(BRAND_INK_RGB.r, BRAND_INK_RGB.g, BRAND_INK_RGB.b),
-          });
+          // Highlight [CHECK] markers with yellow background
+          drawTextWithCheckHighlight(currentPage!, line, xPt(MARGIN_LEFT), yPt(cursorY), fontSize, fontRegular);
           cursorY += lineH;
         }
         cursorY += 2; // bottom margin
@@ -476,7 +515,7 @@ export async function renderDatasheetPdf(opts: DatasheetPdfOptions): Promise<Uin
   }
 
   // --- PDF metadata ---
-  const typeLabel = meta.type === 'manual' ? 'User Manual' : meta.type === 'note' ? 'Note' : 'Datasheet';
+  const typeLabel = meta.type === 'manual' ? 'User Manual' : meta.type === 'note' ? 'Note' : meta.type === 'service' ? 'Service Description' : 'Datasheet';
   doc.setTitle(`${meta.code} ${meta.title} — ${BRAND_NAME} ${typeLabel}`);
   doc.setAuthor(BRAND_NAME);
   doc.setSubject(typeLabel);
@@ -564,7 +603,7 @@ function drawFirstPageHeader(
   // Eyebrow line
   const eyebrowY = titleY + 8;
   const eyebrowSize = 8;
-  const typeLabel = meta.type === 'manual' ? 'USER MANUAL' : meta.type === 'note' ? 'NOTE' : 'DATASHEET';
+  const typeLabel = meta.type === 'manual' ? 'USER MANUAL' : meta.type === 'note' ? 'NOTE' : meta.type === 'service' ? 'SERVICE DESCRIPTION' : 'DATASHEET';
   const eyebrowText = `${typeLabel}    Rev ${meta.rev} \u00B7 ${meta.date}`;
   page.drawText(eyebrowText, {
     x: xPt(MARGIN_LEFT),

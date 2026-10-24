@@ -10,7 +10,7 @@ using pdf-lib with the Geist font family.
 ---
 code: CT-DS-CHA-P        # document code — used as filename
 title: ChArUco composite calibration target
-type: datasheet           # datasheet | manual | note
+type: datasheet           # datasheet | manual | note | service
 rev: A
 date: 2026-10-24
 status: draft             # draft | released
@@ -29,3 +29,7 @@ material: P               # SKU material code (second segment)
   embed them.
 - Tables: Markdown pipe tables. Numeric columns are right-aligned in the PDF.
 - Status `draft` renders a "DRAFT" watermark on the PDF.
+- `[CHECK]` markers render with a yellow highlight in the PDF.
+- Part numbers follow CT-{family}-{material}-{WWWHHH}-{PPPP}.
+- ILAC certificate references: "ILAC-MRA certificate issued by an accredited
+  third-party laboratory, available as SVC-X-CERT-ILAC".
