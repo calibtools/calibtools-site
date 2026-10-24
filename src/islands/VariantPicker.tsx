@@ -6,6 +6,13 @@ import {
 } from '@/lib/shopify';
 import { computeSetBoards } from '@/lib/exportSet';
 
+interface BoardSetImage {
+  src: string;
+  srcset: string;
+  width: number;
+  height: number;
+}
+
 interface Props {
   product: Product;
   /** Variant ID for the ILAC certificate add-on. */
@@ -16,9 +23,11 @@ interface Props {
   certPrice?: string;
   /** Formatted price for the fixture add-on, e.g. "€39". */
   fixturePrice?: string;
+  /** Pre-optimised board set image (brand/home-set.png). */
+  boardSetImage?: BoardSetImage;
 }
 
-export default function VariantPicker({ product, certVariantId, fixtureVariantId, certPrice, fixturePrice }: Props) {
+export default function VariantPicker({ product, certVariantId, fixtureVariantId, certPrice, fixturePrice, boardSetImage }: Props) {
   // Init selections from URL query params or first variant's options
   const initSelections: Record<string, string> = {};
   if (product.variants.length > 0) {
@@ -267,6 +276,19 @@ export default function VariantPicker({ product, certVariantId, fixtureVariantId
                 setBoardStartIds([]);
               }} />
           </div>
+          {boardSetImage && boardCount >= 2 && (
+            <img
+              src={boardSetImage.src}
+              srcSet={boardSetImage.srcset}
+              sizes="(max-width: 640px) 100vw, 420px"
+              width={boardSetImage.width}
+              height={boardSetImage.height}
+              alt="Calib.Tools set of four ChArUco calibration boards with consecutive marker ID ranges arranged in a 2 by 2 grid, seen from above."
+              className="w-full rounded-lg"
+              loading="lazy"
+              decoding="async"
+            />
+          )}
           {boards && boards.length >= 2 && (
             <div className="rounded border border-line bg-ground-panel p-3 text-sm">
               {boards.map(b => (

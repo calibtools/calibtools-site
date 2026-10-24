@@ -2,6 +2,7 @@
 import Base from '@/layouts/Base.astro';
 import VariantPicker from '@/islands/VariantPicker';
 import ImageGallery from '@/islands/ImageGallery';
+import type { GalleryImageData } from '@/islands/ImageGallery';
 import DownloadPicker from '@/islands/DownloadPicker';
 import NotifyForm from '@/islands/NotifyForm';
 import StickyBottomBar from '@/islands/StickyBottomBar';
@@ -12,6 +13,12 @@ import { checkerboardSvg, type PatternSpec } from '@/lib/patterns';
 import { getProductFaq } from '@/lib/faq';
 import { findDatasheetUrl } from '@/lib/datasheetManifest';
 import { WARRANTY_TEXT, COMPLIANCE, PRODUCT_TO_COLLECTION } from '@/lib/constants';
+import { getProductImages } from '@/lib/product-images';
+import { getImageMetadata } from '@/lib/productImageImports';
+import { optimizeProductImage } from '@/lib/optimizeProductImage';
+import { RENDERING_DISCLAIMER, CERTIFICATE_DISCLAIMER } from '@/lib/brand';
+import { getImage } from 'astro:assets';
+import homeSetImage from '@/assets/products/brand/home-set.webp';
 
 export async function getStaticPaths() {
   const products = await getProducts();
@@ -116,9 +123,47 @@ if (hasPatternData) {
 // --- Datasheet URL: metafield value, or fallback to generated PDF ---
 const datasheetUrl = m.datasheet_url || findDatasheetUrl(handle!) || '';
 
-// --- Placeholder render from product geometry ---
+// --- Product images from local catalogue ---
+const catalogImages = getProductImages(handle!);
+const galleryImages: GalleryImageData[] = [];
+
+for (const entry of catalogImages) {
+  const meta = getImageMetadata(entry.handle, entry.file);
+  if (!meta) continue;
+  const optimized = await optimizeProductImage(
+    meta,
+    entry.alt || `Calib.Tools ${product.title} — ${entry.file.replace(/^\d+-/, '').replace(/\.webp$/, '')}`,
+  );
+  galleryImages.push({
+    ...optimized,
+    kind: entry.kind,
+    file: entry.file,
+  });
+}
+
+const hasLocalImages = galleryImages.length > 0;
+
+// --- Board set image (home-set.webp) for multi-board selector ---
+const isBoardProduct = handle?.includes('charuco') || handle?.includes('checkerboard');
+let boardSetImageData: { src: string; srcset: string; width: number; height: number } | undefined;
+if (isBoardProduct) {
+  const boardSetVariants = await Promise.all(
+    [480, 800].map(async (w) => {
+      const result = await getImage({ src: homeSetImage, width: w, format: 'webp' });
+      return { w, src: result.src };
+    }),
+  );
+  boardSetImageData = {
+    src: boardSetVariants[boardSetVariants.length - 1].src,
+    srcset: boardSetVariants.map((v) => `${v.src} ${v.w}w`).join(', '),
+    width: homeSetImage.width,
+    height: homeSetImage.height,
+  };
+}
+
+// --- Placeholder render from product geometry (fallback when no local images) ---
 let placeholderSvg = '';
-if (product.images.length === 0 && hasPatternData) {
+if (!hasLocalImages && product.images.length === 0 && hasPatternData) {
   const [pRows, pCols] = (m.squares ?? '').split(/[x×]/).map((s: string) => Number(s.trim()));
   const pSquare = Number(m.square_size_mm ?? 0);
   const pMarker = Number(m.marker_size_mm ?? 0);
@@ -156,7 +201,9 @@ const productLd: Record<string, any> = {
   description: product.description,
   url: `${siteUrl}${product.url}`,
   brand: { '@type': 'Brand', name: 'Calib.Tools' },
-  image: product.images.length > 0 ? product.images.map((img) => img.url) : undefined,
+  image: hasLocalImages
+    ? galleryImages.map((img) => `${siteUrl}${img.src}`)
+    : product.images.length > 0 ? product.images.map((img) => img.url) : undefined,
 };
 
 if (product.variants.length > 0) {
@@ -185,7 +232,10 @@ if (product.variants.length > 0) {
   };
 }
 
-const ogImage = product.images[0]?.url ?? `/og/${handle}.png`;
+// OG image: use local hero if available, then Shopify, then fallback render
+const ogImage = hasLocalImages
+  ? galleryImages[0].src
+  : product.images[0]?.url ?? `/og/${handle}.png`;
 
 // --- Pairs with / Compare ---
 const isAccessory = handle === 'mounting-fixture' || handle === 'certificate-ilac';
@@ -217,7 +267,19 @@ const faqJsonLd = {
   })),
 };
 ---
-<Base title={product.title} section="targets" description={product.description} jsonLd={[breadcrumbLd, productLd]} ogImage={ogImage}>
+<Base
+  title={product.title}
+  section="targets"
+  description={product.description}
+  jsonLd={[breadcrumbLd, productLd]}
+  ogImage={ogImage}
+  preloadImages={hasLocalImages ? [{
+    href: galleryImages[0].src,
+    type: 'image/avif',
+    srcset: galleryImages[0].sources.find((s) => s.type === 'image/avif')?.srcset,
+    sizes: '(max-width: 640px) 100vw, (max-width: 1024px) 60vw, 520px',
+  }] : undefined}
+>
   <nav class="container-x flex gap-2 overflow-x-auto whitespace-nowrap pt-5 text-sm text-ink-soft scrollbar-none" aria-label="Breadcrumb">
     <a href="/" class="text-ink-soft no-underline shrink-0">Home</a><span>/</span>
     <a href="/targets/" class="text-ink-soft no-underline shrink-0">Calibration targets</a><span>/</span>
@@ -232,9 +294,12 @@ const faqJsonLd = {
     <div class="flex min-w-0 flex-1 basis-[520px] flex-col gap-4">
       <ImageGallery
         client:load
-        images={product.images}
+        images={hasLocalImages ? galleryImages : undefined}
+        shopifyImages={!hasLocalImages ? product.images : undefined}
         placeholderSvg={placeholderSvg}
         title={product.title}
+        disclaimer={hasLocalImages ? RENDERING_DISCLAIMER : undefined}
+        extraDisclaimer={handle === 'certificate-ilac' && hasLocalImages ? CERTIFICATE_DISCLAIMER : undefined}
       />
     </div>
 
@@ -257,6 +322,7 @@ const faqJsonLd = {
         fixtureVariantId={fixtureVariantId}
         certPrice={certPrice}
         fixturePrice={fixturePrice}
+        boardSetImage={boardSetImageData}
       />
     </div>
   </section>

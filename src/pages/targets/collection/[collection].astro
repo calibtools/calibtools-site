@@ -2,6 +2,8 @@
 import Base from '@/layouts/Base.astro';
 import CollectionTabs from '@/islands/CollectionTabs';
 import PurchaseTable from '@/islands/PurchaseTable';
+import { Picture } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
 import { getCollections, getCollectionProducts, getProducts } from '@/lib/shopify';
 import { getEntry } from 'astro:content';
 import { cornersCount } from '@/lib/collectionSpecs';
@@ -9,6 +11,8 @@ import { idRange } from '@/lib/idRange';
 import { COLLECTION_SIBLINGS } from '@/lib/constants';
 import { checkerboardSvg, type PatternSpec } from '@/lib/patterns';
 import { findDatasheetUrl } from '@/lib/datasheetManifest';
+import { getProductImages } from '@/lib/product-images';
+import { getImageMetadata } from '@/lib/productImageImports';
 
 export async function getStaticPaths() {
   const collections = await getCollections();
@@ -56,8 +60,21 @@ const colorClasses: Record<string, string> = {
 };
 const pillClass = colorClasses[collectionColor] ?? colorClasses.brand;
 
+// Build map of handle → local hero ImageMetadata
+const localHeroMap = new Map<string, ImageMetadata>();
+for (const p of collection.products) {
+  const imgs = getProductImages(p.handle);
+  const hero = imgs.find((img) => img.file === '01-hero.webp');
+  if (hero) {
+    const meta = getImageMetadata(hero.handle, hero.file);
+    if (meta) localHeroMap.set(p.handle, meta);
+  }
+}
+
 // Generate preview thumbnails for products
 function productPreview(p: typeof collection.products[0]) {
+  const localMeta = localHeroMap.get(p.handle);
+  if (localMeta) return { type: 'local' as const, meta: localMeta, title: p.title };
   if (p.image) return { type: 'image' as const, src: p.image };
   const m = p.metafields;
   if (m.squares && m.square_size_mm) {
@@ -163,7 +180,9 @@ const breadcrumbLd = {
                   class="shrink-0 w-[100px] h-[75px] rounded border border-line bg-ground-panel flex items-center justify-center overflow-hidden no-underline hover:border-brand transition-colors"
                   title={p.title}
                 >
-                  {preview.type === 'image' ? (
+                  {preview.type === 'local' ? (
+                    <Picture src={preview.meta} widths={[200]} formats={['avif', 'webp', 'jpeg']} alt={preview.title} class="h-full w-full object-contain" loading="lazy" />
+                  ) : preview.type === 'image' ? (
                     <img src={preview.src} alt={p.title} class="h-full w-full object-contain" loading="lazy" />
                   ) : preview.type === 'svg' ? (
                     <div class="h-full w-full flex items-center justify-center p-1" set:html={preview.svg} />
@@ -259,7 +278,9 @@ const breadcrumbLd = {
             <div class="flex flex-col md:flex-row gap-6">
               {/* Product render */}
               <div class="w-full md:w-[280px] shrink-0 aspect-[4/3] rounded border border-line bg-ground-panel flex items-center justify-center overflow-hidden">
-                {preview.type === 'image' ? (
+                {preview.type === 'local' ? (
+                  <Picture src={preview.meta} widths={[480, 800]} formats={['avif', 'webp', 'jpeg']} alt={preview.title} class="h-full w-full object-contain" loading="lazy" />
+                ) : preview.type === 'image' ? (
                   <img src={preview.src} alt={p.title} class="h-full w-full object-contain" loading="lazy" />
                 ) : preview.type === 'svg' ? (
                   <div class="h-full w-full flex items-center justify-center p-4" set:html={preview.svg} />

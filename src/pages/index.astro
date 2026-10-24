@@ -3,12 +3,30 @@ import Base from '@/layouts/Base.astro';
 import ProductCard from '@/components/ProductCard.astro';
 import ToolCard from '@/components/ToolCard.astro';
 import NewsletterForm from '@/islands/NewsletterForm';
+import { Picture } from 'astro:assets';
 import { tools } from '@/lib/tools';
 import { stats } from '@/lib/site';
 import { getCollections } from '@/lib/shopify';
 import { getCollection } from 'astro:content';
+import { getProductImages } from '@/lib/product-images';
+import { getImageMetadata } from '@/lib/productImageImports';
+import heroLabImage from '@/assets/products/brand/home-lab.webp';
 const collections = await getCollections();
 const allGuides = await getCollection('guides');
+
+// Build a map of handle → hero image metadata for product tiles
+const heroImageMap = new Map<string, ImageMetadata>();
+for (const col of collections) {
+  for (const p of col.products) {
+    const images = getProductImages(p.handle);
+    const hero = images.find((img) => img.file === '01-hero.webp');
+    if (hero) {
+      const meta = getImageMetadata(hero.handle, hero.file);
+      if (meta) heroImageMap.set(p.handle, meta);
+    }
+  }
+}
+import type { ImageMetadata } from 'astro';
 /** Hide guides whose body still contains placeholder copy. */
 const isReady = (g: typeof allGuides[number]) => !g.body?.includes('[BODY COPY');
 const guides = allGuides.filter(isReady).slice(0, 3);
@@ -22,24 +40,34 @@ const why = [
 ---
 <Base title="Calibrate with confidence" description="Precision checkerboards, ChArUco, AprilGrid and metrology-grade glass targets, plus free browser tools to generate, size and verify your calibration. Shipped from Europe in 2–4 days.">
   <!-- Hero -->
-  <section class="container-x flex flex-wrap items-center gap-12 py-12 md:py-20" id="top">
-    <div class="flex min-w-0 flex-1 basis-[520px] flex-col gap-6">
-      <span class="eyebrow">Calibration targets &amp; tools for machine vision</span>
-      <h1 class="h-display m-0 text-[40px] leading-[1.08] md:text-[68px] md:leading-[1.02]">Calibrate with <span class="text-brand">confidence.</span></h1>
-      <p class="m-0 max-w-[560px] text-lg leading-relaxed text-ink-muted md:text-xl">Precision checkerboards, ChArUco, AprilGrid and metrology-grade glass targets — with free browser tools to generate, size and verify your calibration. Shipped from Europe in 2–4 days.</p>
-      <div class="flex flex-wrap gap-3.5 pt-2">
-        <a href="/targets/" class="btn-primary">Shop targets</a>
-        <a href="/tools/" class="btn-outline">Open free tools</a>
-      </div>
-      <p class="m-0 pt-3 text-sm text-ink-muted">Works with OpenCV · ROS · HALCON · MATLAB · Kalibr</p>
+  <section class="relative overflow-hidden" id="top">
+    {/* Full-bleed background image */}
+    <div class="absolute inset-0">
+      <Picture
+        src={heroLabImage}
+        widths={[480, 800, 1200, 1600, 2304]}
+        formats={['avif', 'webp', 'jpeg']}
+        alt={heroLabImage.width > 0 ? 'Calib.Tools ChArUco calibration board in a clamp facing a camera rig in a Munich machine vision lab.' : ''}
+        class="h-full w-full object-cover object-left md:object-center"
+        loading="eager"
+        data-hero-bg
+      />
+      {/* Gradient overlay for text readability on the right */}
+      <div class="absolute inset-0 bg-gradient-to-r from-white/90 via-white/70 to-white/30 md:from-white/20 md:via-transparent md:to-transparent" />
     </div>
-    <div class="flex min-w-0 flex-1 basis-[440px] justify-center">
-      <div class="relative aspect-[4/3] w-full max-w-[520px] overflow-hidden rounded-xl bg-ground-panel flex items-center justify-center">
-        <!-- TODO: replace with real product photo -->
-        <div class="grid grid-cols-10 -rotate-6 shadow-[0_24px_60px_rgba(0,0,0,0.18)]" aria-hidden="true">
-          {Array.from({ length: 70 }).map((_, i) => <span class={`h-9 w-9 ${(Math.floor(i / 10) + i) % 2 === 0 ? 'bg-ink' : 'bg-white'}`}></span>)}
+
+    <div class="container-x relative flex flex-wrap items-center gap-12 py-12 md:py-20">
+      {/* Text + CTAs positioned over the right third on desktop, over the board crop on mobile */}
+      <div class="flex-1 basis-full md:basis-0" />
+      <div class="flex min-w-0 flex-1 basis-[520px] flex-col gap-6 md:ml-auto md:max-w-[520px]">
+        <span class="eyebrow">Calibration targets &amp; tools for machine vision</span>
+        <h1 class="h-display m-0 text-[40px] leading-[1.08] md:text-[68px] md:leading-[1.02]">Calibrate with <span class="text-brand">confidence.</span></h1>
+        <p class="m-0 max-w-[560px] text-lg leading-relaxed text-ink-muted md:text-xl">Precision checkerboards, ChArUco, AprilGrid and metrology-grade glass targets — with free browser tools to generate, size and verify your calibration. Shipped from Europe in 2–4 days.</p>
+        <div class="flex flex-wrap gap-3.5 pt-2">
+          <a href="/targets/" class="btn-primary">Shop targets</a>
+          <a href="/tools/" class="btn-outline">Open free tools</a>
         </div>
-        <span class="absolute bottom-3.5 right-4 font-mono text-xs text-ink-soft">[PRODUCT PHOTO]</span>
+        <p class="m-0 pt-3 text-sm text-ink-muted">Works with OpenCV · ROS · HALCON · MATLAB · Kalibr</p>
       </div>
     </div>
   </section>
@@ -71,13 +99,15 @@ const why = [
     <div class="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
       {collections.map((c) => {
         const firstProduct = c.products[0];
+        const localHero = firstProduct ? heroImageMap.get(firstProduct.handle) : undefined;
         return (
           <ProductCard
             href={`/targets/collection/${c.handle}/`}
             title={c.title}
             sub={c.description}
             from={firstProduct?.priceFrom ?? ''}
-            image={c.image ?? firstProduct?.image}
+            localImage={localHero}
+            image={!localHero ? (c.image ?? firstProduct?.image) : undefined}
             placeholder={c.title.toUpperCase()}
           />
         );
