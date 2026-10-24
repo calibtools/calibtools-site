@@ -10,6 +10,7 @@ import { getProducts, getProductByHandle, sanitizeHtml } from '@/lib/shopify';
 import { kalibrYaml, ros2Yaml, halconDescr } from '@/lib/exportConfig';
 import { checkerboardSvg, type PatternSpec } from '@/lib/patterns';
 import { getProductFaq } from '@/lib/faq';
+import { findDatasheetUrl } from '@/lib/datasheetManifest';
 import { WARRANTY_TEXT, COMPLIANCE, PRODUCT_TO_COLLECTION } from '@/lib/constants';
 
 export async function getStaticPaths() {
@@ -111,6 +112,9 @@ if (hasPatternData) {
     ];
   }
 }
+
+// --- Datasheet URL: metafield value, or fallback to generated PDF ---
+const datasheetUrl = m.datasheet_url || findDatasheetUrl(handle!) || '';
 
 // --- Placeholder render from product geometry ---
 let placeholderSvg = '';
@@ -304,13 +308,13 @@ const faqJsonLd = {
   </section>
 
   {/* Downloads */}
-  {(m.datasheet_url || configFiles.length > 0) && (
+  {(datasheetUrl || configFiles.length > 0) && (
     <section class="container-x flex flex-col gap-5 pb-16">
       <h2 class="h-display m-0 text-2xl">Downloads</h2>
       <DownloadPicker
         client:load
         files={[
-          ...(m.datasheet_url ? [{ name: `${handle}-datasheet${m.datasheet_rev ? `-rev${m.datasheet_rev}` : ''}.pdf`, url: m.datasheet_url, mime: 'application/pdf' }] : []),
+          ...(datasheetUrl ? [{ name: `${handle}-datasheet${m.datasheet_rev ? `-rev${m.datasheet_rev}` : ''}.pdf`, url: datasheetUrl, mime: 'application/pdf' }] : []),
           { name: 'sample-inspection-report.pdf', url: '/downloads/sample-inspection-report.pdf', mime: 'application/pdf' },
           ...configFiles.map((f) => ({
             name: f.name,
