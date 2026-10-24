@@ -12,7 +12,7 @@ catalogue pages from the Storefront API and links into the cart.
   Any change to `src/lib/patterns.ts` or PDF export needs a test and `/verify-pdf`.
 - Tools run entirely in the browser. No upload of images or calibration files, ever.
 - Design direction A (see docs/design.md): red #E60012 / dark red #B3000E on white,
-  Inter + JetBrains Mono. Use Tailwind tokens from tailwind.config.mjs, not raw hex.
+  Geist Sans + Geist Mono + Geist Pixel (accent). Use Tailwind tokens from tailwind.config.mjs, not raw hex.
 
 ## Workflow
 - New feature: plan first (list files + tests), then implement tests before code.
