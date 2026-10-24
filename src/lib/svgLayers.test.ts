@@ -113,6 +113,14 @@ describe('brandFooterSvg fallback tiers', () => {
     expect(svg.length).toBeGreaterThan(0);
     expect(svg).toContain('Brand footer omitted');
   });
+
+  it('full footer uses Geist font families, not Inter or JetBrains', () => {
+    const svg = brandFooterSvg(makeCtx());
+    expect(svg).not.toContain('Inter');
+    expect(svg).not.toContain('JetBrains');
+    expect(svg).toContain("'Geist'");
+    expect(svg).toContain("'Geist Mono'");
+  });
 });
 
 describe('corner ID badge', () => {

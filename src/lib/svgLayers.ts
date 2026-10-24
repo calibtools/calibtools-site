@@ -152,10 +152,10 @@ function fullBrandFooter(ctx: SvgContext, footerY: number): string {
   const iso = new Date().toISOString().slice(0, 10);
   parts.push('<g id="calibtools-brand">');
   parts.push(...logoRects);
-  parts.push(`<text x="${textX}" y="${textY}" font-family="'Geist', 'Inter', system-ui, sans-serif" font-size="4" font-weight="600" fill="${BRAND_INK}">calib<tspan fill="${BRAND_RED}">.tools</tspan></text>`);
+  parts.push(`<text x="${textX}" y="${textY}" font-family="'Geist', system-ui, sans-serif" font-size="4" font-weight="600" fill="${BRAND_INK}">calib<tspan fill="${BRAND_RED}">.tools</tspan></text>`);
   parts.push(`<path data-wordmark="outlined" aria-hidden="true" d=""/>`);
-  parts.push(`<text x="${pw / 2}" y="${textY}" font-family="'JetBrains Mono', 'Courier New', monospace" font-size="2.4" text-anchor="middle" fill="#4A4A4A">${summary}</text>`);
-  parts.push(`<text x="${ox + bw}" y="${textY}" font-family="'JetBrains Mono', 'Courier New', monospace" font-size="2.4" text-anchor="end" fill="#6B6B6B">${BRAND_URL} · ${iso}</text>`);
+  parts.push(`<text x="${pw / 2}" y="${textY}" font-family="'Geist Mono', monospace" font-size="2.4" text-anchor="middle" fill="#4A4A4A">${summary}</text>`);
+  parts.push(`<text x="${ox + bw}" y="${textY}" font-family="'Geist Mono', monospace" font-size="2.4" text-anchor="end" fill="#6B6B6B">${BRAND_URL} · ${iso}</text>`);
   parts.push('</g>');
   return parts.join('');
 }
