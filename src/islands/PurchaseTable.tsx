@@ -165,7 +165,7 @@ export default function PurchaseTable({ product }: Props) {
                       <span className="text-ink-soft/40">—</span>
                     )}
                   </td>
-                  <td className="py-3 px-3 text-[13px] text-ink-muted">{cols.available}</td>
+                  <td className="py-3 px-3"><span className="badge border border-line text-ink">{cols.available}</span></td>
                   <td className="py-3 px-3 spec text-right font-semibold">{v.price}</td>
                   <td className="py-3 px-3">
                     <div className="flex items-center justify-center rounded border border-line">
@@ -245,7 +245,7 @@ export default function PurchaseTable({ product }: Props) {
                 <span className="spec text-base font-semibold shrink-0">{v.price}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-[13px] text-ink-muted">{cols.available}</span>
+                <span className="badge border border-line text-ink">{cols.available}</span>
                 <div className="flex items-center gap-2">
                   <div className="flex items-center rounded border border-line">
                     <button
