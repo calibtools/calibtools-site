@@ -46,10 +46,10 @@
     <rect x="500" y="260" width="18" height="18" fill="#E60012"/>
   </g>
   <!-- Wordmark -->
-  <text x="540" y="310" font-family="Inter, system-ui, sans-serif" font-size="48" font-weight="800" fill="#1A1A1A">Calib</text>
-  <text x="710" y="310" font-family="Inter, system-ui, sans-serif" font-size="48" font-weight="800" fill="#E60012">.Tools</text>
+  <text x="540" y="310" font-family="'Geist', system-ui, sans-serif" font-size="48" font-weight="800" fill="#1A1A1A">Calib</text>
+  <text x="710" y="310" font-family="'Geist', system-ui, sans-serif" font-size="48" font-weight="800" fill="#E60012">.Tools</text>
   <!-- Tagline -->
-  <text x="600" y="360" font-family="Inter, system-ui, sans-serif" font-size="20" fill="#6B6B6B" text-anchor="middle">Precision calibration targets &amp; free browser tools</text>
+  <text x="600" y="360" font-family="'Geist', system-ui, sans-serif" font-size="20" fill="#6B6B6B" text-anchor="middle">Precision calibration targets &amp; free browser tools</text>
   <!-- URL -->
   <text x="600" y="580" font-family="monospace" font-size="16" fill="#9A9A9A" text-anchor="middle">calib.tools</text>
 </svg>

@@ -54,10 +54,10 @@ const ogSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630"
     ${logoGrid}
   </g>
   <!-- Wordmark -->
-  <text x="540" y="310" font-family="Inter, system-ui, sans-serif" font-size="48" font-weight="800" fill="${BRAND_INK}">Calib</text>
-  <text x="710" y="310" font-family="Inter, system-ui, sans-serif" font-size="48" font-weight="800" fill="${BRAND_RED}">.Tools</text>
+  <text x="540" y="310" font-family="'Geist', system-ui, sans-serif" font-size="48" font-weight="800" fill="${BRAND_INK}">Calib</text>
+  <text x="710" y="310" font-family="'Geist', system-ui, sans-serif" font-size="48" font-weight="800" fill="${BRAND_RED}">.Tools</text>
   <!-- Tagline -->
-  <text x="600" y="360" font-family="Inter, system-ui, sans-serif" font-size="20" fill="#6B6B6B" text-anchor="middle">Precision calibration targets &amp; free browser tools</text>
+  <text x="600" y="360" font-family="'Geist', system-ui, sans-serif" font-size="20" fill="#6B6B6B" text-anchor="middle">Precision calibration targets &amp; free browser tools</text>
   <!-- URL -->
   <text x="600" y="580" font-family="monospace" font-size="16" fill="#9A9A9A" text-anchor="middle">${BRAND_URL}</text>
 </svg>`;
@@ -228,10 +228,10 @@ for (const { handle, title } of productHandles) {
   <g>
     ${logoGrid}
   </g>
-  <text x="540" y="280" font-family="Inter, system-ui, sans-serif" font-size="48" font-weight="800" fill="${BRAND_INK}">Calib</text>
-  <text x="710" y="280" font-family="Inter, system-ui, sans-serif" font-size="48" font-weight="800" fill="${BRAND_RED}">.Tools</text>
-  <text x="600" y="340" font-family="Inter, system-ui, sans-serif" font-size="28" font-weight="700" fill="${BRAND_INK}" text-anchor="middle">${title.replace(/&/g, '&amp;')}</text>
-  <text x="600" y="380" font-family="Inter, system-ui, sans-serif" font-size="18" fill="#6B6B6B" text-anchor="middle">Precision calibration target</text>
+  <text x="540" y="280" font-family="'Geist', system-ui, sans-serif" font-size="48" font-weight="800" fill="${BRAND_INK}">Calib</text>
+  <text x="710" y="280" font-family="'Geist', system-ui, sans-serif" font-size="48" font-weight="800" fill="${BRAND_RED}">.Tools</text>
+  <text x="600" y="340" font-family="'Geist', system-ui, sans-serif" font-size="28" font-weight="700" fill="${BRAND_INK}" text-anchor="middle">${title.replace(/&/g, '&amp;')}</text>
+  <text x="600" y="380" font-family="'Geist', system-ui, sans-serif" font-size="18" fill="#6B6B6B" text-anchor="middle">Precision calibration target</text>
   <text x="600" y="580" font-family="monospace" font-size="16" fill="#9A9A9A" text-anchor="middle">${BRAND_URL}</text>
 </svg>`;
   const productResvg = new Resvg(productOgSvg, { fitTo: { mode: 'width', value: 1200 } });
