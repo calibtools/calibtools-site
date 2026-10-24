@@ -7,7 +7,7 @@
     "dev": "astro dev",
     "prebuild": "node scripts/verify-storefront.mjs && tsx scripts/generate-placeholders.ts",
     "build": "astro build",
-    "postbuild": "node scripts/check-links.mjs",
+    "postbuild": "node scripts/check-links.mjs && node scripts/check-specs.mjs",
     "preview": "astro preview",
     "check": "astro check",
     "test": "vitest run"
