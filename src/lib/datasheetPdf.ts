@@ -13,8 +13,8 @@ import {
   BRAND_INK_RGB,
   BRAND_URL,
   BRAND_NAME,
-  LOGO_CELLS,
 } from './brand';
+import { drawSvgOnPage } from './svgEmbed';
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -59,7 +59,11 @@ export interface DatasheetPdfOptions {
     regular: ArrayBuffer;
     semiBold: ArrayBuffer;
     mono: ArrayBuffer;
+    medium?: ArrayBuffer;
+    pixel?: ArrayBuffer;
   };
+  /** SVG string of the framed wordmark for the header. */
+  wordmarkSvg?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -357,17 +361,19 @@ export async function renderDatasheetPdf(opts: DatasheetPdfOptions): Promise<Uin
 
   // --- Page management ---
 
+  const wordmarkSvg = opts.wordmarkSvg;
+
   const addFirstPage = () => {
     currentPage = doc.addPage([PAGE_W * MM, PAGE_H * MM]);
     pages.push(currentPage);
-    drawFirstPageHeader(currentPage, meta, fontSemiBold, fontMono);
+    drawFirstPageHeader(currentPage, meta, fontSemiBold, fontMono, wordmarkSvg);
     cursorY = MARGIN_TOP + 40; // header takes ~40mm
   };
 
   const addContinuationPage = () => {
     currentPage = doc.addPage([PAGE_W * MM, PAGE_H * MM]);
     pages.push(currentPage);
-    drawCompactHeader(currentPage, meta, fontRegular, fontMono);
+    drawCompactHeader(currentPage, meta, fontRegular, fontMono, wordmarkSvg);
     cursorY = MARGIN_TOP + 10; // compact header + gap
   };
 
@@ -515,7 +521,8 @@ export async function renderDatasheetPdf(opts: DatasheetPdfOptions): Promise<Uin
   }
 
   // --- PDF metadata ---
-  const typeLabel = meta.type === 'manual' ? 'User Manual' : meta.type === 'note' ? 'Note' : meta.type === 'service' ? 'Service Description' : 'Datasheet';
+  const isIR = meta.code.startsWith('CT-IR-');
+  const typeLabel = isIR ? 'Inspection Report' : meta.type === 'manual' ? 'User Manual' : meta.type === 'note' ? 'Note' : meta.type === 'service' ? 'Service Description' : 'Datasheet';
   doc.setTitle(`${meta.code} ${meta.title} — ${BRAND_NAME} ${typeLabel}`);
   doc.setAuthor(BRAND_NAME);
   doc.setSubject(typeLabel);
@@ -535,62 +542,51 @@ function drawFirstPageHeader(
   meta: DatasheetMeta,
   fontSemiBold: PDFFont,
   fontMono: PDFFont,
+  wordmarkSvg?: string,
 ) {
-  // Logo mark (3×3 grid)
-  const cellSize = 4;
-  const gap = 0.6;
-  const step = cellSize + gap;
-  const logoX = MARGIN_LEFT;
-  const logoY = MARGIN_TOP;
+  // Wordmark SVG at 28mm wide, or fallback to text
+  const wordmarkW = 28; // mm
+  const wordmarkY = MARGIN_TOP + 2;
 
-  for (const cell of LOGO_CELLS) {
-    const cx = logoX + cell.col * step;
-    const cy = logoY + cell.row * step;
-    const fillRgb = cell.fill === '#E60012' ? BRAND_RED_RGB : BRAND_INK_RGB;
-    page.drawRectangle({
-      x: xPt(cx),
-      y: yPt(cy + cellSize),
-      width: cellSize * MM,
-      height: cellSize * MM,
-      color: rgb(fillRgb.r, fillRgb.g, fillRgb.b),
+  if (wordmarkSvg) {
+    drawSvgOnPage(page, {
+      svg: wordmarkSvg,
+      x: xPt(MARGIN_LEFT),
+      y: yPt(wordmarkY + wordmarkW * 0.238), // aspect ratio ~4.2:1
+      width: wordmarkW * MM,
+    });
+  } else {
+    const wordmarkSize = 14;
+    const calibW = fontSemiBold.widthOfTextAtSize('Calib', wordmarkSize);
+    page.drawText('Calib', {
+      x: xPt(MARGIN_LEFT),
+      y: yPt(wordmarkY + 2),
+      size: wordmarkSize,
+      font: fontSemiBold,
+      color: rgb(BRAND_INK_RGB.r, BRAND_INK_RGB.g, BRAND_INK_RGB.b),
+    });
+    page.drawText('.Tools', {
+      x: xPt(MARGIN_LEFT) + calibW,
+      y: yPt(wordmarkY + 2),
+      size: wordmarkSize,
+      font: fontSemiBold,
+      color: rgb(BRAND_RED_RGB.r, BRAND_RED_RGB.g, BRAND_RED_RGB.b),
     });
   }
-
-  // Wordmark next to logo
-  const logoWidth = 3 * cellSize + 2 * gap; // ~13.2mm
-  const wordmarkX = logoX + logoWidth + 3;
-  const wordmarkY = logoY + 5; // vertically centred-ish with logo
-  const wordmarkSize = 14;
-
-  const calibW = fontSemiBold.widthOfTextAtSize('Calib', wordmarkSize);
-  page.drawText('Calib', {
-    x: xPt(wordmarkX),
-    y: yPt(wordmarkY),
-    size: wordmarkSize,
-    font: fontSemiBold,
-    color: rgb(BRAND_INK_RGB.r, BRAND_INK_RGB.g, BRAND_INK_RGB.b),
-  });
-  page.drawText('.Tools', {
-    x: xPt(wordmarkX) + calibW,
-    y: yPt(wordmarkY),
-    size: wordmarkSize,
-    font: fontSemiBold,
-    color: rgb(BRAND_RED_RGB.r, BRAND_RED_RGB.g, BRAND_RED_RGB.b),
-  });
 
   // Doc code right-aligned
   const codeSize = 9;
   const codeW = fontMono.widthOfTextAtSize(meta.code, codeSize);
   page.drawText(meta.code, {
     x: xPt(PAGE_W - MARGIN_RIGHT) - codeW,
-    y: yPt(wordmarkY),
+    y: yPt(wordmarkY + 2),
     size: codeSize,
     font: fontMono,
     color: rgb(0.4, 0.4, 0.4),
   });
 
-  // Title below logo
-  const titleY = logoY + 3 * step + 4; // below the 3-row logo + gap
+  // Title below wordmark
+  const titleY = wordmarkY + 14;
   const titleSize = 18;
   page.drawText(meta.title, {
     x: xPt(MARGIN_LEFT),
@@ -603,7 +599,8 @@ function drawFirstPageHeader(
   // Eyebrow line
   const eyebrowY = titleY + 8;
   const eyebrowSize = 8;
-  const typeLabel = meta.type === 'manual' ? 'USER MANUAL' : meta.type === 'note' ? 'NOTE' : meta.type === 'service' ? 'SERVICE DESCRIPTION' : 'DATASHEET';
+  const isInspectionReport = meta.code.startsWith('CT-IR-');
+  const typeLabel = isInspectionReport ? 'INSPECTION REPORT' : meta.type === 'manual' ? 'USER MANUAL' : meta.type === 'note' ? 'NOTE' : meta.type === 'service' ? 'SERVICE DESCRIPTION' : 'DATASHEET';
   const eyebrowText = `${typeLabel}    Rev ${meta.rev} \u00B7 ${meta.date}`;
   page.drawText(eyebrowText, {
     x: xPt(MARGIN_LEFT),
@@ -629,6 +626,7 @@ function drawCompactHeader(
   meta: DatasheetMeta,
   fontRegular: PDFFont,
   fontMono: PDFFont,
+  _wordmarkSvg?: string,
 ) {
   const headerY = MARGIN_TOP + 3;
   const fontSize = 7;
