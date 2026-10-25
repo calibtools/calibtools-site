@@ -6,7 +6,7 @@
  *
  * Exports:
  * - drawStampOnPage(): render onto a pdf-lib PDFPage
- * - stampSvg(): static SVG string (fields blank)
+ * - stampSvg(): static SVG string (fields blank) — text outlined separately
  * - productMarkSvg(): 25 × 10 mm product-mark SVG
  */
 
@@ -26,6 +26,16 @@ const R_INNER = R_OUTER - 1.8; // inner text ring
 const RING_OUTER_W = 0.4; // mm
 const RING_INNER_W = 0.25; // mm
 const BRAND_RED_HEX = '#E60012';
+
+// Font size targets (in PDF points, at Ø 32mm):
+// Ring text: cap height ≥ 1.9 mm ≈ 5.4 pt → use fontSize ~7.5 (cap ratio ~0.72)
+// Centre INSPECTED: cap height ≥ 4 mm ≈ 11.3 pt → fontSize ~15.8
+// SN/date: cap height ≥ 1.8 mm ≈ 5.1 pt → fontSize ~7.0
+
+const RING_FONT_SIZE = 7.5;   // Geist Medium, produces ~1.9mm cap height
+const CENTRE_FONT_SIZE = 12;  // Geist Pixel, produces ~4mm cap height
+const DETAIL_FONT_SIZE = 6.5; // Geist Mono, produces ~1.8mm cap height
+const DATE_FONT_SIZE = 5.5;   // Geist Mono, smaller for date+initials line
 
 // ---------------------------------------------------------------------------
 // PDF stamp drawing
@@ -48,13 +58,12 @@ export interface StampOptions {
 /**
  * Draw the inspection stamp onto a pdf-lib PDFPage.
  *
- * Requires three fonts: semiBold (ring text), mono (SN/date/initials), pixel (centre text).
- * Since Geist Pixel is not available, uses mono for "INSPECTED" centre text.
+ * Requires three fonts: medium (ring text), mono (SN/date/initials), pixel (centre text).
  */
 export function drawStampOnPage(
   page: PDFPage,
   opts: StampOptions,
-  fonts: { semiBold: PDFFont; mono: PDFFont },
+  fonts: { medium: PDFFont; mono: PDFFont; pixel: PDFFont },
 ): void {
   const { sn, date, inspector, cx, cy, rotation = -8, opacity = 0.9 } = opts;
   const pageH = page.getHeight() / MM; // page height in mm
@@ -76,34 +85,32 @@ export function drawStampOnPage(
   // Inner ring
   drawCircleRing(page, 0, 0, R_INNER * MM, RING_INNER_W * MM, red, opacity);
 
-  // Top arc text: "CALIB.TOOLS · MUNICH"
-  drawArcText(page, 'CALIB.TOOLS \u00B7 MUNICH', fonts.semiBold, 5.5,
-    0, 0, (R_OUTER - 1.0) * MM, 190, 350, red, opacity);
+  // Top arc text: "CALIB.TOOLS · MUNICH" — Geist Medium, letter-spacing ≤ 0.12em
+  drawArcText(page, 'CALIB.TOOLS \u00B7 MUNICH', fonts.medium, RING_FONT_SIZE,
+    0, 0, (R_OUTER - 1.2) * MM, 190, 350, red, opacity);
 
   // Bottom arc text: "DIMENSIONAL INSPECTION"
-  drawArcText(page, 'DIMENSIONAL INSPECTION', fonts.semiBold, 4.5,
-    0, 0, (R_OUTER - 1.0) * MM, 210, 330, red, opacity, true);
+  drawArcText(page, 'DIMENSIONAL INSPECTION', fonts.medium, RING_FONT_SIZE,
+    0, 0, (R_OUTER - 1.2) * MM, 210, 330, red, opacity, true);
 
-  // Centre text: "INSPECTED"
-  const inspSize = 5.5;
-  const inspW = fonts.mono.widthOfTextAtSize('INSPECTED', inspSize);
+  // Centre text: "INSPECTED" — Geist Pixel, cap height ≥ 4mm
+  const inspW = fonts.pixel.widthOfTextAtSize('INSPECTED', CENTRE_FONT_SIZE);
   page.drawText('INSPECTED', {
     x: -inspW / 2,
-    y: 2 * MM,
-    size: inspSize,
-    font: fonts.mono,
+    y: 2.5 * MM,
+    size: CENTRE_FONT_SIZE,
+    font: fonts.pixel,
     color: red,
     opacity,
   });
 
-  // SN line
+  // SN line — Geist Mono, cap height ≥ 1.8mm
   const snText = `SN ${sn}`;
-  const snSize = 4;
-  const snW = fonts.mono.widthOfTextAtSize(snText, snSize);
+  const snW = fonts.mono.widthOfTextAtSize(snText, DETAIL_FONT_SIZE);
   page.drawText(snText, {
     x: -snW / 2,
-    y: -1 * MM,
-    size: snSize,
+    y: -1.5 * MM,
+    size: DETAIL_FONT_SIZE,
     font: fonts.mono,
     color: red,
     opacity,
@@ -111,31 +118,32 @@ export function drawStampOnPage(
 
   // Date + initials
   const dateText = `${date} ${inspector}`;
-  const dateSize = 3.5;
-  const dateW = fonts.mono.widthOfTextAtSize(dateText, dateSize);
+  const dateW = fonts.mono.widthOfTextAtSize(dateText, DATE_FONT_SIZE);
   page.drawText(dateText, {
     x: -dateW / 2,
-    y: -3.5 * MM,
-    size: dateSize,
+    y: -4 * MM,
+    size: DATE_FONT_SIZE,
     font: fonts.mono,
     color: red,
     opacity,
   });
 
-  // QR code (bottom-right quadrant of stamp)
+  // QR code (bottom-centre of stamp) — ≥ 8 × 8 mm with 1-module quiet zone
   const verifyUrl = `https://calib.tools/verify/${sn}`;
   try {
     const qr = generateQR(verifyUrl);
-    const qrSize = 8; // mm total
-    const moduleSize = (qrSize / qr.length) * MM;
-    const qrX = 3 * MM;
-    const qrY = -10 * MM;
-    for (let row = 0; row < qr.length; row++) {
-      for (let col = 0; col < qr[row].length; col++) {
+    const qrSize = 9; // mm total (8mm content + quiet zone)
+    const modules = qr.length;
+    const moduleSize = (qrSize / (modules + 2)) * MM; // +2 for 1-module quiet zone each side
+    const qrTotalPt = (modules + 2) * moduleSize;
+    const qrX = -qrTotalPt / 2 + moduleSize; // centre horizontally
+    const qrY = -12.5 * MM; // bottom area
+    for (let row = 0; row < modules; row++) {
+      for (let col = 0; col < modules; col++) {
         if (qr[row][col]) {
           page.drawRectangle({
             x: qrX + col * moduleSize,
-            y: qrY + (qr.length - 1 - row) * moduleSize,
+            y: qrY + (modules - 1 - row) * moduleSize,
             width: moduleSize,
             height: moduleSize,
             color: red,
@@ -217,7 +225,7 @@ function drawArcText(
 }
 
 // ---------------------------------------------------------------------------
-// Static SVG exports
+// Static SVG exports (text as <text> — outlining done by scripts/outline-svgs.mjs)
 // ---------------------------------------------------------------------------
 
 /**
@@ -227,7 +235,7 @@ export function stampSvg(): string {
   const r = DIAMETER / 2;
   const viewBox = `${-r - 1} ${-r - 1} ${DIAMETER + 2} ${DIAMETER + 2}`;
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}" width="${DIAMETER}mm" height="${DIAMETER}mm">
-  <style>text { font-family: 'Geist Sans', 'Geist Mono', sans-serif; fill: ${BRAND_RED_HEX}; }</style>
+  <style>text { font-family: 'Geist', 'Geist Mono', sans-serif; fill: ${BRAND_RED_HEX}; }</style>
   <!-- Outer ring -->
   <circle cx="0" cy="0" r="${r}" fill="none" stroke="${BRAND_RED_HEX}" stroke-width="${RING_OUTER_W}"/>
   <!-- Inner ring -->
@@ -237,16 +245,16 @@ export function stampSvg(): string {
     <path id="top-arc" d="M ${-R_INNER + 0.5},0 A ${R_INNER - 0.5},${R_INNER - 0.5} 0 1,1 ${R_INNER - 0.5},0"/>
     <path id="bot-arc" d="M ${R_INNER - 0.5},0 A ${R_INNER - 0.5},${R_INNER - 0.5} 0 1,1 ${-R_INNER + 0.5},0"/>
   </defs>
-  <text font-size="3.2" font-weight="600" text-anchor="middle" letter-spacing="0.8">
+  <text font-size="3.2" font-weight="500" text-anchor="middle" letter-spacing="0.10em">
     <textPath href="#top-arc" startOffset="50%">CALIB.TOOLS \u00B7 MUNICH</textPath>
   </text>
-  <text font-size="2.8" font-weight="600" text-anchor="middle" letter-spacing="0.6">
+  <text font-size="2.8" font-weight="500" text-anchor="middle" letter-spacing="0.10em">
     <textPath href="#bot-arc" startOffset="50%">DIMENSIONAL INSPECTION</textPath>
   </text>
   <!-- Centre -->
-  <text x="0" y="1" font-size="3.5" font-weight="700" text-anchor="middle" font-family="'Geist Mono', monospace">INSPECTED</text>
-  <text x="0" y="4.5" font-size="2.5" text-anchor="middle" font-family="'Geist Mono', monospace">SN ______</text>
-  <text x="0" y="7" font-size="2" text-anchor="middle" font-family="'Geist Mono', monospace">DATE ______ ___</text>
+  <text x="0" y="1" font-size="4" font-weight="400" text-anchor="middle" font-family="'Geist Pixel', monospace">INSPECTED</text>
+  <text x="0" y="4.5" font-size="2.2" text-anchor="middle" font-family="'Geist Mono', monospace">SN ______</text>
+  <text x="0" y="7" font-size="1.8" text-anchor="middle" font-family="'Geist Mono', monospace">DATE ______ ___</text>
 </svg>`;
 }
 
@@ -255,9 +263,9 @@ export function stampSvg(): string {
  */
 export function productMarkSvg(): string {
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 10" width="25mm" height="10mm">
-  <style>text { font-family: 'Geist Sans', 'Geist Mono', sans-serif; fill: ${BRAND_RED_HEX}; }</style>
+  <style>text { font-family: 'Geist', 'Geist Mono', sans-serif; fill: ${BRAND_RED_HEX}; }</style>
   <rect x="0" y="0" width="25" height="10" fill="none" stroke="${BRAND_RED_HEX}" stroke-width="0.3"/>
-  <text x="12.5" y="4.5" font-size="2.2" font-weight="600" text-anchor="middle" letter-spacing="0.3">CALIB.TOOLS \u00B7 INSPECTED</text>
+  <text x="12.5" y="4.5" font-size="2.2" font-weight="500" text-anchor="middle" letter-spacing="0.10em">CALIB.TOOLS \u00B7 INSPECTED</text>
   <text x="12.5" y="7.5" font-size="1.6" text-anchor="middle" font-family="'Geist Mono', monospace">100% dimensional check \u00B7 SN ______</text>
 </svg>`;
 }
