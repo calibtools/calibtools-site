@@ -44,6 +44,8 @@ const SVG_ALLOW = [
   'src/docs/ctdoc.ts',
   'src/docs/ctpattern.ts',
   'src/docs/build/ct-ir.ts',
+  'src/docs/build/ct-ds.ts',
+  'src/docs/build/ct-sv-cert-ilac.ts',
 ];
 
 /**

@@ -1,0 +1,152 @@
+/**
+ * CT-SV-CERT-ILAC  Service description builder (1–2 pages).
+ *
+ * Reads docs/datasheets/CT-SV-CERT-ILAC.md and builds a simple
+ * service-description document (no board rendering).
+ */
+
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import {
+  Doc,
+  section,
+  p,
+  table,
+  qr_block,
+  type RenderResult,
+} from '../ctdoc';
+import { parseFrontMatter } from './ct-ds';
+
+// ── Markdown helpers (local) ─────────────────────────────────────────
+
+function extractSection(body: string, heading: string): string | null {
+  const re = new RegExp(`^${heading.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*$`, 'm');
+  const start = body.search(re);
+  if (start < 0) return null;
+  const afterHeading = body.slice(start + heading.length);
+  const nextH2 = afterHeading.search(/^## /m);
+  return nextH2 >= 0 ? afterHeading.slice(0, nextH2) : afterHeading;
+}
+
+function parseMarkdownTable(block: string): { headers: string[]; rows: string[][] } | null {
+  const lines = block.trim().split('\n').filter((l) => l.includes('|'));
+  if (lines.length < 2) return null;
+  const parse = (line: string) =>
+    line.split('|').map((c) => c.trim()).filter((_, i, arr) => i > 0 && i < arr.length);
+  const headers = parse(lines[0]);
+  const dataLines = lines.slice(1).filter((l) => !l.match(/^\s*\|[\s-:|]+\|\s*$/));
+  return { headers, rows: dataLines.map(parse) };
+}
+
+function mono(text: string): string {
+  return text.replace(/`([^`]+)`/g, '<span class="mono">$1</span>');
+}
+
+// ── Builder ──────────────────────────────────────────────────────────
+
+export async function buildILACCert(opts: {
+  code: string;
+  outBase: string;
+  watermark?: string;
+}): Promise<RenderResult> {
+  const { outBase, watermark } = opts;
+
+  const mdPath = resolve(process.cwd(), 'docs/datasheets/CT-SV-CERT-ILAC.md');
+  const md = readFileSync(mdPath, 'utf-8');
+  const { meta, body } = parseFrontMatter(md);
+  const FILE_URL = 'https://calib.tools/files/CT-SV-CERT-ILAC';
+
+  const d = new Doc(
+    'CT-SV-CERT-ILAC', meta.rev, meta.date,
+    'Service description',
+    'ILAC-MRA certificate',
+    undefined, undefined, watermark,
+  );
+
+  let secN = 1;
+
+  // Page 1: what you get + scope table + how to order
+  let page1 = '';
+
+  // "What you get" section
+  const whatSection = extractSection(body, '## What you get');
+  if (whatSection) {
+    page1 += section(secN, 'What you get');
+    const paras = whatSection.trim().split('\n\n').filter((s) => s.trim());
+    for (const para of paras) {
+      page1 += p(mono(para.replace(/\n/g, ' ').trim()));
+    }
+    secN++;
+  }
+
+  // Scope table
+  const scopeSection = extractSection(body, '## Scope');
+  if (scopeSection) {
+    const tbl = parseMarkdownTable(scopeSection);
+    if (tbl) {
+      page1 += section(secN, 'Scope');
+      page1 += table(
+        [['Feature', 't'], ['Detail', 't']],
+        tbl.rows.map((r) => [mono(r[0] ?? ''), mono(r[1] ?? '')]),
+        '', undefined, ['28%', '72%'],
+      );
+      secN++;
+    }
+  }
+
+  // How to order
+  const orderSection = extractSection(body, '## How to order');
+  if (orderSection) {
+    page1 += section(secN, 'How to order');
+    const paras = orderSection.trim().split('\n\n').filter((s) => s.trim());
+    for (const para of paras) {
+      page1 += p(mono(para.replace(/\n/g, ' ').trim()));
+    }
+    secN++;
+  }
+
+  // Recalibration
+  const recalSection = extractSection(body, '## Recalibration');
+  if (recalSection) {
+    page1 += section(secN, 'Recalibration');
+    page1 += p(mono(recalSection.trim().replace(/\n/g, ' ')));
+    secN++;
+  }
+
+  // Notes
+  const notesSection = extractSection(body, '## Notes');
+  if (notesSection) {
+    page1 += section(secN, 'Notes');
+    const items = notesSection.trim().split('\n')
+      .filter((l) => l.trim().startsWith('-'))
+      .map((l) => `<li>${mono(l.replace(/^[-*]\s+/, '').trim())}</li>`)
+      .join('');
+    if (items) {
+      page1 += `<ul class="l">${items}</ul>`;
+    }
+    secN++;
+  }
+
+  // Revision history
+  const revSection = extractSection(body, '## Revision history');
+  if (revSection) {
+    const tbl = parseMarkdownTable(revSection);
+    if (tbl) {
+      page1 += section(secN, 'Revision history');
+      page1 += table(
+        [['Rev', 'm'], ['Date', 'm'], ['Change', 't']],
+        tbl.rows,
+        '', undefined, ['13%', '23%', '64%'],
+      );
+      secN++;
+    }
+  }
+
+  // Footer QR block
+  page1 += `<div class="push" style="display:flex;justify-content:space-between;align-items:flex-end;border-top:.25mm solid #b3b3b3;padding-top:4mm">`;
+  page1 += `<div class="small muted" style="max-width:94mm">Service terms subject to change; current revision at calib.tools.</div>`;
+  page1 += `${qr_block(FILE_URL, 15)}</div>`;
+  d.addPage(page1);
+
+  return d.render(outBase);
+}
