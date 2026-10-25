@@ -11,3 +11,4 @@ test-output/
 .DS_Store
 src/assets/products/report.md
 docs/superpowers/
+.claude/settings.local.json
