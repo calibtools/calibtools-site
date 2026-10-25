@@ -18,6 +18,7 @@ export default {
         line: {
           DEFAULT: 'rgb(var(--color-line) / <alpha-value>)',
           strong: 'rgb(var(--color-line-strong) / <alpha-value>)',
+          soft: 'rgb(var(--color-line-soft) / <alpha-value>)',
         },
         ground: {
           DEFAULT: 'rgb(var(--color-ground) / <alpha-value>)',

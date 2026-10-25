@@ -1,8 +1,19 @@
 ---
 interface Props { theme?: 'dark' | 'light' }
 const { theme = 'light' } = Astro.props;
-const src = theme === 'dark' ? '/brand/logo-circle-dark.svg' : '/brand/logo-circle-light.svg';
+const dark = theme === 'dark';
 ---
 <a href="/" class="flex items-center" aria-label="Calib.Tools home">
-  <img src={src} alt="Calib.Tools" class="h-14 w-14 md:h-[76px] md:w-[76px]" />
+  {/* Desktop: horizontal lockup */}
+  <img
+    src={dark ? '/brand/lockup-dark.svg' : '/brand/lockup-light.svg'}
+    alt="Calib.Tools"
+    class="hidden md:block h-10"
+  />
+  {/* Mobile: C.T icon only */}
+  <img
+    src={dark ? '/brand/icon-dark.svg' : '/brand/icon-light.svg'}
+    alt="Calib.Tools"
+    class="block md:hidden h-12"
+  />
 </a>

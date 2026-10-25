@@ -20,7 +20,7 @@ const items = [
       : 'bg-[rgba(255,255,255,0.86)] border-b border-black/[0.08]',
   ]}
 >
-  <div class="container-x py-4">
+  <div class="container-x py-3">
     {/* Desktop header */}
     <div class="hidden md:flex items-center justify-between gap-6">
       <Logo theme={theme} />
@@ -79,13 +79,7 @@ const items = [
       </button>
 
       <div class="absolute left-1/2 -translate-x-1/2">
-        <a href="/" class="flex items-center" aria-label="Calib.Tools home">
-          <img
-            src={dark ? '/brand/logo-circle-dark.svg' : '/brand/logo-circle-light.svg'}
-            alt="Calib.Tools"
-            class="h-[60px] w-[60px]"
-          />
-        </a>
+        <Logo theme={theme} />
       </div>
 
       {/* Spacer to balance the hamburger */}
