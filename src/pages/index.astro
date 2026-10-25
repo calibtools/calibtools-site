@@ -11,6 +11,8 @@ import { getCollection } from 'astro:content';
 import { getProductImages } from '@/lib/product-images';
 import { getImageMetadata } from '@/lib/productImageImports';
 import { Tag, Truck, FileCheck, Files, RotateCcw, Grid2x2 as Grid2X2, ScanLine, ListChecks, Package, Ruler, CircleDot, Plug, ArrowRight, Mail } from 'lucide-astro';
+import { getAllPublishedReviews, HOW_REVIEWS_WORK_SHORT } from '@/lib/reviews';
+import Stars from '@/components/Stars';
 import heroTight from '@/assets/products/brand/dark/hero-boards-tight.webp';
 import heroTightMobile from '@/assets/products/brand/dark/hero-boards-tight-mobile.webp';
 import familyComposite from '@/assets/products/brand/dark/family-composite.webp';
@@ -59,6 +61,16 @@ const why = [
 
 /* Show 3 featured tools on the home page */
 const featuredTools = tools.slice(0, 3);
+
+const allReviews = await getAllPublishedReviews();
+const showReviews = allReviews.length >= 3;
+const featuredReviews = allReviews
+  .sort((a, b) => {
+    const aScore = (a.tags.camera || a.tags.lensOrFov || a.tags.software ? 1 : 0) + (a.photos.length > 0 ? 1 : 0);
+    const bScore = (b.tags.camera || b.tags.lensOrFov || b.tags.software ? 1 : 0) + (b.photos.length > 0 ? 1 : 0);
+    return bScore - aScore || new Date(b.created).getTime() - new Date(a.created).getTime();
+  })
+  .slice(0, 3);
 ---
 <Base title="Calibrate with confidence" theme="dark" description="Precision checkerboards, ChArUco, AprilGrid and metrology-grade glass targets, plus free browser tools to generate, size and verify your calibration. Shipped from Europe in 2\u20134 days.">
 
@@ -237,6 +249,51 @@ const featuredTools = tools.slice(0, 3);
       </div>
     </div>
   </section>
+
+  {/* ── From the bench (reviews) — only when >= 3 published reviews ── */}
+  {showReviews && (
+    <section id="reviews-home" class="border-t border-line">
+      <div class="container-x flex flex-col gap-8 py-12 md:py-[72px]">
+        <div class="flex flex-wrap items-end justify-between gap-4">
+          <div class="flex flex-col gap-2.5">
+            <span class="font-mono text-[12px] uppercase tracking-[0.18em] text-brand-text md:text-[13px]">From the bench</span>
+            <h2 class="h-display m-0 text-[28px] md:text-[36px]">What engineers measured.</h2>
+          </div>
+          <p class="m-0 max-w-[460px] text-sm text-ink-muted">{HOW_REVIEWS_WORK_SHORT}</p>
+        </div>
+
+        <div class="flex gap-5 overflow-x-auto pb-2 scrollbar-none md:grid md:grid-cols-3 md:overflow-visible md:pb-0">
+          {featuredReviews.map((r) => (
+            <article class="flex w-[85vw] shrink-0 flex-col gap-2.5 rounded border border-line bg-ground-alt p-5 md:w-auto">
+              <div class="flex items-center justify-between gap-2.5">
+                <Stars client:load rating={r.stars} />
+                <span class="font-mono text-xs text-ink-muted">
+                  {new Date(r.created).toLocaleDateString('en-GB', { year: 'numeric', month: 'short', day: 'numeric' })}
+                </span>
+              </div>
+              {r.title && <h4 class="m-0 text-[16px] font-semibold">{r.title}</h4>}
+              <p class="m-0 line-clamp-3 text-[15px] leading-relaxed text-ink-muted">{r.body}</p>
+              {(r.tags.camera || r.tags.lensOrFov || r.tags.software) && (
+                <div class="flex flex-wrap gap-1.5">
+                  {r.tags.camera && <span class="rounded border border-line bg-ground px-2 py-0.5 font-mono text-[11px] text-ink-muted">{r.tags.camera}</span>}
+                  {r.tags.lensOrFov && <span class="rounded border border-line bg-ground px-2 py-0.5 font-mono text-[11px] text-ink-muted">{r.tags.lensOrFov}</span>}
+                  {r.tags.software && <span class="rounded border border-line bg-ground px-2 py-0.5 font-mono text-[11px] text-ink-muted">{r.tags.software}</span>}
+                </div>
+              )}
+              <div class="flex items-center gap-2 pt-1 text-xs text-ink-muted">
+                <span class="font-semibold text-ink">{r.author.initials}</span>
+                {r.author.companyType && <span>· {r.author.companyType}</span>}
+              </div>
+            </article>
+          ))}
+        </div>
+
+        <a href="/targets/" class="text-[15px] font-medium text-brand-dark">
+          Read all reviews on the product pages
+        </a>
+      </div>
+    </section>
+  )}
 
   {/* ── Learn + subscribe ── */}
   <section id="learn" class="container-x flex flex-wrap gap-12 py-12 pb-[72px] md:py-[72px]">
