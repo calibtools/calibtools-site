@@ -34,6 +34,40 @@ describe('dark theme tokens', () => {
   });
 });
 
+describe('round favicon', () => {
+  it('favicon-32.png corner pixels are transparent (alpha 0)', () => {
+    const result = execSync(
+      `python3 -c "
+from PIL import Image
+img = Image.open('public/favicon/calib-tools-favicon-32.png').convert('RGBA')
+w, h = img.size
+corners = [img.getpixel((0,0)), img.getpixel((w-1,0)), img.getpixel((0,h-1)), img.getpixel((w-1,h-1))]
+for c in corners:
+    assert c[3] == 0, f'Corner alpha {c[3]} != 0'
+print('OK')
+"`,
+      { encoding: 'utf-8', cwd: new URL('../..', import.meta.url).pathname },
+    );
+    expect(result.trim()).toBe('OK');
+  });
+
+  it('favicon-32.png centre pixel is black', () => {
+    const result = execSync(
+      `python3 -c "
+from PIL import Image
+img = Image.open('public/favicon/calib-tools-favicon-32.png').convert('RGBA')
+w, h = img.size
+c = img.getpixel((w//2, h//2))
+assert c[3] == 255, f'Centre alpha {c[3]} != 255'
+assert c[0] == 0 and c[1] == 0 and c[2] == 0, f'Centre not black: {c}'
+print('OK')
+"`,
+      { encoding: 'utf-8', cwd: new URL('../..', import.meta.url).pathname },
+    );
+    expect(result.trim()).toBe('OK');
+  });
+});
+
 describe('brand colour consistency', () => {
   it('no #E60113 remains in src/ or public/', () => {
     const result = execSync(

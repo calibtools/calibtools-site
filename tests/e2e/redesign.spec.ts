@@ -58,38 +58,43 @@ test('Favicon and manifest files serve 200', async ({ page }) => {
   expect(res3.ok()).toBeTruthy();
 });
 
-test('Hero image spans full section width at 1440px', async ({ page }) => {
+test('Hero image height ≥ 85% of its column at 1440px', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/');
   await page.waitForLoadState('networkidle');
-  // Find the visible hero img (desktop one has md:block, mobile has md:hidden)
-  const heroImgs = page.locator('#top img');
-  const count = await heroImgs.count();
-  let foundWidth = 0;
-  for (let i = 0; i < count; i++) {
-    const box = await heroImgs.nth(i).boundingBox();
-    if (box && box.width > foundWidth) foundWidth = box.width;
-  }
-  expect(foundWidth).toBeGreaterThanOrEqual(1440 * 0.95);
+  const img = page.locator('[data-hero-img]');
+  const col = page.locator('[data-hero-col]');
+  const imgBox = await img.boundingBox();
+  const colBox = await col.boundingBox();
+  expect(imgBox).not.toBeNull();
+  expect(colBox).not.toBeNull();
+  expect(imgBox!.height).toBeGreaterThanOrEqual(colBox!.height * 0.85);
 });
 
-test('Hero h1 is within left 50% at 1440px', async ({ page }) => {
-  await page.setViewportSize({ width: 1440, height: 900 });
-  await page.goto('/');
-  const h1 = page.locator('#top h1');
-  const box = await h1.boundingBox();
-  expect(box).not.toBeNull();
-  expect(box!.x + box!.width).toBeLessThan(1440 * 0.5);
-});
-
-test('Hero image spans full section width at 390px', async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 844 });
+test('Hero image height ≥ 85% of its column at 1280px', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto('/');
   await page.waitForLoadState('networkidle');
-  const heroImg = page.locator('#top img').first();
-  const box = await heroImg.boundingBox();
-  expect(box).not.toBeNull();
-  expect(box!.width).toBeGreaterThanOrEqual(390 * 0.95);
+  const img = page.locator('[data-hero-img]');
+  const col = page.locator('[data-hero-col]');
+  const imgBox = await img.boundingBox();
+  const colBox = await col.boundingBox();
+  expect(imgBox).not.toBeNull();
+  expect(colBox).not.toBeNull();
+  expect(imgBox!.height).toBeGreaterThanOrEqual(colBox!.height * 0.85);
+});
+
+test('Hero h1 box never intersects hero img box at 1440px', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/');
+  const h1 = page.locator('[data-hero-h1]');
+  const img = page.locator('[data-hero-img]');
+  const h1Box = await h1.boundingBox();
+  const imgBox = await img.boundingBox();
+  expect(h1Box).not.toBeNull();
+  expect(imgBox).not.toBeNull();
+  // h1 right edge must be left of img left edge (no overlap)
+  expect(h1Box!.x + h1Box!.width).toBeLessThanOrEqual(imgBox!.x + 1);
 });
 
 test('Home page screenshot 1440px', async ({ page }) => {
@@ -97,6 +102,13 @@ test('Home page screenshot 1440px', async ({ page }) => {
   await page.goto('/');
   await page.waitForLoadState('networkidle');
   await page.screenshot({ path: 'screenshots/home-1440.png', fullPage: true });
+});
+
+test('Home page screenshot 1280px', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto('/');
+  await page.waitForLoadState('networkidle');
+  await page.screenshot({ path: 'screenshots/home-1280.png', fullPage: true });
 });
 
 test('Home page screenshot 390px', async ({ page }) => {

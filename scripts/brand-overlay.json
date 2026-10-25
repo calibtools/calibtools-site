@@ -428,5 +428,45 @@
         "area": 470492
       }
     ]
+  },
+  "crops": {
+    "hero-boards-tight.webp": {
+      "source": "hero-three-boards.webp",
+      "boards_bbox": [
+        740,
+        281,
+        1542,
+        618
+      ],
+      "crop_box": [
+        684,
+        180,
+        1586,
+        887
+      ],
+      "output_dims": [
+        902,
+        707
+      ]
+    },
+    "hero-boards-tight-mobile.webp": {
+      "source": "hero-three-boards-mobile.webp",
+      "boards_bbox": [
+        37,
+        887,
+        1603,
+        1283
+      ],
+      "crop_box": [
+        0,
+        848,
+        1664,
+        1401
+      ],
+      "output_dims": [
+        1664,
+        553
+      ]
+    }
   }
 }

@@ -102,6 +102,16 @@
   .spec      { @apply font-mono text-[15px] tabular-nums; }
   .stat      { @apply font-pixel text-[48px] leading-none; }
   .h-display { @apply font-extrabold tracking-[-0.03em]; }
+
+  /* Hero image edge fade — blends crop edges into #0A0A0A */
+  .hero-fade {
+    -webkit-mask-image: linear-gradient(to right, transparent, black 60px),
+                        linear-gradient(to top, transparent, black 60px);
+    -webkit-mask-composite: destination-in;
+    mask-image: linear-gradient(to right, transparent, black 60px),
+                linear-gradient(to top, transparent, black 60px);
+    mask-composite: intersect;
+  }
 }
 
 @layer components {
