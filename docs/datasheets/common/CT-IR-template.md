@@ -18,7 +18,7 @@ status: released
 | Datasheet | {{datasheet_code}} |
 | Inspection date | {{inspected_on}} |
 | Inspector | {{inspector}} |
-| Location | Calib.Tools, Munich, Germany |
+| Location | {{location}} |
 | Result | {{result}} |
 
 ## 1. Method
@@ -43,4 +43,4 @@ The item identified above meets the specifications of datasheet {{datasheet_code
 
 Signed: ____________________ · Calib.Tools, Munich · hello@calib.tools
 
-*Report generated from measurement data; raw data retained for 10 years under this serial number.*
+Report generated from measurement data; raw data retained for 10 years under this serial number.

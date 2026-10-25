@@ -15,7 +15,7 @@ describe('inspection report template', () => {
 
   it('contains required placeholders', () => {
     for (const ph of ['{{sn}}', '{{part_number}}', '{{description}}', '{{datasheet_code}}',
-      '{{lot}}', '{{inspected_on}}', '{{inspector}}', '{{result}}',
+      '{{lot}}', '{{inspected_on}}', '{{inspector}}', '{{location}}', '{{result}}',
       '{{measurements_table}}', '{{flatness_table}}', '{{visual_table}}']) {
       expect(template).toContain(ph);
     }
@@ -139,5 +139,38 @@ describe('generated report PDF', () => {
     // PDF header
     const header = bytes.slice(0, 5).toString('ascii');
     expect(header).toBe('%PDF-');
+  });
+
+  it('000311.pdf embeds GeistPixel font for INSPECTED', async () => {
+    if (!existsSync(reportPath)) return;
+    const { PDFDocument } = await import('pdf-lib');
+    const doc = await PDFDocument.load(readFileSync(reportPath));
+    // Collect all font names from every page's resource dictionary
+    const fontNames: string[] = [];
+    for (const page of doc.getPages()) {
+      const fonts = page.node.get(page.node.context.obj('Resources'))?.get(page.node.context.obj('Font'));
+      if (!fonts) continue;
+      // Iterate font dict keys
+      const dict = page.node.Resources()?.get('Font');
+      if (dict && 'entries' in dict) {
+        for (const [key] of (dict as any).entries()) {
+          fontNames.push(key.toString());
+        }
+      }
+    }
+    // Fallback: search compressed streams for the font name
+    const bytes = readFileSync(reportPath);
+    const zlib = await import('node:zlib');
+    const latin1 = bytes.toString('latin1');
+    const streamRe = /stream\r?\n([\s\S]+?)\r?\nendstream/g;
+    let found = false;
+    let m;
+    while ((m = streamRe.exec(latin1)) !== null) {
+      try {
+        const dec = zlib.inflateSync(Buffer.from(m[1], 'latin1')).toString('latin1');
+        if (dec.includes('GeistPixel')) { found = true; break; }
+      } catch { /* not zlib */ }
+    }
+    expect(found).toBe(true);
   });
 });

@@ -152,6 +152,7 @@ function visualTable(meas) {
 mkdirSync(REPORTS_DIR, { recursive: true });
 
 const { parseFrontMatter, parseMarkdown, renderDatasheetPdf } = await import('../src/lib/datasheetPdf.ts');
+const { DEFAULT_INSPECTION_LOCATION } = await import('../src/lib/reportConfig.ts');
 const { drawStampOnPage } = await import('../src/lib/stamp.ts');
 
 const templatePath = resolve(ROOT, 'docs/datasheets/common/CT-IR-template.md');
@@ -173,6 +174,7 @@ let filled = templateRaw
   .replace(/\{\{inspected_on\}\}/g, date)
   .replace(/\{\{inspector\}\}/g, initials)
   .replace(/\{\{id_range\}\}/g, idRange)
+  .replace(/\{\{location\}\}/g, DEFAULT_INSPECTION_LOCATION)
   .replace(/\{\{result\}\}/g, overallResult)
   .replace(/\{\{measurements_table\}\}/g, measurementsTable(measurements))
   .replace(/\{\{flatness_table\}\}/g, flatnessTable(measurements))
@@ -195,11 +197,11 @@ const fontBytes = {
 const wordmarkSvgPath = resolve(ROOT, 'public/brand/wordmark-framed-light.svg');
 const wordmarkSvg = existsSync(wordmarkSvgPath) ? readFileSync(wordmarkSvgPath, 'utf-8') : undefined;
 
-const pdfBytes = await renderDatasheetPdf({ meta, blocks, fontBytes, wordmarkSvg });
+const result = await renderDatasheetPdf({ meta, blocks, fontBytes, wordmarkSvg });
 
-// To add the stamp, we re-open the PDF and draw on the last page
+// To add the stamp, we re-open the PDF and draw on the signature page
 const { PDFDocument } = await import('pdf-lib');
-const pdfDoc = await PDFDocument.load(pdfBytes);
+const pdfDoc = await PDFDocument.load(result.bytes);
 
 // Embed fonts for stamp
 const fontkit = (await import('@pdf-lib/fontkit')).default;
@@ -210,15 +212,26 @@ const stampFonts = {
   pixel: await pdfDoc.embedFont(fontBytes.pixel, { subset: true }),
 };
 
-// Draw stamp on last page — overlapping signature line, right of "Signed:"
+// Draw stamp on signature page — overlapping signature line
 const pages = pdfDoc.getPages();
-const lastPage = pages[pages.length - 1];
-drawStampOnPage(lastPage, {
+const sigPageIdx = result.signaturePageIndex ?? (pages.length - 1);
+const sigPage = pages[sigPageIdx];
+const sigY = result.signatureY ?? 250; // mm from top, fallback
+
+// Stamp Ø 32 mm → radius 16 mm
+// cx = right end of underscores (~155 mm) + 6 mm = 161 mm
+// cy: lower edge (cy + 16) crosses signature baseline (sigY) by 2–3 mm
+//   → cy + 16 = sigY + 2.5  → cy = sigY − 13.5
+const stampCx = 161;
+const stampCy = sigY - 13.5;
+console.log(`[add-serial] Stamp at cx=${stampCx} cy=${stampCy.toFixed(1)} (sigY=${sigY})`);
+
+drawStampOnPage(sigPage, {
   sn,
   date,
   inspector: initials,
-  cx: 155, // mm from left — right of "Signed:" line
-  cy: 250, // mm from top — overlapping signature line by 2-3mm
+  cx: stampCx,
+  cy: stampCy,
   rotation: -8,
   opacity: 0.9,
 }, stampFonts);
