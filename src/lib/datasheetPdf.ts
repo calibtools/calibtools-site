@@ -339,11 +339,19 @@ function drawTextWithCheckHighlight(
 // Main renderer
 // ---------------------------------------------------------------------------
 
+export interface DatasheetPdfResult {
+  bytes: Uint8Array;
+  /** Y position (mm from top of page) of the "Signed:" line, if found. */
+  signatureY?: number;
+  /** 0-based index of the page containing the signature line. */
+  signaturePageIndex?: number;
+}
+
 /**
  * Render datasheet blocks to a multi-page A4 PDF.
- * Returns raw PDF bytes.
+ * Returns PDF bytes and metadata about the signature line position.
  */
-export async function renderDatasheetPdf(opts: DatasheetPdfOptions): Promise<Uint8Array> {
+export async function renderDatasheetPdf(opts: DatasheetPdfOptions): Promise<DatasheetPdfResult> {
   const { meta, blocks } = opts;
   const doc = await PDFDocument.create({ updateMetadata: false });
   doc.setCreationDate(new Date(0));
@@ -358,6 +366,8 @@ export async function renderDatasheetPdf(opts: DatasheetPdfOptions): Promise<Uin
   const pages: PDFPage[] = [];
   let currentPage: PDFPage;
   let cursorY = 0; // mm from top of page
+  let signatureY: number | undefined;
+  let signaturePageIndex: number | undefined;
 
   // --- Page management ---
 
@@ -415,16 +425,40 @@ export async function renderDatasheetPdf(opts: DatasheetPdfOptions): Promise<Uin
       }
 
       case 'paragraph': {
-        const fontSize = 9;
+        // Disclaimer line: render smaller and grey
+        const isDisclaimer = block.text.startsWith('Report generated');
+        const isSignature = block.text.startsWith('Signed:');
+        const fontSize = isDisclaimer ? 8 : 9;
         const lineH = 3.5; // mm
         const maxW = CONTENT_W * MM;
         const lines = wrapText(block.text, fontRegular, fontSize, maxW);
 
-        ensureSpace(lines.length * lineH + 2);
+        // Signature block needs extra space for stamp (Ø 32mm → ~22mm below)
+        if (isSignature) {
+          ensureSpace(lines.length * lineH + 2 + 22);
+        } else {
+          ensureSpace(lines.length * lineH + 2);
+        }
+
+        // Record signature position before drawing
+        if (isSignature) {
+          signatureY = cursorY;
+          signaturePageIndex = pages.length - 1;
+        }
 
         for (const line of lines) {
-          // Highlight [CHECK] markers with yellow background
-          drawTextWithCheckHighlight(currentPage!, line, xPt(MARGIN_LEFT), yPt(cursorY), fontSize, fontRegular);
+          if (isDisclaimer) {
+            currentPage!.drawText(line, {
+              x: xPt(MARGIN_LEFT),
+              y: yPt(cursorY),
+              size: fontSize,
+              font: fontRegular,
+              color: rgb(0.5, 0.5, 0.5),
+            });
+          } else {
+            // Highlight [CHECK] markers with yellow background
+            drawTextWithCheckHighlight(currentPage!, line, xPt(MARGIN_LEFT), yPt(cursorY), fontSize, fontRegular);
+          }
           cursorY += lineH;
         }
         cursorY += 2; // bottom margin
@@ -530,7 +564,7 @@ export async function renderDatasheetPdf(opts: DatasheetPdfOptions): Promise<Uin
   doc.setProducer(`${BRAND_NAME} pdf-lib`);
   doc.setCreator(BRAND_URL);
 
-  return doc.save();
+  return { bytes: await doc.save(), signatureY, signaturePageIndex };
 }
 
 // ---------------------------------------------------------------------------

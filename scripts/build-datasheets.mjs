@@ -113,7 +113,7 @@ for (const mdPath of mdFiles) {
 
   // Render PDF
   const blocks = parseMarkdown(body);
-  const pdfBytes = await renderDatasheetPdf({ meta, blocks, fontBytes });
+  const { bytes: pdfBytes } = await renderDatasheetPdf({ meta, blocks, fontBytes });
 
   writeFileSync(outPath, pdfBytes);
   built++;
