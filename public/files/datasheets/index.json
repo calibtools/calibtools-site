@@ -20,8 +20,8 @@
     "status": "draft",
     "family": "ACC",
     "material": "A",
-    "sha256": "78c229df516a9ec497f528a1820e0d72b4a3c0fff404611735e64b98073f3e98",
-    "bytes": 26609
+    "sha256": "6be2a02f40435081136f4ef2c546ab242fc9d2b30b5665a0d9fd0ef858c8b3eb",
+    "bytes": 26488
   },
   {
     "code": "CT-DS-CHA-C",
@@ -32,8 +32,8 @@
     "status": "draft",
     "family": "CHA",
     "material": "C",
-    "sha256": "be5ef8c474fdc595819c2381128d9eff254f2ffbd3cea3bc9411244b4fcba63e",
-    "bytes": 33516
+    "sha256": "9c8f64610bcad8046a28b7b80574985318e0d66c03c7e452e05c76d671643b66",
+    "bytes": 33340
   },
   {
     "code": "CT-DS-CHA-P",
@@ -44,8 +44,8 @@
     "status": "draft",
     "family": "CHA",
     "material": "P",
-    "sha256": "924bbee3328f7bfb3eaff1b2ff05bc86c19fc1282a12091780e285185f26dce4",
-    "bytes": 35653
+    "sha256": "f46fa096058f3a50104b62557b460f1487302e4269d2cea83933774710cdf72e",
+    "bytes": 35442
   },
   {
     "code": "CT-DS-CHT-P",
@@ -56,8 +56,8 @@
     "status": "draft",
     "family": "CHT",
     "material": "P",
-    "sha256": "41265cbdfba5d0e058b0ad0505e30e65eac9a5f1fb982a0510b52227ee65edea",
-    "bytes": 29919
+    "sha256": "bf1ca5a9813cc2f2ce26efa31344a82eb921c4f4067ac5efd824db422bd0802c",
+    "bytes": 29770
   },
   {
     "code": "CT-IR-{{sn}}",
@@ -68,8 +68,8 @@
     "status": "released",
     "family": null,
     "material": null,
-    "sha256": "19389a624b18e5647c6b83303b6548f3617d70944a27f5e1ce2982327e6f2460",
-    "bytes": 23620
+    "sha256": "349cf0b5f2b9c306b844d1c6aa3041759561e96838b73f3744a53c2c9536b6e4",
+    "bytes": 23596
   },
   {
     "code": "CT-SV-CERT-ILAC",
@@ -80,8 +80,8 @@
     "status": "draft",
     "family": "SVC",
     "material": "X",
-    "sha256": "4fb039ec64ac3e0beeef1b3ce85d48ec1ab82249e0cd8f6c80aeb2d59ee58f8a",
-    "bytes": 25257
+    "sha256": "4bb9bd1ba0437a6a628c1f183338fc34b317cfd0bc85ff518bcc68ae5d87bda3",
+    "bytes": 24985
   },
   {
     "code": "CT-UM-CHA-C",
@@ -128,7 +128,7 @@
     "status": "draft",
     "family": null,
     "material": null,
-    "sha256": "e44385975856d896d847d940303c5d67262acab26df8821ee6bd7eaebb3017fa",
-    "bytes": 35049
+    "sha256": "671ae09295cde8730ebe7e2353a41ac762ae750f0dce1a0f8b80a1f38b57b114",
+    "bytes": 34985
   }
 ]

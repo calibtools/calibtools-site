@@ -64,7 +64,7 @@ Start ID 0, row-major, OpenCV ≥ 4.6 placement. Larger ceramic plates (up to 40
 
 ## Compliance and customs
 
-RoHS-compliant. HS 9031 80. Origin China; inspected in Germany. Fragile — ships in a hard case inside a padded carton.
+RoHS-compliant. HS 9031 80. Fragile — ships in a hard case inside a padded carton.
 
 ## Revision history
 

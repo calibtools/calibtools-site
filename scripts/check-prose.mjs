@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * check-prose.mjs — warn when any <p> text exceeds ~3 lines at 640 px
- * (~360 characters). Warn-only: always exits 0.
+ * (~360 characters). Also fail the build on banned location/claim phrases.
  */
 import { globSync } from 'node:fs';
 import { readFileSync } from 'node:fs';
@@ -10,20 +10,86 @@ import { resolve, relative } from 'node:path';
 const THRESHOLD = 360;
 const ROOT = resolve(import.meta.dirname, '..');
 
-const files = [
+// ---------------------------------------------------------------------------
+// Banned phrases — build fails on a hit
+// ---------------------------------------------------------------------------
+
+const BANNED_PATTERNS = [
+  /\bMunich\b/i,
+  /\bMünchen\b/i,
+  /ships?\s+from\s+Germany/i,
+  /from\s+Germany/i,
+  /\bEU\s+stock\b/i,
+  /\bin\s+stock\b/i,
+  /\bInspected\s+in\s+Germany\b/i,
+  /\bGerman[- ]made\b/i,
+  /\bMade\s+in\s+Germany\b/i,
+  /\bverified\b/i,
+  /\bcertified\b/i,
+];
+
+/** Phrases that are allowed even when they contain a banned word. */
+const ALLOWLIST = [
+  'accredited third-party laboratory',
+  'CNAS-accredited',
+  'DAkkS-accredited',
+  'DAkkS-calibrated',
+];
+
+/**
+ * Test whether a line contains a banned phrase that is NOT inside an
+ * allowlisted context.
+ */
+function findBannedHit(line) {
+  for (const pattern of BANNED_PATTERNS) {
+    const m = pattern.exec(line);
+    if (!m) continue;
+    const matchText = m[0];
+    // Check if the match sits inside an allowlisted phrase
+    const allowed = ALLOWLIST.some((phrase) => {
+      const idx = line.toLowerCase().indexOf(phrase.toLowerCase());
+      if (idx === -1) return false;
+      // The banned match must be fully inside the allowlisted span
+      return m.index >= idx && m.index + matchText.length <= idx + phrase.length;
+    });
+    if (!allowed) return matchText;
+  }
+  return null;
+}
+
+// ---------------------------------------------------------------------------
+// File collection
+// ---------------------------------------------------------------------------
+
+const proseFiles = [
   ...globSync('src/content/**/*.{md,mdx}', { cwd: ROOT }).map((f) => resolve(ROOT, f)),
   ...globSync('src/**/*.astro', { cwd: ROOT }).map((f) => resolve(ROOT, f)),
 ];
 
+const bannedScanFiles = [
+  ...globSync('src/**/*.{astro,ts,tsx,md,mdx}', { cwd: ROOT }).map((f) => resolve(ROOT, f)),
+  ...globSync('docs/datasheets/**/*.md', { cwd: ROOT }).map((f) => resolve(ROOT, f)),
+].filter((f) => {
+  const rel = relative(ROOT, f);
+  // Exclude test files, internal reports, brand docs (which list banned phrases), and code comments in lib utilities
+  if (rel.endsWith('.test.ts') || rel.endsWith('.test.tsx')) return false;
+  if (rel === 'src/assets/products/report.md') return false;
+  if (rel.startsWith('docs/brand/')) return false;
+  return true;
+});
+
+// ---------------------------------------------------------------------------
+// Prose length check (warn-only)
+// ---------------------------------------------------------------------------
+
 const offenders = [];
 
-for (const file of files) {
+for (const file of proseFiles) {
   const src = readFileSync(file, 'utf-8');
   const lines = src.split('\n');
   const ext = file.endsWith('.astro') ? 'astro' : 'md';
 
   if (ext === 'astro') {
-    // Match <p ...>text</p> (single-line or multiline)
     const pRegex = /<p[^>]*>([\s\S]*?)<\/p>/g;
     let match;
     while ((match = pRegex.exec(src)) !== null) {
@@ -34,7 +100,6 @@ for (const file of files) {
       }
     }
   } else {
-    // Markdown: paragraphs are blocks separated by blank lines
     let inFrontmatter = false;
     let block = '';
     let blockStart = 0;
@@ -56,7 +121,6 @@ for (const file of files) {
         block += ' ' + ln;
       }
     }
-    // Flush last block
     if (block.trim()) {
       const text = block.replace(/\s+/g, ' ').trim();
       if (text.length > THRESHOLD && !text.startsWith('#') && !text.startsWith('|') && !text.startsWith('-') && !text.startsWith('*')) {
@@ -74,3 +138,30 @@ if (offenders.length > 0) {
 } else {
   console.log(`[check-prose] OK — no paragraphs exceed ${THRESHOLD} characters.`);
 }
+
+// ---------------------------------------------------------------------------
+// Banned-phrase check (build-breaking)
+// ---------------------------------------------------------------------------
+
+const banned = [];
+
+for (const file of bannedScanFiles) {
+  const src = readFileSync(file, 'utf-8');
+  const lines = src.split('\n');
+  for (let i = 0; i < lines.length; i++) {
+    const hit = findBannedHit(lines[i]);
+    if (hit) {
+      banned.push({ file: relative(ROOT, file), line: i + 1, match: hit });
+    }
+  }
+}
+
+if (banned.length > 0) {
+  console.error(`\n[check-prose] BANNED PHRASES FOUND — build must not proceed:`);
+  for (const b of banned) {
+    console.error(`  ${b.file}:${b.line}  "${b.match}"`);
+  }
+  process.exit(1);
+}
+
+console.log('[check-prose] OK — no banned phrases found.');

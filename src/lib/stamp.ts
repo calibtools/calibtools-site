@@ -85,9 +85,9 @@ export function drawStampOnPage(
   // Inner ring
   drawCircleRing(page, 0, 0, R_INNER * MM, RING_INNER_W * MM, red, opacity);
 
-  // Top arc text: "CALIB.TOOLS · MUNICH" — centred at 90° (12 o'clock in y-up)
+  // Top arc text: "CALIB.TOOLS" — centred at 90° (12 o'clock in y-up)
   const arcR = ((R_OUTER + R_INNER) / 2) * MM; // middle of ring band ≈ 15.1 mm
-  drawArcText(page, 'CALIB.TOOLS \u00B7 MUNICH', fonts.medium, RING_FONT_SIZE,
+  drawArcText(page, 'CALIB.TOOLS', fonts.medium, RING_FONT_SIZE,
     0, 0, arcR, 90, red, opacity);
 
   // Bottom arc text: "DIMENSIONAL INSPECTION" — centred at 270° (6 o'clock), flipped
@@ -280,7 +280,7 @@ export function stampSvg(): string {
     <path id="bot-arc" d="M ${R_INNER - 0.5},0 A ${R_INNER - 0.5},${R_INNER - 0.5} 0 1,1 ${-R_INNER + 0.5},0"/>
   </defs>
   <text font-size="3.2" font-weight="500" text-anchor="middle" letter-spacing="0.10em">
-    <textPath href="#top-arc" startOffset="50%">CALIB.TOOLS \u00B7 MUNICH</textPath>
+    <textPath href="#top-arc" startOffset="50%">CALIB.TOOLS</textPath>
   </text>
   <text font-size="2.8" font-weight="500" text-anchor="middle" letter-spacing="0.10em">
     <textPath href="#bot-arc" startOffset="50%">DIMENSIONAL INSPECTION</textPath>

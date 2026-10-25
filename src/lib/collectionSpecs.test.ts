@@ -20,8 +20,8 @@ describe('availabilityLabel', () => {
     expect(availabilityLabel('5-7 business days', false)).toBe('5-7 business days');
   });
 
-  test('returns "In stock" when available and no lead_time', () => {
-    expect(availabilityLabel(undefined, true)).toBe('In stock');
+  test('returns "Made to order" when available and no lead_time', () => {
+    expect(availabilityLabel(undefined, true)).toBe('Made to order');
   });
 
   test('returns "Made to order" when not available and no lead_time', () => {

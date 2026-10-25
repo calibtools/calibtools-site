@@ -38,7 +38,7 @@ Do not clamp across the pattern face. Do not use as a carrying handle for cerami
 
 ## Compliance and customs
 
-RoHS-compliant. HS 9031 90 (parts and accessories). Origin China.
+RoHS-compliant. HS 9031 90 (parts and accessories).
 
 ## Revision history
 

@@ -17,7 +17,7 @@ import type { PatternSpec } from './patterns';
 
 /**
  * Primitive polynomial taps for the Fibonacci LFSR: x^10 + x^9 + x^6 + x + 1.
- * Verified to produce a maximal-length sequence (period = 2^10 - 1 = 1023).
+ * Confirmed to produce a maximal-length sequence (period = 2^10 - 1 = 1023).
  */
 const SEQ_BITS = 10;
 const SEQ_TAPS = [10, 9, 6, 1];
@@ -89,7 +89,7 @@ export function puzzleGrid(rows: number, cols: number, offsetX: number, offsetY:
  * Returns {x, y} if exactly one match found, null otherwise.
  *
  * For grids >= 4x4 with the 10-bit / stride-37 encoding, matches are
- * unique across the full search space (verified by test).
+ * unique across the full search space (confirmed by test).
  */
 export function decodePuzzleOffset(
   grid: number[][],

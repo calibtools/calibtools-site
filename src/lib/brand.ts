@@ -23,7 +23,6 @@ export const BRAND_INK_RGB = { r: 26 / 255, g: 26 / 255, b: 26 / 255 } as const;
 export const BRAND_URL = 'calib.tools';
 export const BRAND_NAME = 'Calib.Tools';
 export const BRAND_EMAIL = 'hello@calib.tools';
-export const BRAND_LOCATION = 'Munich, Germany';
 
 // ---------------------------------------------------------------------------
 // Logo grid — 3×3, row-major, matching Logo.astro:

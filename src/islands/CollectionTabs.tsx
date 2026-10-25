@@ -70,7 +70,7 @@ export default function CollectionTabs({ collectionHandle, specsTable, founderQu
         </div>
         <div className="flex flex-col gap-1.5">
           <strong className="text-[15px]">Jun Gao</strong>
-          <span className="text-sm text-ink-muted">Founder, Calib.Tools &middot; Munich</span>
+          <span className="text-sm text-ink-muted">Founder, Calib.Tools</span>
           {founderQuote && (
             <p className="m-0 text-sm text-ink-muted italic leading-relaxed">&ldquo;{founderQuote}&rdquo;</p>
           )}
