@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { ListChecks } from '@/lib/icons';
 import {
   recommend, MATERIALS,
   type WizardAnswers, type Application, type AccuracyNeed,
@@ -71,7 +72,7 @@ export default function Wizard() {
   return (
     <section className="mx-auto max-w-[640px]">
       <div className="card p-7">
-        <h1 className="m-0 mb-1 text-[26px] font-extrabold tracking-[-0.02em]">Selection wizard</h1>
+        <h1 className="m-0 mb-1 flex items-center gap-3 text-[26px] font-extrabold tracking-[-0.02em]"><ListChecks size={24} strokeWidth={1.6} className="text-brand" aria-hidden="true" />Selection wizard</h1>
         <p className="m-0 mb-6 text-sm text-ink-muted">Answer a few questions and get a calibration pattern recommendation.</p>
 
         {/* Progress bar */}

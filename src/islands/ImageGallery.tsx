@@ -34,10 +34,6 @@ interface Props {
   /** Inline SVG markup for the placeholder render pipeline. */
   placeholderSvg?: string;
   title: string;
-  /** Caption string under gallery for ai/render images. */
-  disclaimer?: string;
-  /** Extra caption for certificate-ilac. */
-  extraDisclaimer?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -49,8 +45,6 @@ export default function ImageGallery({
   shopifyImages,
   placeholderSvg,
   title,
-  disclaimer,
-  extraDisclaimer,
 }: Props) {
   const [selected, setSelected] = useState(0);
   const [zoomed, setZoomed] = useState(false);
@@ -114,10 +108,6 @@ export default function ImageGallery({
     }
   };
 
-  // Show disclaimer if any image is ai or render
-  const showDisclaimer =
-    disclaimer && hasLocalImages && images.some((img) => img.kind === 'ai' || img.kind === 'render');
-
   // --- No images at all: placeholder render ---
   if (imageCount === 0) {
     return (
@@ -132,11 +122,6 @@ export default function ImageGallery({
             <span className="font-mono text-xs text-ink-soft">[PRODUCT PHOTO]</span>
           )}
         </div>
-        {placeholderSvg && (
-          <span className="text-center text-xs text-ink-soft">
-            Rendering — photo coming
-          </span>
-        )}
       </div>
     );
   }
@@ -244,11 +229,7 @@ export default function ImageGallery({
                 i === selected ? 'ring-2 ring-brand' : ''
               }`}
               aria-label={`View image ${i + 1}`}
-              title={
-                img.kind === 'ai' || img.kind === 'render'
-                  ? 'Rendering — actual product may differ'
-                  : img.alt
-              }
+              title={img.alt}
             >
               <picture>
                 {img.sources.map((s) => (
@@ -271,17 +252,6 @@ export default function ImageGallery({
         </div>
       )}
 
-      {/* Honesty captions */}
-      {showDisclaimer && (
-        <p className="m-0 text-center font-mono text-xs text-ink-soft" data-disclaimer>
-          {disclaimer}
-        </p>
-      )}
-      {extraDisclaimer && (
-        <p className="m-0 text-center text-xs text-ink-muted" data-extra-disclaimer>
-          {extraDisclaimer}
-        </p>
-      )}
     </div>
   );
 }

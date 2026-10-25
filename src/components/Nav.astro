@@ -1,6 +1,7 @@
 ---
 import Logo from './Logo.astro';
 import CartBadge from '@/islands/CartBadge';
+import { ShoppingCart, Menu } from 'lucide-astro';
 interface Props { section?: string; theme?: 'dark' | 'light' }
 const { section, theme = 'light' } = Astro.props;
 const dark = theme === 'dark';
@@ -55,10 +56,7 @@ const items = [
           aria-label="Open cart"
           data-open-cart
         >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-            <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
-            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
-          </svg>
+          <ShoppingCart size={20} stroke-width={1.6} aria-hidden="true" />
           <span class="absolute -right-1.5 -top-1.5"><CartBadge client:load /></span>
         </button>
       </div>
@@ -77,9 +75,7 @@ const items = [
         aria-label="Open menu"
         data-menu-toggle
       >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-          <path d="M4 7h16M4 12h16M4 17h16"/>
-        </svg>
+        <Menu size={20} stroke-width={1.6} aria-hidden="true" />
       </button>
 
       <div class="absolute left-1/2 -translate-x-1/2">

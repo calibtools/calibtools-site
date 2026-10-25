@@ -15,7 +15,7 @@ import { WARRANTY_TEXT, COMPLIANCE, PRODUCT_TO_COLLECTION } from '@/lib/constant
 import { getProductImages } from '@/lib/product-images';
 import { getImageMetadata } from '@/lib/productImageImports';
 import { optimizeProductImage } from '@/lib/optimizeProductImage';
-import { RENDERING_DISCLAIMER, CERTIFICATE_DISCLAIMER } from '@/lib/brand';
+import { Ruler, Package, Plug, CircleDot, Truck, HelpCircle, Plus, Download, Wand2, Columns2, MessageSquare, ArrowRight, ArrowUp, Clock, FileCheck as FileCheckIcon } from 'lucide-astro';
 import { getProductData } from '@/lib/productData';
 import { getImage } from 'astro:assets';
 import homeSetImage from '@/assets/products/brand/home-set.webp';
@@ -287,8 +287,6 @@ const orderingRows = (productData?.orderingRows ?? []).map((row) => {
         shopifyImages={!hasLocalImages ? product.images : undefined}
         placeholderSvg={placeholderSvg}
         title={product.title}
-        disclaimer={hasLocalImages ? RENDERING_DISCLAIMER : undefined}
-        extraDisclaimer={handle === 'certificate-ilac' && hasLocalImages ? CERTIFICATE_DISCLAIMER : undefined}
       />
     </div>
 
@@ -296,8 +294,8 @@ const orderingRows = (productData?.orderingRows ?? []).map((row) => {
     <div class="flex min-w-0 flex-1 basis-[420px] flex-col gap-5" data-buy-box>
       {/* Badges */}
       <div class="flex flex-wrap gap-2">
-        <span class="badge bg-brand/10 text-brand-dark">{eyebrow}</span>
-        <span class="badge bg-ink text-white">Report included</span>
+        <span class="badge bg-brand/10 text-brand-dark inline-flex items-center gap-1.5"><Clock size={14} stroke-width={1.6} aria-hidden="true" />{eyebrow}</span>
+        <span class="badge bg-ink text-white inline-flex items-center gap-1.5"><FileCheckIcon size={14} stroke-width={1.6} aria-hidden="true" />Report included</span>
       </div>
 
       {/* h1 */}
@@ -383,8 +381,8 @@ const orderingRows = (productData?.orderingRows ?? []).map((row) => {
       {specGroups.length > 0 && (
         <details class="group" id="specs-accordion" open>
           <summary class="flex cursor-pointer list-none items-center justify-between gap-4 py-5 text-[20px] font-semibold [&::-webkit-details-marker]:hidden">
-            Specifications
-            <span class="shrink-0 text-ink-soft transition-transform group-open:rotate-45">+</span>
+            <span class="flex items-center gap-3"><Ruler size={22} stroke-width={1.6} class="text-ink-soft" aria-hidden="true" />Specifications</span>
+            <Plus size={22} stroke-width={1.6} class="shrink-0 text-ink-soft transition-transform group-open:rotate-45" aria-hidden="true" />
           </summary>
           <div class="flex flex-col gap-6 pb-6">
             {specGroups.map((group) => (
@@ -414,8 +412,8 @@ const orderingRows = (productData?.orderingRows ?? []).map((row) => {
       {/* 2. What's in the box & files */}
       <details class="group">
         <summary class="flex cursor-pointer list-none items-center justify-between gap-4 py-5 text-[20px] font-semibold [&::-webkit-details-marker]:hidden">
-          What&rsquo;s in the box &amp; files
-          <span class="shrink-0 text-ink-soft transition-transform group-open:rotate-45">+</span>
+          <span class="flex items-center gap-3"><Package size={22} stroke-width={1.6} class="text-ink-soft" aria-hidden="true" />What&rsquo;s in the box &amp; files</span>
+          <Plus size={22} stroke-width={1.6} class="shrink-0 text-ink-soft transition-transform group-open:rotate-45" aria-hidden="true" />
         </summary>
         <div class="grid grid-cols-1 gap-4 pb-6 sm:grid-cols-2">
           <div class="flex flex-col gap-2 text-[15px]">
@@ -441,8 +439,8 @@ const orderingRows = (productData?.orderingRows ?? []).map((row) => {
       {/* 3. Compatibility */}
       <details class="group">
         <summary class="flex cursor-pointer list-none items-center justify-between gap-4 py-5 text-[20px] font-semibold [&::-webkit-details-marker]:hidden">
-          Compatibility
-          <span class="shrink-0 text-ink-soft transition-transform group-open:rotate-45">+</span>
+          <span class="flex items-center gap-3"><Plug size={22} stroke-width={1.6} class="text-ink-soft" aria-hidden="true" />Compatibility</span>
+          <Plus size={22} stroke-width={1.6} class="shrink-0 text-ink-soft transition-transform group-open:rotate-45" aria-hidden="true" />
         </summary>
         <table class="mb-6 w-full border-collapse text-[14px]">
           <tbody>
@@ -465,8 +463,8 @@ const orderingRows = (productData?.orderingRows ?? []).map((row) => {
       {/* 4. Inspection report & certificate */}
       <details class="group">
         <summary class="flex cursor-pointer list-none items-center justify-between gap-4 py-5 text-[20px] font-semibold [&::-webkit-details-marker]:hidden">
-          Inspection report &amp; certificate
-          <span class="shrink-0 text-ink-soft transition-transform group-open:rotate-45">+</span>
+          <span class="flex items-center gap-3"><CircleDot size={22} stroke-width={1.6} class="text-ink-soft" aria-hidden="true" />Inspection report &amp; certificate</span>
+          <Plus size={22} stroke-width={1.6} class="shrink-0 text-ink-soft transition-transform group-open:rotate-45" aria-hidden="true" />
         </summary>
         <div class="flex flex-col gap-4 pb-6 text-[15px] leading-relaxed text-ink-muted">
           <p class="m-0">
@@ -481,8 +479,8 @@ const orderingRows = (productData?.orderingRows ?? []).map((row) => {
       {/* 5. Shipping, returns & warranty */}
       <details class="group">
         <summary class="flex cursor-pointer list-none items-center justify-between gap-4 py-5 text-[20px] font-semibold [&::-webkit-details-marker]:hidden">
-          Shipping, returns &amp; warranty
-          <span class="shrink-0 text-ink-soft transition-transform group-open:rotate-45">+</span>
+          <span class="flex items-center gap-3"><Truck size={22} stroke-width={1.6} class="text-ink-soft" aria-hidden="true" />Shipping, returns &amp; warranty</span>
+          <Plus size={22} stroke-width={1.6} class="shrink-0 text-ink-soft transition-transform group-open:rotate-45" aria-hidden="true" />
         </summary>
         <table class="mb-6 w-full border-collapse text-[14px]">
           <tbody>
@@ -505,8 +503,8 @@ const orderingRows = (productData?.orderingRows ?? []).map((row) => {
       {faqItems.length > 0 && (
         <details class="group">
           <summary class="flex cursor-pointer list-none items-center justify-between gap-4 py-5 text-[20px] font-semibold [&::-webkit-details-marker]:hidden">
-            Frequently asked questions
-            <span class="shrink-0 text-ink-soft transition-transform group-open:rotate-45">+</span>
+            <span class="flex items-center gap-3"><HelpCircle size={22} stroke-width={1.6} class="text-ink-soft" aria-hidden="true" />Frequently asked questions</span>
+            <Plus size={22} stroke-width={1.6} class="shrink-0 text-ink-soft transition-transform group-open:rotate-45" aria-hidden="true" />
           </summary>
           <div class="flex flex-col divide-y divide-line pb-6">
             {faqItems.map((item) => (
@@ -526,32 +524,32 @@ const orderingRows = (productData?.orderingRows ?? []).map((row) => {
       {/* Downloads */}
       {downloadFiles.length > 0 && (
         <div class="card flex flex-col gap-3 bg-ground-alt p-5">
-          <strong class="text-[15px]">Downloads</strong>
+          <strong class="flex items-center gap-2 text-[15px]"><Download size={20} stroke-width={1.6} class="text-brand" aria-hidden="true" />Downloads</strong>
           <DownloadPicker client:load files={downloadFiles} />
         </div>
       )}
 
       {/* Size wizard */}
       <div class="card flex flex-col gap-2 bg-ground-alt p-5">
-        <strong class="text-[15px]">Not sure about the size?</strong>
+        <strong class="flex items-center gap-2 text-[15px]"><Wand2 size={20} stroke-width={1.6} class="text-brand" aria-hidden="true" />Not sure about the size?</strong>
         <span class="text-sm text-ink-muted">Run the free selection wizard with your camera and lens.</span>
-        <a href="/tools/wizard/" class="text-sm font-semibold">Open wizard &rarr;</a>
+        <a href="/tools/wizard/" class="text-sm font-semibold">Open wizard <ArrowRight size={14} stroke-width={1.6} class="inline" aria-hidden="true" /></a>
       </div>
 
       {/* Compare material */}
       {compareProduct && (
         <div class="card flex flex-col gap-2 bg-ground-alt p-5">
-          <strong class="text-[15px]">Compare with {compareProduct.title}</strong>
+          <strong class="flex items-center gap-2 text-[15px]"><Columns2 size={20} stroke-width={1.6} class="text-brand" aria-hidden="true" />Compare with {compareProduct.title}</strong>
           <span class="text-sm text-ink-muted">{handle?.includes('composite') ? 'Higher accuracy, smaller sizes.' : 'Larger sizes from \u20AC79, more affordable.'}</span>
-          <a href={compareProduct.url} class="text-sm font-semibold">View {compareProduct.title} &rarr;</a>
+          <a href={compareProduct.url} class="text-sm font-semibold">View {compareProduct.title} <ArrowRight size={14} stroke-width={1.6} class="inline" aria-hidden="true" /></a>
         </div>
       )}
 
       {/* Request a quote */}
       <div class="card flex flex-col gap-2 bg-ground-alt p-5">
-        <strong class="text-[15px]">Need a quote?</strong>
+        <strong class="flex items-center gap-2 text-[15px]"><MessageSquare size={20} stroke-width={1.6} class="text-brand" aria-hidden="true" />Need a quote?</strong>
         <span class="text-sm text-ink-muted">Reply within one business day.</span>
-        <a href="/quote/" class="text-sm font-semibold">Request a quote &rarr;</a>
+        <a href="/quote/" class="text-sm font-semibold">Request a quote <ArrowRight size={14} stroke-width={1.6} class="inline" aria-hidden="true" /></a>
       </div>
     </div>
   </section>
@@ -571,7 +569,7 @@ const orderingRows = (productData?.orderingRows ?? []).map((row) => {
   {/* Back to family */}
   {collectionHandle && (
     <section class="container-x pb-16">
-      <a href={`/targets/collection/${collectionHandle}/`} class="text-sm font-semibold no-underline">&uarr; All {collectionTitle.toLowerCase()}</a>
+      <a href={`/targets/collection/${collectionHandle}/`} class="text-sm font-semibold no-underline"><ArrowUp size={14} stroke-width={1.6} class="inline" aria-hidden="true" /> All {collectionTitle.toLowerCase()}</a>
     </section>
   )}
 

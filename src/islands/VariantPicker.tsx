@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
+import { Check, Minus, Plus, ArrowRight } from '@/lib/icons';
 import {
   findVariant, buildCartLines, cartCreate, cartLinesAdd,
   getStoredCartId, setStoredCartId, dispatchCartUpdated,
@@ -354,7 +355,7 @@ export default function VariantPicker({ product, certVariantId, fixtureVariantId
             className="flex h-[44px] w-[44px] items-center justify-center text-lg font-semibold text-ink-muted hover:text-ink disabled:opacity-40"
             disabled={quantity <= 1}
             onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-          >−</button>
+          ><Minus size={16} strokeWidth={1.6} aria-hidden="true" /></button>
           <input
             type="number"
             min={1}
@@ -368,7 +369,7 @@ export default function VariantPicker({ product, certVariantId, fixtureVariantId
             aria-label="Increase quantity"
             className="flex h-[44px] w-[44px] items-center justify-center text-lg font-semibold text-ink-muted hover:text-ink"
             onClick={() => setQuantity((q) => q + 1)}
-          >+</button>
+          ><Plus size={16} strokeWidth={1.6} aria-hidden="true" /></button>
         </div>
         <button
           type="button"
@@ -396,13 +397,13 @@ export default function VariantPicker({ product, certVariantId, fixtureVariantId
       {confirmation && <p className="m-0 text-sm font-medium text-green-700">{confirmation}</p>}
       {error && <p className="m-0 text-sm text-brand">{error}</p>}
 
-      <a href="/quote/" className="text-sm text-ink-soft no-underline hover:text-ink">Need a quote or invoice/PO? →</a>
+      <a href="/quote/" className="text-sm text-ink-soft no-underline hover:text-ink">Need a quote or invoice/PO? <ArrowRight size={14} strokeWidth={1.6} aria-hidden="true" className="inline" /></a>
 
       <div className="grid grid-cols-2 gap-3 pt-2 text-sm text-ink-muted">
-        <span>✓ Ships in 1–2 days, 2–4 days in EU</span>
-        <span>✓ Inspection report included</span>
-        <span>✓ 30-day returns</span>
-        <span>✓ Volume pricing from 5 pcs</span>
+        <span className="flex items-center gap-1.5"><Check size={18} strokeWidth={1.6} className="shrink-0 text-brand" aria-hidden="true" /> Ships in 1–2 days, 2–4 days in EU</span>
+        <span className="flex items-center gap-1.5"><Check size={18} strokeWidth={1.6} className="shrink-0 text-brand" aria-hidden="true" /> Inspection report included</span>
+        <span className="flex items-center gap-1.5"><Check size={18} strokeWidth={1.6} className="shrink-0 text-brand" aria-hidden="true" /> 30-day returns</span>
+        <span className="flex items-center gap-1.5"><Check size={18} strokeWidth={1.6} className="shrink-0 text-brand" aria-hidden="true" /> Volume pricing from 5 pcs</span>
       </div>
     </div>
   );

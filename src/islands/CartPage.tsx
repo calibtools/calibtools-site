@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
+import { ShoppingCart, Minus, Plus, Image as ImageIcon, ArrowRight } from '@/lib/icons';
 import {
   cartQuery, cartLinesUpdate, cartLinesRemove, formatPrice,
   getStoredCartId,
@@ -69,13 +70,10 @@ export default function CartPage() {
   if (isEmpty) {
     return (
       <div className="flex flex-col items-center gap-4 py-16 text-center">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-ink-soft" aria-hidden="true">
-          <circle cx="9" cy="21" r="1" /><circle cx="20" cy="21" r="1" />
-          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
-        </svg>
+        <ShoppingCart size={48} strokeWidth={1.5} className="text-ink-soft" aria-hidden="true" />
         <h1 className="text-2xl font-bold">Your cart is empty</h1>
         <a href="/targets/" className="text-sm font-semibold text-brand hover:text-brand-dark">
-          Browse targets →
+          Browse targets <ArrowRight size={16} strokeWidth={1.6} aria-hidden="true" className="inline" />
         </a>
       </div>
     );
@@ -155,11 +153,7 @@ function CartLineRow({
           />
         ) : (
           <div className="flex h-20 w-20 items-center justify-center rounded border border-line bg-ground-panel text-ink-soft">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
-              <rect x="3" y="3" width="18" height="18" rx="2" />
-              <circle cx="8.5" cy="8.5" r="1.5" />
-              <path d="m21 15-5-5L5 21" />
-            </svg>
+            <ImageIcon size={24} strokeWidth={1.5} aria-hidden="true" />
           </div>
         )}
         <div className="flex flex-col gap-0.5">
@@ -191,7 +185,7 @@ function CartLineRow({
             disabled={busy}
             onClick={() => onUpdateQty(line.quantity - 1)}
             className="flex h-[44px] w-[44px] items-center justify-center text-lg font-semibold text-ink-muted hover:text-ink disabled:opacity-40"
-          >−</button>
+          ><Minus size={16} strokeWidth={1.6} aria-hidden="true" /></button>
           <span className="w-8 text-center text-sm" data-testid="line-quantity">{line.quantity}</span>
           <button
             type="button"
@@ -199,7 +193,7 @@ function CartLineRow({
             disabled={busy}
             onClick={() => onUpdateQty(line.quantity + 1)}
             className="flex h-[44px] w-[44px] items-center justify-center text-lg font-semibold text-ink-muted hover:text-ink disabled:opacity-40"
-          >+</button>
+          ><Plus size={16} strokeWidth={1.6} aria-hidden="true" /></button>
         </div>
       </div>
 

@@ -1,4 +1,5 @@
 ---
+import { Github } from 'lucide-astro';
 const shop = [
   { href: '/targets/', label: 'Calibration targets' },
   { href: '/tools/', label: 'Free tools' },
@@ -20,7 +21,12 @@ const company = [
     </div>
     <div class="flex min-w-0 flex-1 basis-[240px] flex-col gap-3">
       <span class="text-[15px] font-bold">Company</span>
-      {company.map((l) => <a href={l.href} class="text-sm text-ink-soft no-underline hover:text-ink">{l.label}</a>)}
+      {company.map((l) => (
+        <a href={l.href} class="inline-flex items-center gap-1.5 text-sm text-ink-soft no-underline hover:text-ink">
+          {l.label === 'GitHub' && <Github size={16} stroke-width={1.6} aria-hidden="true" />}
+          {l.label}
+        </a>
+      ))}
       <a href="mailto:hello@calib.tools" class="text-sm text-ink-soft no-underline hover:text-ink">hello@calib.tools</a>
     </div>
   </div>

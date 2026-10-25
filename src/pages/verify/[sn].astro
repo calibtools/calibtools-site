@@ -1,5 +1,6 @@
 ---
 import Base from '@/layouts/Base.astro';
+import { ArrowLeft } from 'lucide-astro';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
@@ -77,7 +78,7 @@ const { record, found } = Astro.props;
           </table>
         </div>
         <div class="text-center">
-          <a href="/verify/" class="text-sm text-ink-muted no-underline hover:text-brand">&larr; Look up another serial</a>
+          <a href="/verify/" class="inline-flex items-center gap-1 text-sm text-ink-muted no-underline hover:text-brand"><ArrowLeft size={16} stroke-width={1.6} aria-hidden="true" /> Look up another serial</a>
         </div>
       </div>
     ) : (

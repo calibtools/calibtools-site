@@ -13,6 +13,7 @@ import { checkerboardSvg, type PatternSpec } from '@/lib/patterns';
 import { findDatasheetUrl } from '@/lib/datasheetManifest';
 import { getProductImages } from '@/lib/product-images';
 import { getImageMetadata } from '@/lib/productImageImports';
+import { ArrowDown, ArrowRight } from 'lucide-astro';
 
 export async function getStaticPaths() {
   const collections = await getCollections();
@@ -197,8 +198,8 @@ const breadcrumbLd = {
 
         {/* Action buttons */}
         <div class="flex flex-wrap gap-3">
-          <a href="#product-groups" class="btn-primary text-sm no-underline">Go to products &darr;</a>
-          <a href="/tools/wizard/" class="btn-outline text-sm no-underline">Not sure? Open the wizard &rarr;</a>
+          <a href="#product-groups" class="btn-primary inline-flex items-center gap-1 text-sm no-underline">Go to products <ArrowDown size={16} stroke-width={1.6} aria-hidden="true" /></a>
+          <a href="/tools/wizard/" class="btn-outline inline-flex items-center gap-1 text-sm no-underline">Not sure? Open the wizard <ArrowRight size={16} stroke-width={1.6} aria-hidden="true" /></a>
         </div>
       </div>
 

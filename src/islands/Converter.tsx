@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { ArrowLeftRight } from '@/lib/icons';
 import { parse, serialize, detectFormat, FORMAT_LABELS, type Format, type CalibConfig } from '@/lib/convert';
 
 const FORMATS: Format[] = ['opencv-json', 'kalibr-yaml', 'ros2-yaml', 'halcon-descr'];
@@ -71,7 +72,7 @@ export default function Converter() {
       {/* Input panel */}
       <div className="flex min-w-0 flex-1 basis-[400px] flex-col gap-4">
         <div className="card p-7">
-          <h1 className="m-0 mb-1 text-[26px] font-extrabold tracking-[-0.02em]">Format converter</h1>
+          <h1 className="m-0 mb-1 flex items-center gap-3 text-[26px] font-extrabold tracking-[-0.02em]"><ArrowLeftRight size={24} strokeWidth={1.6} className="text-brand" aria-hidden="true" />Format converter</h1>
           <p className="m-0 mb-5 text-sm text-ink-muted">Paste a calibration config in any supported format and convert to another.</p>
 
           <div className="mb-3 flex items-center justify-between">

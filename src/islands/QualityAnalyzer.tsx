@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { BarChart3 } from '@/lib/icons';
 import { parseCalibrationData, analyzeQuality, type QualityReport, type CalibrationData } from '@/lib/quality';
 
 const EXAMPLE = JSON.stringify({
@@ -54,7 +55,7 @@ export default function QualityAnalyzer() {
       {/* Input */}
       <div className="flex min-w-0 flex-1 basis-[400px] flex-col gap-4">
         <div className="card p-7">
-          <h1 className="m-0 mb-1 text-[26px] font-extrabold tracking-[-0.02em]">Quality analyzer</h1>
+          <h1 className="m-0 mb-1 flex items-center gap-3 text-[26px] font-extrabold tracking-[-0.02em]"><BarChart3 size={24} strokeWidth={1.6} className="text-brand" aria-hidden="true" />Quality analyzer</h1>
           <p className="m-0 mb-5 text-sm text-ink-muted">Paste your calibration results (OpenCV JSON) to get a quality report with actionable findings.</p>
 
           <div className="mb-3 flex items-center justify-between">

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Plus, ArrowRight, User } from '@/lib/icons';
 
 interface Props {
   collectionHandle: string;
@@ -65,10 +66,7 @@ export default function CollectionTabs({ collectionHandle, specsTable, founderQu
       {/* Founder contact card */}
       <div className="card flex flex-col sm:flex-row gap-4 p-5 bg-ground-alt">
         <div className="w-16 h-16 rounded-full bg-ground-panel flex items-center justify-center shrink-0 border border-line">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-ink-soft" aria-hidden="true">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-            <circle cx="12" cy="7" r="4" />
-          </svg>
+          <User size={28} strokeWidth={1.5} className="text-ink-soft" aria-hidden="true" />
         </div>
         <div className="flex flex-col gap-1.5">
           <strong className="text-[15px]">Jun Gao</strong>
@@ -77,7 +75,7 @@ export default function CollectionTabs({ collectionHandle, specsTable, founderQu
             <p className="m-0 text-sm text-ink-muted italic leading-relaxed">&ldquo;{founderQuote}&rdquo;</p>
           )}
           <a href="/quote/" className="mt-2 inline-flex items-center gap-1.5 text-sm font-semibold text-brand hover:text-brand-dark">
-            Get a quote &rarr;
+            Get a quote <ArrowRight size={14} strokeWidth={1.6} aria-hidden="true" className="inline" />
           </a>
         </div>
       </div>
@@ -95,7 +93,7 @@ export default function CollectionTabs({ collectionHandle, specsTable, founderQu
             <details key={tab} className="group" data-tab={tab}>
               <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-4 text-[15px] font-semibold [&::-webkit-details-marker]:hidden">
                 {tab}
-                <span className="shrink-0 text-ink-soft transition-transform group-open:rotate-45">+</span>
+                <Plus size={18} strokeWidth={1.6} className="shrink-0 text-ink-soft transition-transform group-open:rotate-45" aria-hidden="true" />
               </summary>
               <div className="pb-4">
                 {content && (
