@@ -14,6 +14,12 @@
 - Ink colour: #E60012 (Calib Red)
 - Field: SN is outlined underscores
 
+## PDF versions — `stamp-inspected.pdf`, `product-mark-inspected.pdf`
+
+- Vector PDFs generated from the outlined SVGs via Playwright
+- Exact mm page sizes (32 × 32 mm stamp, 25 × 10 mm mark)
+- No embedded fonts — all text is outlined paths
+
 ## Regeneration
 
-Run `node scripts/outline-svgs.mjs` to regenerate from the source fonts in `src/assets/fonts/`.
+Run `node scripts/outline-svgs.mjs` to regenerate SVGs and PDFs from the source fonts in `src/assets/fonts/`.

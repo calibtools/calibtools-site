@@ -5,7 +5,7 @@
  * Reads the source SVGs from stamp.ts, replaces text with glyph outlines,
  * and writes to public/brand/.
  *
- * Also exports PDF versions using pdf-lib.
+ * Also exports PDF versions using Playwright.
  */
 
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -40,20 +40,23 @@ function outlineStampSvg() {
   paths.push(`<circle cx="0" cy="0" r="${r}" fill="none" stroke="${BRAND_RED}" stroke-width="${ringOuterW}"/>`);
   paths.push(`<circle cx="0" cy="0" r="${rInner}" fill="none" stroke="${BRAND_RED}" stroke-width="${ringInnerW}"/>`);
 
-  // Top arc text: "CALIB.TOOLS · MUNICH"
-  paths.push(arcTextToPath('CALIB.TOOLS \u00B7 MUNICH', geistMedium, 3.2, rInner - 0.5, 190, 350, false));
+  // Arc radius = middle of ring band
+  const arcR = (r + rInner) / 2;
 
-  // Bottom arc text: "DIMENSIONAL INSPECTION"
-  paths.push(arcTextToPath('DIMENSIONAL INSPECTION', geistMedium, 2.8, rInner - 0.5, 210, 330, true));
+  // Top arc text: "CALIB.TOOLS · MUNICH" — centred at top (−90° in SVG y-down)
+  paths.push(arcTextToPath('CALIB.TOOLS \u00B7 MUNICH', geistMedium, 3.2, arcR, -90, false));
 
-  // Centre "INSPECTED" — Geist Pixel
-  paths.push(textToPath('INSPECTED', geistPixel, 4, 0, 1, 'middle'));
+  // Bottom arc text: "DIMENSIONAL INSPECTION" — centred at bottom (+90° in SVG y-down)
+  paths.push(arcTextToPath('DIMENSIONAL INSPECTION', geistMedium, 2.8, arcR, 90, true));
 
-  // SN placeholder
-  paths.push(textToPath('SN ______', geistMono, 2.2, 0, 4.5, 'middle'));
+  // Centre "INSPECTED" — Geist Pixel, y = −3 mm (above centre in SVG y-down)
+  paths.push(textToPath('INSPECTED', geistPixel, 4, 0, -3, 'middle'));
 
-  // Date placeholder
-  paths.push(textToPath('DATE ______ ___', geistMono, 1.8, 0, 7, 'middle'));
+  // SN placeholder — y = +1 mm
+  paths.push(textToPath('SN ______', geistMono, 2.2, 0, 1, 'middle'));
+
+  // Date placeholder — y = +3.5 mm
+  paths.push(textToPath('DATE ______ ___', geistMono, 1.8, 0, 3.5, 'middle'));
 
   const viewBox = `${-r - 1} ${-r - 1} ${D + 2} ${D + 2}`;
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}" width="${D}mm" height="${D}mm">
@@ -66,87 +69,121 @@ ${paths.join('\n')}
 // ---------------------------------------------------------------------------
 
 function outlineProductMarkSvg() {
+  const W = 25, H = 10;
+  const padding = 1; // mm min padding on each side
   const paths = [];
 
   // Border
-  paths.push(`<rect x="0" y="0" width="25" height="10" fill="none" stroke="${BRAND_RED}" stroke-width="0.3"/>`);
+  paths.push(`<rect x="0" y="0" width="${W}" height="${H}" fill="none" stroke="${BRAND_RED}" stroke-width="0.3"/>`);
 
-  // "CALIB.TOOLS · INSPECTED"
-  paths.push(textToPath('CALIB.TOOLS \u00B7 INSPECTED', geistMedium, 2.2, 12.5, 4.5, 'middle'));
+  // "CALIB.TOOLS · INSPECTED" — shrink to fit with padding
+  const line1 = 'CALIB.TOOLS \u00B7 INSPECTED';
+  const line1Size = fitFontSize(line1, geistMedium, 2.2, W - padding * 2);
+  paths.push(textToPath(line1, geistMedium, line1Size, W / 2, 4.5, 'middle'));
 
   // "100% dimensional check · SN ______"
-  paths.push(textToPath('100% dimensional check \u00B7 SN ______', geistMono, 1.6, 12.5, 7.5, 'middle'));
+  const line2 = '100% dimensional check \u00B7 SN ______';
+  const line2Size = fitFontSize(line2, geistMono, 1.6, W - padding * 2);
+  paths.push(textToPath(line2, geistMono, line2Size, W / 2, 7.5, 'middle'));
 
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 10" width="25mm" height="10mm">
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}mm" height="${H}mm">
 ${paths.join('\n')}
 </svg>`;
 }
 
-// ---------------------------------------------------------------------------
-// Text to SVG path helpers
-// ---------------------------------------------------------------------------
-
-function textToPath(text, font, fontSize, x, y, anchor) {
-  const unitsPerEm = font.unitsPerEm;
-  const scale = fontSize / unitsPerEm;
-
-  // Get glyph outlines
+/** Shrink fontSize until text fits within maxWidth mm. */
+function fitFontSize(text, font, idealSize, maxWidth) {
+  const scale = idealSize / font.unitsPerEm;
   const glyphs = font.stringToGlyphs(text);
   let totalAdvance = 0;
-  for (const g of glyphs) {
-    totalAdvance += (g.advanceWidth ?? 0);
-  }
+  for (const g of glyphs) totalAdvance += (g.advanceWidth ?? 0);
+  const textWidth = totalAdvance * scale;
+  if (textWidth <= maxWidth) return idealSize;
+  return idealSize * (maxWidth / textWidth);
+}
+
+// ---------------------------------------------------------------------------
+// Text to SVG path helpers — uses getPath().toPathData() for correct y-flip
+// ---------------------------------------------------------------------------
+
+/**
+ * Render straight-line text to an SVG <path>.
+ * opentype's getPath(x, y, fontSize) returns path data in SVG coordinates
+ * (y points down, y param is the baseline).
+ */
+function textToPath(text, font, fontSize, x, y, anchor) {
+  const scale = fontSize / font.unitsPerEm;
+  const glyphs = font.stringToGlyphs(text);
+  let totalAdvance = 0;
+  for (const g of glyphs) totalAdvance += (g.advanceWidth ?? 0);
   const totalWidth = totalAdvance * scale;
 
   let startX = x;
   if (anchor === 'middle') startX = x - totalWidth / 2;
   else if (anchor === 'end') startX = x - totalWidth;
 
-  let pathD = '';
-  let curX = startX;
-
-  for (const glyph of glyphs) {
-    const path = glyph.getPath(curX, y, fontSize);
-    const d = path.toSVG();
-    // Extract just the d attribute
-    const dMatch = d.match(/d="([^"]+)"/);
-    if (dMatch) pathD += dMatch[1] + ' ';
-    curX += (glyph.advanceWidth ?? 0) * scale;
-  }
-
-  return `<path d="${pathD.trim()}" fill="${BRAND_RED}"/>`;
+  // Use font.getPath which handles y-flip correctly for SVG
+  const path = font.getPath(text, startX, y, fontSize);
+  const d = path.toPathData(3);
+  if (!d) return '';
+  return `<path d="${d}" fill="${BRAND_RED}"/>`;
 }
 
-function arcTextToPath(text, font, fontSize, radius, startAngleDeg, endAngleDeg, flip) {
-  const unitsPerEm = font.unitsPerEm;
-  const scale = fontSize / unitsPerEm;
+/**
+ * Render text along a circular arc in SVG coordinates (y-down).
+ *
+ * @param centreAngleDeg  Centre of arc in SVG degrees.
+ *   -90 = top (12 o'clock), +90 = bottom (6 o'clock).
+ * @param flip  If true, letters stand upright at the bottom of the circle.
+ */
+function arcTextToPath(text, font, fontSize, radius, centreAngleDeg, flip) {
+  const letterSpacing = 0.08; // em
   const chars = text.split('');
-  const totalAngle = endAngleDeg - startAngleDeg;
-  const step = totalAngle / (chars.length + 1);
+  const scale = fontSize / font.unitsPerEm;
+
+  // Measure char widths in SVG units (mm)
+  const charWidths = chars.map(ch => {
+    const g = font.charToGlyph(ch);
+    return (g.advanceWidth ?? 0) * scale;
+  });
+  const spaceAdv = fontSize * letterSpacing;
+  const totalWidth = charWidths.reduce((s, w) => s + w, 0) + spaceAdv * (chars.length - 1);
+
+  // Convert linear width to angular span
+  const totalAngleRad = totalWidth / radius;
+  const centreRad = (centreAngleDeg * Math.PI) / 180;
+
+  // Sweep direction: top arc (flip=false) → increasing angle = L→R
+  // Bottom arc (flip=true) → decreasing angle = L→R in SVG y-down
+  const dir = flip ? -1 : 1;
+  let curAngle = centreRad - dir * totalAngleRad / 2;
 
   let allPaths = '';
 
   for (let i = 0; i < chars.length; i++) {
-    const angle = startAngleDeg + step * (i + 1);
-    const rad = (angle * Math.PI) / 180;
-    const cx = radius * Math.cos(rad);
-    const cy = radius * Math.sin(rad);
+    const halfCharAngle = (charWidths[i] / 2) / radius;
+    const midAngle = curAngle + dir * halfCharAngle;
 
+    // Position on circle (SVG y-down: sin gives correct downward y)
+    const cx = radius * Math.cos(midAngle);
+    const cy = radius * Math.sin(midAngle);
+
+    // Glyph rotation:
+    // Top arc (flip=false): θ + 90° (baseline tangent, text reads L→R)
+    // Bottom arc (flip=true): θ − 90° (letters stand on feet, text reads L→R)
+    const rotDeg = flip
+      ? (midAngle * 180 / Math.PI) - 90
+      : (midAngle * 180 / Math.PI) + 90;
+
+    // Get glyph path at origin with correct y-flip via getPath
     const glyph = font.charToGlyph(chars[i]);
-    const charW = (glyph.advanceWidth ?? 0) * scale;
-    const charRotation = flip ? angle + 90 : angle - 90;
+    const glyphPath = glyph.getPath(-charWidths[i] / 2, 0, fontSize);
+    const d = glyphPath.toPathData(3);
+    if (!d) { curAngle += dir * (charWidths[i] + spaceAdv) / radius; continue; }
 
-    // Get path at origin then transform
-    const path = glyph.getPath(0, 0, fontSize);
-    const d = path.toSVG();
-    const dMatch = d.match(/d="([^"]+)"/);
-    if (!dMatch) continue;
+    allPaths += `<path d="${d}" fill="${BRAND_RED}" transform="translate(${cx.toFixed(3)},${cy.toFixed(3)}) rotate(${rotDeg.toFixed(2)})"/>`;
 
-    // Apply rotation and translation via SVG transform
-    const tx = cx - (charW / 2) * Math.cos((charRotation * Math.PI) / 180);
-    const ty = cy - (charW / 2) * Math.sin((charRotation * Math.PI) / 180);
-
-    allPaths += `<path d="${dMatch[1]}" fill="${BRAND_RED}" transform="translate(${tx.toFixed(3)},${ty.toFixed(3)}) rotate(${charRotation.toFixed(2)})"/>`;
+    curAngle += dir * (charWidths[i] + spaceAdv) / radius;
   }
 
   return allPaths;
@@ -175,3 +212,26 @@ if (markOutlined.includes('<text')) {
 }
 
 console.log('[outline-svgs] All SVGs verified: no <text> elements.');
+
+// ---------------------------------------------------------------------------
+// PDF export via Playwright — vector, exact mm page size, no fonts
+// ---------------------------------------------------------------------------
+
+async function svgToPdf(svgContent, pdfPath, widthMm, heightMm) {
+  const { chromium } = await import('@playwright/test');
+  const browser = await chromium.launch();
+  const page = await browser.newPage();
+  await page.setContent(`<!DOCTYPE html><html><body style="margin:0;padding:0;overflow:hidden">${svgContent.replace(/width="[^"]*"/, `width="${widthMm}mm"`).replace(/height="[^"]*"/, `height="${heightMm}mm"`)}</body></html>`);
+  await page.pdf({
+    path: pdfPath,
+    width: `${widthMm}mm`,
+    height: `${heightMm}mm`,
+    margin: { top: '0', right: '0', bottom: '0', left: '0' },
+    printBackground: true,
+  });
+  await browser.close();
+  console.log(`[outline-svgs] ${pdfPath} written (vector PDF)`);
+}
+
+await svgToPdf(stampOutlined, resolve(BRAND_DIR, 'stamp-inspected.pdf'), 32, 32);
+await svgToPdf(markOutlined, resolve(BRAND_DIR, 'product-mark-inspected.pdf'), 25, 10);
