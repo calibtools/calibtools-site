@@ -60,16 +60,16 @@
     "bytes": 29919
   },
   {
-    "code": "CT-IR-template",
-    "title": "Inspection report — Template",
+    "code": "CT-IR-{{sn}}",
+    "title": "Inspection report CT-IR-{{sn}}",
     "type": "note",
     "rev": "A",
-    "date": "2026-10-24",
-    "status": "draft",
+    "date": "{{inspected_on}}",
+    "status": "released",
     "family": null,
     "material": null,
-    "sha256": "665cd08585b158fb4f9ecea4b6ae00ef4e6e763016a73a075acf42145c1cd85d",
-    "bytes": 30741
+    "sha256": "19389a624b18e5647c6b83303b6548f3617d70944a27f5e1ce2982327e6f2460",
+    "bytes": 23620
   },
   {
     "code": "CT-SV-CERT-ILAC",
