@@ -85,59 +85,65 @@ export function drawStampOnPage(
   // Inner ring
   drawCircleRing(page, 0, 0, R_INNER * MM, RING_INNER_W * MM, red, opacity);
 
-  // Top arc text: "CALIB.TOOLS · MUNICH" — Geist Medium, letter-spacing ≤ 0.12em
+  // Top arc text: "CALIB.TOOLS · MUNICH" — centred at 90° (12 o'clock in y-up)
+  const arcR = ((R_OUTER + R_INNER) / 2) * MM; // middle of ring band ≈ 15.1 mm
   drawArcText(page, 'CALIB.TOOLS \u00B7 MUNICH', fonts.medium, RING_FONT_SIZE,
-    0, 0, (R_OUTER - 1.2) * MM, 190, 350, red, opacity);
+    0, 0, arcR, 90, red, opacity);
 
-  // Bottom arc text: "DIMENSIONAL INSPECTION"
+  // Bottom arc text: "DIMENSIONAL INSPECTION" — centred at 270° (6 o'clock), flipped
   drawArcText(page, 'DIMENSIONAL INSPECTION', fonts.medium, RING_FONT_SIZE,
-    0, 0, (R_OUTER - 1.2) * MM, 210, 330, red, opacity, true);
+    0, 0, arcR, 270, red, opacity, true);
 
-  // Centre text: "INSPECTED" — Geist Pixel, cap height ≥ 4mm
+  // Centre text: "INSPECTED" — Geist Pixel, y = +3 mm above centre
   const inspW = fonts.pixel.widthOfTextAtSize('INSPECTED', CENTRE_FONT_SIZE);
   page.drawText('INSPECTED', {
     x: -inspW / 2,
-    y: 2.5 * MM,
+    y: 3 * MM,
     size: CENTRE_FONT_SIZE,
     font: fonts.pixel,
     color: red,
     opacity,
   });
 
-  // SN line — Geist Mono, cap height ≥ 1.8mm
+  // SN line — Geist Mono, y = −1 mm
   const snText = `SN ${sn}`;
   const snW = fonts.mono.widthOfTextAtSize(snText, DETAIL_FONT_SIZE);
   page.drawText(snText, {
     x: -snW / 2,
-    y: -1.5 * MM,
+    y: -1 * MM,
     size: DETAIL_FONT_SIZE,
     font: fonts.mono,
     color: red,
     opacity,
   });
 
-  // Date + initials
+  // Date + initials — y = −3.5 mm
   const dateText = `${date} ${inspector}`;
   const dateW = fonts.mono.widthOfTextAtSize(dateText, DATE_FONT_SIZE);
+  const dateY = -3.5 * MM;
   page.drawText(dateText, {
     x: -dateW / 2,
-    y: -4 * MM,
+    y: dateY,
     size: DATE_FONT_SIZE,
     font: fonts.mono,
     color: red,
     opacity,
   });
 
-  // QR code (bottom-centre of stamp) — ≥ 8 × 8 mm with 1-module quiet zone
+  // QR code 8 × 8 mm — top edge ≥ 1 mm below date line, bottom ≥ 1 mm inside inner ring
   const verifyUrl = `https://calib.tools/verify/${sn}`;
   try {
     const qr = generateQR(verifyUrl);
-    const qrSize = 9; // mm total (8mm content + quiet zone)
+    const qrSizeMm = 8;
     const modules = qr.length;
-    const moduleSize = (qrSize / (modules + 2)) * MM; // +2 for 1-module quiet zone each side
+    const moduleSize = (qrSizeMm / (modules + 2)) * MM; // +2 for 1-module quiet zone
     const qrTotalPt = (modules + 2) * moduleSize;
-    const qrX = -qrTotalPt / 2 + moduleSize; // centre horizontally
-    const qrY = -12.5 * MM; // bottom area
+    const qrTopY = dateY - 1 * MM; // 1 mm below date baseline
+    const qrX = -qrTotalPt / 2 + moduleSize;
+    const qrBottomY = qrTopY - qrSizeMm * MM;
+    // Safety: bottom must be ≥ 1 mm inside inner ring (-R_INNER*MM + 1*MM)
+    const minBottom = -(R_INNER - 1) * MM;
+    const qrY = Math.max(qrBottomY, minBottom);
     for (let row = 0; row < modules; row++) {
       for (let col = 0; col < modules; col++) {
         if (qr[row][col]) {
@@ -193,34 +199,62 @@ function drawCircleRing(
 // Arc text (characters placed individually along an arc)
 // ---------------------------------------------------------------------------
 
+/**
+ * Draw text along a circular arc in pdf-lib (y-up coordinate system).
+ *
+ * @param centreAngleDeg  Centre of the text arc in degrees.
+ *   90 = top of circle (12 o'clock in y-up), 270 = bottom.
+ * @param flip  If true, letters stand on their feet (for bottom arc, reading L→R).
+ */
 function drawArcText(
   page: PDFPage, text: string, font: PDFFont, fontSize: number,
-  cx: number, cy: number, radius: number,
-  startAngle: number, endAngle: number,
+  cx: number, cy: number, radiusPt: number,
+  centreAngleDeg: number,
   color: ReturnType<typeof rgb>, opacity: number,
   flip = false,
 ) {
+  const letterSpacing = 0.08; // em — kept ≤ 0.12em
   const chars = text.split('');
-  const totalAngle = endAngle - startAngle;
-  const step = totalAngle / (chars.length + 1);
+
+  // Measure total arc width in points (glyph advances + spacing)
+  const charWidths = chars.map(ch => font.widthOfTextAtSize(ch, fontSize));
+  const spaceAdv = fontSize * letterSpacing;
+  const totalWidth = charWidths.reduce((s, w) => s + w, 0) + spaceAdv * (chars.length - 1);
+
+  // Convert linear width to angular span (radians) on the arc
+  const totalAngleRad = totalWidth / radiusPt;
+  const centreRad = (centreAngleDeg * Math.PI) / 180;
+
+  // Sweep direction in pdf-lib y-up:
+  //   Top (90°): decreasing angle = L→R (135°→45°)
+  //   Bottom (270°): increasing angle = L→R (225°→315°)
+  const dir = flip ? 1 : -1;
+  let curAngle = centreRad - dir * totalAngleRad / 2;
 
   for (let i = 0; i < chars.length; i++) {
-    const angle = startAngle + step * (i + 1);
-    const rad = (angle * Math.PI) / 180;
-    const x = cx + radius * Math.cos(rad);
-    const y = cy + radius * Math.sin(rad);
-    const charRotation = flip ? angle + 90 : angle - 90;
+    const halfCharAngle = (charWidths[i] / 2) / radiusPt;
+    const midAngle = curAngle + dir * halfCharAngle;
 
-    const charW = font.widthOfTextAtSize(chars[i], fontSize);
+    const x = cx + radiusPt * Math.cos(midAngle);
+    const y = cy + radiusPt * Math.sin(midAngle);
+
+    // Top arc: glyph rotation = θ − 90° (baseline tangent, text reads L→R)
+    // Bottom arc (flip): glyph rotation = θ + 90° (letters stand on feet)
+    const rotDeg = flip
+      ? (midAngle * 180 / Math.PI) + 90
+      : (midAngle * 180 / Math.PI) - 90;
+
     page.drawText(chars[i], {
-      x: x - (charW / 2) * Math.cos((charRotation * Math.PI) / 180),
-      y: y - (charW / 2) * Math.sin((charRotation * Math.PI) / 180),
+      x: x - (charWidths[i] / 2) * Math.cos(rotDeg * Math.PI / 180),
+      y: y - (charWidths[i] / 2) * Math.sin(rotDeg * Math.PI / 180),
       size: fontSize,
       font,
       color,
       opacity,
-      rotate: degrees(charRotation),
+      rotate: degrees(rotDeg),
     });
+
+    curAngle += dir * (charWidths[i] + spaceAdv) / radiusPt;
   }
 }
 
