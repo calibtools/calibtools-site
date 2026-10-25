@@ -15,7 +15,9 @@ faq:
 
 ## What it does
 
-The quality analyzer parses your calibration output (camera matrix, distortion coefficients, per-view reprojection errors) and produces a report with an overall grade (excellent, good, fair, poor), per-view error analysis, distortion coefficient review, and actionable findings. It flags issues like insufficient image count, high per-view error outliers, unusual distortion values and poor coverage.
+The quality analyzer parses your calibration output (camera matrix, distortion coefficients, per-view reprojection errors) and produces a report with an overall grade, per-view error analysis, distortion coefficient review, and actionable findings.
+
+It flags issues like insufficient image count, high per-view error outliers, unusual distortion values and poor coverage.
 
 ## How to use it
 

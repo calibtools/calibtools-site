@@ -10,7 +10,9 @@ related: ["charuco-vs-checkerboard-vs-aprilgrid"]
 
 ## Why boards in one rig need distinct ID ranges
 
-When you use multiple calibration boards simultaneously — for example, in a multi-camera rig or a large-volume calibration setup — every ArUco marker or AprilTag across all boards must have a unique ID. If two boards share the same IDs, the detector cannot tell which board a marker belongs to, and your calibration will fail silently or produce incorrect results.
+When you use multiple calibration boards simultaneously — for example, in a multi-camera rig or a large-volume calibration setup — every ArUco marker or AprilTag across all boards must have a unique ID.
+
+If two boards share the same IDs, the detector cannot tell which board a marker belongs to, and your calibration will fail silently or produce incorrect results.
 
 This is especially important for stereo and multi-camera setups where all cameras may see multiple boards at the same time.
 

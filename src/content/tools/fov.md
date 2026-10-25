@@ -15,7 +15,9 @@ faq:
 
 ## What it does
 
-The FOV calculator takes your camera sensor, lens focal length and working distance and computes the horizontal and vertical field of view in degrees, the coverage area in millimetres, and the ground sample distance (mm per pixel). It also recommends a minimum working distance for a given target size and fill factor, so you can size your calibration board before ordering.
+The FOV calculator takes your camera sensor, lens focal length and working distance and computes the horizontal and vertical field of view in degrees, the coverage area in millimetres, and the ground sample distance (mm per pixel).
+
+It also recommends a minimum working distance for a given target size and fill factor, so you can size your calibration board before ordering.
 
 ## How to use it
 
