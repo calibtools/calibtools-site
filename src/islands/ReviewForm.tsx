@@ -5,7 +5,7 @@ interface Props {
   token: string;
 }
 
-export default function ReviewForm({ token }: Props) {
+export default function ReviewForm({ token: tokenProp }: Props) {
   const [stars, setStars] = useState(0);
   const [hoverStars, setHoverStars] = useState(0);
   const [title, setTitle] = useState('');
@@ -20,11 +20,24 @@ export default function ReviewForm({ token }: Props) {
   const [errorMsg, setErrorMsg] = useState('');
   const [handle, setHandle] = useState('');
   const [productTitle, setProductTitle] = useState('');
+  const [token, setToken] = useState(tokenProp);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  // Validate token on mount
+  // Read token from URL path or query on mount (e.g. /review/abc123 or /review/?token=abc123)
   useEffect(() => {
-    if (!token) { setStatus('invalid'); setErrorMsg('No review token provided.'); return; }
+    if (!token) {
+      const path = window.location.pathname.replace(/\/$/, '').split('/');
+      const fromPath = path.length > 2 ? path[path.length - 1] : '';
+      const fromQuery = new URLSearchParams(window.location.search).get('token') ?? '';
+      const resolved = fromPath || fromQuery;
+      if (resolved) { setToken(resolved); return; }
+      setStatus('invalid'); setErrorMsg('No review token provided.'); return;
+    }
+  }, []);
+
+  // Validate token on mount or when token changes
+  useEffect(() => {
+    if (!token) return;
     fetch(`/api/review?token=${encodeURIComponent(token)}`)
       .then((res) => res.json())
       .then((data) => {
