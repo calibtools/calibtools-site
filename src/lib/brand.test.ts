@@ -5,7 +5,6 @@ import {
   BRAND_URL,
   BRAND_NAME,
   BRAND_EMAIL,
-  BRAND_LOCATION,
   BRAND_RED_RGB,
   BRAND_INK_RGB,
   LOGO_CELLS,
@@ -33,10 +32,6 @@ describe('brand constants', () => {
 
   it('BRAND_EMAIL is correct', () => {
     expect(BRAND_EMAIL).toBe('hello@calib.tools');
-  });
-
-  it('BRAND_LOCATION is correct', () => {
-    expect(BRAND_LOCATION).toBe('Munich, Germany');
   });
 
   it('BRAND_RED_RGB matches #E60012', () => {

@@ -6,6 +6,7 @@ import {
   type Product, type Variant,
 } from '@/lib/shopify';
 import { availabilityLabel } from '@/lib/collectionSpecs';
+import { SHIPS_FROM } from '@/lib/claims';
 import { idRange } from '@/lib/idRange';
 import type { PatternSpec } from '@/lib/patterns';
 
@@ -104,7 +105,7 @@ export default function PurchaseTable({ product, datasheetUrl: fallbackUrl }: Pr
         <span className="text-sm font-semibold text-ink">
           {product.title} ({variants.length} item{variants.length !== 1 ? 's' : ''})
         </span>
-        <span className="text-xs text-ink-soft hidden sm:inline">Ships from Munich, Germany</span>
+        <span className="text-xs text-ink-soft hidden sm:inline">{SHIPS_FROM}</span>
       </div>
 
       {/* Desktop table */}

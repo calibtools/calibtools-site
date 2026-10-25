@@ -11,7 +11,7 @@ material: X
 
 ## What you get
 
-A calibration certificate for your specific target, issued by an accredited third-party laboratory whose accreditation body is a signatory to the ILAC MRA (in Germany: DAkkS; recognised worldwide). The certificate states measured feature positions, flatness, measurement uncertainty and traceability to national standards. It is the document auditors ask for under ISO 9001 / IATF 16949 / ISO 17025 quality systems.
+A calibration certificate for your specific target, issued by a CNAS-accredited laboratory (CNAS is a signatory to the ILAC MRA, so the certificate is recognised worldwide). The certificate states measured feature positions, flatness, measurement uncertainty and traceability to national standards. It is the document auditors ask for under ISO 9001 / IATF 16949 / ISO 17025 quality systems.
 
 This is different from the inspection report included with every target: the inspection report is issued by Calib.Tools from our own measurements; the certificate is independent and accredited.
 

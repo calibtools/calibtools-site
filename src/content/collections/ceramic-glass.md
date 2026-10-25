@@ -2,7 +2,7 @@
 title: "Ceramic & glass"
 description: "Lithographed on alumina or borosilicate glass, ±1–2 µm feature accuracy."
 sellingPoints:
-  - "Lithographed blue chrome on alumina — ±1–2 µm verified by coordinate measurement"
+  - "Lithographed blue chrome on alumina — ±1–2 µm measured against a DAkkS-calibrated reference"
   - "ILAC-recognised calibration certificate available for traceable measurement uncertainty"
 color: slate-blue
 pairsWith:
@@ -21,7 +21,7 @@ founderQuote: "I started Calib.Tools because I kept wasting afternoons printing 
 
 ## Overview
 
-Ceramic and glass calibration targets deliver the highest feature accuracy we offer. Blue chrome lithography on 96 % alumina produces ±1–2 µm feature positions — verified by coordinate measurement and optionally certified to ILAC standards.
+Ceramic and glass calibration targets deliver the highest feature accuracy we offer. Blue chrome lithography on 96 % alumina produces ±1–2 µm feature positions — measured against a DAkkS-calibrated reference, with an optional ILAC-MRA certificate from a CNAS-accredited laboratory.
 
 Ideal for metrology, medical imaging, microscopy, and any application where sub-pixel calibration accuracy is critical.
 

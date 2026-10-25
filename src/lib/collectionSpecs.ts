@@ -19,7 +19,7 @@ export function availabilityLabel(
   availableForSale: boolean,
 ): string {
   if (leadTime) return leadTime;
-  return availableForSale ? 'In stock' : 'Made to order';
+  return 'Made to order';
 }
 
 /**

@@ -1,5 +1,6 @@
 ---
 import { Github } from 'lucide-astro';
+import { FOOTER_LINE } from '@/lib/claims';
 const shop = [
   { href: '/targets/', label: 'Calibration targets' },
   { href: '/tools/', label: 'Free tools' },
@@ -34,7 +35,7 @@ const company = [
     <div class="flex items-center gap-3">
       <img src="/brand/wordmark-framed-light.svg" alt="Calib.Tools" class="h-7 [html[data-theme=dark]_&]:hidden" />
       <img src="/brand/wordmark-framed-dark.svg" alt="" class="h-7 hidden [html[data-theme=dark]_&]:block" aria-hidden="true" />
-      <span class="text-sm text-ink-soft">&copy; 2026 Calib.Tools &middot; Munich, Germany</span>
+      <span class="text-sm text-ink-soft">{FOOTER_LINE}</span>
     </div>
   </div>
 </footer>

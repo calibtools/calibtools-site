@@ -65,12 +65,12 @@ Pattern area is centred with a white quiet zone ≥ 1 square on all sides; the e
 | Inspection report | CT-IR-<serial>, per board, dimensional + flatness + visual |
 | Files | `.opencv.json`, `.kalibr.yaml` (checkerboard mode), `.ros2.yaml`, `.halcon.descr`, `.dxf` |
 | Documents | this datasheet, CT-UM-GEN user manual, CT-UM-CHA-P quick start |
-| Lead time | In stock in Munich — ships in 1–2 business days |
+| Lead time | Made to order · ships in 2–3 weeks |
 | Options | ILAC-MRA certificate issued by an accredited third-party laboratory, available as SVC-X-CERT-ILAC (+1–3 weeks) · logo print (-L) · hard case (ACC-A-CSE) |
 
 ## Compliance and customs
 
-RoHS-compliant materials. HS 9031 80. Country of origin: China; inspected in Germany. Not a toy; not for food contact.
+RoHS-compliant materials. HS 9031 80. Not a toy; not for food contact.
 
 ## Revision history
 

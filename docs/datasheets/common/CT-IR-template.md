@@ -41,6 +41,6 @@ Dimensional inspection of pattern features by optical CMM / calibrated camera + 
 
 The item identified above meets the specifications of datasheet {{datasheet_code}} at the time of inspection. This report is an inspection report issued by Calib.Tools; it is not an accredited calibration certificate. An ILAC-MRA certificate issued by an accredited third-party laboratory is available as SVC-X-CERT-ILAC.
 
-Signed: ____________________ · Calib.Tools, Munich · hello@calib.tools
+Signed: ____________________ · Calib.Tools · hello@calib.tools
 
 Report generated from measurement data; raw data retained for 10 years under this serial number.

@@ -49,3 +49,28 @@ Kit names (from `calibtools-tokens.css`) are exposed as `--ct-grey-*` CSS custom
 | Grey 30 | `#B3B3B3` | `line-soft` | Rules, borders, disabled UI |
 | Grey 10 | `#E6E6E6` | `line` | Panels, table stripes |
 | Grey 05 | `#F2F2F2` | `ground-alt` | Page tints, photo backdrops |
+
+## Claims (src/lib/claims.ts)
+
+Centralised constants — import and use everywhere, never hard-code.
+
+| Constant | Value |
+|---|---|
+| `FOOTER_LINE` | © 2026 Calib.Tools |
+| `LEAD_TIME` | Made to order · ships in 2–3 weeks |
+| `SHIPS_FROM` | Ships from the factory |
+| `INSPECTION_CLAIM` | Measured before it ships — against a DAkkS-calibrated reference |
+| `CERT_CLAIM` | ILAC-MRA certificate from a CNAS-accredited laboratory (add-on) |
+| `INCOTERM` | DAP |
+
+### Banned phrases
+
+These must never appear on the website, datasheets or marketing materials:
+
+- Munich, München
+- "ships from Germany", "from Germany", "EU stock", "in stock"
+- "Inspected in Germany", "German-made", "Made in Germany"
+- "verified" (use "measured" instead)
+- "certified" (unless part of: "CNAS-accredited", "DAkkS-accredited", "DAkkS-calibrated", "accredited third-party laboratory", or the certificate product description)
+
+Enforced by `scripts/check-prose.mjs` — build fails on a hit.

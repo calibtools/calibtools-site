@@ -17,7 +17,6 @@ import {
   BRAND_URL,
   BRAND_NAME,
   BRAND_EMAIL,
-  BRAND_LOCATION,
   BRAND_RED_RGB,
   BRAND_INK_RGB,
   LOGO_CELLS,
@@ -196,7 +195,7 @@ for (const line of notice) {
 }
 
 // --- Page footer ---
-const footerText = `${BRAND_URL} \u00B7 ${BRAND_EMAIL} \u00B7 ${BRAND_LOCATION} \u00B7 page 1/1`;
+const footerText = `${BRAND_URL} \u00B7 ${BRAND_EMAIL} \u00B7 page 1/1`;
 const footerWidth = fontRegular.widthOfTextAtSize(footerText, 9);
 page.drawText(footerText, {
   x: (width - footerWidth) / 2, y: 40,

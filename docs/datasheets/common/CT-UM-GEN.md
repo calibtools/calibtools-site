@@ -81,7 +81,7 @@ Store flat, pattern up, in the original carton or a hard case (ACC-A-CSE-…), a
 
 ## 9. Re-inspection and calibration certificates
 
-Each board ships with an inspection report from our Munich inspection. Re-inspection (SVC-X-RECAL) is recommended every 24 months for composite boards in regular use or after any suspected impact; ceramic and glass targets are dimensionally stable and need re-inspection only if damaged. An ILAC-MRA certificate issued by an accredited third-party laboratory is available as an add-on (SVC-X-CERT-ILAC); see its service description.
+Each board ships with an inspection report from our factory inspection against a DAkkS-calibrated reference. Re-inspection (SVC-X-RECAL) is recommended every 24 months for composite boards in regular use or after any suspected impact; ceramic and glass targets are dimensionally stable and need re-inspection only if damaged. An ILAC-MRA certificate issued by a CNAS-accredited laboratory is available as an add-on (SVC-X-CERT-ILAC); see its service description.
 
 ## 10. Warranty and returns
 

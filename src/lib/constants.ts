@@ -6,8 +6,6 @@ export const WARRANTY_TEXT =
 export const COMPLIANCE = {
   rohs: 'RoHS compliant',
   hsCode: 'HS 9031 80',
-  origin: 'Origin: CN',
-  inspection: 'Inspected in Germany',
 } as const;
 
 /**
