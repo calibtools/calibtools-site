@@ -68,3 +68,6 @@ export { ChevronDown, User } from 'lucide-react';
 
 // ── Misc: image placeholder, download-all, spinner ──────────────────
 export { Image, Loader2 } from 'lucide-react';
+
+// ── Reviews ─────────────────────────────────────────────────────────
+export { Star, Flag, ThumbsUp } from 'lucide-react';
