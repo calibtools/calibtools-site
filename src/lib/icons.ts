@@ -71,3 +71,6 @@ export { Image, Loader2 } from 'lucide-react';
 
 // ── Reviews ─────────────────────────────────────────────────────────
 export { Star, Flag, ThumbsUp } from 'lucide-react';
+
+// ── Lightbox ────────────────────────────────────────────────────────
+export { ChevronLeft, ChevronRight } from 'lucide-react';
