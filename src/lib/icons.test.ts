@@ -43,6 +43,7 @@ const SVG_ALLOW = [
   'src/lib/icons.test.ts',
   'src/docs/ctdoc.ts',
   'src/docs/ctpattern.ts',
+  'src/docs/build/ct-ir.ts',
 ];
 
 /**
