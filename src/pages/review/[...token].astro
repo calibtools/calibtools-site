@@ -1,0 +1,21 @@
+---
+import Base from '@/layouts/Base.astro';
+import ReviewForm from '@/islands/ReviewForm';
+
+/**
+ * Static catch-all: generates /review/index.html.
+ * The ReviewForm island reads the token from the URL path client-side.
+ * Invite links are https://calib.tools/review/<token> — Cloudflare Pages
+ * serves this page for any path under /review/ via the catch-all.
+ */
+export function getStaticPaths() {
+  return [{ params: { token: undefined } }];
+}
+---
+<Base title="Write a review" noindex>
+  <section class="container-x py-12 md:py-16">
+    <div class="mx-auto max-w-[640px]">
+      <ReviewForm client:load token="" />
+    </div>
+  </section>
+</Base>
