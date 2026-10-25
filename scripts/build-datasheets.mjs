@@ -27,7 +27,7 @@ function collectMdFiles(dir, files = []) {
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     if (entry.isDirectory()) {
       collectMdFiles(join(dir, entry.name), files);
-    } else if (entry.name.endsWith('.md') && entry.name !== 'README.md') {
+    } else if (entry.name.endsWith('.md') && entry.name !== 'README.md' && !entry.name.includes('template')) {
       files.push(join(dir, entry.name));
     }
   }

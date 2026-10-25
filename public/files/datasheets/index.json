@@ -8,8 +8,8 @@
     "status": "draft",
     "family": null,
     "material": null,
-    "sha256": "c17a75aecad3e0d9caf54900e2cd08f7f9997bfc98a55cc659dd691d55ebf155",
-    "bytes": 24432
+    "sha256": "990f953366a7af4a2e766b74984395facbab3041cd2843c3ccf7a9c68067483b",
+    "bytes": 24312
   },
   {
     "code": "CT-DS-ACC-A-FIX-14",
@@ -60,18 +60,6 @@
     "bytes": 29770
   },
   {
-    "code": "CT-IR-{{sn}}",
-    "title": "Inspection report CT-IR-{{sn}}",
-    "type": "note",
-    "rev": "A",
-    "date": "{{inspected_on}}",
-    "status": "released",
-    "family": null,
-    "material": null,
-    "sha256": "349cf0b5f2b9c306b844d1c6aa3041759561e96838b73f3744a53c2c9536b6e4",
-    "bytes": 23596
-  },
-  {
     "code": "CT-SV-CERT-ILAC",
     "title": "ILAC-MRA certificate — Service description",
     "type": "service",
@@ -92,8 +80,8 @@
     "status": "draft",
     "family": "CHA",
     "material": "C",
-    "sha256": "3b44868514b6fab6f4c738f1b35df789a6dfffce760638dfcfc8b5f2df853d24",
-    "bytes": 25863
+    "sha256": "7ba18c49ae6b36ec9137bd3401fa5b5035b1ceed6f2594a70716de104abd35d4",
+    "bytes": 25750
   },
   {
     "code": "CT-UM-CHA-P",
@@ -104,8 +92,8 @@
     "status": "draft",
     "family": "CHA",
     "material": "P",
-    "sha256": "4d1c5dda35f3df3437d911ba77eeb21b1425c17ead9a54b6d01c5e73364e8261",
-    "bytes": 27647
+    "sha256": "655526626914b16f5396b241d36115fe5d5e5ad5fc932bcf09658c3dde5177b7",
+    "bytes": 27545
   },
   {
     "code": "CT-UM-CHT-P",
@@ -116,8 +104,8 @@
     "status": "draft",
     "family": "CHT",
     "material": "P",
-    "sha256": "590d272c1e79337d5325a82d37ebc871ce95948dccc1587dc2a8af67cc409564",
-    "bytes": 26268
+    "sha256": "a8047c375858c7b02b75f17cfbae2a7388c23d6b6a9edec24839ccb5bab44437",
+    "bytes": 26163
   },
   {
     "code": "CT-UM-GEN",
