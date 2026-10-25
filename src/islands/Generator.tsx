@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { Grid2X2 } from '@/lib/icons';
 import { checkerboardSvg, type PatternSpec } from '@/lib/patterns';
 import { exportPdf } from '@/lib/exportPdf';
 import { exportPng } from '@/lib/exportPng';
@@ -159,7 +160,7 @@ export default function Generator({ initialSpec }: GeneratorProps = {}) {
   return (
     <section className="flex flex-wrap gap-10">
       <form className="card flex basis-[380px] flex-col gap-5 self-start p-7" onSubmit={(e) => e.preventDefault()}>
-        <h1 className="m-0 text-[26px] font-extrabold tracking-[-0.02em]">Pattern generator</h1>
+        <h1 className="m-0 flex items-center gap-3 text-[26px] font-extrabold tracking-[-0.02em]"><Grid2X2 size={24} strokeWidth={1.6} className="text-brand" aria-hidden="true" />Pattern generator</h1>
         <p className="m-0 text-sm leading-relaxed text-ink-muted">Runs in your browser. Nothing is uploaded.</p>
 
         <label className="flex flex-col gap-2 text-[13px] font-semibold">Pattern

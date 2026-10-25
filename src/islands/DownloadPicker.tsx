@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Download } from '@/lib/icons';
 
 interface DownloadFile {
   name: string;
@@ -89,11 +90,7 @@ export default function DownloadPicker({ files }: Props) {
           disabled={busy || selectedFiles.length === 0}
           className="btn-outline gap-2 text-sm self-start"
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
-            <polyline points="7 10 12 15 17 10" />
-            <line x1="12" y1="15" x2="12" y2="3" />
-          </svg>
+          <Download size={16} strokeWidth={1.6} aria-hidden="true" />
           {busy ? 'Zipping…' : `Download all (.zip)`}
         </button>
       )}

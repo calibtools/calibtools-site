@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { ScanLine } from '@/lib/icons';
 import { calculateFov, minDistance, SENSOR_PRESETS, type FovResult } from '@/lib/fov';
 
 const PRESET_NAMES = Object.keys(SENSOR_PRESETS);
@@ -44,7 +45,7 @@ export default function FovCalculator() {
     <section className="flex flex-wrap gap-10">
       {/* Input panel */}
       <form className="card flex basis-[380px] flex-col gap-5 self-start p-7" onSubmit={(e) => e.preventDefault()}>
-        <h1 className="m-0 text-[26px] font-extrabold tracking-[-0.02em]">FOV calculator</h1>
+        <h1 className="m-0 flex items-center gap-3 text-[26px] font-extrabold tracking-[-0.02em]"><ScanLine size={24} strokeWidth={1.6} className="text-brand" aria-hidden="true" />FOV calculator</h1>
         <p className="m-0 text-sm leading-relaxed text-ink-muted">Calculate field of view, coverage and GSD for your camera + lens setup.</p>
 
         <label className="flex flex-col gap-2 text-[13px] font-semibold">Sensor preset

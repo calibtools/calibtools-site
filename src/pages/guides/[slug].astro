@@ -1,5 +1,6 @@
 ---
 import Base from '@/layouts/Base.astro';
+import { ArrowRight } from 'lucide-astro';
 import { getCollection, getEntry } from 'astro:content';
 export async function getStaticPaths() {
   const guides = await getCollection('guides');
@@ -41,7 +42,7 @@ const breadcrumbLd = {
       <div class="card flex flex-col gap-2 bg-ground-alt p-5">
         <strong class="text-[15px]">Try it</strong>
         <span class="text-[15px] text-ink-muted">Generate a board with the geometry from this article, with OpenCV and Kalibr config files.</span>
-        <a href="/tools/generator/" class="text-[15px] font-semibold">Open the pattern generator →</a>
+        <a href="/tools/generator/" class="inline-flex items-center gap-1 text-[15px] font-semibold">Open the pattern generator <ArrowRight size={16} stroke-width={1.6} aria-hidden="true" /></a>
       </div>
       <div class="flex flex-wrap items-center justify-between gap-4 border-t border-line pt-5">
         <span class="text-sm text-ink-soft">Written by <a href="/about/" class="text-ink-soft">{entry.data.author}</a>. Questions? <a href="https://github.com/calibtools/calibtools/issues">Open an issue on GitHub</a>.</span>

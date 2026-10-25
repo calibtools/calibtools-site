@@ -1,4 +1,5 @@
 ---
+import { Plus } from 'lucide-astro';
 /**
  * Renders tool SEO content below the island: prose body + FAQ as <details>.
  */
@@ -21,7 +22,7 @@ const { Content, faq } = Astro.props;
           <details class="group py-4">
             <summary class="flex cursor-pointer list-none items-center justify-between gap-4 text-[15px] font-semibold [&::-webkit-details-marker]:hidden">
               {item.q}
-              <span class="shrink-0 text-ink-soft transition-transform group-open:rotate-45">+</span>
+              <Plus size={18} stroke-width={1.6} class="shrink-0 text-ink-soft transition-transform group-open:rotate-45" aria-hidden="true" />
             </summary>
             <p class="m-0 pt-3 text-[15px] leading-relaxed text-ink-muted">{item.a}</p>
           </details>

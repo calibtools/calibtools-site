@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { ScanSearch } from '@/lib/icons';
 import { loadOpenCv } from '@/lib/opencv';
 import { detectPattern, drawCorners, expectedCount, type DetectionResult } from '@/lib/detect';
 import type { PatternSpec } from '@/lib/patterns';
@@ -77,7 +78,7 @@ export default function DetectionCheck() {
     <section className="flex flex-wrap gap-10">
       {/* Config panel */}
       <form className="card flex basis-[340px] flex-col gap-5 self-start p-7" onSubmit={(e) => e.preventDefault()}>
-        <h1 className="m-0 text-[26px] font-extrabold tracking-[-0.02em]">Detection check</h1>
+        <h1 className="m-0 flex items-center gap-3 text-[26px] font-extrabold tracking-[-0.02em]"><ScanSearch size={24} strokeWidth={1.6} className="text-brand" aria-hidden="true" />Detection check</h1>
         <p className="m-0 text-sm leading-relaxed text-ink-muted">Upload a photo of your printed pattern and verify that OpenCV can detect all corners.</p>
 
         <label className="flex flex-col gap-2 text-[13px] font-semibold">Pattern

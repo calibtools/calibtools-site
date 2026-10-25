@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { FileText, ShoppingCart, Loader2, Minus, Plus } from '@/lib/icons';
 import {
   cartCreate, cartLinesAdd, dispatchCartUpdated,
   getStoredCartId, setStoredCartId,
@@ -158,10 +159,7 @@ export default function PurchaseTable({ product, datasheetUrl: fallbackUrl }: Pr
                   <td className="py-3 px-3">
                     {cols.docsUrl ? (
                       <a href={cols.docsUrl} target="_blank" rel="noopener" className="text-ink-soft hover:text-brand" title="Datasheet PDF">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                          <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
-                          <polyline points="14 2 14 8 20 8" />
-                        </svg>
+                        <FileText size={16} strokeWidth={1.6} aria-hidden="true" />
                       </a>
                     ) : (
                       <span className="text-ink-soft/40">—</span>
@@ -177,14 +175,14 @@ export default function PurchaseTable({ product, datasheetUrl: fallbackUrl }: Pr
                         className="h-[36px] w-[32px] text-center text-ink-muted hover:text-ink disabled:opacity-40"
                         disabled={qty <= 1}
                         onClick={() => setQty(v.id, qty - 1)}
-                      >−</button>
+                      ><Minus size={14} strokeWidth={1.6} aria-hidden="true" /></button>
                       <span className="w-7 text-center text-[13px]">{qty}</span>
                       <button
                         type="button"
                         aria-label="Increase"
                         className="h-[36px] w-[32px] text-center text-ink-muted hover:text-ink"
                         onClick={() => setQty(v.id, qty + 1)}
-                      >+</button>
+                      ><Plus size={14} strokeWidth={1.6} aria-hidden="true" /></button>
                     </div>
                   </td>
                   <td className="py-3 px-3">
@@ -196,15 +194,9 @@ export default function PurchaseTable({ product, datasheetUrl: fallbackUrl }: Pr
                       className="flex h-[36px] w-[36px] items-center justify-center rounded bg-brand text-white hover:bg-brand-dark disabled:opacity-40"
                     >
                       {busy ? (
-                        <svg width="16" height="16" viewBox="0 0 24 24" className="animate-spin" aria-hidden="true">
-                          <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" fill="none" opacity="0.3" />
-                          <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round" />
-                        </svg>
+                        <Loader2 size={16} strokeWidth={2} className="animate-spin" aria-hidden="true" />
                       ) : (
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                          <circle cx="9" cy="21" r="1" /><circle cx="20" cy="21" r="1" />
-                          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
-                        </svg>
+                        <ShoppingCart size={16} strokeWidth={1.6} aria-hidden="true" />
                       )}
                     </button>
                   </td>
@@ -256,14 +248,14 @@ export default function PurchaseTable({ product, datasheetUrl: fallbackUrl }: Pr
                       className="h-[44px] w-[44px] text-center text-lg text-ink-muted hover:text-ink disabled:opacity-40"
                       disabled={qty <= 1}
                       onClick={() => setQty(v.id, qty - 1)}
-                    >−</button>
+                    ><Minus size={16} strokeWidth={1.6} aria-hidden="true" /></button>
                     <span className="w-8 text-center text-sm">{qty}</span>
                     <button
                       type="button"
                       aria-label="Increase"
                       className="h-[44px] w-[44px] text-center text-lg text-ink-muted hover:text-ink"
                       onClick={() => setQty(v.id, qty + 1)}
-                    >+</button>
+                    ><Plus size={16} strokeWidth={1.6} aria-hidden="true" /></button>
                   </div>
                   <button
                     type="button"
@@ -273,15 +265,9 @@ export default function PurchaseTable({ product, datasheetUrl: fallbackUrl }: Pr
                     className="flex h-[44px] w-[44px] items-center justify-center rounded bg-brand text-white hover:bg-brand-dark disabled:opacity-40"
                   >
                     {busy ? (
-                      <svg width="18" height="18" viewBox="0 0 24 24" className="animate-spin" aria-hidden="true">
-                        <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" fill="none" opacity="0.3" />
-                        <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round" />
-                      </svg>
+                      <Loader2 size={18} strokeWidth={2} className="animate-spin" aria-hidden="true" />
                     ) : (
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                        <circle cx="9" cy="21" r="1" /><circle cx="20" cy="21" r="1" />
-                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
-                      </svg>
+                      <ShoppingCart size={18} strokeWidth={1.6} aria-hidden="true" />
                     )}
                   </button>
                 </div>

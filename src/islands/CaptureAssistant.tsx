@@ -1,4 +1,5 @@
 import { useRef, useState, useCallback, useEffect } from 'react';
+import { Check, ArrowRight, Camera, X } from '@/lib/icons';
 
 /**
  * Guided calibration image capture.
@@ -131,7 +132,7 @@ export default function CaptureAssistant() {
       {/* Camera + controls */}
       <div className="flex min-w-0 flex-1 basis-[520px] flex-col gap-4">
         <div className="card p-7">
-          <h1 className="m-0 mb-1 text-[26px] font-extrabold tracking-[-0.02em]">Capture assistant</h1>
+          <h1 className="m-0 mb-1 flex items-center gap-3 text-[26px] font-extrabold tracking-[-0.02em]"><Camera size={24} strokeWidth={1.6} className="text-brand" aria-hidden="true" />Capture assistant</h1>
           <p className="m-0 mb-5 text-sm text-ink-muted">Guided calibration image capture. 15 poses for good coverage. Nothing is uploaded.</p>
 
           {/* Video area */}
@@ -239,7 +240,7 @@ export default function CaptureAssistant() {
                     onClick={() => removeCapture(img.id)}
                     title="Remove"
                   >
-                    ✕
+                    <X size={14} strokeWidth={1.6} aria-hidden="true" />
                   </button>
                 </div>
               ))}
@@ -255,7 +256,7 @@ export default function CaptureAssistant() {
               const captured = captures.some((c) => c.pose === p.label);
               return (
                 <div key={p.id} className={`flex items-center gap-2 ${i === currentPose ? 'font-bold text-brand' : captured ? 'text-green-700' : 'text-ink-muted'}`}>
-                  <span className="w-4 text-center">{captured ? '✓' : i === currentPose ? '→' : '·'}</span>
+                  <span className="flex w-4 items-center justify-center">{captured ? <Check size={16} strokeWidth={1.6} className="text-brand" aria-hidden="true" /> : i === currentPose ? <ArrowRight size={16} strokeWidth={1.6} className="text-brand" aria-hidden="true" /> : '·'}</span>
                   <span>{p.label}</span>
                 </div>
               );
