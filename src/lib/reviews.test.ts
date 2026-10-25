@@ -1,4 +1,6 @@
 import { describe, it, expect } from 'vitest';
+import { readdirSync, readFileSync, statSync } from 'fs';
+import { join, relative } from 'path';
 import { summarize, sortReviews, type Review } from './reviews';
 
 const makeReview = (overrides: Partial<Review> = {}): Review => ({
@@ -97,5 +99,41 @@ describe('compliance: no literal "verified"', () => {
     const { HOW_REVIEWS_WORK, HOW_REVIEWS_WORK_SHORT } = await import('./reviews');
     expect(HOW_REVIEWS_WORK.toLowerCase()).not.toContain('verified');
     expect(HOW_REVIEWS_WORK_SHORT.toLowerCase()).not.toContain('verified');
+  });
+});
+
+function walk(dir: string): string[] {
+  const out: string[] = [];
+  for (const entry of readdirSync(dir)) {
+    const full = join(dir, entry);
+    if (statSync(full).isDirectory()) out.push(...walk(full));
+    else out.push(full);
+  }
+  return out;
+}
+
+describe('compliance: no "verified" in review UI copy', () => {
+  it('no review UI file uses the word "verified"', () => {
+    const SRC = join(__dirname, '..');
+    const reviewFiles = walk(SRC).filter(
+      (f) =>
+        (f.includes('Review') || f.includes('review') || f.includes('Stars')) &&
+        /\.(tsx|ts|astro)$/.test(f) &&
+        !f.includes('.test.') &&
+        !f.includes('node_modules'),
+    );
+    const violations: string[] = [];
+    for (const file of reviewFiles) {
+      const content = readFileSync(file, 'utf-8');
+      const lines = content.split('\n');
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        if (line.trimStart().startsWith('//') || line.trimStart().startsWith('*')) continue;
+        if (/\bverified\b/i.test(line) && !line.includes('import')) {
+          violations.push(`${relative(join(SRC, '..'), file)}:${i + 1}: ${line.trim()}`);
+        }
+      }
+    }
+    expect(violations, `Review UI files containing "verified":\n${violations.join('\n')}`).toEqual([]);
   });
 });
