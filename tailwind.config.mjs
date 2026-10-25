@@ -4,10 +4,26 @@ export default {
   theme: {
     extend: {
       colors: {
-        brand: { DEFAULT: '#E60012', dark: '#B3000E', tint: '#FBE9EA' },
-        ink: { DEFAULT: '#1A1A1A', muted: '#4A4A4A', soft: '#6B6B6B' },
-        line: { DEFAULT: '#E6E6E6', light: '#ECECEC' },
-        ground: { DEFAULT: '#FFFFFF', alt: '#FAFAFA', panel: '#F5F5F5' },
+        brand: {
+          DEFAULT: 'rgb(var(--color-brand) / <alpha-value>)',
+          text: 'rgb(var(--color-brand-text) / <alpha-value>)',
+          dark: 'rgb(var(--color-brand-dark) / <alpha-value>)',
+          tint: 'var(--color-brand-tint)',
+        },
+        ink: {
+          DEFAULT: 'rgb(var(--color-ink) / <alpha-value>)',
+          muted: 'rgb(var(--color-ink-muted) / <alpha-value>)',
+          soft: 'rgb(var(--color-ink-soft) / <alpha-value>)',
+        },
+        line: {
+          DEFAULT: 'rgb(var(--color-line) / <alpha-value>)',
+          strong: 'rgb(var(--color-line-strong) / <alpha-value>)',
+        },
+        ground: {
+          DEFAULT: 'rgb(var(--color-ground) / <alpha-value>)',
+          alt: 'rgb(var(--color-ground-alt) / <alpha-value>)',
+          panel: 'rgb(var(--color-ground-panel) / <alpha-value>)',
+        },
         collection: {
           brand: '#E60012',
           'slate-blue': '#475C8A',

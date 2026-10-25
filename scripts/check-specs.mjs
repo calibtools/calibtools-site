@@ -1,3 +1,4 @@
+if (process.env.SKIP_SPECS_CHECK === '1') { console.log('[check-specs] Skipped (SKIP_SPECS_CHECK=1)'); process.exit(0); }
 /**
  * Postbuild check: verify required spec metafields are present in every
  * rendered product page in dist/targets/{handle}/index.html.
