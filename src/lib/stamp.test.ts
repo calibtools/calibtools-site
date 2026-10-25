@@ -4,7 +4,7 @@
 import { describe, it, expect } from 'vitest';
 import { stampSvg, productMarkSvg } from './stamp';
 
-describe('stamp SVGs', () => {
+describe('stamp SVGs (source, pre-outlining)', () => {
   it('stampSvg contains no forbidden words', () => {
     const svg = stampSvg();
     expect(svg).not.toContain('Certified');
@@ -19,11 +19,24 @@ describe('stamp SVGs', () => {
     expect(svg).toContain('DIMENSIONAL INSPECTION');
   });
 
-  it('stampSvg is valid SVG', () => {
+  it('stampSvg is valid SVG at Ø 32 mm', () => {
     const svg = stampSvg();
     expect(svg).toMatch(/^<svg/);
     expect(svg).toMatch(/<\/svg>$/);
-    expect(svg).toContain('32mm'); // Ø 32 mm
+    expect(svg).toContain('32mm');
+  });
+
+  it('stampSvg uses Geist Pixel for INSPECTED', () => {
+    const svg = stampSvg();
+    expect(svg).toMatch(/font-family.*Geist Pixel.*INSPECTED/s);
+  });
+
+  it('stampSvg ring text uses letter-spacing ≤ 0.12em', () => {
+    const svg = stampSvg();
+    const lsMatch = svg.match(/letter-spacing="([^"]+)"/);
+    expect(lsMatch).not.toBeNull();
+    const val = parseFloat(lsMatch![1]);
+    expect(val).toBeLessThanOrEqual(0.12);
   });
 
   it('productMarkSvg is 25 × 10 mm', () => {
