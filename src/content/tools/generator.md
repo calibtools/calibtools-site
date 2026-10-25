@@ -19,7 +19,12 @@ faq:
 
 ## What it does
 
-The pattern generator creates calibration targets in seven pattern types: Checkerboard, ChArUco, AprilGrid (Kalibr format), asymmetric circles, symmetric circles, ArUco grid and HALCON-style dots. Every pattern is rendered as a geometrically exact SVG and can be exported as a 1:1 PDF for printing, a 300 dpi PNG for documentation, a raw SVG, or a DXF for CNC or laser cutting. The generator also produces ready-to-use config files for OpenCV JSON, Kalibr YAML, ROS 2 YAML and HALCON .descr format.
+The pattern generator creates calibration targets and exports them with matching config files. Supported pattern types:
+
+- Checkerboard, ChArUco, AprilGrid (Kalibr format)
+- Asymmetric circles, symmetric circles, ArUco grid, HALCON-style dots
+
+Export formats include 1:1 PDF for printing, 300 dpi PNG for documentation, raw SVG, and DXF for CNC or laser cutting. Config files are generated for OpenCV JSON, Kalibr YAML, ROS 2 YAML and HALCON .descr format.
 
 ## How to use it
 

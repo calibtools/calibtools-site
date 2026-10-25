@@ -15,7 +15,9 @@ faq:
 
 ## What it does
 
-The capture assistant uses your webcam to guide you through 15 calibration poses that provide optimal frame coverage. Each pose instructs you where to hold the board — center, corners, close, far and tilted — following the best practices for camera calibration. Captured images are saved as PNG files for use with OpenCV, ROS, Kalibr or any calibration toolchain.
+The capture assistant uses your webcam to guide you through 15 calibration poses that provide optimal frame coverage. Each pose instructs you where to hold the board — center, corners, close, far and tilted — following best practices for camera calibration.
+
+Captured images are saved as PNG files for use with OpenCV, ROS, Kalibr or any calibration toolchain.
 
 ## How to use it
 

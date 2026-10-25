@@ -15,7 +15,9 @@ faq:
 
 ## What it does
 
-The selection wizard guides you through five questions — application, accuracy need, camera type, environment and calibration toolchain — and produces a recommendation: pattern type (checkerboard, ChArUco, AprilGrid), board size, material (composite, ceramic or glass) and a matching product link. It handles edge cases like fisheye lenses (which favour ChArUco for partial views) and outdoor environments (which need weather-resistant materials).
+The selection wizard guides you through five questions — application, accuracy need, camera type, environment and calibration toolchain — and produces a recommendation: pattern type, board size, material and a matching product link.
+
+It handles edge cases like fisheye lenses (which favour ChArUco for partial views) and outdoor environments (which need weather-resistant materials).
 
 ## How to use it
 
