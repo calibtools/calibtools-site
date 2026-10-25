@@ -1,0 +1,6 @@
+SAMPLE PLACEHOLDER
+
+Expected delivery file: CT-AN-001.pdf
+Expected source: /home/ubuntu/work/docs/out/CT-AN/CT-AN-001.pdf
+
+This file was unavailable when the CT-FM sample archive was assembled. Replace this placeholder with the delivered file and re-run build_fm.py.
