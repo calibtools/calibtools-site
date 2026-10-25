@@ -1,0 +1,12 @@
+# SAMPLE Kalibr-compatible ChArUco target description
+target_type: charuco
+part_number: CT-CHA-C-200150-6X6
+serial_number: "000311"
+rows: 12
+cols: 17
+square_length: 0.010
+marker_length: 0.007
+dictionary: DICT_6X6_250
+start_id: 0
+legacy_pattern: false
+coordinate_frame: opencv_top_left_x_right_y_down

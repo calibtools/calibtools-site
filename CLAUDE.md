@@ -35,3 +35,4 @@ pnpm install · pnpm dev · pnpm build · pnpm test · pnpm check
 
 ## Roadmap (from docs/plan.md)
 All T1–T7 tools are live. See docs/plan.md for acceptance criteria.
+Customer PDFs are generated from src/docs/ (port of docs/design/customer-docs/_source); do not edit the Python reference.

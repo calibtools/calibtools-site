@@ -1,0 +1,13 @@
+# SAMPLE HALCON target description
+# ChArUco board parameters. Units are metres unless stated.
+TargetType = ChArUco
+PartNumber = CT-CHA-C-200150-6X6
+SerialNumber = 000312
+Rows = 12
+Columns = 17
+SquareLength = 0.010
+MarkerLength = 0.007
+Dictionary = DICT_6X6_250
+StartID = 102
+LegacyPattern = false
+CoordinateFrame = OpenCV_top_left_X_right_Y_down

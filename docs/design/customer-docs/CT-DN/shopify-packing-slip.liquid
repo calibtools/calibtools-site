@@ -1,0 +1,121 @@
+<!--
+  Calib.Tools delivery-note packing slip for Shopify.
+  Uses system / Google-hosted Geist when available. Keep product properties named
+  Serial(s), Serial, or SN; Start ID and ID range are printed in the properties loop.
+-->
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap');
+  * { box-sizing: border-box; }
+  body { margin: 0; color: #333333; font-family: Geist, Arial, sans-serif; font-size: 10pt; line-height: 1.42; }
+  .sheet { width: 100%; max-width: 178mm; margin: 0 auto; }
+  .header { display: flex; justify-content: space-between; align-items: start; border-bottom: 1px solid #000; padding-bottom: 10px; margin-bottom: 16px; }
+  .wordmark { color: #000; font-weight: 700; letter-spacing: -.04em; font-size: 18pt; border: 1px solid #000; padding: 1px 4px 2px; line-height: 1; }
+  .wordmark .dot { color: #E60012; }
+  .doc-id, .mono, th, .tag { font-family: 'Geist Mono', 'Courier New', monospace; }
+  .doc-id { color: #000; font-size: 8.5pt; text-align: right; }
+  .eyebrow, .tag { color: #666666; font-size: 7.5pt; letter-spacing: .14em; text-transform: uppercase; }
+  h1 { margin: 3px 0 0; color: #000; font-size: 22pt; line-height: 1.1; letter-spacing: -.02em; }
+  h2 { margin: 18px 0 7px; padding-top: 6px; border-top: 1px solid #000; color: #000; font-size: 11pt; }
+  .parties, .closing { display: grid; grid-template-columns: 1fr 1fr; gap: 36px; }
+  .party-name { margin-top: 4px; color: #000; font-weight: 600; }
+  .small { font-size: 8.5pt; }
+  .muted { color: #666666; }
+  .meta { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; border-top: 1px solid #E6E6E6; margin-top: 12px; padding-top: 9px; }
+  .meta-value { margin-top: 3px; color: #000; font-family: 'Geist Mono', 'Courier New', monospace; font-size: 8.5pt; }
+  table { width: 100%; border-collapse: collapse; font-size: 8pt; line-height: 1.25; }
+  th { color: #666666; font-size: 6.8pt; font-weight: 500; letter-spacing: .05em; text-align: left; padding: 5px 5px; border-bottom: 1px solid #000; vertical-align: bottom; }
+  td { padding: 5px; vertical-align: top; color: #000; }
+  tbody tr:nth-child(even) td { background: #F2F2F2; }
+  td.qty, th.qty { text-align: right; }
+  .properties { font-size: 7.6pt; }
+  .package { display: grid; grid-template-columns: repeat(3, max-content); column-gap: 30px; row-gap: 4px; }
+  .document-checks { font-size: 9pt; letter-spacing: .01em; }
+  .check { display: inline-block; width: 11px; height: 11px; margin: 0 5px 0 0; border: 1px solid #000; vertical-align: -1px; }
+  .checked::after { content: ''; display: block; width: 7px; height: 7px; margin: 1px; background: #000; }
+  .closing { border-top: 1px solid #000; margin-top: 26px; padding-top: 10px; align-items: end; }
+  .signature-line { height: 30px; border-bottom: 1px solid #000; }
+  @media print { .sheet { max-width: none; } }
+</style>
+
+<div class="sheet">
+  <div class="header">
+    <div class="wordmark">CALIB<span class="dot">.</span>TOOLS</div>
+    <div class="doc-id">CT-DN-{{ order.name | remove: '#' }} · Rev A · {{ 'now' | date: '%Y-%m-%d' }}</div>
+  </div>
+
+  <div class="eyebrow">Delivery note</div>
+  <h1>Order {{ order.name }}</h1>
+
+  <h2>1&nbsp;&nbsp;Shipment</h2>
+  <div class="parties">
+    <div>
+      <div class="tag">Shipper</div>
+      <div class="party-name">{{ shop.name }}</div>
+      <div class="small">{{ shop.address1 }}{% if shop.address2 %}<br>{{ shop.address2 }}{% endif %}<br>{{ shop.zip }} {{ shop.city }}<br>{{ shop.country }}</div>
+      {% if shop.vat_number %}<div class="small muted" style="margin-top:4px">VAT ID · <span class="mono">{{ shop.vat_number }}</span></div>{% endif %}
+    </div>
+    <div>
+      <div class="tag">Consignee</div>
+      <div class="party-name">{{ shipping_address.name }}</div>
+      <div class="small">{{ shipping_address.address1 }}{% if shipping_address.address2 %}<br>{{ shipping_address.address2 }}{% endif %}<br>{{ shipping_address.zip }} {{ shipping_address.city }}<br>{{ shipping_address.country }}</div>
+    </div>
+  </div>
+  <div class="meta">
+    <div><div class="tag">Order no.</div><div class="meta-value">{{ order.name }}</div></div>
+    <div><div class="tag">Shopify order</div><div class="meta-value">{{ order.name }}</div></div>
+    <div><div class="tag">Dispatch date</div><div class="meta-value">{{ 'now' | date: '%Y-%m-%d' }}</div></div>
+    <div><div class="tag">Carrier / tracking</div><div class="meta-value">{{ fulfillment.tracking_company | default: '—' }}<br>{{ fulfillment.tracking_number | default: '—' }}</div></div>
+  </div>
+
+  <h2>2&nbsp;&nbsp;Delivered items</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Pos</th><th>Part number</th><th>Description</th><th>Serial(s)</th><th class="qty">Qty</th><th>Line properties</th><th>HS code</th><th>Origin</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for line_item in order.line_items %}
+      <tr>
+        <td class="mono">{{ forloop.index }}</td>
+        <td class="mono">{{ line_item.sku | default: '—' }}</td>
+        <td>{{ line_item.title }}</td>
+        <td class="mono">{{ line_item.properties['Serial(s)'] | default: line_item.properties['Serial'] | default: line_item.properties['SN'] | default: '—' }}</td>
+        <td class="qty mono">{{ line_item.quantity }}</td>
+        <td class="properties">
+          {% for property in line_item.properties %}
+            {% unless property.first == 'Serial(s)' or property.first == 'Serial' or property.first == 'SN' %}
+              <span class="mono">{{ property.first }} {{ property.last }}</span>{% unless forloop.last %}<br>{% endunless %}
+            {% endunless %}
+          {% endfor %}
+        </td>
+        <td class="mono">{{ line_item.properties['HS code'] | default: '—' }}</td>
+        <td>{{ line_item.properties['Origin'] | default: '—' }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <h2>3&nbsp;&nbsp;Package</h2>
+  <div class="package small">
+    <div><span class="tag">Packages</span><br><span class="mono">{{ fulfillment.line_items.size | default: 1 }}</span></div>
+    <div><span class="tag">Weight (kg)</span><br><span class="mono">{{ order.total_weight | default: '—' }}</span></div>
+    <div><span class="tag">Dimensions (cm)</span><br><span class="mono">{{ order.attributes['Package dimensions (cm)'] | default: '—' }}</span></div>
+  </div>
+
+  <h2>4&nbsp;&nbsp;Enclosed documents</h2>
+  <div class="document-checks"><span class="check checked"></span>IR &nbsp;&nbsp; <span class="check checked"></span>DS &nbsp;&nbsp; <span class="check checked"></span>UM &nbsp;&nbsp; <span class="check checked"></span>CoC &nbsp;&nbsp; <span class="check"></span>CC</div>
+  <div class="small muted" style="margin-top:4px">CC — third-party certificate may follow separately after dispatch.</div>
+
+  <div class="closing">
+    <div>
+      <div class="tag">Receipt</div>
+      <div class="signature-line"></div>
+      <div class="small muted" style="margin-top:4px">Receiver signature · printed name · date</div>
+    </div>
+    <div class="small">
+      <div class="tag">Returns</div>
+      <div style="margin-top:4px"><strong>Return address</strong><br>{{ shop.name }} · Returns<br>{{ shop.address1 }}{% if shop.address2 %}<br>{{ shop.address2 }}{% endif %}<br>{{ shop.zip }} {{ shop.city }}, {{ shop.country }}<br><strong>30-day returns — see calib.tools/returns</strong></div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,20 @@
+{
+  "sample": true,
+  "target_type": "charuco",
+  "part_number": "CT-CHA-C-200150-6X6",
+  "serial_number": "000311",
+  "board": {
+    "rows": 12,
+    "cols": 17,
+    "square_length_m": 0.01,
+    "marker_length_m": 0.007,
+    "dictionary": "DICT_6X6_250",
+    "start_id": 0,
+    "legacy_pattern": false
+  },
+  "coordinate_frame": {
+    "origin": "top-left outer corner of the pattern",
+    "x_axis": "right",
+    "y_axis": "down"
+  }
+}

@@ -1,0 +1,344 @@
+{
+ "_readme": "Values marked in 'illustrative' are NOT from spec section 18; they were added so that every field of the layout can be shown. Replace them from the real data sources (serials.json, measurements/<sn>.json, datasheets).",
+ "company": {
+  "brand": "Calib.Tools",
+  "legal_name": "[Legal entity name — to be decided]",
+  "address": [
+   "[Street and number]",
+   "[Postcode] Munich",
+   "Germany"
+  ],
+  "vat_id": "DE[VAT ID — to be assigned]",
+  "register": "[Commercial register — to be decided]",
+  "managing_director": "[Name]",
+  "email": "hello@calib.tools",
+  "web": "calib.tools",
+  "phone": "[+49 …]",
+  "bank": {
+   "name": "[Bank]",
+   "iban": "DE00 0000 0000 0000 0000 00",
+   "bic": "[BIC]"
+  },
+  "returns_address": [
+   "Calib.Tools · Returns",
+   "[Street and number]",
+   "[Postcode] Munich, Germany"
+  ]
+ },
+ "product": {
+  "part": "CT-CHA-C-200150-6X6",
+  "description": "ChArUco calibration target, ceramic, 200 × 150 mm",
+  "family": "CHA",
+  "family_name": "ChArUco",
+  "material": "C",
+  "material_name": "ceramic",
+  "W": 200,
+  "H": 150,
+  "t": 4.0,
+  "rows": 12,
+  "cols": 17,
+  "sq": 10,
+  "marker": 7,
+  "dict": "DICT_6X6_250",
+  "id_first": 0,
+  "id_last": 101,
+  "start_id": 0,
+  "markers": 102,
+  "corners": 176,
+  "mx": 15,
+  "my": 15,
+  "pattern_w": 170,
+  "pattern_h": 120,
+  "pattern_summary": "ChArUco 12 × 17 · 10 / 7 mm · DICT_6X6_250 · IDs 0–101 · start 0",
+  "label_line": "CALIB.TOOLS   CT-CHA-C-200150-6X6   ChArUco 12×17 · 10/7 mm · DICT_6X6_250 · IDs 0–101   SN 000311 · Rev A",
+  "datasheet": "CT-DS-CHA-C",
+  "datasheet_rev": "A",
+  "drawing": "CT-DWG-CHA-C-200150",
+  "drawing_rev": "A",
+  "axes_spec": [
+   4.5,
+   4.5,
+   6.5,
+   0.6
+  ]
+ },
+ "unit": {
+  "sn": "000311",
+  "sn_new_format": "26W45-00311",
+  "lot": "L-2611-0382"
+ },
+ "inspection": {
+  "report_no": "CT-IR-000311",
+  "rev": "A",
+  "date": "2026-11-04",
+  "inspector": "JG",
+  "inspector_role": "Inspector",
+  "location": "per Calib.Tools procedure CT-WI-001",
+  "procedure": "CT-WI-001",
+  "instrument_type": "Optical CMM",
+  "instrument_id": "OCMM-01",
+  "instrument_cal": "2026-03",
+  "instrument_valid": "2027-03",
+  "ambient_c": 20.4,
+  "ref_c": 20,
+  "U_k2_um": 1.5,
+  "n_points": 176,
+  "flatness_points": 25,
+  "result": "PASS"
+ },
+ "geometry": [
+  {
+   "feature": "Square pitch X",
+   "nominal": "10.000",
+   "measured": "10.0012",
+   "dev": "+1.2",
+   "tol": "±2",
+   "result": "PASS"
+  },
+  {
+   "feature": "Square pitch Y",
+   "nominal": "10.000",
+   "measured": "9.9992",
+   "dev": "−0.8",
+   "tol": "±2",
+   "result": "PASS"
+  },
+  {
+   "feature": "Pattern width",
+   "nominal": "170.000",
+   "measured": "170.004",
+   "dev": "+4",
+   "tol": "±5",
+   "result": "PASS"
+  },
+  {
+   "feature": "Pattern height",
+   "nominal": "120.000",
+   "measured": "120.003",
+   "dev": "+3",
+   "tol": "±5",
+   "result": "PASS",
+   "illustrative": true
+  },
+  {
+   "feature": "Diagonal 1",
+   "nominal": "208.087",
+   "measured": "208.091",
+   "dev": "+4",
+   "tol": "±7",
+   "result": "PASS",
+   "illustrative": true
+  },
+  {
+   "feature": "Diagonal 2",
+   "nominal": "208.087",
+   "measured": "208.085",
+   "dev": "−2",
+   "tol": "±7",
+   "result": "PASS",
+   "illustrative": true
+  },
+  {
+   "feature": "Orthogonality",
+   "nominal": "90.000°",
+   "measured": "90.0008°",
+   "dev": "—",
+   "tol": "±0.002°",
+   "result": "PASS"
+  },
+  {
+   "feature": "Max single-feature deviation",
+   "nominal": "—",
+   "measured": "—",
+   "dev": "1.6",
+   "tol": "≤ 2",
+   "result": "PASS",
+   "note": "n = 176"
+  },
+  {
+   "feature": "RMS deviation",
+   "nominal": "—",
+   "measured": "—",
+   "dev": "0.7",
+   "tol": "—",
+   "result": "N/A",
+   "note": "information only",
+   "illustrative": true
+  }
+ ],
+ "flatness": {
+  "measured_um": 12,
+  "tol": "≤ 20",
+  "method": "25 points, 5 × 5 grid, least-squares plane",
+  "result": "PASS"
+ },
+ "visual": [
+  {
+   "check": "Edge chamfer",
+   "criterion": "0.5 × 45° on all edges, no chips > 0.3 mm",
+   "result": "PASS",
+   "illustrative": true
+  },
+  {
+   "check": "Surface defects",
+   "criterion": "No scratches or pinholes in the pattern area",
+   "result": "PASS"
+  },
+  {
+   "check": "Print / edge definition",
+   "criterion": "Square edges sharp, no ink bleed at 10× loupe",
+   "result": "PASS"
+  },
+  {
+   "check": "Marking legibility",
+   "criterion": "Label line, X / Y arrows and SN legible",
+   "result": "PASS"
+  }
+ ],
+ "traceability": {
+  "instrument_cert": "OCMM-01 · certificate K-2026-03-0141 · valid to 2027-03",
+  "reference": "Glass scale GS-01 (200 mm) · certificate K-2026-02-0087 · valid to 2027-02",
+  "retention": "Raw data retained for 10 years under this serial number.",
+  "illustrative": true
+ },
+ "customer": {
+  "name": "Example Robotics GmbH",
+  "contact": "Dr. Anna Weber",
+  "dept": "Vision Systems",
+  "address": [
+   "Musterstraße 12",
+   "70173 Stuttgart",
+   "Germany"
+  ],
+  "vat_id": "DE123456789",
+  "email": "a.weber@example-robotics.de",
+  "illustrative": true
+ },
+ "order": {
+  "no": "CT-1047",
+  "shopify": "#1047",
+  "date": "2026-11-02",
+  "ship_date": "2026-11-05",
+  "line": 1,
+  "carrier": "DHL Express",
+  "tracking": "1234567890",
+  "incoterm": "DAP",
+  "payment": "Paid online (Shopify)",
+  "illustrative": true,
+  "lines": [
+   {
+    "pos": 1,
+    "part": "CT-CHA-C-200150-6X6",
+    "description": "ChArUco calibration target, ceramic, 200 × 150 mm — multi-board set of 2",
+    "qty": 2,
+    "unit_price_eur": 1290.0,
+    "serials": [
+     {
+      "sn": "000311",
+      "start_id": 0,
+      "id_range": "0–101",
+      "report": "CT-IR-000311",
+      "lot": "L-2611-0382"
+     },
+     {
+      "sn": "000312",
+      "start_id": 102,
+      "id_range": "102–203",
+      "report": "CT-IR-000312",
+      "lot": "L-2611-0382"
+     }
+    ],
+    "hs": "9031 80",
+    "origin": "[Country of origin — per facts]",
+    "weight_kg_each": 0.47
+   },
+   {
+    "pos": 2,
+    "part": "SVC-X-CERT-ILAC",
+    "description": "ILAC-MRA calibration certificate from an accredited third-party laboratory, for SN 000311",
+    "qty": 1,
+    "unit_price_eur": 390.0,
+    "serials": [
+     {
+      "sn": "000311"
+     }
+    ],
+    "hs": "—",
+    "origin": "—",
+    "service": true
+   }
+  ],
+  "shipping_eur": 29.0,
+  "vat_rate_de": 19,
+  "package": {
+   "packages": 1,
+   "weight_kg": 2.4,
+   "dimensions_cm": "36 × 30 × 12"
+  },
+  "note": "DICT_6X6_250 has 250 IDs: a 12 × 17 board uses 102 markers, so at most two such boards fit in one multi-board set without ID overlap (0–101, 102–203)."
+ },
+ "files": {
+  "verify_url": "https://calib.tools/verify/000311",
+  "files_url_base": "https://calib.tools/files/"
+ },
+ "doc_numbers": {
+  "CT-IR": "CT-IR-000311",
+  "CT-CSV": "CT-CSV-000311",
+  "CT-DS": "CT-DS-CHA-C",
+  "CT-UM": "CT-UM-GEN",
+  "CT-UM-family": "CT-UM-CHA-C",
+  "CT-AN": "CT-AN-004",
+  "CT-FM": "CT-FM-1047-01",
+  "CT-DN": "CT-DN-1047",
+  "CT-CoC": "CT-CoC-1047",
+  "CT-CC": "CT-CC-000311",
+  "CT-RI": "CT-RI-000311-01",
+  "CT-BR": "CT-BR-L-2611-0390",
+  "CT-QR": "CT-QR-7K2F9",
+  "CT-DR": "CT-DR-3M8Q1",
+  "CT-PS": "CT-PS-A4X7Q",
+  "CT-QT": "Q00017",
+  "CT-INV": "CT-INV-2026-0047"
+ },
+ "coordinates": {
+  "file": "CT-CSV-000311.csv",
+  "n": 176,
+  "max_id": 88,
+  "max_um": 1.6,
+  "rms_um": 0.65,
+  "synthetic": true
+ },
+ "customer_eu": {
+  "name": "Beispiel Optik GmbH",
+  "contact": "Ing. Lukas Huber",
+  "address": [
+   "Praterstraße 1",
+   "1020 Wien",
+   "Austria"
+  ],
+  "vat_id": "ATU12345678",
+  "illustrative": true
+ },
+ "oem": {
+  "customer": "Example Automation AG",
+  "po": "PO-4500123456",
+  "part": "CT-CHA-C-200150-6X6",
+  "lot": "L-2611-0390",
+  "quantity": 24,
+  "serial_first": "000320",
+  "serial_last": "000343",
+  "inspection_from": "2026-11-09",
+  "inspection_to": "2026-11-13",
+  "master_board": "S1b master board SN 000300",
+  "illustrative": true
+ },
+ "quote": {
+  "no": "Q00017",
+  "date": "2026-10-26",
+  "valid_until": "2026-11-25",
+  "rfq": "RFQ-ER-2026-118",
+  "customer": "Example Robotics GmbH",
+  "contact": "Dr. Anna Weber",
+  "illustrative": true
+ }
+}

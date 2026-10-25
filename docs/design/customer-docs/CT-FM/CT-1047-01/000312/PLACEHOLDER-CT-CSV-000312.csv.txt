@@ -1,0 +1,6 @@
+SAMPLE PLACEHOLDER
+
+Expected delivery file: CT-CSV-000312.csv
+Expected source: /home/ubuntu/work/docs/out/CT-CSV/CT-CSV-000312.csv
+
+This file was unavailable when the CT-FM sample archive was assembled. Replace this placeholder with the delivered file and re-run build_fm.py.
