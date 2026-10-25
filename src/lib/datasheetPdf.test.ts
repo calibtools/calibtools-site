@@ -127,7 +127,7 @@ describe('parseMarkdown table parsing', () => {
 describe('renderDatasheetPdf', () => {
   it('produces valid PDF bytes', async () => {
     const blocks = parseMarkdown('## Test\n\nHello world.\n');
-    const bytes = await renderDatasheetPdf({ meta: sampleMeta, blocks, fontBytes });
+    const { bytes } = await renderDatasheetPdf({ meta: sampleMeta, blocks, fontBytes });
     const header = new TextDecoder().decode(bytes.slice(0, 5));
     expect(header).toBe('%PDF-');
     expect(bytes.length).toBeGreaterThan(1000);
@@ -135,17 +135,17 @@ describe('renderDatasheetPdf', () => {
 
   it('manifest sha256 matches file content', async () => {
     const blocks = parseMarkdown('## Test\n\nContent.\n');
-    const bytes = await renderDatasheetPdf({ meta: sampleMeta, blocks, fontBytes });
+    const { bytes } = await renderDatasheetPdf({ meta: sampleMeta, blocks, fontBytes });
     const hash = createHash('sha256').update(Buffer.from(bytes)).digest('hex');
     // Render again — should produce same hash (deterministic)
-    const bytes2 = await renderDatasheetPdf({ meta: sampleMeta, blocks, fontBytes });
+    const { bytes: bytes2 } = await renderDatasheetPdf({ meta: sampleMeta, blocks, fontBytes });
     const hash2 = createHash('sha256').update(Buffer.from(bytes2)).digest('hex');
     expect(hash).toBe(hash2);
   });
 
   it('page dimensions are A4 (210x297mm)', async () => {
     const blocks = parseMarkdown('## Test\n\nParagraph.\n');
-    const bytes = await renderDatasheetPdf({ meta: sampleMeta, blocks, fontBytes });
+    const { bytes } = await renderDatasheetPdf({ meta: sampleMeta, blocks, fontBytes });
     const doc = await PDFDocument.load(bytes);
     const page = doc.getPage(0);
     const { width, height } = page.getSize();
@@ -161,7 +161,7 @@ describe('renderDatasheetPdf', () => {
     ].join('\n');
 
     const blocks = parseMarkdown(longContent);
-    const bytes = await renderDatasheetPdf({ meta: sampleMeta, blocks, fontBytes });
+    const { bytes } = await renderDatasheetPdf({ meta: sampleMeta, blocks, fontBytes });
     const doc = await PDFDocument.load(bytes);
 
     // Check that the PDF has multiple pages (long content should overflow)
@@ -185,7 +185,7 @@ describe('renderDatasheetPdf', () => {
 | B | 200 mm | 400 g |
 `;
     const blocks = parseMarkdown(md);
-    const bytes = await renderDatasheetPdf({ meta: sampleMeta, blocks, fontBytes });
+    const { bytes } = await renderDatasheetPdf({ meta: sampleMeta, blocks, fontBytes });
     expect(bytes.length).toBeGreaterThan(1000);
     const doc = await PDFDocument.load(bytes);
     expect(doc.getPageCount()).toBeGreaterThanOrEqual(1);
@@ -194,10 +194,10 @@ describe('renderDatasheetPdf', () => {
   it('renders DRAFT watermark when status is draft', async () => {
     const blocks = parseMarkdown('## Test\n\nDraft content.\n');
     const draftMeta = { ...sampleMeta, status: 'draft' as const };
-    const draftBytes = await renderDatasheetPdf({ meta: draftMeta, blocks, fontBytes });
+    const { bytes: draftBytes } = await renderDatasheetPdf({ meta: draftMeta, blocks, fontBytes });
 
     const releasedMeta = { ...sampleMeta, status: 'released' as const };
-    const releasedBytes = await renderDatasheetPdf({ meta: releasedMeta, blocks, fontBytes });
+    const { bytes: releasedBytes } = await renderDatasheetPdf({ meta: releasedMeta, blocks, fontBytes });
 
     // Draft PDF should be larger due to watermark text on each page
     expect(draftBytes.length).toBeGreaterThan(releasedBytes.length);
@@ -212,7 +212,7 @@ describe('renderDatasheetPdf', () => {
 `;
     const blocks = parseMarkdown(md);
     expect(blocks.some((b) => b.type === 'bullet')).toBe(true);
-    const bytes = await renderDatasheetPdf({ meta: sampleMeta, blocks, fontBytes });
+    const { bytes } = await renderDatasheetPdf({ meta: sampleMeta, blocks, fontBytes });
     expect(bytes.length).toBeGreaterThan(1000);
   });
 });
