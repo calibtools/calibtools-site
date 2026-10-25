@@ -17,6 +17,9 @@ import { getImageMetadata } from '@/lib/productImageImports';
 import { optimizeProductImage } from '@/lib/optimizeProductImage';
 import { Ruler, Package, Plug, CircleDot, Truck, HelpCircle, Plus, Download, Wand2, Columns2, MessageSquare, ArrowRight, ArrowUp, Clock, FileCheck as FileCheckIcon } from 'lucide-astro';
 import { getProductData } from '@/lib/productData';
+import ReviewsSection from '@/islands/ReviewsSection';
+import Stars from '@/components/Stars';
+import { getReviewsForProduct, summarize } from '@/lib/reviews';
 import { getImage } from 'astro:assets';
 import homeSetImage from '@/assets/products/brand/home-set.webp';
 
@@ -206,6 +209,10 @@ if (!hasLocalImages && product.images.length === 0 && hasPatternData) {
   }
 }
 
+// --- Reviews ---
+const productReviews = await getReviewsForProduct(handle!);
+const reviewSummary = summarize(productReviews.filter(r => r.status === 'published'));
+
 // --- JSON-LD ---
 const siteUrl = 'https://calib.tools';
 const breadcrumbLd = {
@@ -230,6 +237,15 @@ if (product.variants.length > 0) {
   }));
 } else {
   productLd.offers = { '@type': 'AggregateOffer', lowPrice: product.priceMinAmount, priceCurrency: product.priceMinCurrency, availability: 'https://schema.org/InStock', url: `${siteUrl}${product.url}` };
+}
+if (reviewSummary.count > 0) {
+  productLd.aggregateRating = {
+    '@type': 'AggregateRating',
+    ratingValue: reviewSummary.average.toFixed(1),
+    reviewCount: reviewSummary.count,
+    bestRating: '5',
+    worstRating: '1',
+  };
 }
 
 const ogImage = hasLocalImages ? galleryImages[0].src : product.images[0]?.url ?? `/og/${handle}.png`;
@@ -300,6 +316,15 @@ const orderingRows = (productData?.orderingRows ?? []).map((row) => {
 
       {/* h1 */}
       <h1 class="h-display m-0 text-[28px] leading-[1.1] md:text-[36px]">{product.title}</h1>
+
+      {/* Review summary link */}
+      <a href="#reviews" class="inline-flex items-center gap-2 text-sm text-ink-muted no-underline hover:text-ink">
+        <Stars client:load rating={Math.round(reviewSummary.average)} size={14} />
+        {reviewSummary.count === 0
+          ? <span>No reviews yet · <span class="text-brand-dark">how reviews work ↓</span></span>
+          : <span>{reviewSummary.average.toFixed(1)} · {reviewSummary.count} review{reviewSummary.count !== 1 ? 's' : ''}</span>
+        }
+      </a>
 
       {/* One-line positioning */}
       <p class="m-0 text-[17px] leading-relaxed text-ink-muted">{positioning}</p>
@@ -553,6 +578,9 @@ const orderingRows = (productData?.orderingRows ?? []).map((row) => {
       </div>
     </div>
   </section>
+
+  {/* ── Reviews ── */}
+  <ReviewsSection client:load reviews={productReviews} handle={handle!} />
 
   {/* ── Pairs with ── */}
   {pairsWith.length > 0 && (
