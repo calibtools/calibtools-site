@@ -1,17 +1,27 @@
 import { test, expect } from '@playwright/test';
 
-test('Logo renders circle SVG with correct src for light page', async ({ page }) => {
+test('Desktop shows horizontal lockup on light page', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/tools/');
-  const logo = page.locator('img[alt="Calib.Tools"]').first();
+  const logo = page.locator('nav img[alt="Calib.Tools"]').first();
   await expect(logo).toBeVisible();
-  await expect(logo).toHaveAttribute('src', '/brand/logo-circle-light.svg');
+  await expect(logo).toHaveAttribute('src', '/brand/lockup-light.svg');
 });
 
-test('Logo renders circle SVG with correct src for dark page', async ({ page }) => {
+test('Desktop shows horizontal lockup on dark page', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/');
-  const logo = page.locator('img[alt="Calib.Tools"]').first();
+  const logo = page.locator('nav img[alt="Calib.Tools"]').first();
   await expect(logo).toBeVisible();
-  await expect(logo).toHaveAttribute('src', '/brand/logo-circle-dark.svg');
+  await expect(logo).toHaveAttribute('src', '/brand/lockup-dark.svg');
+});
+
+test('Mobile shows icon (not lockup) at 390px', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/tools/');
+  const icon = page.locator('nav img[alt="Calib.Tools"]').last();
+  await expect(icon).toBeVisible();
+  await expect(icon).toHaveAttribute('src', '/brand/icon-light.svg');
 });
 
 test('Only index sets data-theme=dark', async ({ page }) => {
@@ -44,18 +54,25 @@ test('Mobile header has hamburger and logo, no cart', async ({ page }) => {
 
 test('Favicon links present in head', async ({ page }) => {
   await page.goto('/');
-  await expect(page.locator('link[href="/favicon/calib-tools-favicon.svg"]')).toHaveCount(1);
-  await expect(page.locator('link[rel="manifest"][href="/calib-tools.webmanifest"]')).toHaveCount(1);
+  await expect(page.locator('link[href="/favicon.ico"]')).toHaveCount(1);
+  await expect(page.locator('link[rel="manifest"][href="/site.webmanifest"]')).toHaveCount(1);
   await expect(page.locator('link[rel="apple-touch-icon"]')).toHaveCount(1);
+  await expect(page.locator('link[rel="mask-icon"]')).toHaveCount(1);
 });
 
 test('Favicon and manifest files serve 200', async ({ page }) => {
-  const res1 = await page.request.get('/favicon/calib-tools-favicon.svg');
+  const res1 = await page.request.get('/favicon.ico');
   expect(res1.ok()).toBeTruthy();
-  const res2 = await page.request.get('/calib-tools.webmanifest');
+  const res2 = await page.request.get('/site.webmanifest');
   expect(res2.ok()).toBeTruthy();
-  const res3 = await page.request.get('/app/calib-tools-app-icon-192.png');
+  const res3 = await page.request.get('/apple-touch-icon.png');
   expect(res3.ok()).toBeTruthy();
+  const res4 = await page.request.get('/favicon-32x32.png');
+  expect(res4.ok()).toBeTruthy();
+  const res5 = await page.request.get('/safari-pinned-tab.svg');
+  expect(res5.ok()).toBeTruthy();
+  const res6 = await page.request.get('/android-chrome-192x192.png');
+  expect(res6.ok()).toBeTruthy();
 });
 
 test('Hero image height ≥ 85% of its column at 1440px', async ({ page }) => {
