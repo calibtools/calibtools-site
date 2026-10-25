@@ -130,5 +130,47 @@
     "file": "home-set.webp",
     "kind": "ai",
     "alt": "Calib.Tools set of four ChArUco calibration boards with consecutive marker ID ranges arranged in a 2 by 2 grid, seen from above."
+  },
+  {
+    "handle": "brand",
+    "file": "dark/hero-three-boards.webp",
+    "kind": "ai",
+    "alt": "Calib.Tools three calibration boards on a dark surface — a checkerboard, a ChArUco composite board and a ceramic ChArUco plate — with brand markings and coordinate axes in the margins."
+  },
+  {
+    "handle": "brand",
+    "file": "dark/hero-three-boards-mobile.webp",
+    "kind": "ai",
+    "alt": "Calib.Tools three calibration boards arranged vertically on a dark surface for mobile view, with brand markings and coordinate axes in the margins."
+  },
+  {
+    "handle": "brand",
+    "file": "dark/og-default.webp",
+    "kind": "ai",
+    "alt": "Calib.Tools three calibration boards on a dark table — checkerboard, ChArUco composite and ceramic — used as the default Open Graph social sharing image."
+  },
+  {
+    "handle": "brand",
+    "file": "dark/family-composite.webp",
+    "kind": "ai",
+    "alt": "Calib.Tools composite checkerboard and ChArUco calibration boards side by side on a dark surface with brand markings in the bottom margins."
+  },
+  {
+    "handle": "brand",
+    "file": "dark/family-ceramic.webp",
+    "kind": "ai",
+    "alt": "Calib.Tools ceramic ChArUco calibration plate on a dark surface with brand markings and coordinate axes in the margins."
+  },
+  {
+    "handle": "brand",
+    "file": "dark/family-set.webp",
+    "kind": "ai",
+    "alt": "Calib.Tools set of four ChArUco calibration boards with consecutive marker ID ranges arranged in a two-by-two grid on a dark surface."
+  },
+  {
+    "handle": "brand",
+    "file": "dark/family-mounts.webp",
+    "kind": "ai",
+    "alt": "Calib.Tools ChArUco calibration board held in a black aluminium mounting fixture with red thumb screws on a dark surface."
   }
 ]
