@@ -10,8 +10,25 @@ import { getCollections } from '@/lib/shopify';
 import { getCollection } from 'astro:content';
 import { getProductImages } from '@/lib/product-images';
 import { getImageMetadata } from '@/lib/productImageImports';
-import heroLabImage from '@/assets/products/brand/home-lab.webp';
+import heroDesktop from '@/assets/products/brand/dark/hero-three-boards.webp';
+import heroMobile from '@/assets/products/brand/dark/hero-three-boards-mobile.webp';
+import familyComposite from '@/assets/products/brand/dark/family-composite.webp';
+import familyCeramic from '@/assets/products/brand/dark/family-ceramic.webp';
+import familySet from '@/assets/products/brand/dark/family-set.webp';
+import familyMounts from '@/assets/products/brand/dark/family-mounts.webp';
 import type { ImageMetadata } from 'astro';
+
+/* Override collection card images on the dark home page */
+const collectionHeroOverrides: Record<string, ImageMetadata> = {
+  'composite-boards': familyComposite,
+  'ceramic-glass': familyCeramic,
+  'lidar-image-quality': familySet,       // TODO: proper multi-board-sets collection
+  'mounts-accessories': familyMounts,
+};
+/* Override titles where needed */
+const collectionTitleOverrides: Record<string, string> = {
+  'lidar-image-quality': 'Multi-board sets', // TODO: update when collection handle changes
+};
 
 const collections = await getCollections();
 const allGuides = await getCollection('guides');
@@ -66,18 +83,26 @@ const featuredTools = tools.slice(0, 3);
       </p>
     </div>
 
-    {/* Hero image */}
+    {/* Hero image — responsive: mobile below 768 px, desktop above */}
     <div class="relative flex-1 basis-[480px]">
-      <Picture
-        src={heroLabImage}
-        widths={[480, 800, 1200, 1600]}
-        formats={['avif', 'webp', 'jpeg']}
-        alt="Calib.Tools ChArUco calibration board in a clamp facing a camera rig in a Munich machine vision lab."
-        class="w-full rounded-lg object-cover"
-        loading="eager"
-      />
-      {/* TODO: Replace with dark three-board hero — see images.json */}
-      <span class="absolute bottom-3 right-3 font-mono text-[11px] tracking-[0.06em] text-ink-soft md:text-[12px]">Rendering</span>
+      <picture>
+        <source
+          media="(max-width: 767px)"
+          srcset={heroMobile.src}
+          type="image/webp"
+          width={heroMobile.width}
+          height={heroMobile.height}
+        />
+        <Picture
+          src={heroDesktop}
+          widths={[480, 800, 1200, 1600]}
+          formats={['avif', 'webp', 'jpeg']}
+          alt="Calib.Tools three calibration boards on a dark surface — a checkerboard, a ChArUco composite board and a ceramic ChArUco plate — with brand markings and coordinate axes in the margins."
+          class="w-full rounded-lg object-cover"
+          loading="eager"
+        />
+      </picture>
+      <span class="absolute bottom-3 right-3 font-mono text-[11px] tracking-[0.06em] text-ink-soft md:text-[12px]">Rendering &mdash; actual product may differ</span>
     </div>
   </section>
 
@@ -108,16 +133,18 @@ const featuredTools = tools.slice(0, 3);
     <div class="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
       {collections.map((c) => {
         const firstProduct = c.products[0];
-        const localHero = firstProduct ? heroImageMap.get(firstProduct.handle) : undefined;
+        const overrideImage = collectionHeroOverrides[c.handle];
+        const localHero = overrideImage ?? (firstProduct ? heroImageMap.get(firstProduct.handle) : undefined);
+        const displayTitle = collectionTitleOverrides[c.handle] ?? c.title;
         return (
           <ProductCard
             href={`/targets/collection/${c.handle}/`}
-            title={c.title}
+            title={displayTitle}
             sub={c.description}
             from={firstProduct?.priceFrom ?? ''}
             localImage={localHero}
             image={!localHero ? (c.image ?? firstProduct?.image) : undefined}
-            placeholder={c.title.toUpperCase()}
+            placeholder={displayTitle.toUpperCase()}
           />
         );
       })}
