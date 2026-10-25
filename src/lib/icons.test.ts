@@ -41,6 +41,7 @@ const SVG_ALLOW = [
   'src/lib/brand.test.ts',
   'src/lib/brand-overlay.test.ts',
   'src/lib/icons.test.ts',
+  'src/docs/ctdoc.ts',
 ];
 
 /**
