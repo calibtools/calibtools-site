@@ -10,8 +10,8 @@ import { getCollections } from '@/lib/shopify';
 import { getCollection } from 'astro:content';
 import { getProductImages } from '@/lib/product-images';
 import { getImageMetadata } from '@/lib/productImageImports';
-import heroDesktop from '@/assets/products/brand/dark/hero-three-boards.webp';
-import heroMobile from '@/assets/products/brand/dark/hero-three-boards-mobile.webp';
+import heroTight from '@/assets/products/brand/dark/hero-boards-tight.webp';
+import heroTightMobile from '@/assets/products/brand/dark/hero-boards-tight-mobile.webp';
 import familyComposite from '@/assets/products/brand/dark/family-composite.webp';
 import familyCeramic from '@/assets/products/brand/dark/family-ceramic.webp';
 import familySet from '@/assets/products/brand/dark/family-set.webp';
@@ -61,60 +61,76 @@ const featuredTools = tools.slice(0, 3);
 ---
 <Base title="Calibrate with confidence" theme="dark" description="Precision checkerboards, ChArUco, AprilGrid and metrology-grade glass targets, plus free browser tools to generate, size and verify your calibration. Shipped from Europe in 2\u20134 days.">
 
-  {/* ── Hero (full-bleed) ── */}
-  <section class="relative min-h-[85svh] overflow-hidden md:min-h-[640px] md:max-h-[760px] 2xl:max-h-[760px]" id="top">
-    {/* Background image — absolutely positioned, full bleed */}
-    <div class="absolute inset-0">
-      {/* Mobile: hero-three-boards-mobile.webp, object-position bottom */}
-      <Picture
-        src={heroMobile}
-        widths={[480, 768, 1024]}
-        formats={['avif', 'webp', 'jpeg']}
-        alt=""
-        class="h-full w-full object-cover object-bottom md:hidden"
-        loading="eager"
-      />
-      {/* Desktop: hero-three-boards.webp, object-position right center */}
-      <Picture
-        src={heroDesktop}
-        widths={[800, 1200, 1600, 2400]}
-        formats={['avif', 'webp', 'jpeg']}
-        alt="Calib.Tools three calibration boards on a dark surface — a checkerboard, a ChArUco composite board and a ceramic ChArUco plate — with brand markings and coordinate axes in the margins."
-        class="hidden h-full w-full object-cover object-right md:block"
-        loading="eager"
-      />
-    </div>
-
-    {/* Gradient overlays for text readability */}
-    {/* Mobile: top-to-bottom */}
-    <div class="absolute inset-0 bg-gradient-to-b from-[rgba(10,10,10,0.9)] to-transparent bg-[length:100%_45%] bg-no-repeat md:hidden" />
-    {/* Desktop: left-to-right */}
-    <div class="absolute inset-0 hidden bg-gradient-to-r from-[rgba(10,10,10,0.85)] via-[rgba(10,10,10,0.5)] to-transparent md:block" style="--tw-gradient-via-position:35%;--tw-gradient-to-position:55%;" />
-
-    {/* Text content */}
-    <div class="container-x relative flex h-full min-h-[inherit] items-start pt-16 md:items-center md:pt-0">
-      <div class="flex max-w-[560px] flex-col gap-6">
-        <span class="font-mono text-[12px] uppercase tracking-[0.18em] text-brand-text md:text-[13px]">
+  {/* ── Hero ── */}
+  <section id="top">
+    {/* Desktop: two-column */}
+    <div class="container-x hidden items-stretch gap-0 py-10 md:flex lg:py-14">
+      {/* Left column 44 % — text */}
+      <div class="flex w-[44%] shrink-0 flex-col justify-center gap-6 pr-8">
+        <span class="font-mono text-[13px] uppercase tracking-[0.18em] text-brand-text">
           Calibration targets &amp; tools for machine vision
         </span>
-        <h1 class="m-0 text-[38px] font-[800] uppercase leading-[1.02] tracking-[-0.02em] md:text-[52px]">
+        <h1 class="m-0 text-[52px] font-[800] uppercase leading-[1.02] tracking-[-0.02em]" data-hero-h1>
           Calibrate with<br /><span class="text-brand">confidence</span>
         </h1>
-        <p class="m-0 max-w-[480px] text-[17px] leading-[1.5] text-ink-muted md:text-[18px]">
+        <p class="m-0 max-w-[460px] text-[18px] leading-[1.5] text-ink-muted">
           Precision checkerboards, ChArUco, AprilGrid and metrology-grade glass targets &mdash; with free browser tools to generate, size and verify your calibration. Shipped from Europe in 2&ndash;4&nbsp;days.
         </p>
         <div class="flex flex-wrap gap-3.5 pt-2">
           <a href="/targets/" class="btn-primary uppercase tracking-[0.1em]">Shop targets</a>
           <a href="/tools/" class="btn-outline uppercase tracking-[0.1em]">Open free tools</a>
         </div>
-        <p class="m-0 pt-3 font-mono text-[13px] tracking-[0.1em] text-ink-soft md:text-[14px]">
+        <p class="m-0 pt-3 font-mono text-[14px] tracking-[0.1em] text-ink-soft">
           OpenCV &middot; ROS &middot; HALCON &middot; MATLAB &middot; Kalibr
         </p>
       </div>
+      {/* Right column 56 % — tight crop image */}
+      <div class="relative w-[56%]" data-hero-col>
+        <Picture
+          src={heroTight}
+          widths={[480, 700, 900]}
+          formats={['avif', 'webp', 'jpeg']}
+          alt="Calib.Tools three calibration boards cropped tight — checkerboard, ChArUco composite and ceramic plate with brand markings, on a dark surface."
+          class="w-full hero-fade"
+          loading="eager"
+          data-hero-img
+        />
+        <span class="absolute bottom-2 right-0 font-mono text-[12px] tracking-[0.06em] text-ink-soft">Rendering &mdash; actual product may differ</span>
+      </div>
     </div>
 
-    {/* Caption */}
-    <span class="absolute bottom-4 right-5 font-mono text-[11px] tracking-[0.06em] text-ink-soft md:text-[12px]">Rendering &mdash; actual product may differ</span>
+    {/* Mobile: stacked */}
+    <div class="container-x flex flex-col gap-8 py-12 md:hidden">
+      <div class="flex flex-col gap-6">
+        <span class="font-mono text-[12px] uppercase tracking-[0.18em] text-brand-text">
+          Calibration targets &amp; tools for machine vision
+        </span>
+        <h1 class="m-0 text-[38px] font-[800] uppercase leading-[1.02] tracking-[-0.02em]">
+          Calibrate with<br /><span class="text-brand">confidence</span>
+        </h1>
+        <p class="m-0 max-w-[480px] text-[17px] leading-[1.5] text-ink-muted">
+          Precision checkerboards, ChArUco, AprilGrid and metrology-grade glass targets &mdash; with free browser tools to generate, size and verify your calibration. Shipped from Europe in 2&ndash;4&nbsp;days.
+        </p>
+        <div class="flex flex-wrap gap-3.5 pt-2">
+          <a href="/targets/" class="btn-primary uppercase tracking-[0.1em]">Shop targets</a>
+          <a href="/tools/" class="btn-outline uppercase tracking-[0.1em]">Open free tools</a>
+        </div>
+        <p class="m-0 pt-3 font-mono text-[13px] tracking-[0.1em] text-ink-soft">
+          OpenCV &middot; ROS &middot; HALCON &middot; MATLAB &middot; Kalibr
+        </p>
+      </div>
+      <div class="relative">
+        <Picture
+          src={heroTightMobile}
+          widths={[390, 640, 768]}
+          formats={['avif', 'webp', 'jpeg']}
+          alt="Calib.Tools three calibration boards in a tight horizontal crop for mobile, with brand markings and coordinate axes."
+          class="w-full object-contain hero-fade"
+          loading="eager"
+        />
+        <span class="mt-1 block text-right font-mono text-[11px] tracking-[0.06em] text-ink-soft">Rendering &mdash; actual product may differ</span>
+      </div>
+    </div>
   </section>
 
   {/* ── Free tools ── */}

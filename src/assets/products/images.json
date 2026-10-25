@@ -172,5 +172,17 @@
     "file": "dark/family-mounts.webp",
     "kind": "ai",
     "alt": "Calib.Tools ChArUco calibration board held in a black aluminium mounting fixture with red thumb screws on a dark surface."
+  },
+  {
+    "handle": "brand",
+    "file": "dark/hero-boards-tight.webp",
+    "kind": "ai",
+    "alt": "Calib.Tools three calibration boards cropped tight — checkerboard, ChArUco composite and ceramic plate with brand markings, on a dark surface."
+  },
+  {
+    "handle": "brand",
+    "file": "dark/hero-boards-tight-mobile.webp",
+    "kind": "ai",
+    "alt": "Calib.Tools three calibration boards in a tight horizontal crop for mobile, with brand markings and coordinate axes."
   }
 ]

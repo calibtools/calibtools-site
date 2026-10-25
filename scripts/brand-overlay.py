@@ -402,17 +402,101 @@ def cmd_overlay(args):
         print(f"  OG → {og_out}")
 
 
+# ── crop command ───────────────────────────────────────────────────────
+
+def boards_bbox(img):
+    """Return (x_min, y_min, x_max, y_max) bounding box of all white boards."""
+    h, w = img.shape[:2]
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    _, thresh = cv2.threshold(gray, 150, 255, cv2.THRESH_BINARY)
+    contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    all_pts = []
+    for c in contours:
+        if cv2.contourArea(c) > 0.02 * h * w:
+            all_pts.extend(c.reshape(-1, 2).tolist())
+    if not all_pts:
+        return None
+    pts = np.array(all_pts)
+    return int(pts[:, 0].min()), int(pts[:, 1].min()), int(pts[:, 0].max()), int(pts[:, 1].max())
+
+
+def cmd_crop(args):
+    """Crop overlaid hero images tight around the boards."""
+    # Load existing json to append crop boxes
+    with open(JSON_PATH) as f:
+        data = json.load(f)
+
+    crops = {
+        "hero-three-boards.webp": {
+            "output": "hero-boards-tight.webp",
+            "margins": {"left": 0.07, "right": 0.07, "top": 0.30, "bottom": 0.80},
+        },
+        "hero-three-boards-mobile.webp": {
+            "output": "hero-boards-tight-mobile.webp",
+            "margins": {"left": 0.06, "right": 0.06, "top": 0.10, "bottom": 0.30},
+        },
+    }
+
+    for src_name, cfg in crops.items():
+        src_path = OUT_DIR / src_name
+        if not src_path.exists():
+            print(f"  SKIP {src_name} (not found — run overlay first)")
+            continue
+
+        img = cv2.imread(str(src_path))
+        h, w = img.shape[:2]
+        bbox = boards_bbox(img)
+        if not bbox:
+            print(f"  SKIP {src_name} (no boards detected)")
+            continue
+
+        bx0, by0, bx1, by1 = bbox
+        bw = bx1 - bx0
+        bh = by1 - by0
+
+        ml = int(bw * cfg["margins"]["left"])
+        mr = int(bw * cfg["margins"]["right"])
+        mt = int(bh * cfg["margins"]["top"])
+        mb = int(bh * cfg["margins"]["bottom"])
+
+        cx0 = max(0, bx0 - ml)
+        cy0 = max(0, by0 - mt)
+        cx1 = min(w, bx1 + mr)
+        cy1 = min(h, by1 + mb)
+
+        cropped = img[cy0:cy1, cx0:cx1]
+        out_path = OUT_DIR / cfg["output"]
+        cv2.imwrite(str(out_path), cropped, [cv2.IMWRITE_WEBP_QUALITY, 90])
+        ch, cw = cropped.shape[:2]
+        print(f"  {src_name} → {cfg['output']} ({cw}x{ch}, {out_path.stat().st_size // 1024} KB)")
+        print(f"    boards bbox [{bx0},{by0}]-[{bx1},{by1}], crop [{cx0},{cy0}]-[{cx1},{cy1}]")
+
+        # Record in json
+        data.setdefault("crops", {})[cfg["output"]] = {
+            "source": src_name,
+            "boards_bbox": [bx0, by0, bx1, by1],
+            "crop_box": [cx0, cy0, cx1, cy1],
+            "output_dims": [cw, ch],
+        }
+
+    with open(JSON_PATH, "w") as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
+    print(f"  Crop data → {JSON_PATH}")
+
+
 # ── main ───────────────────────────────────────────────────────────────
 
 def main():
     parser = argparse.ArgumentParser(description="Brand overlay pipeline")
-    parser.add_argument("command", choices=["detect", "overlay"])
+    parser.add_argument("command", choices=["detect", "overlay", "crop"])
     args = parser.parse_args()
 
     if args.command == "detect":
         cmd_detect(args)
     elif args.command == "overlay":
         cmd_overlay(args)
+    elif args.command == "crop":
+        cmd_crop(args)
 
 
 if __name__ == "__main__":
