@@ -4,7 +4,6 @@ import VariantPicker from '@/islands/VariantPicker';
 import ImageGallery from '@/islands/ImageGallery';
 import type { GalleryImageData } from '@/islands/ImageGallery';
 import DownloadPicker from '@/islands/DownloadPicker';
-import NotifyForm from '@/islands/NotifyForm';
 import MobileBottomCluster from '@/islands/MobileBottomCluster';
 import ProductCard from '@/components/ProductCard.astro';
 import { getProducts, getProductByHandle, sanitizeHtml } from '@/lib/shopify';
@@ -17,6 +16,7 @@ import { getProductImages } from '@/lib/product-images';
 import { getImageMetadata } from '@/lib/productImageImports';
 import { optimizeProductImage } from '@/lib/optimizeProductImage';
 import { RENDERING_DISCLAIMER, CERTIFICATE_DISCLAIMER } from '@/lib/brand';
+import { getProductData } from '@/lib/productData';
 import { getImage } from 'astro:assets';
 import homeSetImage from '@/assets/products/brand/home-set.webp';
 
@@ -30,8 +30,9 @@ const product = await getProductByHandle(handle!);
 if (!product) return Astro.redirect('/targets/');
 
 const m = product.metafields;
+const productData = getProductData(handle!, m);
 
-// Find add-on variant IDs from all products
+// Find add-on variant IDs
 const allProducts = await getProducts();
 const certProduct = allProducts.find((p) => p.handle === 'certificate-ilac');
 const fixtureProduct = allProducts.find((p) => p.handle === 'mounting-fixture');
@@ -42,8 +43,7 @@ const fixturePrice = fixtureProduct?.variants[0]?.price;
 
 const cleanDescription = sanitizeHtml(product.descriptionHtml);
 
-// Eyebrow: lead_time metafield > availableForSale > "Made to order"
-// Never show "In stock" for certificate-ilac (it's a service, not physical stock)
+// Lead-time eyebrow
 const anyAvailable = product.variants.some((v) => v.availableForSale);
 const eyebrow = m.lead_time
   ? m.lead_time
@@ -53,44 +53,67 @@ const eyebrow = m.lead_time
       ? 'In stock \u00B7 ships in 1\u20132 days from Germany'
       : 'Made to order';
 
-// --- Grouped specification table ---
+// Positioning: datasheet first sentence → product.description
+const positioning = productData?.positioning || product.description;
+
+// Key-specs strip cells
+type KeySpec = { label: string; value: string };
+const keySpecs: KeySpec[] = [];
+if (m.feature_tolerance) keySpecs.push({ label: 'Accuracy', value: m.feature_tolerance });
+const substrate = [m.material, m.thickness_mm ? `${m.thickness_mm} mm` : ''].filter(Boolean).join(' \u00B7 ');
+if (substrate) keySpecs.push({ label: 'Substrate', value: substrate });
+// Sizes: min–max from variant size options
+const sizeValues = product.variants
+  .map((v) => v.selectedOptions.find((o) => o.name === 'Size')?.value)
+  .filter(Boolean) as string[];
+if (sizeValues.length > 1) {
+  const nums = sizeValues.map((s) => parseInt(s, 10)).filter((n) => n > 0).sort((a, b) => a - b);
+  if (nums.length >= 2) keySpecs.push({ label: 'Sizes', value: `${nums[0]}\u2013${nums[nums.length - 1]} mm` });
+} else if (sizeValues.length === 1) {
+  keySpecs.push({ label: 'Size', value: sizeValues[0] });
+}
+if (m.flatness) keySpecs.push({ label: 'Flatness', value: m.flatness });
+
+// Spec groups: prefer datasheet, fall back to metafield-based groups
 type SpecRow = { label: string; value: string };
 type SpecGroup = { title: string; rows: SpecRow[] };
 
-const SPEC_LABELS: Record<string, string> = {
-  size_mm: 'Board size', squares: 'Grid', square_size_mm: 'Square size',
-  marker_size_mm: 'Marker size', dictionary: 'Dictionary', start_id: 'Start ID',
-  material: 'Material', thickness_mm: 'Thickness', weight_g: 'Weight',
-  corner_radius_mm: 'Corner radius', finish: 'Finish',
-  feature_tolerance: 'Feature tolerance', flatness: 'Flatness',
-  cte: 'CTE', operating_temp: 'Operating temperature',
-  files_included: 'Files included', lead_time: 'Lead time',
-};
-
-const SPEC_UNITS: Record<string, string> = {
-  size_mm: 'mm', square_size_mm: 'mm', marker_size_mm: 'mm',
-  thickness_mm: 'mm', weight_g: 'g', corner_radius_mm: 'mm',
-};
-
-function specRow(key: string): SpecRow | null {
-  const raw = m[key];
-  if (!raw) return null;
-  const unit = SPEC_UNITS[key];
-  const value = unit && !raw.includes(unit) ? `${raw} ${unit}` : raw;
-  return { label: SPEC_LABELS[key] ?? key, value };
+let specGroups: SpecGroup[] = [];
+if (productData && productData.specGroups.length > 0) {
+  specGroups = productData.specGroups;
+} else {
+  // Fall back to metafield-based groups (existing logic)
+  const SPEC_LABELS: Record<string, string> = {
+    size_mm: 'Board size', squares: 'Grid', square_size_mm: 'Square size',
+    marker_size_mm: 'Marker size', dictionary: 'Dictionary', start_id: 'Start ID',
+    material: 'Material', thickness_mm: 'Thickness', weight_g: 'Weight',
+    corner_radius_mm: 'Corner radius', finish: 'Finish',
+    feature_tolerance: 'Feature tolerance', flatness: 'Flatness',
+    cte: 'CTE', operating_temp: 'Operating temperature',
+    files_included: 'Files included', lead_time: 'Lead time',
+  };
+  const SPEC_UNITS: Record<string, string> = {
+    size_mm: 'mm', square_size_mm: 'mm', marker_size_mm: 'mm',
+    thickness_mm: 'mm', weight_g: 'g', corner_radius_mm: 'mm',
+  };
+  function specRow(key: string): SpecRow | null {
+    const raw = m[key];
+    if (!raw) return null;
+    const unit = SPEC_UNITS[key];
+    const value = unit && !raw.includes(unit) ? `${raw} ${unit}` : raw;
+    return { label: SPEC_LABELS[key] ?? key, value };
+  }
+  function specGroup(title: string, keys: string[]): SpecGroup | null {
+    const rows = keys.map(specRow).filter((r): r is SpecRow => r !== null);
+    return rows.length > 0 ? { title, rows } : null;
+  }
+  specGroups = [
+    specGroup('Geometry', ['size_mm', 'squares', 'square_size_mm', 'marker_size_mm', 'dictionary', 'start_id']),
+    specGroup('Physical', ['material', 'thickness_mm', 'weight_g', 'corner_radius_mm', 'finish']),
+    specGroup('Accuracy', ['feature_tolerance', 'flatness', 'cte', 'operating_temp']),
+    specGroup('Deliverables', ['files_included', 'lead_time']),
+  ].filter((g): g is SpecGroup => g !== null);
 }
-
-function specGroup(title: string, keys: string[]): SpecGroup | null {
-  const rows = keys.map(specRow).filter((r): r is SpecRow => r !== null);
-  return rows.length > 0 ? { title, rows } : null;
-}
-
-const specGroups = [
-  specGroup('Geometry', ['size_mm', 'squares', 'square_size_mm', 'marker_size_mm', 'dictionary', 'start_id']),
-  specGroup('Physical', ['material', 'thickness_mm', 'weight_g', 'corner_radius_mm', 'finish']),
-  specGroup('Accuracy', ['feature_tolerance', 'flatness', 'cte', 'operating_temp']),
-  specGroup('Deliverables', ['files_included', 'lead_time']),
-].filter((g): g is SpecGroup => g !== null);
 
 // --- Downloads ---
 const hasPatternData = !!(m.squares && m.square_size_mm);
@@ -101,18 +124,17 @@ if (hasPatternData) {
   const square = Number(m.square_size_mm ?? 0);
   const marker = Number(m.marker_size_mm ?? 0);
   const dict = m.dictionary ?? '';
-  const startId = Number(m.start_id ?? 0);
   const patternType = dict ? 'ChArUco' : 'Checkerboard';
 
   if (rows > 0 && cols > 0 && square > 0) {
     const spec: PatternSpec = {
       type: patternType as PatternSpec['type'],
       rows, cols, square, marker, dict,
-      paper: 'A4', startId, scaleBar: false,
+      paper: 'A4', startId: Number(m.start_id ?? 0), scaleBar: false,
     };
     const slug = `${handle}-${rows}x${cols}-${square}mm`;
     configFiles = [
-      { name: `${slug}.opencv.json`, content: JSON.stringify({ pattern: patternType, rows, cols, square_mm: square, marker_mm: marker, dictionary: dict, start_id: startId, generator: 'Calib.Tools' }, null, 2), mime: 'application/json' },
+      { name: `${slug}.opencv.json`, content: JSON.stringify({ pattern: patternType, rows, cols, square_mm: square, marker_mm: marker, dictionary: dict, start_id: Number(m.start_id ?? 0), generator: 'Calib.Tools' }, null, 2), mime: 'application/json' },
       { name: `${slug}.kalibr.yaml`, content: kalibrYaml(spec), mime: 'text/yaml' },
       { name: `${slug}.ros2.yaml`, content: ros2Yaml(spec), mime: 'text/yaml' },
       { name: `${slug}.halcon.descr`, content: halconDescr(spec), mime: 'text/plain' },
@@ -120,10 +142,19 @@ if (hasPatternData) {
   }
 }
 
-// --- Datasheet URL: metafield value, or fallback to generated PDF ---
 const datasheetUrl = m.datasheet_url || findDatasheetUrl(handle!) || '';
 
-// --- Product images from local catalogue ---
+const downloadFiles = [
+  ...(datasheetUrl ? [{ name: `${handle}-datasheet${m.datasheet_rev ? `-rev${m.datasheet_rev}` : ''}.pdf`, url: datasheetUrl, mime: 'application/pdf' }] : []),
+  { name: 'sample-inspection-report.pdf', url: '/downloads/sample-inspection-report.pdf', mime: 'application/pdf' },
+  ...configFiles.map((f) => ({
+    name: f.name,
+    url: `data:${f.mime};charset=utf-8,${encodeURIComponent(f.content)}`,
+    mime: f.mime,
+  })),
+];
+
+// --- Product images ---
 const catalogImages = getProductImages(handle!);
 const galleryImages: GalleryImageData[] = [];
 
@@ -134,16 +165,12 @@ for (const entry of catalogImages) {
     meta,
     entry.alt || `Calib.Tools ${product.title} — ${entry.file.replace(/^\d+-/, '').replace(/\.webp$/, '')}`,
   );
-  galleryImages.push({
-    ...optimized,
-    kind: entry.kind,
-    file: entry.file,
-  });
+  galleryImages.push({ ...optimized, kind: entry.kind, file: entry.file });
 }
 
 const hasLocalImages = galleryImages.length > 0;
 
-// --- Board set image (home-set.webp) for multi-board selector ---
+// Board set image
 const isBoardProduct = handle?.includes('charuco') || handle?.includes('checkerboard');
 let boardSetImageData: { src: string; srcset: string; width: number; height: number } | undefined;
 if (isBoardProduct) {
@@ -161,7 +188,7 @@ if (isBoardProduct) {
   };
 }
 
-// --- Placeholder render from product geometry (fallback when no local images) ---
+// Placeholder render
 let placeholderSvg = '';
 if (!hasLocalImages && product.images.length === 0 && hasPatternData) {
   const [pRows, pCols] = (m.squares ?? '').split(/[x×]/).map((s: string) => Number(s.trim()));
@@ -175,97 +202,57 @@ if (!hasLocalImages && product.images.length === 0 && hasPatternData) {
       rows: pRows, cols: pCols, square: pSquare, marker: pMarker, dict: pDict,
       paper: 'A4', startId: Number(m.start_id ?? 0), scaleBar: false,
     };
-    const pw = pCols * pSquare + 20;
-    const ph = pRows * pSquare + 20;
-    placeholderSvg = checkerboardSvg(previewSpec, pw, ph);
+    placeholderSvg = checkerboardSvg(previewSpec, pCols * pSquare + 20, pRows * pSquare + 20);
   }
 }
 
 // --- JSON-LD ---
 const siteUrl = 'https://calib.tools';
-
 const breadcrumbLd = {
-  '@context': 'https://schema.org',
-  '@type': 'BreadcrumbList',
+  '@context': 'https://schema.org', '@type': 'BreadcrumbList',
   itemListElement: [
     { '@type': 'ListItem', position: 1, name: 'Home', item: siteUrl },
     { '@type': 'ListItem', position: 2, name: 'Calibration targets', item: `${siteUrl}/targets/` },
     { '@type': 'ListItem', position: 3, name: product.title },
   ],
 };
-
 const productLd: Record<string, any> = {
-  '@context': 'https://schema.org',
-  '@type': 'ProductGroup',
-  name: product.title,
-  description: product.description,
+  '@context': 'https://schema.org', '@type': 'ProductGroup',
+  name: product.title, description: product.description,
   url: `${siteUrl}${product.url}`,
   brand: { '@type': 'Brand', name: 'Calib.Tools' },
-  image: hasLocalImages
-    ? galleryImages.map((img) => `${siteUrl}${img.src}`)
-    : product.images.length > 0 ? product.images.map((img) => img.url) : undefined,
+  image: hasLocalImages ? galleryImages.map((img) => `${siteUrl}${img.src}`) : product.images.length > 0 ? product.images.map((img) => img.url) : undefined,
 };
-
 if (product.variants.length > 0) {
   productLd.hasVariant = product.variants.map((v) => ({
-    '@type': 'Product',
-    name: `${product.title} — ${v.title}`,
-    sku: v.sku || undefined,
-    offers: {
-      '@type': 'Offer',
-      price: v.priceAmount,
-      priceCurrency: v.currencyCode,
-      availability: v.availableForSale
-        ? 'https://schema.org/InStock'
-        : 'https://schema.org/OutOfStock',
-      url: `${siteUrl}${product.url}?variant=${encodeURIComponent(v.id)}`,
-      seller: { '@type': 'Organization', name: 'Calib.Tools' },
-    },
+    '@type': 'Product', name: `${product.title} — ${v.title}`, sku: v.sku || undefined,
+    offers: { '@type': 'Offer', price: v.priceAmount, priceCurrency: v.currencyCode, availability: v.availableForSale ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock', url: `${siteUrl}${product.url}?variant=${encodeURIComponent(v.id)}`, seller: { '@type': 'Organization', name: 'Calib.Tools' } },
   }));
 } else {
-  productLd.offers = {
-    '@type': 'AggregateOffer',
-    lowPrice: product.priceMinAmount,
-    priceCurrency: product.priceMinCurrency,
-    availability: 'https://schema.org/InStock',
-    url: `${siteUrl}${product.url}`,
-  };
+  productLd.offers = { '@type': 'AggregateOffer', lowPrice: product.priceMinAmount, priceCurrency: product.priceMinCurrency, availability: 'https://schema.org/InStock', url: `${siteUrl}${product.url}` };
 }
 
-// OG image: use local hero if available, then Shopify, then fallback render
-const ogImage = hasLocalImages
-  ? galleryImages[0].src
-  : product.images[0]?.url ?? `/og/${handle}.png`;
+const ogImage = hasLocalImages ? galleryImages[0].src : product.images[0]?.url ?? `/og/${handle}.png`;
 
-// --- Pairs with / Compare ---
+// Pairs with / Compare
 const isAccessory = handle === 'mounting-fixture' || handle === 'certificate-ilac';
 const pairsWith = isAccessory ? [] : [fixtureProduct, certProduct].filter(Boolean);
-
-// Compare: swap composite↔ceramic in the handle
 let compareProduct: typeof product | null = null;
-if (handle?.includes('-composite')) {
-  compareProduct = allProducts.find((p) => p.handle === handle.replace('-composite', '-ceramic')) ?? null;
-} else if (handle?.includes('-ceramic')) {
-  compareProduct = allProducts.find((p) => p.handle === handle.replace('-ceramic', '-composite')) ?? null;
-}
+if (handle?.includes('-composite')) compareProduct = allProducts.find((p) => p.handle === handle.replace('-composite', '-ceramic')) ?? null;
+else if (handle?.includes('-ceramic')) compareProduct = allProducts.find((p) => p.handle === handle.replace('-ceramic', '-composite')) ?? null;
 
-// --- Parent collection link ---
 const collectionHandle = PRODUCT_TO_COLLECTION[handle!] ?? '';
-const collectionTitle = collectionHandle
-  ? collectionHandle.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
-  : '';
+const collectionTitle = collectionHandle ? collectionHandle.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()) : '';
 
-// --- FAQ ---
+// FAQ
 const faqItems = getProductFaq(handle!);
-const faqJsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'FAQPage',
-  mainEntity: faqItems.map((item) => ({
-    '@type': 'Question',
-    name: item.question,
-    acceptedAnswer: { '@type': 'Answer', text: item.answer },
-  })),
-};
+const faqJsonLd = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqItems.map((item) => ({ '@type': 'Question', name: item.question, acceptedAnswer: { '@type': 'Answer', text: item.answer } })) };
+
+// Ordering rows with prices from Shopify variants
+const orderingRows = (productData?.orderingRows ?? []).map((row) => {
+  const matchedVariant = product.variants.find((v) => v.sku && row.partNumber.startsWith(v.sku.replace(/-6X6$|-5X5$|-4X4$|-AT36$/, '')));
+  return { ...row, price: matchedVariant?.price ?? '' };
+});
 ---
 <Base
   title={product.title}
@@ -280,6 +267,7 @@ const faqJsonLd = {
     sizes: '(max-width: 640px) 100vw, (max-width: 1024px) 60vw, 520px',
   }] : undefined}
 >
+  {/* Breadcrumb */}
   <nav class="container-x flex gap-2 overflow-x-auto whitespace-nowrap pt-5 text-sm text-ink-soft scrollbar-none" aria-label="Breadcrumb">
     <a href="/" class="text-ink-soft no-underline shrink-0">Home</a><span>/</span>
     <a href="/targets/" class="text-ink-soft no-underline shrink-0">Calibration targets</a><span>/</span>
@@ -289,8 +277,9 @@ const faqJsonLd = {
     <span class="text-ink shrink-0">{product.title}</span>
   </nav>
 
+  {/* ── Buy box ── */}
   <section class="container-x flex flex-wrap gap-14 py-8 md:pb-16">
-    {/* Images */}
+    {/* Gallery */}
     <div class="flex min-w-0 flex-1 basis-[520px] flex-col gap-4">
       <ImageGallery
         client:load
@@ -303,18 +292,33 @@ const faqJsonLd = {
       />
     </div>
 
-    {/* Product info + variant picker */}
+    {/* Product info */}
     <div class="flex min-w-0 flex-1 basis-[420px] flex-col gap-5" data-buy-box>
+      {/* Badges */}
       <div class="flex flex-wrap gap-2">
         <span class="badge bg-brand/10 text-brand-dark">{eyebrow}</span>
-        {m.feature_tolerance && (
-          <span class="badge border border-line text-ink">{m.feature_tolerance}</span>
-        )}
         <span class="badge bg-ink text-white">Report included</span>
       </div>
-      <h1 class="h-display m-0 text-[32px] leading-[1.1] md:text-[40px]">{product.title}</h1>
-      <p class="m-0 text-base leading-relaxed text-ink-muted">{product.description}</p>
 
+      {/* h1 */}
+      <h1 class="h-display m-0 text-[28px] leading-[1.1] md:text-[36px]">{product.title}</h1>
+
+      {/* One-line positioning */}
+      <p class="m-0 text-[17px] leading-relaxed text-ink-muted">{positioning}</p>
+
+      {/* Key-specs strip */}
+      {keySpecs.length > 0 && (
+        <dl class="m-0 grid grid-cols-2 gap-px rounded border border-line bg-line md:grid-cols-4">
+          {keySpecs.map((ks) => (
+            <div class="flex flex-col gap-1 bg-ground p-3">
+              <dt class="text-[12px] uppercase tracking-[0.08em] text-ink-muted">{ks.label}</dt>
+              <dd class="m-0 font-mono text-[15px] font-medium">{ks.value}</dd>
+            </div>
+          ))}
+        </dl>
+      )}
+
+      {/* VariantPicker (price, selectors, add-ons, qty, cart, assurances) */}
       <VariantPicker
         client:load
         product={product}
@@ -327,155 +331,267 @@ const faqJsonLd = {
     </div>
   </section>
 
-  {/* Specs + description */}
+  {/* ── Sizes and part numbers ── */}
+  {orderingRows.length > 0 && (
+    <section class="container-x flex flex-col gap-5 pb-12 md:pb-16">
+      <h2 class="h-display m-0 text-[20px] md:text-2xl">Sizes and part numbers</h2>
+      <div class="overflow-x-auto -mx-5 px-5 md:mx-0 md:px-0">
+        <table class="w-full min-w-[640px] border-collapse text-[14px]">
+          <thead>
+            <tr class="border-b border-line bg-ground-alt text-left text-[12px] font-semibold uppercase tracking-wider text-ink-muted">
+              <th class="py-2.5 px-3">Part number</th>
+              <th class="py-2.5 px-3">Size W × H</th>
+              <th class="py-2.5 px-3">Squares</th>
+              <th class="py-2.5 px-3">Square · marker</th>
+              <th class="py-2.5 px-3">Corners</th>
+              <th class="py-2.5 px-3">Markers</th>
+              {orderingRows.some((r) => r.weight) && <th class="py-2.5 px-3">Weight</th>}
+              <th class="py-2.5 px-3 text-right">Price</th>
+            </tr>
+          </thead>
+          <tbody>
+            {orderingRows.map((row, i) => (
+              <tr
+                class={`border-b border-line cursor-pointer hover:bg-ground-alt/50 ${i % 2 === 1 ? 'bg-ground-alt' : ''}`}
+                data-select-size={row.size.split(/\s*[×x]\s*/)[0]?.trim()}
+              >
+                <td class="py-3 px-3 font-mono text-[13px] text-brand-dark">{row.partNumber}</td>
+                <td class="py-3 px-3 whitespace-nowrap">{row.size}</td>
+                <td class="py-3 px-3 font-mono text-[13px]">{row.squares}</td>
+                <td class="py-3 px-3 font-mono text-[13px]">{row.squareMarker}</td>
+                <td class="py-3 px-3 font-mono text-[13px]">{row.corners}</td>
+                <td class="py-3 px-3 font-mono text-[13px]">{row.markers}</td>
+                {orderingRows.some((r) => r.weight) && <td class="py-3 px-3 font-mono text-[13px]">{row.weight}</td>}
+                <td class="py-3 px-3 font-mono text-[13px] font-semibold text-right">{row.price}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {productData && (
+        <p class="m-0 text-[13px] text-ink-soft">Start ID 0, row-major, OpenCV &ge; 4.6 placement. Larger sizes on request.</p>
+      )}
+    </section>
+  )}
+
+  {/* ── Details accordion + sidebar ── */}
   <section class="container-x flex flex-wrap gap-12 pb-16">
-    <div class="flex min-w-0 flex-1 basis-[520px] flex-col gap-6">
-      {specGroups.length > 0 ? (
-        <>
-          <h2 class="h-display m-0 text-2xl">Specifications</h2>
-          {specGroups.map((group) => (
-            <div>
-              <h3 class="m-0 pb-2 text-[13px] font-semibold uppercase tracking-[0.08em] text-ink-soft" data-spec-group>{group.title}</h3>
-              <div class="overflow-x-auto">
-                <table class="w-full border-collapse text-[15px]">
+    {/* Left column: accordions */}
+    <div class="flex min-w-0 flex-[2] basis-[520px] flex-col divide-y divide-line border-y border-line">
+
+      {/* 1. Specifications */}
+      {specGroups.length > 0 && (
+        <details class="group" id="specs-accordion" open>
+          <summary class="flex cursor-pointer list-none items-center justify-between gap-4 py-5 text-[20px] font-semibold [&::-webkit-details-marker]:hidden">
+            Specifications
+            <span class="shrink-0 text-ink-soft transition-transform group-open:rotate-45">+</span>
+          </summary>
+          <div class="flex flex-col gap-6 pb-6">
+            {specGroups.map((group) => (
+              <div>
+                <h3 class="m-0 pb-2 font-mono text-[12px] uppercase tracking-[0.16em] text-brand-dark">{group.title}</h3>
+                <table class="w-full border-collapse text-[14px]">
                   <tbody>
                     {group.rows.map((row, i) => (
                       <tr class={`border-t border-line last:border-b ${i % 2 === 1 ? 'bg-ground-alt' : ''}`}>
-                        <td class="w-2/5 py-3 text-ink-soft md:table-cell">{row.label}</td>
-                        <td class="spec py-3">{row.value}</td>
+                        <td class="w-[38%] py-2.5 pr-3 text-ink-muted">{row.label}</td>
+                        <td class="py-2.5 font-mono text-[14px]">{row.value}</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
-            </div>
-          ))}
-        </>
-      ) : cleanDescription ? (
-        <>
-          <h2 class="h-display m-0 text-2xl">Details</h2>
-          <div class="prose" set:html={cleanDescription} />
-        </>
-      ) : null}
+            ))}
+            {productData && (
+              <p class="m-0 text-[13px] text-ink-soft">
+                Values at 20&nbsp;&deg;C unless stated. Full tolerances in datasheet <code class="text-[12px]">{productData.datasheetCode}</code> rev&nbsp;{productData.rev}.
+              </p>
+            )}
+          </div>
+        </details>
+      )}
+
+      {/* 2. What's in the box & files */}
+      <details class="group">
+        <summary class="flex cursor-pointer list-none items-center justify-between gap-4 py-5 text-[20px] font-semibold [&::-webkit-details-marker]:hidden">
+          What&rsquo;s in the box &amp; files
+          <span class="shrink-0 text-ink-soft transition-transform group-open:rotate-45">+</span>
+        </summary>
+        <div class="grid grid-cols-1 gap-4 pb-6 sm:grid-cols-2">
+          <div class="flex flex-col gap-2 text-[15px]">
+            <strong class="text-[13px] uppercase tracking-[0.08em] text-ink-muted">In the box</strong>
+            <ul class="m-0 flex flex-col gap-1.5 pl-4 text-[15px]">
+              <li>Calibration board in protective case</li>
+              <li>Dimensional inspection report (PDF)</li>
+              <li>Edge label with serial number</li>
+            </ul>
+          </div>
+          <div class="flex flex-col gap-2 text-[15px]">
+            <strong class="text-[13px] uppercase tracking-[0.08em] text-ink-muted">Digital files</strong>
+            <ul class="m-0 flex flex-col gap-1.5 pl-4 text-[15px]">
+              <li>Datasheet PDF &middot; DXF drawing</li>
+              <li>OpenCV JSON &middot; Kalibr YAML</li>
+              <li>HALCON .descr &middot; ROS 2 YAML</li>
+              <li>Per-feature coordinates CSV</li>
+            </ul>
+          </div>
+        </div>
+      </details>
+
+      {/* 3. Compatibility */}
+      <details class="group">
+        <summary class="flex cursor-pointer list-none items-center justify-between gap-4 py-5 text-[20px] font-semibold [&::-webkit-details-marker]:hidden">
+          Compatibility
+          <span class="shrink-0 text-ink-soft transition-transform group-open:rotate-45">+</span>
+        </summary>
+        <table class="mb-6 w-full border-collapse text-[14px]">
+          <tbody>
+            {([
+              ['OpenCV', '\u2265 4.6 \u00B7 cv::aruco::CharucoBoard'],
+              ['Kalibr', 'YAML config file supplied'],
+              ['HALCON', 'Plate description file supplied'],
+              ['MATLAB', 'Camera Calibrator app'],
+              ['ROS 2', 'camera_calibration package'],
+            ] as [string, string][]).map(([tool, note], i) => (
+              <tr class={`border-t border-line last:border-b ${i % 2 === 1 ? 'bg-ground-alt' : ''}`}>
+                <td class="w-[38%] py-2.5 pr-3 font-semibold">{tool}</td>
+                <td class="py-2.5 font-mono text-[14px] text-ink-muted">{note}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </details>
+
+      {/* 4. Inspection report & certificate */}
+      <details class="group">
+        <summary class="flex cursor-pointer list-none items-center justify-between gap-4 py-5 text-[20px] font-semibold [&::-webkit-details-marker]:hidden">
+          Inspection report &amp; certificate
+          <span class="shrink-0 text-ink-soft transition-transform group-open:rotate-45">+</span>
+        </summary>
+        <div class="flex flex-col gap-4 pb-6 text-[15px] leading-relaxed text-ink-muted">
+          <p class="m-0">
+            Every board ships with a manufacturer inspection report: feature positions measured on a coordinate system, flatness check, and visual inspection. The report PDF and measured-coordinates CSV are available via the serial-number lookup at <a href="/verify/">calib.tools/verify</a>.
+          </p>
+          <p class="m-0">
+            For traceable measurement uncertainty, add an ILAC-MRA calibration certificate issued by an accredited third-party laboratory. This is a separate service (SVC-X-CERT-ILAC) and adds 1&ndash;3 weeks to lead time. A manufacturer inspection is not a substitute for accredited calibration.
+          </p>
+        </div>
+      </details>
+
+      {/* 5. Shipping, returns & warranty */}
+      <details class="group">
+        <summary class="flex cursor-pointer list-none items-center justify-between gap-4 py-5 text-[20px] font-semibold [&::-webkit-details-marker]:hidden">
+          Shipping, returns &amp; warranty
+          <span class="shrink-0 text-ink-soft transition-transform group-open:rotate-45">+</span>
+        </summary>
+        <table class="mb-6 w-full border-collapse text-[14px]">
+          <tbody>
+            {([
+              ['Lead time', m.lead_time || 'Ships in 1\u20132 business days'],
+              ['Shipping', 'From Germany via DHL. Free EU shipping over \u20AC150. DDP to the US on request.'],
+              ['Returns', '30 days, unused, in original case.'],
+              ['Warranty', '2 years against manufacturing defects.'],
+            ] as [string, string][]).map(([label, value], i) => (
+              <tr class={`border-t border-line last:border-b ${i % 2 === 1 ? 'bg-ground-alt' : ''}`}>
+                <td class="w-[38%] py-2.5 pr-3 text-ink-muted">{label}</td>
+                <td class="py-2.5 text-[14px]">{value}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </details>
+
+      {/* 6. FAQ */}
+      {faqItems.length > 0 && (
+        <details class="group">
+          <summary class="flex cursor-pointer list-none items-center justify-between gap-4 py-5 text-[20px] font-semibold [&::-webkit-details-marker]:hidden">
+            Frequently asked questions
+            <span class="shrink-0 text-ink-soft transition-transform group-open:rotate-45">+</span>
+          </summary>
+          <div class="flex flex-col divide-y divide-line pb-6">
+            {faqItems.map((item) => (
+              <div class="py-3">
+                <strong class="text-[15px]">{item.question}</strong>
+                <p class="m-0 pt-2 text-[15px] leading-relaxed text-ink-muted">{item.answer}</p>
+              </div>
+            ))}
+          </div>
+          <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+        </details>
+      )}
     </div>
 
-    <div class="flex min-w-0 flex-1 basis-[320px] flex-col gap-4">
+    {/* Right column: sidebar cards */}
+    <div class="flex min-w-0 flex-1 basis-[280px] flex-col gap-4">
+      {/* Downloads */}
+      {downloadFiles.length > 0 && (
+        <div class="card flex flex-col gap-3 bg-ground-alt p-5">
+          <strong class="text-[15px]">Downloads</strong>
+          <DownloadPicker client:load files={downloadFiles} />
+        </div>
+      )}
+
+      {/* Size wizard */}
       <div class="card flex flex-col gap-2 bg-ground-alt p-5">
         <strong class="text-[15px]">Not sure about the size?</strong>
         <span class="text-sm text-ink-muted">Run the free selection wizard with your camera and lens.</span>
-        <a href="/tools/wizard/" class="text-sm font-semibold">Open wizard →</a>
+        <a href="/tools/wizard/" class="text-sm font-semibold">Open wizard &rarr;</a>
       </div>
+
+      {/* Compare material */}
+      {compareProduct && (
+        <div class="card flex flex-col gap-2 bg-ground-alt p-5">
+          <strong class="text-[15px]">Compare with {compareProduct.title}</strong>
+          <span class="text-sm text-ink-muted">{handle?.includes('composite') ? 'Higher accuracy, smaller sizes.' : 'Larger sizes from \u20AC79, more affordable.'}</span>
+          <a href={compareProduct.url} class="text-sm font-semibold">View {compareProduct.title} &rarr;</a>
+        </div>
+      )}
+
+      {/* Request a quote */}
       <div class="card flex flex-col gap-2 bg-ground-alt p-5">
-        <strong class="text-[15px]">Need a custom pattern?</strong>
-        <span class="text-sm text-ink-muted">Generate any grid, download the PDF and order as custom.</span>
-        <a href="/tools/generator/" class="text-sm font-semibold">Open generator →</a>
+        <strong class="text-[15px]">Need a quote?</strong>
+        <span class="text-sm text-ink-muted">Reply within one business day.</span>
+        <a href="/quote/" class="text-sm font-semibold">Request a quote &rarr;</a>
       </div>
     </div>
   </section>
 
-  {/* Downloads */}
-  {(datasheetUrl || configFiles.length > 0) && (
-    <section class="container-x flex flex-col gap-5 pb-16">
-      <h2 class="h-display m-0 text-2xl">Downloads</h2>
-      <DownloadPicker
-        client:load
-        files={[
-          ...(datasheetUrl ? [{ name: `${handle}-datasheet${m.datasheet_rev ? `-rev${m.datasheet_rev}` : ''}.pdf`, url: datasheetUrl, mime: 'application/pdf' }] : []),
-          { name: 'sample-inspection-report.pdf', url: '/downloads/sample-inspection-report.pdf', mime: 'application/pdf' },
-          ...configFiles.map((f) => ({
-            name: f.name,
-            url: `data:${f.mime};charset=utf-8,${encodeURIComponent(f.content)}`,
-            mime: f.mime,
-          })),
-        ]}
-      />
-      <NotifyForm client:load handle={handle!} />
-    </section>
-  )}
-
-  {/* Pairs with */}
+  {/* ── Pairs with ── */}
   {pairsWith.length > 0 && (
     <section class="container-x flex flex-col gap-5 pb-16">
       <h2 class="h-display m-0 text-2xl">Pairs with</h2>
       <div class="grid grid-cols-2 gap-4 md:grid-cols-4">
         {pairsWith.map((p) => p && (
-          <ProductCard
-            href={p.url}
-            title={p.title}
-            sub={p.description}
-            from={p.priceFrom}
-            image={p.image}
-            placeholder={p.title.toUpperCase()}
-          />
+          <ProductCard href={p.url} title={p.title} sub={p.description} from={p.priceFrom} image={p.image} placeholder={p.title.toUpperCase()} />
         ))}
       </div>
     </section>
   )}
 
-  {/* Compare */}
-  {compareProduct && (
-    <section class="container-x pb-16">
-      <div class="card flex flex-wrap items-center justify-between gap-4 bg-ground-alt px-6 py-5">
-        <div class="flex flex-col gap-1">
-          <strong class="text-[15px]">Compare with {compareProduct.title}</strong>
-          <span class="text-sm text-ink-muted">{handle?.includes('composite') ? 'Higher accuracy, smaller sizes' : 'Larger sizes, more affordable'}</span>
-        </div>
-        <a href={compareProduct.url} class="text-sm font-semibold">View {compareProduct.title} →</a>
-      </div>
-    </section>
-  )}
-
-  {/* FAQ */}
-  {faqItems.length > 0 && (
-    <section class="container-x flex flex-col gap-5 pb-16">
-      <h2 class="h-display m-0 text-2xl">Frequently asked questions</h2>
-      <div class="flex flex-col divide-y divide-line border-y border-line">
-        {faqItems.map((item) => (
-          <details class="group py-4">
-            <summary class="flex cursor-pointer list-none items-center justify-between gap-4 text-[15px] font-semibold [&::-webkit-details-marker]:hidden">
-              {item.question}
-              <span class="shrink-0 text-ink-soft transition-transform group-open:rotate-45">+</span>
-            </summary>
-            <p class="m-0 pt-3 text-[15px] leading-relaxed text-ink-muted">{item.answer}</p>
-          </details>
-        ))}
-      </div>
-      <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
-    </section>
-  )}
-
-  {/* Warranty + Compliance */}
-  <section class="container-x grid grid-cols-1 md:grid-cols-2 gap-4 pb-16">
-    <div class="card flex gap-4 p-5">
-      <div class="shrink-0 mt-0.5">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-brand" aria-hidden="true">
-          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-        </svg>
-      </div>
-      <div class="flex flex-col gap-1">
-        <strong class="text-[15px]">2-year warranty</strong>
-        <p class="m-0 text-sm text-ink-muted">{WARRANTY_TEXT}</p>
-      </div>
-    </div>
-    <div class="card flex flex-col gap-3 p-5">
-      <strong class="text-[15px]">Compliance</strong>
-      <div class="flex flex-wrap gap-2">
-        {Object.values(COMPLIANCE).map((label) => (
-          <span class="badge border border-line text-ink text-[11px]">{label}</span>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  {/* Back to family page */}
+  {/* Back to family */}
   {collectionHandle && (
     <section class="container-x pb-16">
-      <a href={`/targets/collection/${collectionHandle}/`} class="text-sm font-semibold no-underline">
-        &uarr; All {collectionTitle.toLowerCase()}
-      </a>
+      <a href={`/targets/collection/${collectionHandle}/`} class="text-sm font-semibold no-underline">&uarr; All {collectionTitle.toLowerCase()}</a>
     </section>
   )}
 
-  {/* Mobile sticky bottom bar */}
   <MobileBottomCluster slot="mobile-cluster" client:load mode="add-to-cart" defaultPrice={product.priceFrom} />
 </Base>
+
+<script>
+  // Close specs accordion on mobile by default
+  if (window.innerWidth < 768) {
+    const specs = document.getElementById('specs-accordion');
+    if (specs) specs.removeAttribute('open');
+  }
+
+  // Ordering table row click → select size in VariantPicker
+  document.querySelectorAll('[data-select-size]').forEach((row) => {
+    row.addEventListener('click', () => {
+      const size = (row as HTMLElement).dataset.selectSize;
+      if (size) {
+        window.dispatchEvent(new CustomEvent('select-size', { detail: { size } }));
+      }
+    });
+  });
+</script>

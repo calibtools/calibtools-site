@@ -66,7 +66,7 @@ export default function VariantPicker({ product, certVariantId, fixtureVariantId
 
   const variant = findVariant(product.variants, selections);
 
-  // Dispatch variant-changed for StickyBottomBar
+  // Dispatch variant-changed for MobileBottomCluster
   useEffect(() => {
     if (typeof window === 'undefined') return;
     window.dispatchEvent(new CustomEvent('variant-changed', {
@@ -77,6 +77,22 @@ export default function VariantPicker({ product, certVariantId, fixtureVariantId
       },
     }));
   }, [variant?.id, variant?.price, variant?.availableForSale, product.priceFrom]);
+
+  // Listen for select-size from ordering table row clicks
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const handler = (e: Event) => {
+      const size = (e as CustomEvent).detail?.size;
+      if (!size) return;
+      // Find a Size option value that starts with the given size prefix
+      const sizeOpt = product.options.find((o) => o.name === 'Size');
+      if (!sizeOpt) return;
+      const match = sizeOpt.values.find((v) => v.startsWith(size));
+      if (match) handleSelect('Size', match);
+    };
+    window.addEventListener('select-size', handler);
+    return () => window.removeEventListener('select-size', handler);
+  }, [product.options]);
 
   // Determine if this is a board-set-eligible product
   const isBoardProduct = product.handle.includes('charuco') || product.handle.includes('aprilgrid') || product.handle.includes('aruco');
