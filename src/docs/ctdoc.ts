@@ -297,7 +297,7 @@ export function kv(
   return `<dl class="kv" style="${style}">${out.join('')}</dl>`;
 }
 
-type ColumnKind = 't' | 'm' | 'n' | 'c' | 's';
+export type ColumnKind = 't' | 'm' | 'n' | 'c' | 's';
 
 export function table(
   columns: [string, ColumnKind][],
