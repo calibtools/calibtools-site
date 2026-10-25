@@ -5,13 +5,14 @@
 /* --- Theme colour tokens (RGB triplets for Tailwind alpha support) --- */
 :root {
   --color-ground: 255 255 255;
-  --color-ground-alt: 250 250 250;
+  --color-ground-alt: 242 242 242;
   --color-ground-panel: 245 245 245;
   --color-line: 230 230 230;
   --color-line-strong: 236 236 236;
+  --color-line-soft: 179 179 179;
   --color-ink: 26 26 26;
-  --color-ink-muted: 74 74 74;
-  --color-ink-soft: 107 107 107;
+  --color-ink-muted: 51 51 51;
+  --color-ink-soft: 102 102 102;
   --color-brand: 230 0 18;
   --color-brand-text: 230 0 18;
   --color-brand-dark: 179 0 14;
@@ -31,6 +32,18 @@
   --color-brand-text: 255 59 71;
   --color-brand-dark: 179 0 14;
   --color-brand-tint: rgba(230, 0, 18, 0.16);
+}
+
+/* --- Brand-kit colour aliases (from calibtools-tokens.css) --- */
+:root {
+  --ct-black: #000000;
+  --ct-red: #E60012;
+  --ct-white: #FFFFFF;
+  --ct-grey-80: #333333;
+  --ct-grey-60: #666666;
+  --ct-grey-30: #B3B3B3;
+  --ct-grey-10: #E6E6E6;
+  --ct-grey-05: #F2F2F2;
 }
 
 /* --- Geist Sans (variable, wght 100–900) --- */
