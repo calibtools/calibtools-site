@@ -11,10 +11,11 @@ import { getCollection } from 'astro:content';
 import { getProductImages } from '@/lib/product-images';
 import { getImageMetadata } from '@/lib/productImageImports';
 import heroLabImage from '@/assets/products/brand/home-lab.webp';
+import type { ImageMetadata } from 'astro';
+
 const collections = await getCollections();
 const allGuides = await getCollection('guides');
 
-// Build a map of handle → hero image metadata for product tiles
 const heroImageMap = new Map<string, ImageMetadata>();
 for (const col of collections) {
   for (const p of col.products) {
@@ -26,75 +27,83 @@ for (const col of collections) {
     }
   }
 }
-import type { ImageMetadata } from 'astro';
-/** Hide guides whose body still contains placeholder copy. */
+
 const isReady = (g: typeof allGuides[number]) => !g.body?.includes('[BODY COPY');
 const guides = allGuides.filter(isReady).slice(0, 3);
+
 const why = [
   ['Transparent pricing', 'Every size and material priced on the page. No quote forms for standard parts.'],
-  ['EU stock, 2–4 days', 'Core targets ship from Germany. DDP to the US on request.'],
+  ['EU stock, 2\u20134 days', 'Core targets ship from Germany. DDP to the US on request.'],
   ['Inspection report included', 'Dimensional check on every board. ILAC-recognised calibration certificate as an add-on.'],
   ['Files you can use', 'Datasheet, CAD and pattern JSON for OpenCV, Kalibr and HALCON with every target.'],
-  ['30-day returns', 'Not flat, not accurate, not what you ordered — send it back.'],
+  ['30-day returns', 'Not flat, not accurate, not what you ordered\u2009\u2014\u2009send it back.'],
 ];
+
+/* Show 3 featured tools on the home page */
+const featuredTools = tools.slice(0, 3);
 ---
-<Base title="Calibrate with confidence" description="Precision checkerboards, ChArUco, AprilGrid and metrology-grade glass targets, plus free browser tools to generate, size and verify your calibration. Shipped from Europe in 2–4 days.">
-  <!-- Hero -->
-  <section class="relative overflow-hidden" id="top">
-    {/* Full-bleed background image */}
-    <div class="absolute inset-0">
-      <Picture
-        src={heroLabImage}
-        widths={[480, 800, 1200, 1600, 2304]}
-        formats={['avif', 'webp', 'jpeg']}
-        alt={heroLabImage.width > 0 ? 'Calib.Tools ChArUco calibration board in a clamp facing a camera rig in a Munich machine vision lab.' : ''}
-        class="h-full w-full object-cover object-left md:object-center"
-        loading="eager"
-        data-hero-bg
-      />
-      {/* Gradient overlay for text readability on the right */}
-      <div class="absolute inset-0 bg-gradient-to-r from-white/90 via-white/70 to-white/30 md:from-white/20 md:via-transparent md:to-transparent" />
+<Base title="Calibrate with confidence" theme="dark" description="Precision checkerboards, ChArUco, AprilGrid and metrology-grade glass targets, plus free browser tools to generate, size and verify your calibration. Shipped from Europe in 2\u20134 days.">
+
+  {/* ── Hero ── */}
+  <section class="container-x flex flex-col-reverse gap-10 py-12 md:flex-row md:items-center md:gap-16 md:py-20" id="top">
+    {/* Text column */}
+    <div class="flex min-w-0 flex-1 basis-[480px] flex-col gap-6">
+      <span class="font-mono text-[12px] uppercase tracking-[0.18em] text-brand-text md:text-[13px]">
+        Calibration targets &amp; tools for machine vision
+      </span>
+      <h1 class="m-0 text-[38px] font-[800] uppercase leading-[1.02] tracking-[-0.02em] md:text-[52px]">
+        Calibrate with<br /><span class="text-brand">confidence</span>
+      </h1>
+      <p class="m-0 max-w-[560px] text-[17px] leading-[1.5] text-ink-muted md:text-[18px]">
+        Precision checkerboards, ChArUco, AprilGrid and metrology-grade glass targets &mdash; with free browser tools to generate, size and verify your calibration. Shipped from Europe in 2&ndash;4&nbsp;days.
+      </p>
+      <div class="flex flex-wrap gap-3.5 pt-2">
+        <a href="/targets/" class="btn-primary uppercase tracking-[0.1em]">Shop targets</a>
+        <a href="/tools/" class="btn-outline uppercase tracking-[0.1em]">Open free tools</a>
+      </div>
+      <p class="m-0 pt-3 font-mono text-[13px] tracking-[0.1em] text-ink-soft md:text-[14px]">
+        OpenCV &middot; ROS &middot; HALCON &middot; MATLAB &middot; Kalibr
+      </p>
     </div>
 
-    <div class="container-x relative flex flex-wrap items-center gap-12 py-12 md:py-20">
-      {/* Text + CTAs positioned over the right third on desktop, over the board crop on mobile */}
-      <div class="flex-1 basis-full md:basis-0" />
-      <div class="flex min-w-0 flex-1 basis-[520px] flex-col gap-6 md:ml-auto md:max-w-[520px]">
-        <span class="eyebrow">Calibration targets &amp; tools for machine vision</span>
-        <h1 class="h-display m-0 text-[40px] leading-[1.08] md:text-[68px] md:leading-[1.02]">Calibrate with <span class="text-brand">confidence.</span></h1>
-        <p class="m-0 max-w-[560px] text-lg leading-relaxed text-ink-muted md:text-xl">Precision checkerboards, ChArUco, AprilGrid and metrology-grade glass targets — with free browser tools to generate, size and verify your calibration. Shipped from Europe in 2–4 days.</p>
-        <div class="flex flex-wrap gap-3.5 pt-2">
-          <a href="/targets/" class="btn-primary">Shop targets</a>
-          <a href="/tools/" class="btn-outline">Open free tools</a>
-        </div>
-        <p class="m-0 pt-3 text-sm text-ink-muted">Works with OpenCV · ROS · HALCON · MATLAB · Kalibr</p>
-      </div>
+    {/* Hero image */}
+    <div class="relative flex-1 basis-[480px]">
+      <Picture
+        src={heroLabImage}
+        widths={[480, 800, 1200, 1600]}
+        formats={['avif', 'webp', 'jpeg']}
+        alt="Calib.Tools ChArUco calibration board in a clamp facing a camera rig in a Munich machine vision lab."
+        class="w-full rounded-lg object-cover"
+        loading="eager"
+      />
+      {/* TODO: Replace with dark three-board hero — see images.json */}
+      <span class="absolute bottom-3 right-3 font-mono text-[11px] tracking-[0.06em] text-ink-soft md:text-[12px]">Rendering</span>
     </div>
   </section>
 
-  <!-- Tools -->
-  <section id="tools" class="border-y border-line-light bg-ground-alt">
+  {/* ── Free tools ── */}
+  <section id="tools" class="border-y border-line bg-ground-alt">
     <div class="container-x flex flex-col gap-9 py-12 md:py-[72px]">
       <div class="flex flex-wrap items-end justify-between gap-4">
         <div class="flex flex-col gap-2.5">
-          <span class="eyebrow">Free tools · runs in your browser</span>
-          <h2 class="h-display m-0 text-[28px] md:text-[40px]">Free tools. Serious targets.</h2>
+          <span class="font-mono text-[12px] uppercase tracking-[0.18em] text-brand-text md:text-[13px]">Free tools &middot; runs in your browser</span>
+          <h2 class="h-display m-0 text-[28px] md:text-[36px]">Free tools. Serious targets.</h2>
         </div>
-        <a href="/tools/" class="text-[15px] font-semibold">See all tools →</a>
+        <a href="/tools/" class="text-[15px] font-semibold">See all tools &rarr;</a>
       </div>
-      <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-4">
-        {tools.map((t) => (
+      <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
+        {featuredTools.map((t) => (
           <ToolCard href={t.href} title={t.title} cta={t.live ? t.cta : `${t.cta} (coming soon)`} body={t.body} />
         ))}
       </div>
     </div>
   </section>
 
-  <!-- Products -->
+  {/* ── Targets ── */}
   <section id="products" class="container-x flex flex-col gap-9 py-12 md:py-[72px]">
     <div class="flex flex-col gap-2.5">
-      <span class="eyebrow">Calibration targets</span>
-      <h2 class="h-display m-0 text-[28px] md:text-[40px]">From checkerboard to certificate.</h2>
+      <span class="font-mono text-[12px] uppercase tracking-[0.18em] text-brand-text md:text-[13px]">Calibration targets</span>
+      <h2 class="h-display m-0 text-[28px] md:text-[36px]">From checkerboard to certificate.</h2>
     </div>
     <div class="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
       {collections.map((c) => {
@@ -115,15 +124,15 @@ const why = [
     </div>
   </section>
 
-  <!-- Why -->
-  <section id="why" class="bg-ink text-white">
+  {/* ── Why us (red band) ── */}
+  <section id="why" class="bg-brand text-white">
     <div class="container-x flex flex-col gap-10 py-12 md:py-[72px]">
-      <h2 class="h-display m-0 max-w-[720px] text-[28px] md:text-[40px]">Built flat. Measured twice. Shipped fast.</h2>
+      <h2 class="h-display m-0 max-w-[720px] text-[28px] md:text-[36px]">Built flat. Measured twice. Shipped fast.</h2>
       <div class="grid grid-cols-1 gap-8 md:grid-cols-5">
         {why.map(([t, b]) => (
-          <div class="flex flex-col gap-2 border-t-2 border-brand pt-4">
+          <div class="flex flex-col gap-2 border-t-2 border-white/30 pt-4">
             <strong class="text-[17px]">{t}</strong>
-            <span class="text-sm leading-relaxed text-[#CFCFCF]">{b}</span>
+            <span class="text-sm leading-relaxed text-[#FFE1E3]">{b}</span>
           </div>
         ))}
       </div>
@@ -131,26 +140,26 @@ const why = [
         {stats.map((s) => (
           <div class="flex flex-col gap-1">
             <span class="stat text-white">{s.value}</span>
-            <span class="text-[13px] text-[#9A9A9A]">{s.caption}</span>
+            <span class="text-[13px] text-[#FFE1E3]">{s.caption}</span>
           </div>
         ))}
       </div>
-      <div class="flex flex-wrap items-center gap-10 pt-2 font-mono text-sm text-[#9A9A9A]">
+      <div class="flex flex-wrap items-center gap-10 pt-2 font-mono text-sm text-[#FFE1E3]">
         <span>OpenCV</span><span>ROS 2</span><span>MVTec HALCON</span><span>MATLAB</span><span>Kalibr</span><span>COLMAP</span>
       </div>
     </div>
   </section>
 
-  <!-- Learn + subscribe -->
+  {/* ── Learn + subscribe ── */}
   <section id="learn" class="container-x flex flex-wrap gap-12 py-12 md:py-[72px]">
     {guides.length > 0 && (
       <div class="flex min-w-0 flex-1 basis-[520px] flex-col gap-5">
-        <span class="eyebrow">Knowledge base</span>
+        <span class="font-mono text-[12px] uppercase tracking-[0.18em] text-brand-text md:text-[13px]">Knowledge base</span>
         <h2 class="h-display m-0 text-[26px] md:text-[32px]">Where calibration starts.</h2>
         <div class="flex flex-col border-t border-line">
           {guides.map((g) => (
             <a href={`/guides/${g.slug}/`} class="flex justify-between gap-4 border-b border-line py-4 text-ink no-underline hover:text-ink">
-              <span class="font-semibold">{g.data.title}</span><span class="text-brand-dark">→</span>
+              <span class="font-semibold">{g.data.title}</span><span class="text-brand-dark">&rarr;</span>
             </a>
           ))}
         </div>

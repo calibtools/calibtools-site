@@ -5,7 +5,7 @@ import ImageGallery from '@/islands/ImageGallery';
 import type { GalleryImageData } from '@/islands/ImageGallery';
 import DownloadPicker from '@/islands/DownloadPicker';
 import NotifyForm from '@/islands/NotifyForm';
-import StickyBottomBar from '@/islands/StickyBottomBar';
+import MobileBottomCluster from '@/islands/MobileBottomCluster';
 import ProductCard from '@/components/ProductCard.astro';
 import { getProducts, getProductByHandle, sanitizeHtml } from '@/lib/shopify';
 import { kalibrYaml, ros2Yaml, halconDescr } from '@/lib/exportConfig';
@@ -477,5 +477,5 @@ const faqJsonLd = {
   )}
 
   {/* Mobile sticky bottom bar */}
-  <StickyBottomBar client:load defaultPrice={product.priceFrom} />
+  <MobileBottomCluster slot="mobile-cluster" client:load mode="add-to-cart" defaultPrice={product.priceFrom} />
 </Base>

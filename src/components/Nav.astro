@@ -1,8 +1,9 @@
 ---
 import Logo from './Logo.astro';
 import CartBadge from '@/islands/CartBadge';
-interface Props { section?: string }
-const { section } = Astro.props;
+interface Props { section?: string; theme?: 'dark' | 'light' }
+const { section, theme = 'light' } = Astro.props;
+const dark = theme === 'dark';
 const items = [
   { href: '/tools/', label: 'Free tools', key: 'tools' },
   { href: '/targets/', label: 'Targets', key: 'targets' },
@@ -10,41 +11,125 @@ const items = [
   { href: '/guides/', label: 'Guides', key: 'guides' },
 ];
 ---
-<nav class="border-b border-line-light">
-  <div class="container-x flex flex-wrap items-center justify-between gap-4 py-5">
-    <Logo />
-    <div class="hidden md:flex gap-7 text-[15px] font-medium">
-      {items.map((i) => (
-        <a href={i.href} class={`no-underline ${section === i.key ? 'text-brand' : 'text-ink hover:text-brand'}`}>{i.label}</a>
-      ))}
+<nav
+  class:list={[
+    'sticky top-0 z-50 backdrop-blur-[14px]',
+    dark
+      ? 'bg-[rgba(10,10,10,0.82)] border-b border-white/[0.08]'
+      : 'bg-[rgba(255,255,255,0.86)] border-b border-black/[0.08]',
+  ]}
+>
+  <div class="container-x py-4">
+    {/* Desktop header */}
+    <div class="hidden md:flex items-center justify-between gap-6">
+      <Logo theme={theme} />
+      <div class="flex items-center gap-8">
+        {items.map((i) => (
+          <a
+            href={i.href}
+            class:list={[
+              'text-[16px] font-medium uppercase tracking-[0.08em] no-underline',
+              section === i.key
+                ? 'text-brand'
+                : dark
+                  ? 'text-ink hover:text-brand'
+                  : 'text-ink hover:text-brand',
+            ]}
+          >
+            {i.label}
+          </a>
+        ))}
+      </div>
+      <div class="flex items-center gap-3">
+        <a href="/targets/" class="btn bg-brand text-white hover:bg-brand-dark hover:text-white px-5 py-3 text-[16px] font-semibold uppercase tracking-[0.1em] no-underline">
+          Shop targets
+        </a>
+        <button
+          type="button"
+          class:list={[
+            'relative flex h-11 w-11 items-center justify-center rounded',
+            dark
+              ? 'border-[1.5px] border-white/20 hover:border-white/40'
+              : 'border-[1.5px] border-line hover:border-ink',
+          ]}
+          aria-label="Open cart"
+          data-open-cart
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+          </svg>
+          <span class="absolute -right-1.5 -top-1.5"><CartBadge client:load /></span>
+        </button>
+      </div>
     </div>
-    <div class="flex items-center gap-3">
-      <a href="/targets/" class="btn btn-primary !px-5 !py-3 !text-[15px]">
-        Shop targets
-      </a>
-      <button type="button" class="relative flex h-11 w-11 items-center justify-center rounded border-[1.5px] border-line hover:border-ink" aria-label="Open cart" data-open-cart>
+
+    {/* Mobile header: hamburger | logo | spacer */}
+    <div class="flex md:hidden items-center justify-between">
+      <button
+        type="button"
+        class:list={[
+          'flex h-11 w-11 items-center justify-center rounded',
+          dark
+            ? 'border-[1.5px] border-white/20'
+            : 'border-[1.5px] border-ink',
+        ]}
+        aria-label="Open menu"
+        data-menu-toggle
+      >
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-          <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
-          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+          <path d="M4 7h16M4 12h16M4 17h16"/>
         </svg>
-        <span class="absolute -right-1.5 -top-1.5"><CartBadge client:load /></span>
       </button>
-      <button type="button" class="md:hidden flex h-11 w-11 items-center justify-center rounded border-[1.5px] border-ink" aria-label="Open menu" data-menu-toggle>
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
-      </button>
+
+      <div class="absolute left-1/2 -translate-x-1/2">
+        <a href="/" class="flex items-center" aria-label="Calib.Tools home">
+          <img
+            src={dark ? '/brand/logo-circle-dark.svg' : '/brand/logo-circle-light.svg'}
+            alt="Calib.Tools"
+            class="h-[60px] w-[60px]"
+          />
+        </a>
+      </div>
+
+      {/* Spacer to balance the hamburger */}
+      <div class="h-11 w-11" aria-hidden="true"></div>
     </div>
   </div>
-  <div class="container-x hidden flex-col gap-3 pb-5 md:!hidden" data-menu>
-    {items.map((i) => <a href={i.href} class="text-ink no-underline text-base py-1">{i.label}</a>)}
+
+  {/* Mobile menu panel */}
+  <div
+    class:list={[
+      'container-x hidden flex-col gap-3 pb-5 md:!hidden',
+      dark ? 'border-t border-white/[0.08]' : 'border-t border-black/[0.08]',
+    ]}
+    data-menu
+  >
+    {items.map((i) => (
+      <a
+        href={i.href}
+        class:list={[
+          'text-[16px] font-medium uppercase tracking-[0.08em] no-underline py-2',
+          dark ? 'text-ink hover:text-brand' : 'text-ink hover:text-brand',
+        ]}
+      >
+        {i.label}
+      </a>
+    ))}
   </div>
 </nav>
+
 <script>
   const t = document.querySelector('[data-menu-toggle]');
   const m = document.querySelector('[data-menu]');
-  t?.addEventListener('click', () => { m?.classList.toggle('hidden'); m?.classList.toggle('flex'); });
+  t?.addEventListener('click', () => {
+    m?.classList.toggle('hidden');
+    m?.classList.toggle('flex');
+  });
 
-  const cartBtn = document.querySelector('[data-open-cart]');
-  cartBtn?.addEventListener('click', () => {
-    window.dispatchEvent(new Event('open-cart-drawer'));
+  document.querySelectorAll('[data-open-cart]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      window.dispatchEvent(new Event('open-cart-drawer'));
+    });
   });
 </script>

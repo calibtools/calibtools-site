@@ -63,7 +63,7 @@ export default function NewsletterForm() {
           placeholder="you@company.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="flex-1 rounded border border-[#CFCFCF] bg-white px-3 py-3 text-[15px]"
+          className="flex-1 rounded border border-line bg-ground px-3 py-3 text-[15px] text-ink"
         />
         <button
           type="submit"
