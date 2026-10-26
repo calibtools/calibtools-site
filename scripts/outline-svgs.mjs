@@ -2,7 +2,7 @@
  * Convert <text> elements in stamp SVGs to outlined <path> elements
  * using opentype.js, so the SVGs work on machines without our fonts.
  *
- * Reads the source SVGs from stamp.ts, replaces text with glyph outlines,
+ * Generates stamp SVGs with glyph outlines (no live text),
  * and writes to public/brand/.
  *
  * Also exports PDF versions using Playwright.
@@ -43,8 +43,8 @@ function outlineStampSvg() {
   // Arc radius = middle of ring band
   const arcR = (r + rInner) / 2;
 
-  // Top arc text: "CALIB.TOOLS · MUNICH" — centred at top (−90° in SVG y-down)
-  paths.push(arcTextToPath('CALIB.TOOLS \u00B7 MUNICH', geistMedium, 3.2, arcR, -90, false));
+  // Top arc text: "CALIB.TOOLS" — centred at top (−90° in SVG y-down)
+  paths.push(arcTextToPath('CALIB.TOOLS', geistMedium, 3.2, arcR, -90, false));
 
   // Bottom arc text: "DIMENSIONAL INSPECTION" — centred at bottom (+90° in SVG y-down)
   paths.push(arcTextToPath('DIMENSIONAL INSPECTION', geistMedium, 2.8, arcR, 90, true));

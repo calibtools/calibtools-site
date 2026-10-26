@@ -4,7 +4,7 @@
 import { describe, it, expect } from 'vitest';
 import { readdirSync, readFileSync } from 'node:fs';
 import { resolve, join } from 'node:path';
-import { parseFrontMatter } from './datasheetPdf';
+import { parseFrontMatter } from '../docs/build/ct-ds';
 
 const DOCS_DIR = resolve(process.cwd(), 'docs/datasheets');
 

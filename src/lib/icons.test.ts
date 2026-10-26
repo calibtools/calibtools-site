@@ -21,8 +21,6 @@ function walk(dir: string): string[] {
 /** Files that legitimately contain `<svg` (pattern renderers, stamp, export helpers). */
 const SVG_ALLOW = [
   'src/lib/icons.ts',
-  'src/lib/stamp.ts',
-  'src/lib/stamp.test.ts',
   'src/lib/svgLayers.ts',
   'src/lib/svgLayers.test.ts',
   'src/lib/exportPng.ts',
