@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
-    "prebuild": "node scripts/check-prose.mjs && node scripts/verify-storefront.mjs && node scripts/validate-product-images.mjs && tsx scripts/generate-placeholders.ts && tsx scripts/build-datasheets.mjs",
+    "prebuild": "node scripts/check-prose.mjs && node scripts/verify-storefront.mjs && node scripts/validate-product-images.mjs && tsx scripts/generate-placeholders.ts && node scripts/docs-check.mjs",
+    "docs:build": "tsx scripts/docs-build.mjs",
+    "docs:check": "node scripts/docs-check.mjs",
     "build": "astro build",
     "postbuild": "node scripts/check-links.mjs && node scripts/check-specs.mjs",
     "preview": "astro preview",

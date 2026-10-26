@@ -1,83 +1,56 @@
+#!/usr/bin/env node
 /**
- * Append a serial record and render its inspection-report PDF with stamp.
+ * Append a serial record and render its inspection-report PDF.
  *
  * Usage:
- *   node scripts/add-serial.mjs <sn> <part_number> <id_range> <date> <initials>
+ *   tsx scripts/add-serial.mjs <sn> <part_number> <id_range> <date> <initials>
  *
  * Example:
- *   node scripts/add-serial.mjs 000311 CT-CHA-C-200150-1007 "0–34" 2026-10-24 JG
+ *   tsx scripts/add-serial.mjs 000311 CT-CHA-C-200150-6X6 "0\u2013101" 2026-10-24 JG
  *
  * Outputs:
- *   - Appends record to data/serials.json
- *   - Renders public/files/reports/<sn>.pdf (inspection report with stamp)
- *
- * Optional: place data/measurements/<sn>.json with measurement data:
- *   { rows: [{feature, nominal, measured, deviation, tolerance, result}],
- *     flatness: {measured, tolerance, result},
- *     visual: [{check, result}] }
+ *   - Appends/updates record in data/serials.json
+ *   - Renders public/files/reports/CT-IR-<sn>.pdf
+ *   - Writes  public/files/reports/CT-CSV-<sn>.csv (if coords exist)
+ *   - Updates public/files/manifest.json
  */
 
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { resolve, relative } from 'node:path';
+import { createHash } from 'node:crypto';
 
 const ROOT = process.cwd();
 const SERIALS_PATH = resolve(ROOT, 'data/serials.json');
-const REPORTS_DIR = resolve(ROOT, 'public/files/reports');
+const IR_OUT_DIR = resolve(ROOT, 'public/files/reports');
+const MANIFEST_PATH = resolve(ROOT, 'public/files/manifest.json');
 
-// --- Parse args ---
+// ── Parse args ──────────────────────────────────────────────────────
 
 const [,, sn, partNumber, idRange, date, initials] = process.argv;
 
 if (!sn || !partNumber || !idRange || !date || !initials) {
-  console.error('Usage: node scripts/add-serial.mjs <sn> <part_number> <id_range> <date> <initials>');
+  console.error('Usage: tsx scripts/add-serial.mjs <sn> <part_number> <id_range> <date> <initials>');
   process.exit(1);
 }
 
-// --- Part number → description / datasheet code ---
+// ── Import builders (TypeScript via tsx) ─────────────────────────────
 
-const FAMILY_MAP = {
-  CHA: 'ChArUco calibration target',
-  CHT: 'Checkerboard calibration target',
-  APR: 'AprilGrid calibration target',
-};
+const { buildIR, parsePartNumber } = await import('../src/docs/build/ct-ir.ts');
+const { buildCSV } = await import('../src/docs/build/ct-csv.ts');
 
-const MATERIAL_MAP = {
-  C: 'ceramic',
-  P: 'composite',
-  G: 'glass',
-};
+// ── Parse part number for product geometry ──────────────────────────
 
-/**
- * Parse a part number like CT-CHA-C-200150-1007 and derive:
- *   family code (CHA), material code (C),
- *   description ("ChArUco calibration target, ceramic"),
- *   datasheet code ("CT-DS-CHA-C").
- */
-function parsePartNumber(pn) {
-  const parts = pn.split('-');
-  // CT-<family>-<material>-<dims...>
-  const familyCode = parts[1] ?? '';
-  const materialCode = parts[2] ?? '';
-  const familyName = FAMILY_MAP[familyCode] ?? familyCode;
-  const materialName = MATERIAL_MAP[materialCode] ?? materialCode;
-  return {
-    familyCode,
-    materialCode,
-    description: `${familyName}, ${materialName}`,
-    datasheetCode: `CT-DS-${familyCode}-${materialCode}`,
-  };
-}
+const geo = parsePartNumber(partNumber);
 
-// --- Load serials ---
+// ── Load / update serials.json ──────────────────────────────────────
 
 let serials = [];
 try {
   serials = JSON.parse(readFileSync(SERIALS_PATH, 'utf-8'));
 } catch { /* start fresh */ }
 
-// Check for duplicate
 if (serials.some((s) => s.sn === sn)) {
-  console.log(`[add-serial] SN ${sn} already exists — updating.`);
+  console.log(`[add-serial] SN ${sn} already exists \u2014 updating.`);
   serials = serials.filter((s) => s.sn !== sn);
 }
 
@@ -87,156 +60,102 @@ const record = {
   id_range: idRange,
   inspected_on: date,
   inspector: initials,
-  report_url: `/files/reports/${sn}.pdf`,
+  report_url: `/files/reports/CT-IR-${sn}.pdf`,
 };
 
 serials.push(record);
 serials.sort((a, b) => a.sn.localeCompare(b.sn));
-
 writeFileSync(SERIALS_PATH, JSON.stringify(serials, null, 2) + '\n');
-console.log(`[add-serial] Record added for SN ${sn}`);
+console.log(`[add-serial] Record saved for SN ${sn}`);
 
-// --- Load optional measurements ---
+// ── Load measurements ───────────────────────────────────────────────
 
 const measPath = resolve(ROOT, `data/measurements/${sn}.json`);
 let measurements = null;
 if (existsSync(measPath)) {
-  try {
-    measurements = JSON.parse(readFileSync(measPath, 'utf-8'));
-    console.log(`[add-serial] Loaded measurements from ${measPath}`);
-  } catch (e) {
-    console.warn(`[add-serial] Warning: could not parse ${measPath}: ${e.message}`);
-  }
+  measurements = JSON.parse(readFileSync(measPath, 'utf-8'));
+  console.log(`[add-serial] Loaded measurements from ${measPath}`);
 }
 
-// --- Build Markdown tables ---
+// ── Load coords ─────────────────────────────────────────────────────
 
-function measurementsTable(meas) {
-  const header = '| Feature | Nominal | Measured | Deviation | Tolerance | Result |';
-  const sep = '|---|---|---|---|---|---|';
-  if (!meas?.rows?.length) {
-    return [header, sep, '| — | — | — | — | — | PENDING |'].join('\n');
-  }
-  const rows = meas.rows.map(r =>
-    `| ${r.feature} | ${r.nominal} | ${r.measured} | ${r.deviation} | ${r.tolerance} | ${r.result} |`
-  );
-  return [header, sep, ...rows].join('\n');
+const coordsSnPath = resolve(ROOT, `data/measurements/${sn}_coords.json`);
+const sampleCoordsPath = resolve(ROOT, 'data/sample_coords.json');
+let coords = null;
+if (existsSync(coordsSnPath)) {
+  coords = JSON.parse(readFileSync(coordsSnPath, 'utf-8'));
+  console.log(`[add-serial] Loaded coords from ${coordsSnPath}`);
+} else if (existsSync(sampleCoordsPath)) {
+  coords = JSON.parse(readFileSync(sampleCoordsPath, 'utf-8'));
+  console.log(`[add-serial] Loaded sample coords`);
 }
 
-function flatnessTable(meas) {
-  const header = '| Quantity | Measured | Tolerance | Result |';
-  const sep = '|---|---|---|---|';
-  if (!meas?.flatness) {
-    return [header, sep, '| Flatness (peak-to-valley) | — | — | PENDING |'].join('\n');
-  }
-  const f = meas.flatness;
-  return [header, sep, `| Flatness (peak-to-valley) | ${f.measured} | ${f.tolerance} | ${f.result} |`].join('\n');
-}
+// ── Build IR data ───────────────────────────────────────────────────
 
-function visualTable(meas) {
-  const header = '| Check | Result |';
-  const sep = '|---|---|';
-  if (!meas?.visual?.length) {
-    return [header, sep,
-      '| Print defects (voids, pinholes > 0.2 mm, scratches in pattern area) | — |',
-      '| Edge and corner condition | — |',
-      '| Edge strip legible, serial matches | — |',
-    ].join('\n');
-  }
-  const rows = meas.visual.map(v => `| ${v.check} | ${v.result} |`);
-  return [header, sep, ...rows].join('\n');
-}
-
-// --- Fill template ---
-
-mkdirSync(REPORTS_DIR, { recursive: true });
-
-const { parseFrontMatter, parseMarkdown, renderDatasheetPdf } = await import('../src/lib/datasheetPdf.ts');
-const { DEFAULT_INSPECTION_LOCATION } = await import('../src/lib/reportConfig.ts');
-const { drawStampOnPage } = await import('../src/lib/stamp.ts');
-
-const templatePath = resolve(ROOT, 'docs/datasheets/common/CT-IR-template.md');
-const templateRaw = readFileSync(templatePath, 'utf-8');
-
-const parsed = parsePartNumber(partNumber);
-const overallResult = measurements?.rows?.length
-  ? (measurements.rows.every(r => r.result === 'PASS') &&
-     (!measurements.flatness || measurements.flatness.result === 'PASS')
-      ? 'PASS' : 'FAIL')
-  : 'PENDING';
-
-let filled = templateRaw
-  .replace(/\{\{sn\}\}/g, sn)
-  .replace(/\{\{part_number\}\}/g, partNumber)
-  .replace(/\{\{description\}\}/g, parsed.description)
-  .replace(/\{\{datasheet_code\}\}/g, parsed.datasheetCode)
-  .replace(/\{\{lot\}\}/g, record.lot ?? '—')
-  .replace(/\{\{inspected_on\}\}/g, date)
-  .replace(/\{\{inspector\}\}/g, initials)
-  .replace(/\{\{id_range\}\}/g, idRange)
-  .replace(/\{\{location\}\}/g, DEFAULT_INSPECTION_LOCATION)
-  .replace(/\{\{result\}\}/g, overallResult)
-  .replace(/\{\{measurements_table\}\}/g, measurementsTable(measurements))
-  .replace(/\{\{flatness_table\}\}/g, flatnessTable(measurements))
-  .replace(/\{\{visual_table\}\}/g, visualTable(measurements));
-
-const { meta, body } = parseFrontMatter(filled);
-
-const blocks = parseMarkdown(body);
-
-const fontDir = resolve(ROOT, 'src/assets/fonts');
-const fontBytes = {
-  regular: readFileSync(resolve(fontDir, 'Geist-Regular.ttf')).buffer,
-  semiBold: readFileSync(resolve(fontDir, 'Geist-SemiBold.ttf')).buffer,
-  mono: readFileSync(resolve(fontDir, 'GeistMono-Regular.ttf')).buffer,
-  medium: readFileSync(resolve(fontDir, 'Geist-Medium.otf')).buffer,
-  pixel: readFileSync(resolve(fontDir, 'GeistPixel-Square.otf')).buffer,
-};
-
-// Load wordmark SVG for PDF header
-const wordmarkSvgPath = resolve(ROOT, 'public/brand/wordmark-framed-light.svg');
-const wordmarkSvg = existsSync(wordmarkSvgPath) ? readFileSync(wordmarkSvgPath, 'utf-8') : undefined;
-
-const result = await renderDatasheetPdf({ meta, blocks, fontBytes, wordmarkSvg });
-
-// To add the stamp, we re-open the PDF and draw on the signature page
-const { PDFDocument } = await import('pdf-lib');
-const pdfDoc = await PDFDocument.load(result.bytes);
-
-// Embed fonts for stamp
-const fontkit = (await import('@pdf-lib/fontkit')).default;
-pdfDoc.registerFontkit(fontkit);
-const stampFonts = {
-  medium: await pdfDoc.embedFont(fontBytes.medium, { subset: true }),
-  mono: await pdfDoc.embedFont(fontBytes.mono, { subset: true }),
-  pixel: await pdfDoc.embedFont(fontBytes.pixel, { subset: true }),
-};
-
-// Draw stamp on signature page — overlapping signature line
-const pages = pdfDoc.getPages();
-const sigPageIdx = result.signaturePageIndex ?? (pages.length - 1);
-const sigPage = pages[sigPageIdx];
-const sigY = result.signatureY ?? 250; // mm from top, fallback
-
-// Stamp Ø 32 mm → radius 16 mm
-// cx = right end of underscores (~155 mm) + 6 mm = 161 mm
-// cy: lower edge (cy + 16) crosses signature baseline (sigY) by 2–3 mm
-//   → cy + 16 = sigY + 2.5  → cy = sigY − 13.5
-const stampCx = 161;
-const stampCy = sigY - 13.5;
-console.log(`[add-serial] Stamp at cx=${stampCx} cy=${stampCy.toFixed(1)} (sigY=${sigY})`);
-
-drawStampOnPage(sigPage, {
+const label_line = `CALIB.TOOLS   ${partNumber}   ${geo.description}   SN ${sn} \u00b7 Rev A`;
+const data = {
   sn,
-  date,
+  lot: record.lot ?? '',
+  id_range: idRange,
   inspector: initials,
-  cx: stampCx,
-  cy: stampCy,
-  rotation: -8,
-  opacity: 0.9,
-}, stampFonts);
+  date,
+  label_line,
+  ...geo,
+};
 
-const finalBytes = await pdfDoc.save();
-const outPath = resolve(REPORTS_DIR, `${sn}.pdf`);
-writeFileSync(outPath, finalBytes);
-console.log(`[add-serial] Report written: ${outPath}`);
+// ── Render ──────────────────────────────────────────────────────────
+
+mkdirSync(IR_OUT_DIR, { recursive: true });
+
+const outBase = resolve(IR_OUT_DIR, `CT-IR-${sn}`);
+const result = await buildIR({ data, measurements, coords, outBase });
+console.log(`[add-serial] Report written: CT-IR-${sn}.pdf (${result.pages} pages)`);
+
+// CSV
+if (coords) {
+  const csvPath = resolve(IR_OUT_DIR, `CT-CSV-${sn}.csv`);
+  buildCSV(coords, csvPath);
+  console.log(`[add-serial] CSV written: CT-CSV-${sn}.csv`);
+}
+
+// ── Update manifest ─────────────────────────────────────────────────
+
+function sha256File(path) {
+  return createHash('sha256').update(readFileSync(path)).digest('hex');
+}
+
+let manifest = { generated: '', inputHash: '', files: [] };
+if (existsSync(MANIFEST_PATH)) {
+  try {
+    manifest = JSON.parse(readFileSync(MANIFEST_PATH, 'utf-8'));
+  } catch { /* start fresh */ }
+}
+
+// Remove old entries for this serial
+const reportCode = `CT-IR-${sn}`;
+const csvCode = `CT-CSV-${sn}`;
+manifest.files = manifest.files.filter(
+  (f) => f.code !== reportCode && f.code !== csvCode,
+);
+
+// Add new entries
+const pdfPath = `${outBase}.pdf`;
+manifest.files.push({
+  code: reportCode,
+  path: relative(ROOT, pdfPath),
+  sha256: sha256File(pdfPath),
+  pages: result.pages,
+});
+
+if (coords) {
+  const csvPath = resolve(IR_OUT_DIR, `CT-CSV-${sn}.csv`);
+  manifest.files.push({
+    code: csvCode,
+    path: relative(ROOT, csvPath),
+    sha256: sha256File(csvPath),
+  });
+}
+
+manifest.generated = new Date().toISOString();
+writeFileSync(MANIFEST_PATH, JSON.stringify(manifest, null, 2) + '\n');
+console.log(`[add-serial] Manifest updated.`);

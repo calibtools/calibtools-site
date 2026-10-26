@@ -619,12 +619,12 @@ export class Doc {
       await pg.evaluate(() => (document.fonts as any).ready.then(() => true));
       await pg.waitForTimeout(300);
 
-      const over = await pg.evaluate(`() => Array.from(document.querySelectorAll('.page .body')).map((b, i) => {
+      const over = await pg.evaluate(`(() => Array.from(document.querySelectorAll('.page .body')).map((b, i) => {
                     const r = b.getBoundingClientRect(); let maxB = 0, maxR = 0;
                     b.querySelectorAll('.zin *').forEach(e => { if (e.tagName.toLowerCase() !== 'svg' && e.closest('svg')) return; const q = e.getBoundingClientRect(); if (q.height>0) { maxB = Math.max(maxB, q.bottom); maxR = Math.max(maxR, q.right);} });
                     return {page: i+1, over_mm: Math.max(0, (Math.max(b.scrollHeight - b.clientHeight, maxB - r.bottom)) * 25.4/96),
                             over_w_mm: Math.max(0, (Math.max(b.scrollWidth - b.clientWidth, maxR - r.right)) * 25.4/96),
-                            free_mm: Math.max(0, (r.bottom - maxB) * 25.4/96)}; })`);
+                            free_mm: Math.max(0, (r.bottom - maxB) * 25.4/96)}; }))()`);
 
       const pdfPath = `${outBase}${paper === 'A4' ? '' : '-letter'}.pdf`;
       await pg.pdf({
