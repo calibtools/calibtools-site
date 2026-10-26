@@ -94,12 +94,12 @@ export type Coord = {
 
 // ──────────────────────────────────────────────────── part-number parser
 
-/** Map a part number to product geometry.  Only CT-CHA-C-200150-6X6 for now. */
+/** Map a part number to product geometry.  Only CT-CHA-C-185110-6X6 for now. */
 export function parsePartNumber(pn: string): Omit<
   IRData,
   'sn' | 'lot' | 'id_range' | 'inspector' | 'date' | 'label_line'
 > {
-  // CT-CHA-C-200150-6X6
+  // CT-CHA-C-185110-6X6
   const m = pn.match(
     /^CT-([A-Z]+)-([A-Z])-(\d{3})(\d{3})-(\d+)X(\d+)$/,
   );
@@ -108,7 +108,7 @@ export function parsePartNumber(pn: string): Omit<
   const W = Number(wStr);
   const H = Number(hStr);
 
-  // Geometry lookup — currently only CHA-C-200150-6X6
+  // Geometry lookup — currently only CHA-C-185110-6X6
   const PRODUCTS: Record<
     string,
     {
@@ -128,20 +128,20 @@ export function parsePartNumber(pn: string): Omit<
       axes_spec: [number, number, number, number];
     }
   > = {
-    'CT-CHA-C-200150-6X6': {
-      description: 'ChArUco calibration target, ceramic, 200 \u00d7 150 mm',
+    'CT-CHA-C-185110-6X6': {
+      description: 'ChArUco calibration target, ceramic, 185 \u00d7 110 mm',
       datasheet: 'CT-DS-CHA-C',
       datasheet_rev: 'A',
-      rows: 12,
-      cols: 17,
-      sq: 10,
-      marker: 7,
-      mx: 15,
-      my: 15,
+      rows: 7,
+      cols: 12,
+      sq: 14,
+      marker: 10.5,
+      mx: 8.5,
+      my: 6,
       dict_name: 'DICT_6X6_250',
       start_id: 0,
-      corners: 176,
-      markers: 102,
+      corners: 66,
+      markers: 42,
       axes_spec: [4.5, 4.5, 6.5, 0.6],
     },
   };
@@ -344,7 +344,7 @@ export function featureMap(
     mx: data.mx,
     my: data.my,
     label: data.label_line,
-    label_w: 170,
+    label_w: 168,
     axes_spec: data.axes_spec,
     mode: 'map',
     width_mm: 104,

@@ -21,15 +21,15 @@ const SAMPLE_MEAS: IRMeasurements = {
   U_k2_um: 1.5,
   flatness_points: 25,
   geometry: [
-    { feature: 'Square pitch X', nominal: '10.000', measured: '10.0012', dev: '+1.2', tol: '\u00b12', result: 'PASS' },
-    { feature: 'Square pitch Y', nominal: '10.000', measured: '9.9992', dev: '\u22120.8', tol: '\u00b12', result: 'PASS' },
-    { feature: 'Pattern width',  nominal: '170.000', measured: '170.004', dev: '+4', tol: '\u00b15', result: 'PASS' },
-    { feature: 'Pattern height', nominal: '120.000', measured: '120.003', dev: '+3', tol: '\u00b15', result: 'PASS' },
-    { feature: 'Diagonal 1',    nominal: '208.087', measured: '208.091', dev: '+4', tol: '\u00b17', result: 'PASS' },
-    { feature: 'Diagonal 2',    nominal: '208.087', measured: '208.085', dev: '\u22122', tol: '\u00b17', result: 'PASS' },
+    { feature: 'Square pitch X', nominal: '14.000', measured: '14.0008', dev: '+0.8', tol: '\u00b12', result: 'PASS' },
+    { feature: 'Square pitch Y', nominal: '14.000', measured: '13.9994', dev: '\u22120.6', tol: '\u00b12', result: 'PASS' },
+    { feature: 'Pattern width',  nominal: '168.000', measured: '168.003', dev: '+3', tol: '\u00b15', result: 'PASS' },
+    { feature: 'Pattern height', nominal: '98.000', measured: '98.002', dev: '+2', tol: '\u00b15', result: 'PASS' },
+    { feature: 'Diagonal 1',    nominal: '194.454', measured: '194.457', dev: '+3', tol: '\u00b17', result: 'PASS' },
+    { feature: 'Diagonal 2',    nominal: '194.454', measured: '194.452', dev: '\u22122', tol: '\u00b17', result: 'PASS' },
     { feature: 'Orthogonality',  nominal: '90.000\u00b0', measured: '90.0006\u00b0', dev: '', tol: '\u00b10.002\u00b0', result: 'PASS' },
-    { feature: 'Max single-feature deviation (n = 176)', nominal: '\u2014', measured: '\u2014', dev: '1.6', tol: '\u00b7', result: 'PASS' },
-    { feature: 'RMS deviation  information only', nominal: '\u2014', measured: '\u2014', dev: '0.7', tol: '\u2014', result: 'N/A' },
+    { feature: 'Max single-feature deviation (n = 66)', nominal: '\u2014', measured: '\u2014', dev: '1.4', tol: '\u00b7', result: 'PASS' },
+    { feature: 'RMS deviation  information only', nominal: '\u2014', measured: '\u2014', dev: '0.6', tol: '\u2014', result: 'N/A' },
   ],
   flatness: { measured_um: 12, tol: '\u2264 20', method: '25 points, 5 \u00d7 5 grid, least-squares plane', result: 'PASS' },
   visual: [
@@ -40,10 +40,10 @@ const SAMPLE_MEAS: IRMeasurements = {
   ],
   traceability: {
     instrument_cert: 'OCMM-01 \u00b7 certificate K-2026-03-0141 \u00b7 valid to 2027-03',
-    reference: 'Golden sample GS-CHA-C-200150-6X6 \u00b7 DAkkS certificate [number] \u00b7 valid to [date]',
+    reference: 'Golden sample GS-CHA-C-185110-6X6 \u00b7 DAkkS certificate [number] \u00b7 valid to [date]',
     retention: 'Raw data retained for 10 years under this serial number.',
   },
-  coordinates: { file: 'CT-CSV-000311.csv', n: 176, max_id: 88, max_um: 1.6, rms_um: 0.65 },
+  coordinates: { file: 'CT-CSV-000311.csv', n: 66, max_id: 33, max_um: 1.4, rms_um: 0.6 },
 };
 
 function makeSampleCoords(): Coord[] {
@@ -65,14 +65,14 @@ function makeSampleCoords(): Coord[] {
 }
 
 function makeIRData(): IRData {
-  const geo = parsePartNumber('CT-CHA-C-200150-6X6');
+  const geo = parsePartNumber('CT-CHA-C-185110-6X6');
   return {
     sn: '000311',
     lot: 'L-2611-0382',
-    id_range: '0\u2013101',
+    id_range: '0\u201341',
     inspector: 'JG',
     date: '2026-10-24',
-    label_line: 'CALIB.TOOLS   CT-CHA-C-200150-6X6   ChArUco 12\u00d717   SN 000311 \u00b7 Rev A',
+    label_line: 'CALIB.TOOLS   CT-CHA-C-185110-6X6   ChArUco 7\u00d712   SN 000311 \u00b7 Rev A',
     ...geo,
   };
 }

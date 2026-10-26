@@ -11,11 +11,11 @@ import {
 } from '../ctpattern';
 
 describe('corner_list', () => {
-  it('returns 176 corners for 12x17 board with sq=10', () => {
-    const cl = corner_list(12, 17, 10);
-    expect(cl).toHaveLength(176); // (12-1)*(17-1) = 11*16 = 176
-    expect(cl[0]).toEqual([0, 0, 0, 10, 10]);
-    expect(cl[cl.length - 1]).toEqual([175, 10, 15, 160, 110]);
+  it('returns 66 corners for 7x12 board with sq=14', () => {
+    const cl = corner_list(7, 12, 14);
+    expect(cl).toHaveLength(66); // (7-1)*(12-1) = 6*11 = 66
+    expect(cl[0]).toEqual([0, 0, 0, 14, 14]);
+    expect(cl[cl.length - 1]).toEqual([65, 5, 10, 154, 84]);
   });
 });
 
