@@ -10,15 +10,15 @@
   "U_k2_um": 1.5,
   "flatness_points": 25,
   "geometry": [
-    {"feature": "Square pitch X", "nominal": "10.000", "measured": "10.0012", "dev": "+1.2", "tol": "\u00b12", "result": "PASS"},
-    {"feature": "Square pitch Y", "nominal": "10.000", "measured": "9.9992", "dev": "\u22120.8", "tol": "\u00b12", "result": "PASS"},
-    {"feature": "Pattern width", "nominal": "170.000", "measured": "170.004", "dev": "+4", "tol": "\u00b15", "result": "PASS"},
-    {"feature": "Pattern height", "nominal": "120.000", "measured": "120.003", "dev": "+3", "tol": "\u00b15", "result": "PASS"},
-    {"feature": "Diagonal 1", "nominal": "208.087", "measured": "208.091", "dev": "+4", "tol": "\u00b17", "result": "PASS"},
-    {"feature": "Diagonal 2", "nominal": "208.087", "measured": "208.085", "dev": "\u22122", "tol": "\u00b17", "result": "PASS"},
-    {"feature": "Orthogonality", "nominal": "90.000\u00b0", "measured": "90.0008\u00b0", "dev": "\u2014", "tol": "\u00b10.002\u00b0", "result": "PASS"},
-    {"feature": "Max single-feature deviation", "nominal": "\u2014", "measured": "\u2014", "dev": "1.6", "tol": "\u2264 2", "result": "PASS", "note": "n = 176"},
-    {"feature": "RMS deviation", "nominal": "\u2014", "measured": "\u2014", "dev": "0.7", "tol": "\u2014", "result": "N/A", "note": "information only"}
+    {"feature": "Square pitch X", "nominal": "14.000", "measured": "14.0008", "dev": "+0.8", "tol": "\u00b12", "result": "PASS"},
+    {"feature": "Square pitch Y", "nominal": "14.000", "measured": "13.9994", "dev": "\u22120.6", "tol": "\u00b12", "result": "PASS"},
+    {"feature": "Pattern width", "nominal": "168.000", "measured": "168.003", "dev": "+3", "tol": "\u00b15", "result": "PASS"},
+    {"feature": "Pattern height", "nominal": "98.000", "measured": "98.002", "dev": "+2", "tol": "\u00b15", "result": "PASS"},
+    {"feature": "Diagonal 1", "nominal": "194.454", "measured": "194.457", "dev": "+3", "tol": "\u00b17", "result": "PASS"},
+    {"feature": "Diagonal 2", "nominal": "194.454", "measured": "194.452", "dev": "\u22122", "tol": "\u00b17", "result": "PASS"},
+    {"feature": "Orthogonality", "nominal": "90.000\u00b0", "measured": "90.0006\u00b0", "dev": "\u2014", "tol": "\u00b10.002\u00b0", "result": "PASS"},
+    {"feature": "Max single-feature deviation", "nominal": "\u2014", "measured": "\u2014", "dev": "1.4", "tol": "\u2264 2", "result": "PASS", "note": "n = 66"},
+    {"feature": "RMS deviation", "nominal": "\u2014", "measured": "\u2014", "dev": "0.6", "tol": "\u2014", "result": "N/A", "note": "information only"}
   ],
   "flatness": {
     "measured_um": 12,
@@ -34,14 +34,14 @@
   ],
   "traceability": {
     "instrument_cert": "OCMM-01 \u00b7 certificate K-2026-03-0141 \u00b7 valid to 2027-03",
-    "reference": "Golden sample GS-CHA-C-200150-6X6 \u00b7 DAkkS certificate [number] \u00b7 valid to [date]",
+    "reference": "Golden sample GS-CHA-C-185110-6X6 \u00b7 DAkkS certificate [number] \u00b7 valid to [date]",
     "retention": "Raw data retained for 10 years under this serial number."
   },
   "coordinates": {
     "file": "CT-CSV-000311.csv",
-    "n": 176,
-    "max_id": 88,
-    "max_um": 1.6,
-    "rms_um": 0.65
+    "n": 66,
+    "max_id": 33,
+    "max_um": 1.4,
+    "rms_um": 0.6
   }
 }

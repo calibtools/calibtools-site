@@ -27,8 +27,8 @@ describe('serial register', () => {
     const data: SerialRecord[] = JSON.parse(readFileSync(SERIALS_PATH, 'utf-8'));
     const record = data.find(r => r.sn === '000311');
     expect(record).toBeTruthy();
-    expect(record!.part_number).toBe('CT-CHA-C-200150-6X6');
-    expect(record!.id_range).toContain('101');
+    expect(record!.part_number).toBe('CT-CHA-C-185110-6X6');
+    expect(record!.id_range).toContain('41');
     expect(record!.inspected_on).toBe('2026-10-24');
     expect(record!.report_url).toBe('/files/reports/CT-IR-000311.pdf');
   });

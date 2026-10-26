@@ -221,12 +221,12 @@ function mono(text: string): string {
 
 function chaCProductRendering(): string {
   const label =
-    'CALIB.TOOLS   CT-CHA-C-200150-6X6   ChArUco 12\u00d717 \u00b7 10/7 mm \u00b7 DICT_6X6_250 \u00b7 IDs 0\u2013101   SN [per unit] \u00b7 Rev A';
+    'CALIB.TOOLS   CT-CHA-C-185110-6X6   ChArUco 7\u00d712 \u00b7 14/10.5 mm \u00b7 DICT_6X6_250 \u00b7 IDs 0\u201341   SN [per unit] \u00b7 Rev A';
   const board = board_svg({
-    W: 200, H: 150, rows: 12, cols: 17, sq: 10,
-    marker: 7, mx: 15, my: 15,
+    W: 185, H: 110, rows: 7, cols: 12, sq: 14,
+    marker: 10.5, mx: 8.5, my: 6,
     dict_name: 'DICT_6X6_250', start_id: 0,
-    label, label_w: 170, axes_spec: [4.5, 4.5, 6.5, 0.6],
+    label, label_w: 168, axes_spec: [4.5, 4.5, 6.5, 0.6],
     mode: 'print', width_mm: 125,
   });
   const coord = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 38" width="43mm" height="27.2mm">
@@ -244,7 +244,7 @@ function chaCProductRendering(): string {
     </div>`;
   return (
     `<div style="display:grid;grid-template-columns:125mm 1fr;gap:6mm;align-items:start">` +
-    `<figure>${board}<figcaption>Rendering \u00b7 200 \u00d7 150 mm variant</figcaption></figure>${key}</div>`
+    `<figure>${board}<figcaption>Rendering \u00b7 185 \u00d7 110 mm variant</figcaption></figure>${key}</div>`
   );
 }
 
@@ -284,16 +284,16 @@ function chaCKeySpecs(): string {
 
 function chaCGeometryReference(): string {
   const board = board_svg({
-    W: 200, H: 150, rows: 12, cols: 17, sq: 10,
-    marker: 7, mx: 15, my: 15,
+    W: 185, H: 110, rows: 7, cols: 12, sq: 14,
+    marker: 10.5, mx: 8.5, my: 6,
     dict_name: 'DICT_6X6_250', start_id: 0, axes_spec: null,
     mode: 'map', width_mm: 62, origin: true,
   });
   const details = kv([
-    ['Reference pattern', '<span class="mono">12 \u00d7 17</span> squares \u00b7 <span class="mono">10 / 7 mm</span>.'],
-    ['Marker IDs', '<span class="mono">0\u2013101</span>, row-major through white squares.'],
+    ['Reference pattern', '<span class="mono">7 \u00d7 12</span> squares \u00b7 <span class="mono">14 / 10.5 mm</span>.'],
+    ['Marker IDs', '<span class="mono">0\u201341</span>, row-major through white squares.'],
     ['Coordinate frame', 'Origin at the top-left outer pattern corner; X right, Y down.'],
-    ['Version control', 'Current <span class="mono">\u2265 4.6</span> convention for an even-row board; no legacy pattern setting.'],
+    ['Version control', 'Odd-row board: no legacy-pattern issue with OpenCV <span class="mono">\u2265 4.6</span> or older versions.'],
   ]);
   return (
     `<div class="box" style="padding:2mm 3mm;margin:.8mm 0 .8mm">` +
@@ -311,7 +311,7 @@ function chaCSpecTables(): string {
       ['Edge definition', 'Sharp black / white transition', '\u2264 1 \u00b5m lithographic edge.'],
       ['Orthogonality', '<span class="mono">90\u00b0 \u00b1 0.002\u00b0</span>', 'Pattern axes.'],
       ['Start ID / placement', '<span class="mono">0</span> \u00b7 row-major', 'Black square top-left; marker IDs advance through white squares.'],
-      ['OpenCV pattern convention', 'OpenCV <span class="mono">\u2265 4.6</span> layout', 'Even-row boards. Older-board layouts require <span class="mono">CharucoBoard.setLegacyPattern(True)</span>.'],
+      ['OpenCV pattern convention', 'OpenCV <span class="mono">\u2265 4.6</span> layout', 'Odd-row board: no legacy-pattern issue with OpenCV \u2265 4.6 or older versions.'],
     ],
     '', undefined, ['25%', '24%', '51%'],
   );
@@ -379,34 +379,34 @@ function chaCCompatibilityTable(): string {
 }
 
 function chaCDrawingSvg(): string {
-  const W = 200, H = 150, mx = 15, my = 15;
+  const W = 185, H = 110, mx = 8.5, my = 6;
   const patW = W - 2 * mx, patH = H - 2 * my;
   const dims = [
-    dim_h(0, W, 173, `W ${W} mm`, H, 4.0),
+    dim_h(0, W, 133, `W ${W} mm`, H, 4.0),
     dim_v(-20, 0, H, `H ${H} mm`, 0, 4.0),
     dim_h(mx, W - mx, -12, `pattern ${patW} mm`, 0, 3.4),
-    dim_v(216, my, H - my, `pattern ${patH} mm`, W, 3.4),
+    dim_v(201, my, H - my, `pattern ${patH} mm`, W, 3.4),
     dim_h(0, mx, -27, `${mx}`, 0, 3.0),
-    dim_v(232, 0, my, `${my}`, W, 3.0),
-    dim_v(270, 77, 81, 't 3.0 mm', 252, 3.4),
+    dim_v(217, 0, my, `${my}`, W, 3.0),
+    dim_v(255, 57, 61, 't 3.0 mm', 237, 3.4),
   ].join('');
 
   return `<figure style="margin:0">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="-37 -37 322 228" width="137mm" height="97mm">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="-37 -37 307 188" width="137mm" height="84mm">
         <rect x="0" y="0" width="${W}" height="${H}" fill="#fff" stroke="#000" stroke-width="0.55"/>
         <rect x="${mx}" y="${my}" width="${patW}" height="${patH}" fill="#f2f2f2" stroke="#666" stroke-width="0.35" stroke-dasharray="2 1.3"/>
-        <path d="M0 5L5 0 M195 0L200 5 M0 145L5 150 M195 150L200 145" stroke="#333" stroke-width="0.5" fill="none"/>
-        <line x1="194" y1="7" x2="248" y2="-9" stroke="#666" stroke-width="0.25"/>
-        <text x="250" y="-10" font-family="Geist Mono" font-size="3.4" fill="#333">0.5 mm chamfer</text>
-        <text x="100" y="78" font-family="Geist Mono" font-size="4.6" fill="#666" text-anchor="middle">PATTERN AREA</text>
-        <text x="100" y="85" font-family="Geist Mono" font-size="3.6" fill="#666" text-anchor="middle">${patW} \u00d7 ${patH} mm</text>
-        <text x="100" y="145.5" font-family="Geist Mono" font-size="3.3" fill="#666" text-anchor="middle">${mx} mm white margin</text>
-        <text x="218" y="68" font-family="Geist Mono" font-size="3.3" fill="#666">SIDE SECTION</text>
-        <rect x="220" y="77" width="32" height="3" fill="#f2f2f2" stroke="#000" stroke-width="0.35"/>
-        <text x="236" y="89" font-family="Geist Mono" font-size="3.3" fill="#666" text-anchor="middle">no mounting holes</text>
+        <path d="M0 5L5 0 M180 0L185 5 M0 105L5 110 M180 110L185 105" stroke="#333" stroke-width="0.5" fill="none"/>
+        <line x1="179" y1="7" x2="233" y2="-9" stroke="#666" stroke-width="0.25"/>
+        <text x="235" y="-10" font-family="Geist Mono" font-size="3.4" fill="#333">0.5 mm chamfer</text>
+        <text x="92.5" y="57" font-family="Geist Mono" font-size="4.6" fill="#666" text-anchor="middle">PATTERN AREA</text>
+        <text x="92.5" y="64" font-family="Geist Mono" font-size="3.6" fill="#666" text-anchor="middle">${patW} \u00d7 ${patH} mm</text>
+        <text x="92.5" y="106" font-family="Geist Mono" font-size="3.3" fill="#666" text-anchor="middle">${mx} mm white margin</text>
+        <text x="203" y="48" font-family="Geist Mono" font-size="3.3" fill="#666">SIDE SECTION</text>
+        <rect x="205" y="57" width="32" height="3" fill="#f2f2f2" stroke="#000" stroke-width="0.35"/>
+        <text x="221" y="69" font-family="Geist Mono" font-size="3.3" fill="#666" text-anchor="middle">no mounting holes</text>
         ${dims}
       </svg>
-      <figcaption>CT-DWG-CHA-C-200150 \u00b7 Rev A \u00b7 dimensions nominal unless stated.</figcaption>
+      <figcaption>CT-DWG-CHA-C-185110 \u00b7 Rev A \u00b7 dimensions nominal unless stated.</figcaption>
     </figure>`;
 }
 
@@ -472,7 +472,7 @@ function genericRevisionTable(revHistory: DSParsed['revisionHistory']): string {
 
 function buildChaC(ds: DSParsed, watermark?: string): Doc {
   const FILE_URL = 'https://calib.tools/files/CT-DS-CHA-C';
-  const DXF_URL = 'https://calib.tools/files/CT-DWG-CHA-C-200150.dxf';
+  const DXF_URL = 'https://calib.tools/files/CT-DWG-CHA-C-185110.dxf';
 
   const d = new Doc(
     'CT-DS-CHA-C', ds.meta.rev, ds.meta.date,
@@ -505,7 +505,7 @@ function buildChaC(ds: DSParsed, watermark?: string): Doc {
     + chaCDeliverablesBox()
     + section(4, 'Compatibility')
     + chaCCompatibilityTable()
-    + section(5, 'Drawing', '200 \u00d7 150 mm reference variant')
+    + section(5, 'Drawing', '185 \u00d7 110 mm reference variant')
     + `<div style="display:grid;grid-template-columns:140mm 1fr;gap:7mm;align-items:end">${chaCDrawingSvg()}`
     + `<div class="small" style="padding-bottom:5mm"><div class="tag" style="margin-bottom:1mm">DXF download</div>`
     + `<div class="mono black" style="font-size:7.5pt;overflow-wrap:anywhere">${DXF_URL.replace('https://', '')}</div>`
