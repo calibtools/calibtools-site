@@ -77,8 +77,15 @@ export function parseFrontMatter(md: string): { meta: DSFrontMatter; body: strin
 function parseMarkdownTable(block: string): { headers: string[]; rows: string[][] } | null {
   const lines = block.trim().split('\n').filter((l) => l.includes('|'));
   if (lines.length < 2) return null;
-  const parse = (line: string) =>
-    line.split('|').map((c) => c.trim()).filter((_, i, arr) => i > 0 && i < arr.length);
+  const parse = (line: string) => {
+    // Handle escaped pipes (\|) by replacing with placeholder, splitting, then restoring
+    const placeholder = '\x00PIPE\x00';
+    const safe = line.replace(/\\\|/g, placeholder);
+    const cells = safe.split('|').map((c) => c.trim().replaceAll(placeholder, '|')).filter((_, i, arr) => i > 0 && i < arr.length);
+    // Strip empty trailing cells (from trailing |)
+    while (cells.length > 0 && cells[cells.length - 1] === '') cells.pop();
+    return cells;
+  };
   const headers = parse(lines[0]);
   // Skip separator row (contains ---)
   const dataLines = lines.slice(1).filter((l) => !l.match(/^\s*\|[\s-:|]+\|\s*$/));
