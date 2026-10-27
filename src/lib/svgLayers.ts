@@ -11,6 +11,7 @@ import {
   SITE_URL,
   wordmarkSvgGroup,
 } from './exportBrand';
+import { GEIST_MONO_WOFF2_B64 } from './geistMonoBase64';
 
 export interface SvgContext {
   spec: PatternSpec;
@@ -19,10 +20,14 @@ export interface SvgContext {
   bw: number; bh: number;
 }
 
-/** Opening `<svg>` tag + white background rect. */
+/** Opening `<svg>` tag + embedded font defs + white background rect. */
 export function svgOpen(ctx: SvgContext): string {
   const { spec: s, pw, ph } = ctx;
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${pw}mm" height="${ph}mm" viewBox="0 0 ${pw} ${ph}" role="img" aria-label="${s.type} ${s.rows} by ${s.cols}"><rect width="${pw}" height="${ph}" fill="#fff"/>`;
+  return [
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${pw}mm" height="${ph}mm" viewBox="0 0 ${pw} ${ph}" role="img" aria-label="${s.type} ${s.rows} by ${s.cols}">`,
+    `<defs><style>@font-face{font-family:'Geist Mono';font-weight:500;src:url('data:font/woff2;base64,${GEIST_MONO_WOFF2_B64}') format('woff2');}</style></defs>`,
+    `<rect width="${pw}" height="${ph}" fill="#fff"/>`,
+  ].join('');
 }
 
 /** Closing `</svg>` tag. */
