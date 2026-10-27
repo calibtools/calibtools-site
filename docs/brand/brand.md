@@ -112,5 +112,8 @@ These must never appear on the website, datasheets or marketing materials:
 - "Inspected in Germany", "German-made", "Made in Germany"
 - "verified" (use "measured" instead)
 - "certified" (unless part of: "CNAS-accredited", "DAkkS-accredited", "DAkkS-calibrated", "accredited third-party laboratory", or the certificate product description)
+- "days delivery" (we ship made-to-order in weeks, not days)
+- "Calibrate with Confidence" (superseded tagline — use `TAGLINE` from `src/lib/claims.ts`)
+- "Shipped fast" (superseded copy)
 
 Enforced by `scripts/check-prose.mjs` — build fails on a hit.

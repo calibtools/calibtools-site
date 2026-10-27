@@ -26,6 +26,9 @@ const BANNED_PATTERNS = [
   /\bMade\s+in\s+Germany\b/i,
   /\bverified\b/i,
   /\bcertified\b/i,
+  /days\s+delivery/i,
+  /Calibrate\s+with\s+Confidence/i,
+  /Shipped\s+fast/i,
 ];
 
 /** Phrases that are allowed even when they contain a banned word. */
