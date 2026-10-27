@@ -115,5 +115,8 @@ These must never appear on the website, datasheets or marketing materials:
 - "days delivery" (we ship made-to-order in weeks, not days)
 - "Calibrate with Confidence" (superseded tagline — use `TAGLINE` from `src/lib/claims.ts`)
 - "Shipped fast" (superseded copy)
+- "DAkkS certificate", "DAkkS-certified", "certified by DAkkS" (the certificate is issued by a CNAS lab, not by DAkkS; our golden sample is DAkkS-calibrated)
+- "lab-grade" (vague, unverifiable)
+- "factor 10" (use the exact ratio from `ceramicVsCompositeRatio()` instead)
 
 Enforced by `scripts/check-prose.mjs` — build fails on a hit.

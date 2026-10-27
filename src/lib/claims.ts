@@ -23,6 +23,26 @@ export const CERT_CLAIM =
 /** Default Incoterm (to be confirmed). */
 export const INCOTERM = 'DAP' as const;
 
+// ── Material specs ───────────────────────────────────────────────────
+
+/** Ceramic feature accuracy (lithography on alumina). */
+export const CERAMIC_ACCURACY = '\u00B12 \u00B5m';
+
+/** Composite feature tolerance (UV flatbed on aluminium composite). */
+export const COMPOSITE_TOLERANCE = '\u00B10.3 mm + 0.2 mm/m';
+
+/** Composite flatness specification. */
+export const COMPOSITE_FLATNESS = '\u22640.5 mm per metre (three-point support)';
+
+/** Ceramic flatness specification. */
+export const CERAMIC_FLATNESS = '\u226420 \u00B5m over the pattern area';
+
+/** Composite CTE in µm/(m·K). */
+export const COMPOSITE_CTE_UM_PER_M_K = 24;
+
+/** Ceramic CTE in µm/(m·K). */
+export const CERAMIC_CTE_UM_PER_M_K = 7.2;
+
 /** Short inspection claim — used where the full INSPECTION_CLAIM is too long. */
 export const INSPECTION_CLAIM_SHORT = 'Measured before it ships';
 

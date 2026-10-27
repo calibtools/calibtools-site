@@ -1,54 +1,177 @@
 ---
 import Base from '@/layouts/Base.astro';
-import { ArrowRight } from 'lucide-astro';
+import ProductCard from '@/components/ProductCard.astro';
+import { ArrowRight, FileText, ExternalLink } from 'lucide-astro';
 import { getCollection, getEntry } from 'astro:content';
+import { getProducts } from '@/lib/shopify';
+
 export async function getStaticPaths() {
   const guides = await getCollection('guides');
   return guides.map((g) => ({ params: { slug: g.slug }, props: { entry: g } }));
 }
+
 const { entry } = Astro.props;
 const { Content, headings } = await entry.render();
-const related = (await Promise.all(entry.data.related.map((s: string) => getEntry('guides', s)))).filter(Boolean);
+const d = entry.data;
+const related = (await Promise.all(d.related.map((s: string) => getEntry('guides', s)))).filter(Boolean);
+
+// Resolve product handles → product objects for cards
+const allProducts = await getProducts();
+const linkedProducts = d.products
+  .map((h: string) => allProducts.find((p) => p.handle === h))
+  .filter(Boolean);
+
+// Sample-file links
+const sampleLinks = {
+  report: { href: '/files/reports/CT-IR-000311.pdf', label: 'Sample inspection report (PDF)' },
+  datasheet: { href: '/files/datasheets/CT-DS-CHA-C.pdf', label: 'Sample datasheet (PDF)' },
+  csv: { href: '/files/reports/CT-CSV-000311.csv', label: 'Measured coordinates (CSV)' },
+};
+const showSampleFiles = d.sampleFiles.length > 0;
+
 const siteUrl = 'https://calib.tools';
+
+// JSON-LD: Article
 const articleLd = {
   '@context': 'https://schema.org',
   '@type': 'Article',
-  headline: entry.data.title,
-  description: entry.data.description,
-  datePublished: entry.data.date.toISOString(),
-  dateModified: entry.data.date.toISOString(),
-  author: { '@type': 'Organization', name: entry.data.author || 'Calib.Tools', url: `${siteUrl}/about/` },
+  headline: d.title,
+  description: d.description,
+  datePublished: d.date.toISOString(),
+  dateModified: d.updated.toISOString(),
+  author: { '@type': 'Organization', name: 'Calib.Tools', url: `${siteUrl}/about/` },
   publisher: { '@type': 'Organization', name: 'Calib.Tools', url: siteUrl },
   mainEntityOfPage: `${siteUrl}/guides/${entry.slug}/`,
 };
+
+// JSON-LD: Breadcrumb
 const breadcrumbLd = {
   '@context': 'https://schema.org',
   '@type': 'BreadcrumbList',
   itemListElement: [
     { '@type': 'ListItem', position: 1, name: 'Home', item: siteUrl },
     { '@type': 'ListItem', position: 2, name: 'Guides', item: `${siteUrl}/guides/` },
-    { '@type': 'ListItem', position: 3, name: entry.data.title },
+    { '@type': 'ListItem', position: 3, name: d.title },
   ],
 };
+
+// JSON-LD: FAQPage (only when faq non-empty)
+const faqLd = d.faq.length > 0
+  ? {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: d.faq.map((item: { q: string; a: string }) => ({
+        '@type': 'Question',
+        name: item.q,
+        acceptedAnswer: { '@type': 'Answer', text: item.a },
+      })),
+    }
+  : null;
+
+const jsonLdItems = [articleLd, breadcrumbLd, ...(faqLd ? [faqLd] : [])];
 ---
-<Base title={entry.data.title} description={entry.data.description} section="guides" jsonLd={[articleLd, breadcrumbLd]}>
+<Base title={d.title} description={d.description} section="guides" jsonLd={jsonLdItems}>
   <section class="container-x flex flex-wrap justify-center gap-14 py-12 md:py-16">
     <article class="prose-calib flex min-w-0 flex-1 basis-[560px] max-w-[720px] flex-col gap-5">
-      <div class="flex gap-2 text-sm text-ink-soft"><a href="/guides/" class="text-ink-soft no-underline">Guides</a><span>/</span><span>Article</span></div>
-      <span class="eyebrow">Guide · {entry.data.readingTime} read · updated {entry.data.date.toISOString().slice(0, 10)}</span>
-      <h1 class="h-display m-0 text-[32px] leading-[1.08] md:text-[44px]">{entry.data.title}</h1>
-      <p class="m-0 text-lg leading-relaxed text-ink-muted md:text-[19px]">{entry.data.description}</p>
-      <Content />
-      <div class="card flex flex-col gap-2 bg-ground-alt p-5">
-        <strong class="text-[15px]">Try it</strong>
-        <span class="text-[15px] text-ink-muted">Generate a board with the geometry from this article, with OpenCV and Kalibr config files.</span>
-        <a href="/tools/generator/" class="inline-flex items-center gap-1 text-[15px] font-semibold">Open the pattern generator <ArrowRight size={16} stroke-width={1.6} aria-hidden="true" /></a>
+      {/* Breadcrumb */}
+      <div class="flex gap-2 text-sm text-ink-soft">
+        <a href="/guides/" class="text-ink-soft no-underline">Guides</a><span>/</span><span>Article</span>
       </div>
+
+      {/* Eyebrow */}
+      <span class="eyebrow">Guide &middot; {d.readingTime ?? '5 min'} read &middot; updated {d.updated.toISOString().slice(0, 10)}</span>
+
+      {/* H1 */}
+      <h1 class="h-display m-0 text-[32px] leading-[1.08] md:text-[44px]">{d.title}</h1>
+
+      {/* Description */}
+      <p class="m-0 text-lg leading-relaxed text-ink-muted md:text-[19px]">{d.description}</p>
+
+      {/* Short answer box */}
+      {d.keyRule && (
+        <div class="flex gap-4 rounded border border-line bg-ground-alt p-5">
+          <span class="block w-[3px] shrink-0 rounded bg-brand"></span>
+          <div class="flex flex-col gap-1.5">
+            <span class="font-mono text-[11px] uppercase tracking-[0.16em] text-ink-soft">Short answer</span>
+            <p class="m-0 text-[15px] leading-relaxed">{d.keyRule}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Body (markdown) */}
+      <Content />
+
+      {/* FAQ accordion */}
+      {d.faq.length > 0 && (
+        <div class="flex flex-col gap-4 border-t border-line pt-6">
+          <h2 class="m-0 text-[24px] font-semibold" id="faq">Frequently asked questions</h2>
+          <div class="flex flex-col divide-y divide-line">
+            {d.faq.map((item: { q: string; a: string }) => (
+              <details class="group py-3">
+                <summary class="flex cursor-pointer list-none items-center justify-between gap-4 text-[15px] font-semibold [&::-webkit-details-marker]:hidden">
+                  {item.q}
+                  <span class="shrink-0 text-ink-soft transition-transform group-open:rotate-45">+</span>
+                </summary>
+                <p class="m-0 pt-2 text-[15px] leading-relaxed text-ink-muted">{item.a}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* See a real report */}
+      {showSampleFiles && (
+        <div class="flex flex-col gap-3 rounded border border-line bg-ground-alt p-5">
+          <strong class="flex items-center gap-2 text-[15px]"><FileText size={18} stroke-width={1.6} class="text-brand" aria-hidden="true" />See a real report</strong>
+          <div class="flex flex-col gap-2">
+            {d.sampleFiles.map((key: string) => {
+              const link = sampleLinks[key as keyof typeof sampleLinks];
+              return link ? (
+                <a href={link.href} class="inline-flex items-center gap-1.5 text-[14px] font-medium text-brand-dark no-underline">
+                  {link.label} <ExternalLink size={14} stroke-width={1.6} aria-hidden="true" />
+                </a>
+              ) : null;
+            })}
+            <a href="/verify/000311" class="inline-flex items-center gap-1.5 text-[14px] font-medium text-brand-dark no-underline">
+              Verify serial 000311 online <ExternalLink size={14} stroke-width={1.6} aria-hidden="true" />
+            </a>
+          </div>
+        </div>
+      )}
+
+      {/* Related guides */}
+      {related.length > 0 && (
+        <div class="flex flex-col gap-3 border-t border-line pt-6">
+          <span class="text-[13px] font-bold uppercase tracking-[0.06em] text-ink-soft">Related guides</span>
+          {related.map((r) => r && (
+            <a href={`/guides/${r.slug}/`} class="flex justify-between gap-4 text-[15px] text-ink no-underline hover:text-brand">
+              <span>{r.data.title}</span>
+              <ArrowRight size={16} stroke-width={1.6} class="shrink-0 text-ink-soft" aria-hidden="true" />
+            </a>
+          ))}
+        </div>
+      )}
+
+      {/* Related products */}
+      {linkedProducts.length > 0 && (
+        <div class="flex flex-col gap-4 border-t border-line pt-6">
+          <span class="text-[13px] font-bold uppercase tracking-[0.06em] text-ink-soft">Related products</span>
+          <div class="grid grid-cols-2 gap-4">
+            {linkedProducts.map((p) => p && (
+              <ProductCard href={p.url} title={p.title} sub={p.description} from={p.priceFrom} image={p.image} placeholder={p.title.toUpperCase()} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Author line */}
       <div class="flex flex-wrap items-center justify-between gap-4 border-t border-line pt-5">
-        <span class="text-sm text-ink-soft">Written by <a href="/about/" class="text-ink-soft">{entry.data.author}</a>. Questions? <a href="https://github.com/calibtools/calibtools/issues">Open an issue on GitHub</a>.</span>
+        <span class="text-sm text-ink-soft">Written by {d.authorName} &middot; updated {d.updated.toISOString().slice(0, 10)}</span>
         <a href="/targets/" class="btn-dark">Shop targets</a>
       </div>
     </article>
+
+    {/* Sidebar */}
     <aside class="flex min-w-0 flex-none basis-[300px] flex-col gap-6 self-start">
       {headings.length > 0 && (
         <div class="flex flex-col gap-2.5">

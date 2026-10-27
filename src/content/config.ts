@@ -6,9 +6,15 @@ const guides = defineCollection({
     title: z.string(),
     description: z.string(),
     date: z.date(),
+    updated: z.date(),
     readingTime: z.string().optional(),
-    author: z.string().default('Calib.Tools'),
+    authorName: z.string().default('Calib.Tools Engineering'),
+    authorRole: z.string().default('Calibration targets & tools'),
     related: z.array(z.string()).default([]),
+    faq: z.array(z.object({ q: z.string(), a: z.string() })).default([]),
+    keyRule: z.string().optional(),
+    products: z.array(z.string()).default([]),
+    sampleFiles: z.array(z.enum(['report', 'datasheet', 'csv'])).default([]),
   }),
 });
 

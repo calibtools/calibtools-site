@@ -543,7 +543,7 @@ const FALLBACK_PRODUCTS: Product[] = [
 
 const FALLBACK_COLLECTIONS: Collection[] = [
   { handle: 'composite-boards', title: 'Composite boards', description: '200–1200 mm, rigid, matte, outdoor-safe.', products: FALLBACK_PRODUCTS.filter((p) => p.handle.includes('composite')) },
-  { handle: 'ceramic-glass', title: 'Ceramic & glass', description: 'Lithographed, ±1–2 µm, certificate option.', products: FALLBACK_PRODUCTS.filter((p) => p.handle.includes('ceramic')) },
+  { handle: 'ceramic-glass', title: 'Ceramic & glass', description: 'Lithographed, ±2 µm, certificate option.', products: FALLBACK_PRODUCTS.filter((p) => p.handle.includes('ceramic')) },
   { handle: 'lidar-image-quality', title: 'LiDAR & image quality', description: 'Reflectance panels, ISO 12233 charts, IR boards.', products: [] },
   { handle: 'mounts-accessories', title: 'Mounts & accessories', description: 'Fixtures, stands, robot flange, hard cases.', products: FALLBACK_PRODUCTS.filter((p) => p.handle === 'mounting-fixture' || p.handle === 'certificate-ilac') },
 ];
