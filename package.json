@@ -38,6 +38,7 @@
     "@types/pako": "^3.0.0",
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",
+    "exceljs": "^4.4.0",
     "opentype.js": "^2.0.0",
     "pako": "^3.0.3",
     "tsx": "^4.23.15",

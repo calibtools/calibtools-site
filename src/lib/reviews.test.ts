@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { readdirSync, readFileSync, statSync } from 'fs';
 import { join, relative } from 'path';
-import { summarize, sortReviews, type Review } from './reviews';
+import { summarize, sortReviews, type Review, type MaterialConnection } from './reviews';
 
 const makeReview = (overrides: Partial<Review> = {}): Review => ({
   id: crypto.randomUUID(),
@@ -15,6 +15,7 @@ const makeReview = (overrides: Partial<Review> = {}): Review => ({
   photos: [],
   created: '2026-10-01T00:00:00Z',
   status: 'published',
+  source: 'order',
   ...overrides,
 });
 
@@ -111,6 +112,85 @@ function walk(dir: string): string[] {
   }
   return out;
 }
+
+describe('summarize: source counts', () => {
+  it('counts order and imported reviews separately', () => {
+    const reviews = [
+      makeReview({ source: 'order' }),
+      makeReview({ source: 'order' }),
+      makeReview({ source: 'imported', materialConnection: 'none', consent: true }),
+    ];
+    const s = summarize(reviews);
+    expect(s.count).toBe(3);
+    expect(s.orderCount).toBe(2);
+    expect(s.importedCount).toBe(1);
+  });
+
+  it('defaults to all-order when no imported reviews', () => {
+    const reviews = [makeReview(), makeReview()];
+    const s = summarize(reviews);
+    expect(s.orderCount).toBe(2);
+    expect(s.importedCount).toBe(0);
+  });
+});
+
+describe('Review type: imported review constraints', () => {
+  it('imported review has source, consent, materialConnection', () => {
+    const imported = makeReview({
+      source: 'imported',
+      importBatch: '2026-10-01',
+      consent: true,
+      materialConnection: 'free_sample',
+      reviewerOrg: 'Test Lab',
+      country: 'US',
+      language: 'en',
+      orderRefHash: '',
+    });
+    expect(imported.source).toBe('imported');
+    expect(imported.consent).toBe(true);
+    expect(imported.materialConnection).toBe('free_sample');
+  });
+
+  it('materialConnection values are restricted', () => {
+    const valid: MaterialConnection[] = ['none', 'free_sample', 'discount', 'insider'];
+    for (const mc of valid) {
+      const r = makeReview({ source: 'imported', materialConnection: mc, consent: true });
+      expect(r.materialConnection).toBe(mc);
+    }
+  });
+});
+
+describe('material connection labels', () => {
+  it('MATERIAL_CONNECTION_LABEL has entries for all four values', async () => {
+    const { MATERIAL_CONNECTION_LABEL } = await import('@/lib/claims');
+    expect(MATERIAL_CONNECTION_LABEL.none).toBeTruthy();
+    expect(MATERIAL_CONNECTION_LABEL.free_sample).toBeTruthy();
+    expect(MATERIAL_CONNECTION_LABEL.discount).toBeTruthy();
+    expect(MATERIAL_CONNECTION_LABEL.insider).toBeTruthy();
+  });
+
+  it('labels do not use the word "verified"', async () => {
+    const { MATERIAL_CONNECTION_LABEL } = await import('@/lib/claims');
+    for (const [, label] of Object.entries(MATERIAL_CONNECTION_LABEL)) {
+      expect(label.toLowerCase()).not.toContain('verified');
+    }
+  });
+});
+
+describe('policy page content', () => {
+  it('contains order reviews, shared reviews, and publish-everything', () => {
+    const content = readFileSync(join(__dirname, '..', 'pages', 'reviews-policy.astro'), 'utf-8');
+    expect(content).toContain('Order reviews');
+    expect(content).toContain('Shared reviews');
+    expect(content).toContain('publish every review we receive');
+    expect(content).toContain('never moved between products');
+  });
+
+  it('does not contain old single-source wording', () => {
+    const content = readFileSync(join(__dirname, '..', 'pages', 'reviews-policy.astro'), 'utf-8');
+    expect(content).not.toContain('Only customers we e-mail after delivery can submit a review');
+  });
+});
 
 describe('compliance: no "verified" in review UI copy', () => {
   it('no review UI file uses the word "verified"', () => {
