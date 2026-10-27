@@ -116,6 +116,18 @@ function extractSubsections(sectionBody: string): { title: string; body: string 
   });
 }
 
+// ── ChArUco geometry derivation ───────────────────────────────────────
+
+/** Derive corner count from rows × cols squares. */
+export function charucoCornerCount(rows: number, cols: number): number {
+  return (rows - 1) * (cols - 1);
+}
+
+/** Derive marker count from rows × cols squares (OpenCV ≥ 4.6 layout). */
+export function charucoMarkerCount(rows: number, cols: number): number {
+  return Math.floor((rows * cols) / 2);
+}
+
 // ── Full markdown parser ─────────────────────────────────────────────
 
 export function parseDatasheet(md: string): DSParsed {
@@ -254,12 +266,24 @@ function chaCOrderingTable(): string {
     ['Square / marker<br>(mm)', 'n'], ['Dictionary options', 't'],
     ['Corners', 'n'], ['Markers', 'n'], ['Weight<br>(kg)', 'n'],
   ];
-  const rows = [
-    ['CT-CHA-C-110085-6X6', '110 \u00d7 85', '7 \u00d7 10', '10 / 7.5', '<span class="mono">DICT_6X6_250</span>,<br><span class="mono">DICT_6X6_1000</span>', '54', '35', '0.10'],
-    ['CT-CHA-C-150100-6X6', '150 \u00d7 100', '7 \u00d7 11', '12.5 / 9.5', '<span class="mono">DICT_6X6_250</span>,<br><span class="mono">DICT_6X6_1000</span>', '60', '39', '0.17'],
-    ['CT-CHA-C-185110-6X6', '185 \u00d7 110', '7 \u00d7 12', '14 / 10.5', '<span class="mono">DICT_6X6_250</span>,<br><span class="mono">DICT_6X6_1000</span>', '66', '42', '0.22'],
-    ['CT-CHA-C-230140-6X6', '230 \u00d7 140', '8 \u00d7 14', '15 / 11', '<span class="mono">DICT_6X6_250</span>,<br><span class="mono">DICT_6X6_1000</span>', '91', '56', '0.35'],
+  const dicts = '<span class="mono">DICT_6X6_250</span>,<br><span class="mono">DICT_6X6_1000</span>';
+  type Row = [number, number, number, number, string, string, string, string];
+  const rawRows: Row[] = [
+    [7, 10, 110, 85,  10,   7.5,  dicts, '0.10'],
+    [7, 11, 150, 100, 12.5, 9.5,  dicts, '0.17'],
+    [7, 12, 185, 110, 14,   10.5, dicts, '0.22'],
+    [8, 14, 230, 140, 15,   11,   dicts, '0.35'],
   ];
+  const rows = rawRows.map(([r, c, w, h, sq, mk, dict, wt]) => [
+    `CT-CHA-C-${w}${h < 100 ? '0' + h : h}-6X6`,
+    `${w} \u00d7 ${h}`,
+    `${r} \u00d7 ${c}`,
+    `${sq} / ${mk}`,
+    dict,
+    String(charucoCornerCount(r, c)),
+    String(charucoMarkerCount(r, c)),
+    wt,
+  ]);
   return table(cols, rows, 'dense rawhead', undefined, ['23%', '11%', '9%', '12%', '19%', '8%', '8%', '10%']);
 }
 
