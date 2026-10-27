@@ -109,7 +109,7 @@ describe('images.json validation', () => {
       jsonFiles.get(entry.handle)!.add(entry.file);
     }
 
-    const SKIP_DIRS = new Set(['brand']);
+    const SKIP_DIRS = new Set(['brand', 'packaging']);
     for (const dirName of readdirSync(PRODUCTS_DIR)) {
       const dirPath = join(PRODUCTS_DIR, dirName);
       if (!statSync(dirPath).isDirectory()) continue;

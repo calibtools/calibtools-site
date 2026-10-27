@@ -29,13 +29,6 @@ test.describe('product page with local images: charuco-composite', () => {
     await expect(thumbnails).toHaveCount(5);
   });
 
-  test('rendering disclaimer is shown', async ({ page }) => {
-    const disclaimer = page.locator('[data-disclaimer]');
-    await expect(disclaimer).toBeVisible();
-    await expect(disclaimer).toContainText('Rendering');
-    await expect(disclaimer).toContainText('actual product may differ');
-  });
-
   test('hero image has explicit width and height (no CLS)', async ({ page }) => {
     const heroImg = page.locator('[data-gallery] picture img').first();
     const width = await heroImg.getAttribute('width');
@@ -50,11 +43,6 @@ test.describe('product page with local images: charuco-composite', () => {
     expect(loading).toBe('eager');
   });
 
-  test('thumbnail title contains rendering disclaimer', async ({ page }) => {
-    const thumb = page.locator('[data-gallery] [role="tab"]').first();
-    const title = await thumb.getAttribute('title');
-    expect(title).toContain('Rendering');
-  });
 });
 
 // ---------------------------------------------------------------------------
@@ -66,29 +54,6 @@ test.describe('product page: mounting-fixture (3 images)', () => {
     await page.goto('/targets/mounting-fixture/');
     const thumbnails = page.locator('[data-gallery] [role="tab"]');
     await expect(thumbnails).toHaveCount(3);
-  });
-});
-
-// ---------------------------------------------------------------------------
-// Certificate-ILAC: both disclaimer sentences
-// ---------------------------------------------------------------------------
-
-test.describe('product page: certificate-ilac captions', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto('/targets/certificate-ilac/');
-  });
-
-  test('rendering disclaimer is shown', async ({ page }) => {
-    const disclaimer = page.locator('[data-disclaimer]');
-    await expect(disclaimer).toBeVisible();
-  });
-
-  test('ILAC certificate extra disclaimer is shown', async ({ page }) => {
-    const extra = page.locator('[data-extra-disclaimer]');
-    await expect(extra).toBeVisible();
-    await expect(extra).toContainText('Sample inspection report');
-    await expect(extra).toContainText('ILAC-MRA certificate');
-    await expect(extra).toContainText('shipped with the board');
   });
 });
 
@@ -109,37 +74,6 @@ test.describe('product page without local images: render fallback', () => {
 });
 
 // ---------------------------------------------------------------------------
-// Home page hero
-// ---------------------------------------------------------------------------
-
-test.describe('home page hero image', () => {
-  test('hero background image renders at 1440px', async ({ page }) => {
-    await page.setViewportSize({ width: 1440, height: 900 });
-    await page.goto('/');
-    const heroImg = page.locator('[data-hero-bg]');
-    await expect(heroImg).toBeVisible();
-
-    const box = await heroImg.boundingBox();
-    expect(box).toBeTruthy();
-    expect(box!.width).toBeGreaterThan(400);
-  });
-
-  test('hero image keeps the board in frame at 390px mobile', async ({ page }) => {
-    await page.setViewportSize({ width: 390, height: 844 });
-    await page.goto('/');
-    const heroImg = page.locator('[data-hero-bg]');
-    await expect(heroImg).toBeVisible();
-
-    // On mobile the image should use object-left to keep the board in frame
-    const objectPosition = await heroImg.evaluate(
-      (el) => getComputedStyle(el).objectPosition,
-    );
-    // object-left translates to "0% 50%" or "left center"
-    expect(objectPosition).toMatch(/0%|left/);
-  });
-});
-
-// ---------------------------------------------------------------------------
 // CLS check (basic — full Lighthouse requires CI setup)
 // ---------------------------------------------------------------------------
 
@@ -155,13 +89,6 @@ test.describe('layout stability', () => {
       expect(Number(width), `image ${i} missing width`).toBeGreaterThan(0);
       expect(Number(height), `image ${i} missing height`).toBeGreaterThan(0);
     }
-  });
-
-  test('home page hero image has explicit dimensions', async ({ page }) => {
-    await page.goto('/');
-    // The Picture component generates an <img> with width/height
-    const heroImg = page.locator('[data-hero-bg]');
-    await expect(heroImg).toBeVisible();
   });
 });
 

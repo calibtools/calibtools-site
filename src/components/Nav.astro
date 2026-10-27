@@ -20,7 +20,7 @@ const items = [
       : 'bg-[rgba(255,255,255,0.86)] border-b border-black/[0.08]',
   ]}
 >
-  <div class="container-x py-3">
+  <div class="container-x py-[22px]">
     {/* Desktop header */}
     <div class="hidden md:flex items-center justify-between gap-6">
       <Logo theme={theme} />
@@ -29,7 +29,7 @@ const items = [
           <a
             href={i.href}
             class:list={[
-              'text-[16px] font-medium uppercase tracking-[0.08em] no-underline',
+              'text-[16px] font-semibold uppercase tracking-[0.08em] no-underline',
               section === i.key
                 ? 'text-brand'
                 : dark
@@ -99,7 +99,7 @@ const items = [
       <a
         href={i.href}
         class:list={[
-          'text-[16px] font-medium uppercase tracking-[0.08em] no-underline py-2',
+          'text-[16px] font-semibold uppercase tracking-[0.08em] no-underline py-2',
           dark ? 'text-ink hover:text-brand' : 'text-ink hover:text-brand',
         ]}
       >

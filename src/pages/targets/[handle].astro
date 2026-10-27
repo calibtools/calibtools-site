@@ -15,13 +15,15 @@ import { WARRANTY_TEXT, COMPLIANCE, PRODUCT_TO_COLLECTION } from '@/lib/constant
 import { getProductImages } from '@/lib/product-images';
 import { getImageMetadata } from '@/lib/productImageImports';
 import { optimizeProductImage } from '@/lib/optimizeProductImage';
-import { Ruler, Package, Plug, CircleDot, Truck, HelpCircle, Plus, Download, Wand2, Columns2, MessageSquare, ArrowRight, ArrowUp, Clock, FileCheck as FileCheckIcon } from 'lucide-astro';
+import { Ruler, Package, PackageOpen, Plug, CircleDot, Truck, HelpCircle, Plus, Download, Wand2, Columns2, MessageSquare, ArrowRight, ArrowUp, Clock, FileCheck as FileCheckIcon } from 'lucide-astro';
 import { getProductData } from '@/lib/productData';
 import ReviewsSection from '@/islands/ReviewsSection';
 import Stars from '@/components/Stars';
 import { getReviewsForProduct, summarize } from '@/lib/reviews';
-import { getImage } from 'astro:assets';
+import { getImage, Picture } from 'astro:assets';
 import homeSetImage from '@/assets/products/brand/home-set.webp';
+import pkgOpenImage from '@/assets/products/packaging/CT-PK-M_open.webp';
+import pkgExplodedImage from '@/assets/products/packaging/CT-PK-M_exploded.webp';
 
 export async function getStaticPaths() {
   const products = await getProducts();
@@ -578,6 +580,56 @@ const orderingRows = (productData?.orderingRows ?? []).map((row) => {
       </div>
     </div>
   </section>
+
+  {/* ── What's in the box ── */}
+  {isBoardProduct && (
+    <section class="container-x flex flex-col gap-5 pb-12 md:pb-16">
+      <details class="group border-y border-line" open>
+        <summary class="flex cursor-pointer list-none items-center justify-between gap-4 py-5 text-[20px] font-semibold [&::-webkit-details-marker]:hidden">
+          <span class="flex items-center gap-3"><PackageOpen size={22} stroke-width={1.6} class="text-ink-soft" aria-hidden="true" />What&rsquo;s in the box</span>
+          <Plus size={22} stroke-width={1.6} class="shrink-0 text-ink-soft transition-transform group-open:rotate-45" aria-hidden="true" />
+        </summary>
+        <div class="grid grid-cols-1 gap-8 pb-8 md:grid-cols-2">
+          {/* Left: packaging renders */}
+          <div class="flex flex-col gap-4">
+            <div class="grid grid-cols-2 gap-3">
+              <button type="button" class="overflow-hidden rounded border border-line" data-lightbox-trigger data-lightbox-src={pkgOpenImage.src}>
+                <Picture
+                  src={pkgOpenImage}
+                  widths={[280, 400]}
+                  formats={['avif', 'webp']}
+                  alt="Calib.Tools packaging — mailer box open, showing the board in closed-cell foam insert"
+                  class="w-full"
+                />
+              </button>
+              <button type="button" class="overflow-hidden rounded border border-line" data-lightbox-trigger data-lightbox-src={pkgExplodedImage.src}>
+                <Picture
+                  src={pkgExplodedImage}
+                  widths={[280, 400]}
+                  formats={['avif', 'webp']}
+                  alt="Calib.Tools packaging — exploded view showing box, foam inserts and board"
+                  class="w-full"
+                />
+              </button>
+            </div>
+          </div>
+          {/* Right: contents list */}
+          <div class="flex flex-col gap-4">
+            <ul class="m-0 flex flex-col gap-2.5 pl-4 text-[15px]">
+              <li>Calibration board</li>
+              <li>Inspection report CT-IR-<em class="font-mono text-[13px] not-italic text-ink-muted">&lt;SN&gt;</em> (printed, and online at <a href="/verify/">/verify</a>)</li>
+              <li>Datasheet</li>
+              <li>Download card for pattern files</li>
+              <li>Tamper seal with the serial number</li>
+            </ul>
+            <p class="m-0 text-[14px] leading-relaxed text-ink-muted">
+              Ships in a self-locking mailer (FEFCO 0427) with closed-cell foam inserts; box size S&thinsp;/&thinsp;M&thinsp;/&thinsp;L by board size.
+            </p>
+          </div>
+        </div>
+      </details>
+    </section>
+  )}
 
   {/* ── Reviews ── */}
   <ReviewsSection client:load reviews={productReviews} handle={handle!} />
