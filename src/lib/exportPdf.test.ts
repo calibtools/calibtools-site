@@ -207,8 +207,8 @@ describe('exportPdf with layout (e2e)', () => {
     expect(layout.axes.originY).toBeGreaterThan(0);
     expect(layout.axes.originX + layout.axes.arrowLen + 5).toBeLessThan(layout.pw);
     // Brand block inside page
-    expect(layout.brand.wmX).toBeGreaterThanOrEqual(10);
-    expect(layout.brand.wmY + layout.brand.wmH).toBeLessThanOrEqual(layout.ph - 10 + 0.01);
+    expect(layout.brand.wmX).toBeGreaterThanOrEqual(layout.margin);
+    expect(layout.brand.wmY + layout.brand.wmH).toBeLessThanOrEqual(layout.ph - layout.margin + 0.01);
     expect(layout.brand.textX).toBeLessThan(layout.pw);
   });
 });

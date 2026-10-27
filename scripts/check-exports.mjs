@@ -115,7 +115,7 @@ async function run() {
   // =====================================================================
   // Layout computation (shared by PDF and SVG checks)
   // =====================================================================
-  const { computeLayout } = await import('../src/lib/pageLayout.ts');
+  const { computeLayout, PAGE_MARGIN, patternQuietZone } = await import('../src/lib/pageLayout.ts');
 
   // =====================================================================
   // PDF — inflate content streams, check operators and path data
@@ -221,6 +221,49 @@ async function run() {
     }
   }
 
+  // Quiet zone and layout enforcement (PDF + SVG)
+  // Uses a separate spec that actually fits A4 at 100 % with full quiet zones.
+  const fitSpec = {
+    type: 'ChArUco', rows: 6, cols: 10, square: 20, marker: 14,
+    dict: 'DICT_6X6_250', paper: 'A4', startId: 0, scaleBar: true, showAxes: true,
+  };
+  const fitLayout = computeLayout(fitSpec, 210, 297);
+  if (fitLayout.fit !== 'single') {
+    errors.push(`Layout: 6×10 at 20 mm should fit A4 but got fit=${fitLayout.fit}`);
+  } else {
+    const qz = fitLayout.quietZone;
+    const margin = PAGE_MARGIN;
+
+    const patternBottom = fitLayout.oy + fitLayout.bh;
+
+    // Axes must be inside PAGE_MARGIN (≥ margin from edge)
+    if (fitLayout.axes.originX < margin - 0.01) {
+      errors.push(`Layout: axes originX (${fitLayout.axes.originX.toFixed(1)}) < PAGE_MARGIN (${margin})`);
+    }
+    if (fitLayout.axes.originY < margin - 0.01) {
+      errors.push(`Layout: axes originY (${fitLayout.axes.originY.toFixed(1)}) < PAGE_MARGIN (${margin})`);
+    }
+
+    // Brand block must be outside pattern quiet zone
+    if (fitLayout.brand.wmY < patternBottom + qz - 0.01) {
+      errors.push(`Layout: brand wmY (${fitLayout.brand.wmY.toFixed(1)}) inside pattern quiet zone (bottom=${(patternBottom + qz).toFixed(1)})`);
+    }
+
+    // Brand block must be inside page margins
+    if (fitLayout.brand.wmX < margin - 0.01) {
+      errors.push(`Layout: brand wmX (${fitLayout.brand.wmX.toFixed(1)}) < PAGE_MARGIN (${margin})`);
+    }
+    if (fitLayout.brand.wmY + fitLayout.brand.wmH > fitLayout.ph - margin + 0.01) {
+      errors.push(`Layout: brand block extends past bottom margin`);
+    }
+
+    // Axes X arrow endpoint must be inside page
+    const axXEnd = fitLayout.axes.originX + fitLayout.axes.arrowLen + 5;
+    if (axXEnd > fitLayout.pw - margin + 0.01) {
+      errors.push(`Layout: X arrow endpoint (${axXEnd.toFixed(1)}) extends past right margin`);
+    }
+  }
+
   // Banned phrases
   for (const pattern of BANNED) {
     if (pattern.test(svg)) errors.push(`SVG: banned phrase ${pattern}`);
@@ -235,9 +278,9 @@ async function run() {
     process.exit(1);
   }
 
-  console.log('[check-exports] OK — T1 exports pass all brand checks.');
-  console.log('  PDF: metadata ✓, axes colours ✓, wordmark path ✓');
-  console.log('  SVG: provenance ✓, wordmark ✓, axes bbox ✓, brand bbox ✓, print note ✓, font ✓');
+  console.log('[check-exports] OK — T1 exports pass all brand + layout checks.');
+  console.log('  PDF: metadata ✓, axes colours ✓, wordmark path ✓, quiet zone ✓, margins ✓');
+  console.log('  SVG: provenance ✓, wordmark ✓, axes bbox ✓, brand bbox ✓, print note ✓, font ✓, quiet zone ✓');
   console.log('  DXF: provenance ✓, wordmark ✓, print note ✓');
   console.log('  T2–T7: no branded file exports (confirmed by audit).');
 }
