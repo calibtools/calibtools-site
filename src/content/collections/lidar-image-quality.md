@@ -35,4 +35,4 @@ Care instructions vary by product. Refer to the product datasheet.
 ## FAQ
 
 **When will LiDAR targets be available?**
-We are finalising the first batch of reflectance panels and expect to ship in early 2025. Sign up for the newsletter to be notified.
+Reflectance panels and image-quality charts are in development. Sign up for the newsletter to be notified when they ship.

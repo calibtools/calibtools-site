@@ -22,6 +22,7 @@ import Stars from '@/components/Stars';
 import { getReviewsForProduct, summarize } from '@/lib/reviews';
 import { getImage, Picture } from 'astro:assets';
 import homeSetImage from '@/assets/products/brand/home-set.webp';
+import { compositeToleranceAtSize, thermalExpansion, FLATNESS_EXPLAINER, ceramicVsCompositeRatio } from '@/lib/specExplainers';
 import pkgOpenImage from '@/assets/products/packaging/CT-PK-M_open.webp';
 import pkgExplodedImage from '@/assets/products/packaging/CT-PK-M_exploded.webp';
 
@@ -250,6 +251,37 @@ if (reviewSummary.count > 0) {
   };
 }
 
+// ── Spec explainers ("What this means" lines) ──
+const isCeramic = handle?.includes('ceramic');
+const isComposite = handle?.includes('composite') || handle?.includes('checkerboard');
+// Find the largest board size from variants (long side in mm)
+const largestSizeMm = (() => {
+  const sizes = product.variants
+    .map((v) => v.selectedOptions.find((o) => o.name === 'Size')?.value)
+    .filter(Boolean)
+    .map((s) => {
+      const parts = s!.split(/[×x]/i).map((n) => parseInt(n.trim(), 10)).filter((n) => n > 0);
+      return Math.max(...parts);
+    })
+    .filter((n) => n > 0);
+  return sizes.length > 0 ? Math.max(...sizes) : 0;
+})();
+
+const specExplainers: Record<string, string> = {};
+if (largestSizeMm > 0) {
+  if (isComposite) {
+    specExplainers['Feature tolerance'] = compositeToleranceAtSize(largestSizeMm);
+    specExplainers['CTE'] = thermalExpansion('composite', largestSizeMm);
+  }
+  if (isCeramic) {
+    specExplainers['Feature tolerance'] = ceramicVsCompositeRatio();
+    specExplainers['CTE'] = thermalExpansion('ceramic', largestSizeMm);
+  }
+}
+if (isComposite || isCeramic) {
+  specExplainers['Flatness'] = FLATNESS_EXPLAINER;
+}
+
 const ogImage = hasLocalImages ? galleryImages[0].src : product.images[0]?.url ?? `/og/${handle}.png`;
 
 // Pairs with / Compare
@@ -418,10 +450,17 @@ const orderingRows = (productData?.orderingRows ?? []).map((row) => {
                 <table class="w-full border-collapse text-[14px]">
                   <tbody>
                     {group.rows.map((row, i) => (
-                      <tr class={`border-t border-line last:border-b ${i % 2 === 1 ? 'bg-ground-alt' : ''}`}>
-                        <td class="w-[38%] py-2.5 pr-3 text-ink-muted">{row.label}</td>
-                        <td class="py-2.5 font-mono text-[14px]">{row.value}</td>
-                      </tr>
+                      <>
+                        <tr class={`border-t border-line ${i % 2 === 1 ? 'bg-ground-alt' : ''}`}>
+                          <td class="w-[38%] py-2.5 pr-3 text-ink-muted">{row.label}</td>
+                          <td class="py-2.5 font-mono text-[14px]">{row.value}</td>
+                        </tr>
+                        {specExplainers[row.label] && (
+                          <tr class={i % 2 === 1 ? 'bg-ground-alt' : ''}>
+                            <td colspan="2" class="px-3 pb-2.5 text-[12px] italic text-ink-soft" data-explainer>{specExplainers[row.label]}</td>
+                          </tr>
+                        )}
+                      </>
                     ))}
                   </tbody>
                 </table>
@@ -495,11 +534,17 @@ const orderingRows = (productData?.orderingRows ?? []).map((row) => {
         </summary>
         <div class="flex flex-col gap-4 pb-6 text-[15px] leading-relaxed text-ink-muted">
           <p class="m-0">
-            Every board ships with a manufacturer inspection report: feature positions measured on a coordinate system, flatness check, and visual inspection. The report PDF and measured-coordinates CSV are available via the serial-number lookup at <a href="/verify/">calib.tools/verify</a>.
+            <strong class="text-ink">Factory inspection report (included)</strong> &mdash; every board measured by comparison against a golden sample calibrated by a DAkkS-accredited laboratory. Report PDF and coordinates CSV at <a href="/verify/">calib.tools/verify</a>.
           </p>
           <p class="m-0">
-            For traceable measurement uncertainty, add an ILAC-MRA calibration certificate issued by an accredited third-party laboratory. This is a separate service (SVC-X-CERT-ILAC) and adds 1&ndash;3 weeks to lead time. A manufacturer inspection is not a substitute for accredited calibration.
+            <strong class="text-ink">Accredited calibration certificate (optional)</strong> &mdash; issued by an ISO/IEC&nbsp;17025-accredited laboratory, [lab name, accreditation no.] (CNAS), recognised under the ILAC&nbsp;MRA, now operated by Global&nbsp;ACI. Separate service (SVC-X-CERT-ILAC), adds 1&ndash;3&nbsp;weeks.
           </p>
+          <div class="flex flex-col gap-2 rounded border border-line bg-ground-alt p-4 text-[13px] text-ink-soft">
+            <p class="m-0"><strong>ISO/IEC 17025</strong> &mdash; international standard for testing and calibration laboratories. Accreditation proves competence and a quality system.</p>
+            <p class="m-0"><strong>ILAC MRA / Global ACI</strong> &mdash; mutual recognition among national accreditation bodies; accepted in 100+ economies. ILAC and IAF merged into Global&nbsp;ACI on 1&nbsp;Jan&nbsp;2026; existing ILAC marks remain valid.</p>
+            <p class="m-0"><strong>CNAS</strong> &mdash; China National Accreditation Service, an ILAC MRA signatory.</p>
+            <p class="m-0"><strong>Measurement uncertainty</strong> &mdash; quantified range within which the true value lies at 95&nbsp;% confidence. Only an accredited certificate provides this.</p>
+          </div>
         </div>
       </details>
 

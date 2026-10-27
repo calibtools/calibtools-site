@@ -1,7 +1,7 @@
 ---
 import Base from '@/layouts/Base.astro';
 import { getCollection } from 'astro:content';
-const guides = (await getCollection('guides')).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const guides = (await getCollection('guides')).sort((a, b) => b.data.updated.valueOf() - a.data.updated.valueOf());
 ---
 <Base title="Guides" section="guides" description="Practical guides on camera calibration targets, patterns and materials.">
   <section class="container-x flex flex-col gap-8 py-12 md:py-16">
@@ -12,7 +12,12 @@ const guides = (await getCollection('guides')).sort((a, b) => b.data.date.valueO
         <a href={`/guides/${g.slug}/`} class="flex flex-col gap-1 border-b border-line py-5 text-ink no-underline hover:text-ink">
           <span class="text-lg font-semibold">{g.data.title}</span>
           <span class="text-[15px] text-ink-muted">{g.data.description}</span>
-          <span class="spec text-xs text-ink-soft">{g.data.date.toISOString().slice(0, 10)} · {g.data.readingTime ?? '5 min read'}</span>
+          {g.data.keyRule && (
+            <span class="mt-1 text-[13px] font-mono text-ink-soft">{g.data.keyRule}</span>
+          )}
+          <span class="spec mt-1 text-xs text-ink-soft">
+            {g.data.updated.toISOString().slice(0, 10)} &middot; {g.data.readingTime ?? '5 min read'}
+          </span>
         </a>
       ))}
     </div>

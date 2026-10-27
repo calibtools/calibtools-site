@@ -2,8 +2,11 @@
 title: "ChArUco vs checkerboard vs AprilGrid: which one, when"
 description: "Three patterns cover almost every calibration job. The right one depends on how much of the board your camera can see, how wide the lens is, and which software reads the result."
 date: 2026-10-22
+updated: 2026-10-22
 readingTime: "8 min"
 related: ["printed-target-costs-half-a-pixel", "composite-ceramic-or-glass"]
+products: ["charuco-composite", "checkerboard-composite"]
+sampleFiles: ["report"]
 ---
 
 ## The short answer

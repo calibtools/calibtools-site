@@ -2,8 +2,19 @@
 title: "Multi-board marker IDs: why they matter and how to set them"
 description: "When running multiple calibration boards in one rig, each board needs distinct marker IDs. Here's how to compute them and configure OpenCV and Kalibr."
 date: 2026-10-24
+updated: 2026-10-25
 readingTime: "3 min"
 related: ["charuco-vs-checkerboard-vs-aprilgrid"]
+keyRule: "Each board's start ID = board index × markers per board. A 7×10 ChArUco has 35 markers, so board 2 starts at 35."
+products: ["charuco-composite"]
+sampleFiles: ["report"]
+faq:
+  - q: "How many markers does a ChArUco board have?"
+    a: "floor(rows × cols / 2). A 7×10 board has 35 markers."
+  - q: "What happens if two boards share the same marker IDs?"
+    a: "The detector cannot tell which board a marker belongs to. Calibration fails silently or produces incorrect extrinsics."
+  - q: "Which ArUco dictionary should I use for a multi-board rig?"
+    a: "DICT_6X6_250 supports up to 250 markers (7 boards of 35). For larger rigs, use DICT_7X7_1000."
 ---
 
 ![Calib.Tools set of four ChArUco calibration boards with consecutive marker ID ranges arranged in a 2 by 2 grid, seen from above.](../../assets/products/brand/home-set.webp)

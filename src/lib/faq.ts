@@ -11,7 +11,7 @@ export interface FaqItem {
 const SHARED: FaqItem[] = [
   {
     question: 'What tolerances can I expect?',
-    answer: 'Composite boards are printed to ±0.3 mm feature accuracy. Ceramic targets achieve ±1–2 µm, measured against a DAkkS-calibrated reference. Every target ships with a dimensional inspection report.',
+    answer: 'Composite boards are printed to ±0.3 mm feature accuracy. Ceramic targets achieve ±2 µm, measured against a DAkkS-calibrated reference. Every target ships with a dimensional inspection report.',
   },
   {
     question: 'What is included with each target?',
