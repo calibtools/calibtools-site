@@ -62,11 +62,24 @@ export function innerCorners(rows: number, cols: number, square: number): Array<
   return pts;
 }
 
-/** SVG of the pattern centred on a page of pw×ph mm, 1 user unit = 1 mm. */
-export function checkerboardSvg(s: PatternSpec, pw: number, ph: number): string {
-  const bw = s.cols * s.square, bh = s.rows * s.square;
-  const ox = (pw - bw) / 2, oy = (ph - bh) / 2 - (s.scaleBar ? 6 : 0);
-  const ctx: SvgContext = { spec: s, pw, ph, ox, oy, bw, bh };
+import type { PageLayout } from './pageLayout';
+
+/**
+ * SVG of the pattern centred on a page of pw×ph mm, 1 user unit = 1 mm.
+ * If a PageLayout is provided, its geometry (orientation, ox/oy, brand, axes) is used.
+ */
+export function checkerboardSvg(s: PatternSpec, pw: number, ph: number, layout?: PageLayout): string {
+  const bw = layout?.bw ?? s.cols * s.square;
+  const bh = layout?.bh ?? s.rows * s.square;
+  const ox = layout?.ox ?? (pw - bw) / 2;
+  const oy = layout?.oy ?? ((ph - bh) / 2 - (s.scaleBar ? 6 : 0));
+  const usePw = layout?.pw ?? pw;
+  const usePh = layout?.ph ?? ph;
+  const ctx: SvgContext = {
+    spec: s, pw: usePw, ph: usePh, ox, oy, bw, bh,
+    brand: layout?.brand,
+    axes: layout?.axes,
+  };
 
   const parts: string[] = [];
   parts.push(svgOpen(ctx));

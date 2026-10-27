@@ -170,3 +170,45 @@ describe('exportPdf', () => {
     expect(doc.getPageCount()).toBe(1);
   });
 });
+
+// ---------------------------------------------------------------------------
+// e2e: orientation + layout integration
+// ---------------------------------------------------------------------------
+
+import { computeLayout } from './pageLayout';
+
+describe('exportPdf with layout (e2e)', () => {
+
+  it('7×12 ChArUco 25mm on A4 → landscape PDF, pattern unscaled', async () => {
+    // bw = 300, bh = 175 → landscape (300 > 175)
+    const wideSpec: PatternSpec = {
+      ...base, rows: 7, cols: 12, square: 25,
+    };
+    const layout = computeLayout(wideSpec, 210, 297);
+    expect(layout.orientation).toBe('landscape');
+    expect(layout.pw).toBe(297); // A4 landscape
+    expect(layout.ph).toBe(210);
+
+    const bytes = await exportPdf({ spec: wideSpec, pw: 297, ph: 210, fontBytes, layout });
+    const doc = await PDFDocument.load(bytes);
+    const page = doc.getPage(0);
+    const { width, height } = page.getSize();
+    // Landscape: width > height
+    expect(width).toBeGreaterThan(height);
+    // Page is A4 landscape: 297 × 210 mm
+    expect(width).toBeCloseTo(297 * MM, 1);
+    expect(height).toBeCloseTo(210 * MM, 1);
+  });
+
+  it('axes and brand inside page bounds (layout-computed positions)', async () => {
+    const layout = computeLayout(base, 210, 297);
+    // Axes origin inside page
+    expect(layout.axes.originX).toBeGreaterThan(0);
+    expect(layout.axes.originY).toBeGreaterThan(0);
+    expect(layout.axes.originX + layout.axes.arrowLen + 5).toBeLessThan(layout.pw);
+    // Brand block inside page
+    expect(layout.brand.wmX).toBeGreaterThanOrEqual(10);
+    expect(layout.brand.wmY + layout.brand.wmH).toBeLessThanOrEqual(layout.ph - 10 + 0.01);
+    expect(layout.brand.textX).toBeLessThan(layout.pw);
+  });
+});

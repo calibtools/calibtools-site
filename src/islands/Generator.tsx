@@ -8,6 +8,7 @@ import { kalibrYaml, ros2Yaml, halconDescr, opencvJson } from '@/lib/exportConfi
 import { exportZip } from '@/lib/exportZip';
 import { patternSummary } from '@/lib/brand';
 import { computeSetBoards, buildSetManifest, setBoardFilename } from '@/lib/exportSet';
+import { PAPERS, computeLayout, fitNotice, reductionNotice, smallestFittingPaper, type Orientation } from '@/lib/pageLayout';
 
 /**
  * Pattern generator.
@@ -20,10 +21,7 @@ const DICTS = [
   'DICT_ARUCO_ORIGINAL', 'DICT_ARUCO_MIP_36h12',
   'DICT_APRILTAG_36h11',
 ];
-const PAPERS: Record<string, [number, number]> = {
-  A4: [210, 297], A3: [297, 420], A2: [420, 594], A1: [594, 841], A0: [841, 1189],
-  Letter: [215.9, 279.4], Tabloid: [279.4, 431.8],
-};
+// PAPERS imported from pageLayout.ts
 
 /** Build a product URL with query params to preselect the variant. */
 function productCtaUrl(spec: PatternSpec): string {
@@ -58,6 +56,7 @@ export default function Generator({ initialSpec }: GeneratorProps = {}) {
   const [boardStartIds, setBoardStartIds] = useState<number[]>([]);
   const [autoSize, setAutoSize] = useState(false);
   const [compactInfo, setCompactInfo] = useState(false);
+  const [orientation, setOrientation] = useState<Orientation>('auto');
   const [urlRead, setUrlRead] = useState(false);
   const [showBeta, setShowBeta] = useState(false);
 
@@ -112,35 +111,31 @@ export default function Generator({ initialSpec }: GeneratorProps = {}) {
     window.history.replaceState(null, '', `${window.location.pathname}?${params.toString()}`);
   }, [spec, urlRead]);
 
-  const [pw, ph] = PAPERS[spec.paper] ?? PAPERS.A4;
-  const svg = useMemo(() => checkerboardSvg(spec, pw, ph), [spec, pw, ph]);
+  const [paperW, paperH] = PAPERS[spec.paper] ?? PAPERS.A4;
+  const layout = useMemo(() => computeLayout(spec, paperW, paperH, orientation), [spec, paperW, paperH, orientation]);
+  const { pw, ph } = layout;
+  const svg = useMemo(() => checkerboardSvg(spec, pw, ph, layout), [spec, pw, ph, layout]);
   const set = <K extends keyof PatternSpec>(k: K, v: PatternSpec[K]) => setSpec((s) => ({ ...s, [k]: v }));
   const boardW = spec.cols * spec.square, boardH = spec.rows * spec.square;
   const productMatch = PRODUCT_SIZES.find(([pw2,ph2]) =>
     Math.abs(boardW - pw2) <= 2 && Math.abs(boardH - ph2) <= 2
   );
 
-  // Auto-size paper: pick smallest standard page that fits
+  // Auto-size paper: pick smallest standard page that fits (orientation-aware)
   useEffect(() => {
     if (!autoSize) return;
-    const quietZone = spec.square;
-    const needW = boardW + 2 * quietZone;
-    const needH = boardH + 2 * quietZone + 20;
     const isInch = spec.paper === 'Letter' || spec.paper === 'Tabloid';
-    const candidates = isInch
-      ? (['Letter', 'Tabloid'] as const).map(n => [n, PAPERS[n]] as const)
-      : (['A4', 'A3', 'A2', 'A1', 'A0'] as const).map(n => [n, PAPERS[n]] as const);
-    const fit = candidates.find(([, [w, h]]) => w >= needW && h >= needH);
-    if (fit && fit[0] !== spec.paper) {
-      set('paper', fit[0] as string);
+    const best = smallestFittingPaper(boardW, boardH, spec.scaleBar, isInch);
+    if (best && best !== spec.paper) {
+      set('paper', best);
     }
-  }, [autoSize, boardW, boardH, spec.square]);
+  }, [autoSize, boardW, boardH, spec.scaleBar]);
 
   const corners = (spec.rows - 1) * (spec.cols - 1);
   const markers = Math.floor((spec.rows * spec.cols) / 2);
   const margin = 10;
-  const fits = boardW + 2 * margin <= pw && boardH + 2 * margin + (spec.scaleBar ? 12 : 0) <= ph;
-  const maxSquare = Math.floor(Math.min((pw - 2 * margin) / spec.cols, (ph - 2 * margin - 12) / spec.rows) * 10) / 10;
+  const fits = layout.fit === 'single';
+  const maxSquare = Math.floor(Math.min((pw - 2 * margin) / spec.cols, (ph - 2 * margin - 14) / spec.rows) * 10) / 10;
 
   const download = (name: string, text: string, mime: string) => {
     const a = document.createElement('a');
@@ -180,6 +175,13 @@ export default function Generator({ initialSpec }: GeneratorProps = {}) {
         <div className="grid grid-cols-2 gap-3">
           <label className="flex flex-col gap-2 text-[13px] font-semibold">Page / board
             <select className={field} value={spec.paper} onChange={(e) => set('paper', e.target.value)}>{Object.keys(PAPERS).map((p) => <option key={p}>{p}</option>)}</select>
+          </label>
+          <label className="flex flex-col gap-2 text-[13px] font-semibold">Orientation
+            <select className={field} value={orientation} onChange={(e) => setOrientation(e.target.value as Orientation)}>
+              <option value="auto">Auto</option>
+              <option value="portrait">Portrait</option>
+              <option value="landscape">Landscape</option>
+            </select>
           </label>
           <label className="flex flex-col gap-2 text-[13px] font-semibold">Start ID<input className={field} type="number" min={0} value={spec.startId} onChange={(e) => set('startId', +e.target.value)} /></label>
         </div>
@@ -441,9 +443,9 @@ export default function Generator({ initialSpec }: GeneratorProps = {}) {
                 setBusy('pdf');
                 try {
                   const summary = patternSummary(spec);
-                  const pdfBytes = await exportPdf({ spec, pw, ph });
+                  const pdfBytes = await exportPdf({ spec, pw, ph, layout });
                   const pngBlob = await exportPng({ svg, pw, ph });
-                  const dxf = exportDxf({ spec, pw, ph });
+                  const dxf = exportDxf({ spec, pw, ph, layout });
                   const files = [
                     { name: `${slug}.pdf`, desc: 'PDF pattern (1:1 mm scale)', data: pdfBytes },
                     { name: `${slug}.svg`, desc: 'SVG vector pattern', data: svg },
@@ -473,7 +475,8 @@ export default function Generator({ initialSpec }: GeneratorProps = {}) {
                     const JSZip = (await import('jszip')).default;
                     const zip = new JSZip();
                     for (const board of boards) {
-                      const bytes = await exportPdf({ spec: board.spec, pw, ph });
+                      const boardLayout = computeLayout(board.spec, paperW, paperH, orientation);
+                      const bytes = await exportPdf({ spec: board.spec, pw: boardLayout.pw, ph: boardLayout.ph, layout: boardLayout });
                       zip.file(setBoardFilename(spec, board.startId), bytes);
                     }
                     zip.file('set-manifest.json', buildSetManifest(spec, boards));
@@ -491,7 +494,7 @@ export default function Generator({ initialSpec }: GeneratorProps = {}) {
             <button type="button" className="rounded bg-brand px-3 py-[11px] text-sm font-semibold text-white disabled:opacity-50" disabled={busy !== null} onClick={async () => {
               setBusy('pdf');
               try {
-                const bytes = await exportPdf({ spec, pw, ph });
+                const bytes = await exportPdf({ spec, pw, ph, layout });
                 const a = document.createElement('a');
                 a.href = URL.createObjectURL(new Blob([bytes.buffer as ArrayBuffer], { type: 'application/pdf' }));
                 a.download = `${slug}.pdf`;
@@ -511,7 +514,7 @@ export default function Generator({ initialSpec }: GeneratorProps = {}) {
                 URL.revokeObjectURL(a.href);
               } finally { setBusy(null); }
             }}>{busy === 'png' ? 'Generating…' : 'PNG (300 dpi)'}</button>
-            <button type="button" className="rounded border border-ink bg-white px-3 py-[11px] text-sm font-medium" onClick={() => download(`${slug}.dxf`, exportDxf({ spec, pw, ph }), 'application/dxf')}>DXF</button>
+            <button type="button" className="rounded border border-ink bg-white px-3 py-[11px] text-sm font-medium" onClick={() => download(`${slug}.dxf`, exportDxf({ spec, pw, ph, layout }), 'application/dxf')}>DXF</button>
           </div>
           <span className="pt-1.5 text-[13px] font-semibold">Config files</span>
           <div className="flex flex-wrap gap-2 font-mono text-[13px]">
@@ -526,7 +529,7 @@ export default function Generator({ initialSpec }: GeneratorProps = {}) {
       <div className="flex min-w-0 flex-1 basis-[520px] flex-col gap-4">
         <div className="flex flex-wrap justify-between gap-3 text-sm text-ink-muted">
           {!compactInfo && (
-            <span>Preview · {spec.paper} · {spec.rows} × {spec.cols} {spec.type}, {spec.square} mm squares</span>
+            <span>Preview · {spec.paper} {layout.orientation} · {spec.rows} × {spec.cols} {spec.type}, {spec.square} mm squares</span>
           )}
           <span className="font-mono">Board {boardW} × {boardH} mm <span className="text-ink-soft">({mmToIn(boardW)} × {mmToIn(boardH)} in)</span> · {corners} corners · {markers} markers</span>
           {productMatch && (
@@ -535,8 +538,23 @@ export default function Generator({ initialSpec }: GeneratorProps = {}) {
         </div>
         {!fits && (
           <div role="alert" className="rounded border border-brand bg-brand-tint px-4 py-3 text-sm text-brand-dark">
-            Board {boardW} × {boardH} mm does not fit on {spec.paper} with a 10 mm margin. Use squares ≤ {maxSquare} mm, fewer rows/columns, or a larger page.{' '}
-            <button type="button" className="font-semibold underline" onClick={() => set('square', maxSquare)}>Set {maxSquare} mm</button>
+            <p className="m-0 mb-2 font-semibold">{fitNotice(boardW, boardH, spec.paper)}</p>
+            <ul className="m-0 list-none space-y-1 pl-0 text-[13px]">
+              <li>(a) <strong>Tile</strong> across {layout.tiling ? `${layout.tiling.cols} \u00D7 ${layout.tiling.rows} = ${layout.tiling.totalPages}` : ''} {spec.paper} sheets at 100 % scale with 10 mm overlap and crop marks.</li>
+              {layout.reducedSpec && (
+                <li>(b) <strong>Reduce grid</strong>: {reductionNotice(spec.rows, spec.cols, layout.reducedSpec.rows, layout.reducedSpec.cols, spec.square)}.{' '}
+                  <button type="button" className="font-semibold underline" onClick={() => { set('rows', layout.reducedSpec!.rows); set('cols', layout.reducedSpec!.cols); }}>Apply</button>
+                </li>
+              )}
+              {layout.upsizePaper && (
+                <li>(c) <strong>Switch to {layout.upsizePaper}</strong>.{' '}
+                  <button type="button" className="font-semibold underline" onClick={() => set('paper', layout.upsizePaper!)}>Switch</button>
+                </li>
+              )}
+            </ul>
+            <p className="m-0 mt-2 text-[12px] text-ink-muted">Or use squares ≤ {maxSquare} mm.{' '}
+              <button type="button" className="font-semibold underline" onClick={() => set('square', maxSquare)}>Set {maxSquare} mm</button>
+            </p>
           </div>
         )}
         <div className="flex justify-center overflow-hidden rounded-xl bg-ground-panel p-6 md:p-10">

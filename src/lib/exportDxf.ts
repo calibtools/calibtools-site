@@ -18,6 +18,7 @@ import {
   WORDMARK_DOT_RECT as WM_DOT_RECT,
   WORDMARK_VIEWBOX as WM_VB,
 } from './wordmarkDxf';
+import type { PageLayout } from './pageLayout';
 
 export interface DxfExportOptions {
   spec: PatternSpec;
@@ -25,6 +26,8 @@ export interface DxfExportOptions {
   pw: number;
   /** Page height in mm */
   ph: number;
+  /** Layout-computed geometry. When provided, overrides pw/ph and inline ox/oy. */
+  layout?: PageLayout;
 }
 
 // ---------------------------------------------------------------------------
@@ -171,15 +174,15 @@ function tablesSection(): string {
   );
 }
 
-function entitiesSection(spec: PatternSpec, pw: number, ph: number): string {
+function entitiesSection(spec: PatternSpec, pw: number, ph: number, layout?: PageLayout): string {
   const parts: string[] = [];
   parts.push(gc(0, 'SECTION'));
   parts.push(gc(2, 'ENTITIES'));
 
-  const bw = spec.cols * spec.square;
-  const bh = spec.rows * spec.square;
-  const ox = (pw - bw) / 2;
-  const oy = (ph - bh) / 2 - (spec.scaleBar ? 6 : 0);
+  const bw = layout?.bw ?? spec.cols * spec.square;
+  const bh = layout?.bh ?? spec.rows * spec.square;
+  const ox = layout?.ox ?? (pw - bw) / 2;
+  const oy = layout?.oy ?? ((ph - bh) / 2 - (spec.scaleBar ? 6 : 0));
 
   const isMarkerType = spec.type === 'ChArUco' || spec.type === 'ArUco grid' || spec.type === 'AprilGrid (Kalibr)';
   const isCircles = spec.type.includes('circles') || spec.type.includes('dots');
@@ -280,15 +283,16 @@ function entitiesSection(spec: PatternSpec, pw: number, ph: number): string {
 
   // --- Axes ---
   if (spec.showAxes !== false) {
-    const isKalibr = spec.type === 'AprilGrid (Kalibr)' && spec.symmetricCorners;
+    const ax = layout?.axes;
+    const isKalibr = ax ? ax.isKalibr : (spec.type === 'AprilGrid (Kalibr)' && (spec.symmetricCorners ?? false));
     const shorter = Math.min(bw, bh);
-    const arrowLen = Math.max(15, Math.min(40, shorter * 0.15));
-    const headLen = Math.min(3, arrowLen * 0.2);
+    const arrowLen = ax?.arrowLen ?? Math.max(15, Math.min(40, shorter * 0.15));
+    const headLen = ax?.headLen ?? Math.min(3, arrowLen * 0.2);
     const axGap = 0.5 * spec.square;
 
     // Origin in pattern coords (y-down)
-    const axOriginX = ox - axGap;
-    const axOriginYDown = isKalibr ? oy + bh + axGap : oy - axGap;
+    const axOriginX = ax?.originX ?? ox - axGap;
+    const axOriginYDown = ax?.originY ?? (isKalibr ? oy + bh + axGap : oy - axGap);
 
     // Convert to DXF y-up
     const axOriginYDxf = dxfY(axOriginYDown, ph);
@@ -334,7 +338,9 @@ function entitiesSection(spec: PatternSpec, pw: number, ph: number): string {
  * - Pattern entities on layer "0"
  * - Brand elements (logo + text) on layer "CALIBTOOLS_BRAND"
  */
-export function exportDxf({ spec, pw, ph }: DxfExportOptions): string {
+export function exportDxf({ spec, pw: rawPw, ph: rawPh, layout }: DxfExportOptions): string {
+  const pw = layout?.pw ?? rawPw;
+  const ph = layout?.ph ?? rawPh;
   const summary = patternSummary({
     type: spec.type, rows: spec.rows, cols: spec.cols, square: spec.square,
     marker: spec.marker, dict: spec.dict, startId: spec.startId,
@@ -345,7 +351,7 @@ export function exportDxf({ spec, pw, ph }: DxfExportOptions): string {
   parts.push(gc(999, comment));
   parts.push(headerSection());
   parts.push(tablesSection());
-  parts.push(entitiesSection(spec, pw, ph));
+  parts.push(entitiesSection(spec, pw, ph, layout));
   parts.push(gc(0, 'EOF'));
 
   return parts.join('');

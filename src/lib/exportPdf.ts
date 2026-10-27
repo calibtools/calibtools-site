@@ -18,6 +18,7 @@ import {
   WORDMARK_DOT_RECT,
   WORDMARK_VB,
 } from './exportBrand';
+import type { PageLayout } from './pageLayout';
 
 /** Conversion factor: millimetres → PDF points. */
 export const MM = 72 / 25.4;
@@ -34,6 +35,8 @@ export interface PdfExportOptions {
     semiBold: ArrayBuffer;
     mono: ArrayBuffer;
   };
+  /** Layout-computed geometry. When provided, overrides pw/ph and inline ox/oy. */
+  layout?: PageLayout;
 }
 
 /** Load font bytes — uses provided bytes or fetches from assets in browser. */
@@ -54,7 +57,9 @@ async function loadFontBytes(
  * Generate a 1:1 millimetre-accurate PDF of the calibration pattern.
  * Returns raw PDF bytes (Uint8Array).
  */
-export async function exportPdf({ spec, pw, ph, fontBytes }: PdfExportOptions): Promise<Uint8Array> {
+export async function exportPdf({ spec, pw: rawPw, ph: rawPh, fontBytes, layout }: PdfExportOptions): Promise<Uint8Array> {
+  const pw = layout?.pw ?? rawPw;
+  const ph = layout?.ph ?? rawPh;
   const doc = await PDFDocument.create();
   doc.registerFontkit(fontkit);
   const page = doc.addPage([pw * MM, ph * MM]);
@@ -63,10 +68,10 @@ export async function exportPdf({ spec, pw, ph, fontBytes }: PdfExportOptions): 
   /** Convert mm x/y to PDF points (flip y). */
   const pt = (xMm: number, yMm: number): [number, number] => [xMm * MM, pageH - yMm * MM];
 
-  const bw = spec.cols * spec.square;
-  const bh = spec.rows * spec.square;
-  const ox = (pw - bw) / 2;
-  const oy = (ph - bh) / 2 - (spec.scaleBar ? 6 : 0);
+  const bw = layout?.bw ?? spec.cols * spec.square;
+  const bh = layout?.bh ?? spec.rows * spec.square;
+  const ox = layout?.ox ?? (pw - bw) / 2;
+  const oy = layout?.oy ?? ((ph - bh) / 2 - (spec.scaleBar ? 6 : 0));
 
   const isMarkerType = spec.type === 'ChArUco' || spec.type === 'ArUco grid' || spec.type === 'AprilGrid (Kalibr)';
   const isCircles = spec.type.includes('circles') || spec.type.includes('dots');
@@ -184,7 +189,22 @@ export async function exportPdf({ spec, pw, ph, fontBytes }: PdfExportOptions): 
     });
   };
 
-  if (fullFooterY + 14 < ph) {
+  // Layout-computed brand block (new path — wordmark bottom-left, text to the right)
+  if (layout?.brand) {
+    const b = layout.brand;
+    drawWordmark(b.wmX, b.wmY, b.wmH);
+
+    const summary = patternSummary(spec);
+    const provenance = provenanceLine('generator');
+    const fs = 2.47 * MM; // 7 pt
+
+    const [tx, ty] = pt(b.textX, b.textY);
+    page.drawText(summary, { x: tx, y: ty, size: fs, font: fontMono, color: rgb(0.2, 0.2, 0.2) });
+    const [tx2, ty2] = pt(b.textX, b.textY + b.textLineH);
+    page.drawText(provenance, { x: tx2, y: ty2, size: fs, font: fontMono, color: rgb(0.4, 0.4, 0.4) });
+    const [tx3, ty3] = pt(b.textX, b.textY + 2 * b.textLineH);
+    page.drawText(PRINT_NOTE, { x: tx3, y: ty3, size: fs, font: fontMono, color: rgb(0.6, 0.6, 0.6) });
+  } else if (fullFooterY + 14 < ph) {
     // Tier 1: Full footer — wordmark + parameter + provenance + print note
     drawWordmark(ox, fullFooterY, 5);
 
@@ -251,17 +271,18 @@ export async function exportPdf({ spec, pw, ph, fontBytes }: PdfExportOptions): 
 
   // --- XY orientation axes (same geometry as SVG/DXF) ---
   if (spec.showAxes !== false) {
-    const isKalibr = spec.type === 'AprilGrid (Kalibr)' && spec.symmetricCorners;
+    const ax = layout?.axes;
+    const isKalibr = ax ? ax.isKalibr : (spec.type === 'AprilGrid (Kalibr)' && (spec.symmetricCorners ?? false));
     const shorter = Math.min(bw, bh);
-    const arrowLen = Math.max(15, Math.min(40, shorter * 0.15));
-    const shaftW = 0.4;
-    const headLen = Math.min(3, arrowLen * 0.2);
-    const headW = headLen * 0.6;
+    const arrowLen = ax?.arrowLen ?? Math.max(15, Math.min(40, shorter * 0.15));
+    const shaftW = ax?.shaft ?? 0.4;
+    const headLen = ax?.headLen ?? Math.min(3, arrowLen * 0.2);
+    const headW = ax?.headW ?? headLen * 0.6;
     const axGap = 0.5 * spec.square;
 
     // Origin in mm (y-down pattern coords)
-    const axOx = ox - axGap;
-    const axOy = isKalibr ? oy + bh + axGap : oy - axGap;
+    const axOx = ax?.originX ?? ox - axGap;
+    const axOy = ax?.originY ?? (isKalibr ? oy + bh + axGap : oy - axGap);
 
     const xColor = rgb(230 / 255, 0, 18 / 255); // #E60012
     const yColor = rgb(27 / 255, 165 / 255, 90 / 255); // #1BA55A

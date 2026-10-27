@@ -113,9 +113,15 @@ async function run() {
   if (!/^999\n.*calib\.tools/.test(dxf)) errors.push('DXF: missing brand comment (999 group)');
 
   // =====================================================================
+  // Layout computation (shared by PDF and SVG checks)
+  // =====================================================================
+  const { computeLayout } = await import('../src/lib/pageLayout.ts');
+
+  // =====================================================================
   // PDF — inflate content streams, check operators and path data
   // =====================================================================
-  const pdfBytes = await exportPdf({ spec, pw: 210, ph: 297, fontBytes });
+  const pdfLayout = computeLayout(spec, 210, 297);
+  const pdfBytes = await exportPdf({ spec, pw: pdfLayout.pw, ph: pdfLayout.ph, fontBytes, layout: pdfLayout });
   const { doc: pdfDoc, allText: pdfContent } = await decodePdfContentStreams(pdfBytes);
 
   // Metadata (uncompressed)
@@ -154,7 +160,8 @@ async function run() {
   // =====================================================================
   // SVG — plain text, direct string/DOM-style checks
   // =====================================================================
-  const svg = checkerboardSvg(spec, 210, 297);
+  const svgLayout = computeLayout(spec, 210, 297);
+  const svg = checkerboardSvg(spec, svgLayout.pw, svgLayout.ph, svgLayout);
 
   // Wordmark <g> with bracket-framed title
   if (!svg.includes('CALIB.TOOLS wordmark-framed')) errors.push('SVG: missing bracket-framed wordmark');
@@ -178,6 +185,42 @@ async function run() {
     errors.push('SVG: missing base64 woff2 font data URI');
   }
 
+  // SVG spatial checks: axes and brand text inside printable area
+  {
+    const vbMatch = svg.match(/viewBox="0 0 ([\d.]+) ([\d.]+)"/);
+    if (vbMatch) {
+      const svgW = parseFloat(vbMatch[1]);
+      const svgH = parseFloat(vbMatch[2]);
+
+      // Axes: extract x1/y1 from first <line> in calibtools-axes group
+      const axesGroup = svg.match(/<g id="calibtools-axes">([\s\S]*?)<\/g>/);
+      if (axesGroup) {
+        const coords = [...axesGroup[1].matchAll(/(?:x1|y1|x2|y2|cx|cy)="([\d.-]+)"/g)].map(m => parseFloat(m[1]));
+        const textCoords = [...axesGroup[1].matchAll(/(?:^|\s)x="([\d.-]+)".*?y="([\d.-]+)"/g)].map(m => [parseFloat(m[1]), parseFloat(m[2])]);
+        const allX = coords.filter((_, i) => i % 2 === 0).concat(textCoords.map(([x]) => x));
+        const allY = coords.filter((_, i) => i % 2 === 1).concat(textCoords.map(([, y]) => y));
+        const minX = Math.min(...allX), maxX = Math.max(...allX);
+        const minY = Math.min(...allY), maxY = Math.max(...allY);
+        if (minX < 0) errors.push(`SVG: axes extend past left edge (minX=${minX.toFixed(1)})`);
+        if (minY < 0) errors.push(`SVG: axes extend past top edge (minY=${minY.toFixed(1)})`);
+        if (maxX > svgW) errors.push(`SVG: axes extend past right edge (maxX=${maxX.toFixed(1)} > ${svgW})`);
+        if (maxY > svgH) errors.push(`SVG: axes extend past bottom edge (maxY=${maxY.toFixed(1)} > ${svgH})`);
+      }
+
+      // Brand: extract <text> elements (not <rect> from wordmark internals) from calibtools-brand group
+      const brandGroup = svg.match(/<g id="calibtools-brand">([\s\S]*?)<\/g>/s);
+      if (brandGroup) {
+        const brandTexts = [...brandGroup[1].matchAll(/<text\s[^>]*x="([\d.-]+)"[^>]*y="([\d.-]+)"/g)];
+        for (const m of brandTexts) {
+          const tx = parseFloat(m[1]), ty = parseFloat(m[2]);
+          if (tx < 0 || ty < 0 || tx > svgW || ty > svgH) {
+            errors.push(`SVG: brand text at (${tx.toFixed(1)}, ${ty.toFixed(1)}) outside page (${svgW}×${svgH})`);
+          }
+        }
+      }
+    }
+  }
+
   // Banned phrases
   for (const pattern of BANNED) {
     if (pattern.test(svg)) errors.push(`SVG: banned phrase ${pattern}`);
@@ -193,8 +236,8 @@ async function run() {
   }
 
   console.log('[check-exports] OK — T1 exports pass all brand checks.');
-  console.log('  PDF: metadata ✓, axes colours (E60012/1BA55A in rg ops) ✓, wordmark path (383) ✓');
-  console.log('  SVG: provenance ✓, wordmark ✓, axes ✓, print note ✓, font embedded ✓');
+  console.log('  PDF: metadata ✓, axes colours ✓, wordmark path ✓');
+  console.log('  SVG: provenance ✓, wordmark ✓, axes bbox ✓, brand bbox ✓, print note ✓, font ✓');
   console.log('  DXF: provenance ✓, wordmark ✓, print note ✓');
   console.log('  T2–T7: no branded file exports (confirmed by audit).');
 }
