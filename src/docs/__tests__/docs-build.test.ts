@@ -146,25 +146,20 @@ describe('CT-DS build — no overflow', () => {
   });
 
   for (const code of DS_CODES) {
-    it(`${code} renders without critical A4 overflow`, async () => {
+    it(`${code} renders with no overflow`, async () => {
       const outBase = join(tmp, code);
       const result = await buildDS({ code, outBase });
       expect(result.pages).toBeGreaterThanOrEqual(1);
-
-      // Check A4 overflow: filter for A4 entries with overflow > page height tolerance
-      // The ILAC cert has a known minor overflow; tolerate up to 20mm for now
-      if (Array.isArray(result.overflow)) {
-        for (const entry of result.overflow) {
-          if (Array.isArray(entry) && entry[0] === 'A4') {
-            // entry is [paper, page, overflow_mm, ...]
-            const overflowMm = entry[2];
-            // Flag anything over 25mm as a test failure (critical overflow)
-            expect(overflowMm).toBeLessThan(25);
-          }
-        }
-      }
+      expect(result.overflow).toHaveLength(0);
     });
   }
+
+  it('CT-SV-CERT-ILAC renders exactly 2 pages', async () => {
+    const outBase = join(tmp, 'CT-SV-CERT-ILAC-count');
+    const result = await buildDS({ code: 'CT-SV-CERT-ILAC', outBase });
+    expect(result.pages).toBe(2);
+    expect(result.overflow).toHaveLength(0);
+  });
 
   it('CT-DS-CHA-C renders 4 pages', async () => {
     const outBase = join(tmp, 'CT-DS-CHA-C-count');

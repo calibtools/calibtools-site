@@ -1,5 +1,9 @@
 /**
- * CT-SV-CERT-ILAC  Service description builder (1–2 pages).
+ * CT-SV-CERT-ILAC  Service description builder (2 pages).
+ *
+ * Page 1: What you get · certification hierarchy table · How to order
+ * Page 2: Scope (what is measured) · Recalibration · Notes · Revision history
+ *         + push footer with disclaimer + QR block
  *
  * Reads docs/datasheets/CT-SV-CERT-ILAC.md and builds a simple
  * service-description document (no board rendering).
@@ -12,6 +16,7 @@ import {
   section,
   p,
   table,
+  note,
   qr_block,
   type RenderResult,
 } from '../ctdoc';
@@ -68,12 +73,12 @@ export async function buildILACCert(opts: {
     undefined, undefined, watermark,
   );
 
+  // ── Page 1: What you get · cert hierarchy · How to order ────────
+
+  let page1 = '';
   let secN = 1;
 
-  // Page 1: what you get + scope table + how to order
-  let page1 = '';
-
-  // "What you get" section
+  // "What you get" section — two paragraphs
   const whatSection = extractSection(body, '## What you get');
   if (whatSection) {
     page1 += section(secN, 'What you get');
@@ -84,22 +89,33 @@ export async function buildILACCert(opts: {
     secN++;
   }
 
-  // Scope table
-  const scopeSection = extractSection(body, '## Scope');
-  if (scopeSection) {
-    const tbl = parseMarkdownTable(scopeSection);
-    if (tbl) {
-      page1 += section(secN, 'Scope');
-      page1 += table(
-        [['Feature', 't'], ['Detail', 't']],
-        tbl.rows.map((r) => [mono(r[0] ?? ''), mono(r[1] ?? '')]),
-        '', undefined, ['28%', '72%'],
-      );
-      secN++;
-    }
-  }
+  // Certification hierarchy table (three levels)
+  const certLevels = table(
+    [['Level', 't'], ['Document', 't'], ['Issued by', 't']],
+    [
+      [
+        'Factory inspection',
+        '<span class="mono">CT-IR-&lt;SN&gt;</span> · included with every target',
+        'Calib.Tools (manufacturer)',
+      ],
+      [
+        'ILAC-MRA certificate',
+        '<span class="mono">SVC-X-CERT-ILAC</span> · add-on service',
+        'CNAS-accredited laboratory',
+      ],
+      [
+        'DAkkS certificate',
+        'On request for specific requirements',
+        'DAkkS-accredited laboratory',
+      ],
+    ],
+    '', undefined, ['20%', '45%', '35%'],
+  );
+  page1 += section(secN, 'Certification hierarchy');
+  page1 += certLevels;
+  secN++;
 
-  // How to order
+  // "How to order" section
   const orderSection = extractSection(body, '## How to order');
   if (orderSection) {
     page1 += section(secN, 'How to order');
@@ -110,24 +126,45 @@ export async function buildILACCert(opts: {
     secN++;
   }
 
+  d.addPage(page1);
+
+  // ── Page 2: Scope · Recalibration · Notes · Revision history ────
+
+  let page2 = '';
+
+  // Scope table (what is measured)
+  const scopeSection = extractSection(body, '## Scope');
+  if (scopeSection) {
+    const tbl = parseMarkdownTable(scopeSection);
+    if (tbl) {
+      page2 += section(secN, 'What is measured');
+      page2 += table(
+        [['Feature', 't'], ['Detail', 't']],
+        tbl.rows.map((r) => [mono(r[0] ?? ''), mono(r[1] ?? '')]),
+        '', undefined, ['28%', '72%'],
+      );
+      secN++;
+    }
+  }
+
   // Recalibration
   const recalSection = extractSection(body, '## Recalibration');
   if (recalSection) {
-    page1 += section(secN, 'Recalibration');
-    page1 += p(mono(recalSection.trim().replace(/\n/g, ' ')));
+    page2 += section(secN, 'Recalibration');
+    page2 += p(mono(recalSection.trim().replace(/\n/g, ' ')));
     secN++;
   }
 
   // Notes
   const notesSection = extractSection(body, '## Notes');
   if (notesSection) {
-    page1 += section(secN, 'Notes');
+    page2 += section(secN, 'Notes');
     const items = notesSection.trim().split('\n')
       .filter((l) => l.trim().startsWith('-'))
       .map((l) => `<li>${mono(l.replace(/^[-*]\s+/, '').trim())}</li>`)
       .join('');
     if (items) {
-      page1 += `<ul class="l">${items}</ul>`;
+      page2 += `<ul class="l">${items}</ul>`;
     }
     secN++;
   }
@@ -137,21 +174,21 @@ export async function buildILACCert(opts: {
   if (revSection) {
     const tbl = parseMarkdownTable(revSection);
     if (tbl) {
-      page1 += section(secN, 'Revision history');
-      page1 += table(
+      page2 += section(secN, 'Revision history');
+      page2 += table(
         [['Rev', 'm'], ['Date', 'm'], ['Change', 't']],
         tbl.rows,
         '', undefined, ['13%', '23%', '64%'],
       );
-      secN++;
     }
   }
 
-  // Footer QR block
-  page1 += `<div class="push" style="display:flex;justify-content:space-between;align-items:flex-end;border-top:.25mm solid #b3b3b3;padding-top:4mm">`;
-  page1 += `<div class="small muted" style="max-width:94mm">Service terms subject to change; current revision at calib.tools.</div>`;
-  page1 += `${qr_block(FILE_URL, 15)}</div>`;
-  d.addPage(page1);
+  // Push footer: disclaimer + QR block
+  page2 += `<div class="push" style="display:flex;justify-content:space-between;align-items:flex-end;border-top:.25mm solid #b3b3b3;padding-top:4mm">`;
+  page2 += note('Service terms subject to change; current revision at calib.tools.');
+  page2 += `${qr_block(FILE_URL, 15)}</div>`;
+
+  d.addPage(page2);
 
   return d.render(outBase);
 }
