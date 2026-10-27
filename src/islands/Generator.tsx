@@ -9,6 +9,7 @@ import { exportZip } from '@/lib/exportZip';
 import { patternSummary } from '@/lib/brand';
 import { computeSetBoards, buildSetManifest, setBoardFilename } from '@/lib/exportSet';
 import { PAPERS, computeLayout, fitNotice, reductionNotice, smallestFittingPaper, type Orientation } from '@/lib/pageLayout';
+import { LEAD_TIME } from '@/lib/claims';
 
 /**
  * Pattern generator.
@@ -574,7 +575,7 @@ export default function Generator({ initialSpec }: GeneratorProps = {}) {
           <div className="w-full max-w-[560px] overflow-hidden bg-white shadow-[0_12px_40px_rgba(0,0,0,0.12)] [&>svg]:h-auto [&>svg]:w-full" dangerouslySetInnerHTML={{ __html: svg }} />
         </div>
         <div className="card flex flex-wrap items-center justify-between gap-3 bg-ground-alt px-5 py-4">
-          <span className="text-[15px]"><strong>Want this exact pattern on a rigid board?</strong> <span className="text-ink-muted">Same geometry, 0.3 mm tolerance, ships in 2–4 days.</span></span>
+          <span className="text-[15px]"><strong>Want this exact pattern on a rigid board?</strong> <span className="text-ink-muted">Same geometry, 0.3 mm tolerance, measured before it ships &middot; {LEAD_TIME.toLowerCase()}.</span></span>
           <a href={productCtaUrl(spec)} className="rounded bg-ink px-4 py-2.5 text-sm font-semibold text-white no-underline hover:text-white">Order as composite board</a>
         </div>
       </div>
