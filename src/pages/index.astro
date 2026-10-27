@@ -12,7 +12,7 @@ import { getProductImages } from '@/lib/product-images';
 import { getImageMetadata } from '@/lib/productImageImports';
 import { Tag, Truck, FileCheck, Files, RotateCcw, Grid2x2 as Grid2X2, ScanLine, ListChecks, Package, Ruler, CircleDot, Plug, ArrowRight, Mail } from 'lucide-astro';
 import { getAllPublishedReviews, HOW_REVIEWS_WORK_SHORT } from '@/lib/reviews';
-import { TAGLINE, IN_DEVELOPMENT } from '@/lib/claims';
+import { TAGLINE, IN_DEVELOPMENT, RETURNS_LINE } from '@/lib/claims';
 import Stars from '@/components/Stars';
 import heroTight from '@/assets/products/brand/dark/hero-boards-tight.webp';
 import heroTightMobile from '@/assets/products/brand/dark/hero-boards-tight-mobile.webp';
@@ -57,7 +57,7 @@ const why = [
   ['Lead time you can plan with', 'Made to order, ships in 2\u20133 weeks. Tracked express worldwide.'],
   ['Inspection report included', 'Dimensional check on every board. ILAC-recognised calibration certificate as an add-on.'],
   ['Files you can use', 'Datasheet, CAD and pattern JSON for OpenCV, Kalibr and HALCON with every target.'],
-  ['30-day returns', 'Not flat, not accurate, not what you ordered\u2009\u2014\u2009send it back.'],
+  ['30-day returns', RETURNS_LINE],
 ];
 
 /* Show 3 featured tools on the home page */
