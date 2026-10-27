@@ -73,7 +73,7 @@ const featuredReviews = allReviews
   })
   .slice(0, 3);
 ---
-<Base title={TAGLINE} theme="dark" ogImage="/og/boards.png" description={`${TAGLINE}. Precision checkerboards, ChArUco, AprilGrid and metrology-grade glass targets, plus free browser tools to generate, size and verify your calibration. Made to order, shipped worldwide.`}>
+<Base title={TAGLINE} theme="dark" ogImage="/og/boards.png" description={`${TAGLINE}. Precision calibration targets and free browser tools for machine vision. Made to order, measured before it ships.`}>
 
   {/* ── Hero ── */}
   <section id="top" class="pb-[72px] md:pb-0">
@@ -118,9 +118,9 @@ const featuredReviews = allReviews
         <span class="font-mono text-[12px] uppercase tracking-[0.18em] text-brand-text">
           Calibration targets &amp; tools for machine vision
         </span>
-        <h1 class="m-0 text-[38px] font-[800] uppercase leading-[1.02] tracking-[-0.02em]">
+        <p class="m-0 text-[38px] font-[800] uppercase leading-[1.02] tracking-[-0.02em]" aria-hidden="true">
           Know your target<br /><span class="text-brand">to the micron</span>
-        </h1>
+        </p>
         <p class="m-0 max-w-[480px] text-[17px] leading-[1.5] text-ink-muted">
           Every board is measured before it ships &mdash; the report is yours. Precision checkerboards, ChArUco, AprilGrid and metrology-grade glass targets, plus free browser tools to generate, size and verify your calibration.
         </p>

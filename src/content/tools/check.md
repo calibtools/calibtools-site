@@ -1,6 +1,6 @@
 ---
-seoTitle: "Detection check — verify calibration pattern detection in your image"
-seoDescription: "Upload a photo of your calibration board and see what OpenCV's detector finds. Overlay of detected corners and markers, in your browser, nothing uploaded."
+seoTitle: "Detection check — verify pattern detection"
+seoDescription: "Upload a calibration board photo and see what the OpenCV detector finds. Detected corners and markers overlaid. Free, in your browser, nothing uploaded."
 h1: "Detection check"
 faq:
   - q: "What does the detection check use?"

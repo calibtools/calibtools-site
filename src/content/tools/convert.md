@@ -1,5 +1,5 @@
 ---
-seoTitle: "Calibration format converter — OpenCV ↔ Kalibr ↔ ROS ↔ HALCON"
+seoTitle: "Format converter — OpenCV, Kalibr, ROS"
 seoDescription: "Convert calibration target configs between OpenCV JSON, Kalibr YAML, ROS 2 camera_info YAML and HALCON .descr. Paste, convert, download. Free, in your browser."
 h1: "Format converter"
 faq:

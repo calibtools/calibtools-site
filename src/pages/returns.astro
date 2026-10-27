@@ -1,7 +1,9 @@
 ---
 import Base from '@/layouts/Base.astro';
+import { breadcrumbLd } from '@/lib/seo';
+const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: 'Returns' }]);
 ---
-<Base title="Returns" description="Return policy for Calib.Tools calibration targets.">
+<Base title="Returns" description="Return and refund policy for Calib.Tools calibration targets. 30-day return window, no questions asked." jsonLd={bcLd}>
   <div class="container-x py-10 md:py-16">
     <div class="prose-calib mx-auto flex max-w-[720px] flex-col gap-5">
       <h1 class="h-display m-0 text-[32px] md:text-[40px]">Returns &amp; refunds</h1>

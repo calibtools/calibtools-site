@@ -1,5 +1,5 @@
 ---
-seoTitle: "Capture assistant — guided calibration image capture with 15 poses"
+seoTitle: "Capture assistant — guided image capture"
 seoDescription: "Guided calibration image capture with 15 poses for optimal coverage. Uses your webcam, no uploads. Captures saved as PNG for OpenCV, ROS or Kalibr."
 h1: "Capture assistant"
 faq:

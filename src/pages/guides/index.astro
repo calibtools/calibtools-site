@@ -1,9 +1,11 @@
 ---
 import Base from '@/layouts/Base.astro';
 import { getCollection } from 'astro:content';
+import { breadcrumbLd } from '@/lib/seo';
 const guides = (await getCollection('guides')).sort((a, b) => b.data.updated.valueOf() - a.data.updated.valueOf());
+const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: 'Guides' }]);
 ---
-<Base title="Guides" section="guides" description="Practical guides on camera calibration targets, patterns and materials.">
+<Base title="Guides" section="guides" description="Practical guides on camera calibration targets, patterns and materials." jsonLd={bcLd}>
   <section class="container-x flex flex-col gap-8 py-12 md:py-16">
     <span class="eyebrow">Knowledge base</span>
     <h1 class="h-display m-0 text-[36px] md:text-[48px]">Where calibration starts.</h1>

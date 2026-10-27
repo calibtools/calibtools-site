@@ -1,5 +1,5 @@
 ---
-seoTitle: "Calibration target selection wizard — pattern, size, material"
+seoTitle: "Target selection wizard — find your board"
 seoDescription: "Answer five questions about your application, accuracy, camera, environment and toolchain to get a calibration target recommendation. Free, no signup."
 h1: "Target selection wizard"
 faq:

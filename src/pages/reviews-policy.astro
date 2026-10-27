@@ -1,7 +1,9 @@
 ---
 import Base from '@/layouts/Base.astro';
+import { breadcrumbLd } from '@/lib/seo';
+const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: 'Reviews policy' }]);
 ---
-<Base title="Reviews policy" description="How customer reviews work on Calib.Tools.">
+<Base title="Reviews policy" description="How customer reviews work on Calib.Tools. We publish every review, disclose material connections, and never incentivize." jsonLd={bcLd}>
   <section class="container-x py-12 md:py-16">
     <div class="prose-calib mx-auto max-w-[640px]">
       <h1 class="h-display m-0 text-[32px] leading-[1.08] md:text-[44px]">Reviews policy</h1>

@@ -1,6 +1,6 @@
 ---
-seoTitle: "ChArUco pattern generator — free PDF with OpenCV config"
-seoDescription: "Generate ChArUco calibration patterns with ArUco markers for OpenCV. Print-exact PDF, SVG, PNG and config files for partial-view detection. Free, in your browser."
+seoTitle: "ChArUco generator — PDF with OpenCV config"
+seoDescription: "Generate ChArUco calibration patterns with ArUco markers for OpenCV. Print-exact PDF, SVG, PNG and config files for partial-view detection. Free, in-browser."
 h1: "ChArUco pattern generator"
 faq:
   - q: "What is a ChArUco board?"

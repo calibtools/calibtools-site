@@ -1,5 +1,5 @@
 ---
-seoTitle: "AprilGrid pattern generator — free Kalibr-compatible PDF"
+seoTitle: "AprilGrid generator — Kalibr PDF"
 seoDescription: "Generate AprilGrid calibration patterns for Kalibr camera–IMU calibration. AprilTag 36h11 dictionary, print-exact PDF and YAML config. Free, in your browser."
 h1: "AprilGrid pattern generator"
 faq:

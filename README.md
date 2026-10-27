@@ -31,3 +31,8 @@ and requires four repository secrets under **Settings → Secrets and variables 
 | `CF_KV_REVIEWS_NAMESPACE_ID` | Workers & Pages → KV → REVIEWS namespace ID | KV namespace holding invite tokens |
 | `CF_API_TOKEN` | Cloudflare API Tokens → Create Token (Account / Workers KV Storage / Edit) | Read/write invite records |
 | `RESEND_API_KEY` | Resend dashboard → API Keys | Send invite emails from `reviews@calib.tools` |
+
+## 404 page
+
+`src/pages/404.astro` generates `dist/404.html`. Cloudflare Pages automatically
+serves this file for any URL that does not match a route — no `_redirects` rule needed.

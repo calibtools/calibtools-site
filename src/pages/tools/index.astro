@@ -2,8 +2,10 @@
 import Base from '@/layouts/Base.astro';
 import ToolCard from '@/components/ToolCard.astro';
 import { tools } from '@/lib/tools';
+import { breadcrumbLd } from '@/lib/seo';
+const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: 'Free tools' }]);
 ---
-<Base title="Free calibration tools" section="tools" description="Free browser tools for camera calibration: pattern generator, FOV calculator, selection wizard, format converter, detection check and quality analyzer.">
+<Base title="Free calibration tools" section="tools" description="Free browser tools for camera calibration: pattern generator, FOV calculator, selection wizard, format converter, detection check and quality analyzer." jsonLd={bcLd}>
   <section class="container-x flex flex-col gap-9 py-12 md:py-16">
     <div class="flex flex-col gap-2.5">
       <span class="eyebrow">Free tools · runs in your browser · open source</span>
