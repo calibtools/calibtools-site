@@ -33,7 +33,7 @@ describe('checkerboardSvg brand group', () => {
 
   it('brand group contains bracket-framed wordmark SVG', () => {
     const svg = checkerboardSvg(spec, 210, 297);
-    expect(svg).toContain('CALIB.TOOLS wordmark-framed');
+    expect(svg).toContain('CALIB.TOOLS wordmark-compact');
     // Wordmark has letter paths
     expect(svg).toContain('<path d="M383.0');
   });

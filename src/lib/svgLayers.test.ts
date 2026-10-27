@@ -84,7 +84,7 @@ describe('brandFooterSvg fallback tiers', () => {
     const svg = brandFooterSvg(ctx);
     expect(svg).toContain('id="calibtools-brand"');
     // Full footer has the bracket-framed wordmark SVG
-    expect(svg).toContain('CALIB.TOOLS wordmark-framed');
+    expect(svg).toContain('CALIB.TOOLS wordmark-compact');
     // And the provenance line
     expect(svg).toContain('Generated with calib.tools/tools/generator');
     // And the print note
@@ -98,7 +98,7 @@ describe('brandFooterSvg fallback tiers', () => {
     const svg = brandFooterSvg(ctx);
     // Should have brand group with compact wordmark
     expect(svg).toContain('calibtools-brand');
-    expect(svg).toContain('CALIB.TOOLS wordmark-framed');
+    expect(svg).toContain('CALIB.TOOLS wordmark-compact');
     expect(svg).toContain('font-size="1.8"');
   });
 

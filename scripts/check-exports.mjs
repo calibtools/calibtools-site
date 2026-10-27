@@ -164,7 +164,7 @@ async function run() {
   const svg = checkerboardSvg(spec, svgLayout.pw, svgLayout.ph, svgLayout);
 
   // Wordmark <g> with bracket-framed title
-  if (!svg.includes('CALIB.TOOLS wordmark-framed')) errors.push('SVG: missing bracket-framed wordmark');
+  if (!svg.includes('CALIB.TOOLS wordmark-compact')) errors.push('SVG: missing bracket-framed wordmark');
 
   // Provenance <text>
   if (!svg.includes('calib.tools/tools/generator')) errors.push('SVG: missing provenance line');

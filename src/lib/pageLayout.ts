@@ -35,11 +35,11 @@ export function patternQuietZone(squareSize: number): number {
   return Math.max(squareSize, 10);
 }
 
-/** Wordmark width on A4/Letter (mm). Brand guidelines §04: print minimum 25 mm. */
-const WM_WIDTH_A4 = 28;
+/** Compact wordmark width on A4/Letter (mm). Guidelines §04: compact print minimum 20 mm. */
+const WM_WIDTH_A4 = 20;
 
 /** Minimum wordmark width (mm). */
-const WM_WIDTH_MIN = 25;
+const WM_WIDTH_MIN = 20;
 
 /** Wordmark aspect ratio (width / height) from the kit. */
 const WM_ASPECT = WORDMARK_VB.width / WORDMARK_VB.height; // 7796.4 / 1857.4 ≈ 4.197
