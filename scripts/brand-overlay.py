@@ -501,15 +501,42 @@ def boards_bbox_from_json(data, source_png, webp_w, webp_h):
     return int(pts[:, 0].min()), int(pts[:, 1].min()), int(pts[:, 0].max()), int(pts[:, 1].max())
 
 
+def _sample_bg_colour(img):
+    """Sample the background colour from the four 20×20-px image corners."""
+    patches = [
+        img[:20, :20], img[:20, -20:],
+        img[-20:, :20], img[-20:, -20:],
+    ]
+    return np.mean(np.concatenate([p.reshape(-1, 3) for p in patches], axis=0), axis=0).astype(np.uint8)
+
+
+def _all_corners_scaled(data, src_name, w, h):
+    """Return all board corners scaled to WebP coordinates."""
+    png_key = src_name.replace(".webp", ".png")
+    entry = data.get(png_key)
+    if not entry:
+        return []
+    orig_w, orig_h = entry["dims"]
+    sx, sy = w / orig_w, h / orig_h
+    pts = []
+    for board in entry.get("boards", []):
+        corners = board.get("corners")
+        if corners:
+            pts.extend([(c[0] * sx, c[1] * sy) for c in corners])
+    return pts
+
+
 def cmd_crop(args):
     """Crop overlaid hero images tight around the boards.
 
     Algorithm:
     1. Board bbox from saved JSON corners (no reflection).
-    2. Expand 6 % each side; at most 12 % extra below lowest corner.
-    3. Scale the expanded region, then centre-crop to the target aspect.
-    4. Assert boards fill ≥ min_board_h_pct of crop height (desktop)
-       or ≥ min_board_w_pct of crop width (mobile).
+    2. Expand 6 % each side; at most 12 % of board height below.
+    3. Expand the box to the target aspect ratio by adding width or
+       height *symmetrically*.  If the source runs out of pixels, pad
+       with the near-black background sampled from the image corners.
+    4. Resize to target dims.
+    5. Assert every board corner lies inside the crop with ≥ 6 % margin.
     """
     with open(JSON_PATH) as f:
         data = json.load(f)
@@ -540,6 +567,7 @@ def cmd_crop(args):
 
         img = cv2.imread(str(src_path))
         h, w = img.shape[:2]
+        bg = _sample_bg_colour(img)
 
         # Step 1: board bbox from JSON corners, scaled to WebP size
         bbox = boards_bbox_from_json(data, src_name, w, h)
@@ -551,48 +579,89 @@ def cmd_crop(args):
         bw = bx1 - bx0
         bh = by1 - by0
 
-        # Step 2: expand board bbox by 6 % each side, at most 12 % below.
+        # Step 2: expand ≥ 6 % each side of the board bbox; at most 12 % below.
+        # Use 8 % for the initial box so that after aspect-ratio expansion
+        # (which only adds to one axis) every corner still has ≥ 6 % margin.
+        margin = 0.06
+        expand = 0.08
+        ml = int(bw * expand)
+        mr = int(bw * expand)
+        mt = int(bh * expand)
+        mb = min(int(bh * 0.12), int(bh * expand * 2))
+
+        ex0 = bx0 - ml
+        ey0 = by0 - mt
+        ex1 = bx1 + mr
+        ey1 = by1 + mb
+
+        ew = ex1 - ex0
+        eh = ey1 - ey0
+
+        # Step 3: expand to the target aspect ratio symmetrically
         tw, th = cfg["target"]
+        target_ar = tw / th
+        box_ar = ew / eh
+
+        if box_ar < target_ar:
+            # Need more width
+            new_w = int(eh * target_ar)
+            pad = new_w - ew
+            ex0 -= pad // 2
+            ex1 += pad - pad // 2
+        else:
+            # Need more height
+            new_h = int(ew / target_ar)
+            pad = new_h - eh
+            ey0 -= pad // 2
+            ey1 += pad - pad // 2
+
+        # Step 4: extract region, padding where the source runs out
+        # Compute padding amounts
+        pad_left = max(0, -ex0)
+        pad_top = max(0, -ey0)
+        pad_right = max(0, ex1 - w)
+        pad_bottom = max(0, ey1 - h)
+
+        # Clamp source coords
+        sx0 = max(0, ex0)
+        sy0 = max(0, ey0)
+        sx1 = min(w, ex1)
+        sy1 = min(h, ey1)
+
+        region = img[sy0:sy1, sx0:sx1]
+
+        if pad_left or pad_top or pad_right or pad_bottom:
+            region = cv2.copyMakeBorder(
+                region, pad_top, pad_bottom, pad_left, pad_right,
+                cv2.BORDER_CONSTANT, value=bg.tolist(),
+            )
+
+        cropped = cv2.resize(region, (tw, th), interpolation=cv2.INTER_AREA)
+        ch, cw = th, tw
+
+        # Scale factor from expanded box to target
+        scale_x = tw / (ex1 - ex0)
+        scale_y = th / (ey1 - ey0)
+
+        # Step 5: assert every board corner is inside with ≥ 6 % margin
+        all_corners = _all_corners_scaled(data, src_name, w, h)
+        margin_px_x = tw * margin
+        margin_px_y = th * margin
+        for i, (px, py) in enumerate(all_corners):
+            # Corner position in crop coordinates
+            cx = (px - ex0) * scale_x
+            cy = (py - ey0) * scale_y
+            assert cx >= margin_px_x and cx <= tw - margin_px_x, \
+                f"Corner {i} x={cx:.0f} outside {margin_px_x:.0f}..{tw - margin_px_x:.0f}"
+            assert cy >= margin_px_y and cy <= th - margin_px_y, \
+                f"Corner {i} y={cy:.0f} outside {margin_px_y:.0f}..{th - margin_px_y:.0f}"
+        print(f"    all {len(all_corners)} corners inside with ≥ {margin:.0%} margin ✓")
+
+        # Board fill
+        board_h_fill = (bh * scale_y) / ch
+        board_w_fill = (bw * scale_x) / cw
         min_bh_pct = cfg["min_board_h_pct"]
         min_bw_pct = cfg["min_board_w_pct"]
-
-        margin = 0.06
-        ml = int(bw * margin)
-        mr = int(bw * margin)
-        mt = int(bh * margin)
-        mb = min(int(bh * 0.12), int(bh * margin * 2))
-
-        cx0 = max(0, bx0 - ml)
-        cy0 = max(0, by0 - mt)
-        cx1 = min(w, bx1 + mr)
-        cy1 = min(h, by1 + mb)
-
-        # Step 3: scale+crop to exact target dims, never pad.
-        region = img[cy0:cy1, cx0:cx1]
-        rh, rw = region.shape[:2]
-        target_ar = tw / th
-        region_ar = rw / rh
-
-        if region_ar > target_ar:
-            # Wider: scale to match height, centre-crop width
-            scale = th / rh
-            sw = int(rw * scale)
-            scaled = cv2.resize(region, (sw, th), interpolation=cv2.INTER_AREA)
-            x_off = (sw - tw) // 2
-            cropped = scaled[:, x_off:x_off + tw]
-        else:
-            # Taller: scale to match width, centre-crop height
-            scale = tw / rw
-            sh = int(rh * scale)
-            scaled = cv2.resize(region, (tw, sh), interpolation=cv2.INTER_AREA)
-            y_off = (sh - th) // 2
-            cropped = scaled[y_off:y_off + th, :]
-
-        ch, cw = cropped.shape[:2]
-
-        # Step 4: assert board fill
-        board_h_fill = (bh * scale) / ch
-        board_w_fill = (bw * scale) / cw
 
         if min_bh_pct > 0:
             assert board_h_fill >= min_bh_pct - 0.02, \
@@ -607,12 +676,12 @@ def cmd_crop(args):
         out_path = OUT_DIR / cfg["output"]
         cv2.imwrite(str(out_path), cropped, [cv2.IMWRITE_WEBP_QUALITY, 90])
         print(f"  {src_name} → {cfg['output']} ({cw}x{ch}, {out_path.stat().st_size // 1024} KB)")
-        print(f"    boards bbox [{bx0},{by0}]-[{bx1},{by1}], expand [{cx0},{cy0}]-[{cx1},{cy1}]")
+        print(f"    boards bbox [{bx0},{by0}]-[{bx1},{by1}], expand [{ex0},{ey0}]-[{ex1},{ey1}]")
 
         data.setdefault("crops", {})[cfg["output"]] = {
             "source": src_name,
             "boards_bbox": [bx0, by0, bx1, by1],
-            "crop_box": [cx0, cy0, cx1, cy1],
+            "crop_box": [ex0, ey0, ex1, ey1],
             "output_dims": [cw, ch],
         }
 
