@@ -1,0 +1,5 @@
+# scripts/seo-allowlist.txt
+# Each line: relative-path-in-dist<TAB>reason
+# Lines starting with # are comments.
+cart/index.html	noindex, h1 rendered client-side by CartPage island
+review/index.html	noindex, h1 rendered client-side by ReviewForm island

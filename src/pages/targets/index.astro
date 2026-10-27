@@ -5,6 +5,8 @@ import type { ImageMetadata } from 'astro';
 import { getCollections, getProducts } from '@/lib/shopify';
 import { getProductImages } from '@/lib/product-images';
 import { getImageMetadata } from '@/lib/productImageImports';
+import { breadcrumbLd } from '@/lib/seo';
+const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: 'Calibration targets' }]);
 
 const collections = await getCollections();
 const products = await getProducts();
@@ -20,7 +22,7 @@ for (const p of products) {
   }
 }
 ---
-<Base title="Calibration targets" section="targets" description="Checkerboard, ChArUco, AprilGrid, ceramic and glass calibration targets with inspection report. Made to order, shipped worldwide.">
+<Base title="Calibration targets" section="targets" description="Checkerboard, ChArUco, AprilGrid, ceramic and glass calibration targets with inspection report. Made to order, shipped worldwide." jsonLd={bcLd}>
   <section class="container-x flex flex-col gap-9 py-12 md:py-16">
     <div class="flex flex-col gap-2.5">
       <span class="eyebrow">Calibration targets</span>

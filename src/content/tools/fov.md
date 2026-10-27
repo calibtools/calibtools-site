@@ -1,6 +1,6 @@
 ---
-seoTitle: "FOV & resolution calculator — field of view, GSD, target sizing"
-seoDescription: "Calculate field of view, ground sample distance and recommended target size for any camera sensor and lens. Presets for common machine vision cameras. Free, in your browser."
+seoTitle: "FOV calculator — field of view and GSD"
+seoDescription: "Calculate field of view, ground sample distance and target size for any camera and lens. Presets for common machine vision cameras. Free, in your browser."
 h1: "FOV & resolution calculator"
 faq:
   - q: "What is GSD?"

@@ -1,5 +1,5 @@
 ---
-seoTitle: "Checkerboard pattern generator — free calibration PDF"
+seoTitle: "Checkerboard generator — free PDF"
 seoDescription: "Generate checkerboard calibration patterns as print-exact PDF. Standard pattern for OpenCV cv::findChessboardCorners. Free, runs in your browser."
 h1: "Checkerboard pattern generator"
 faq:

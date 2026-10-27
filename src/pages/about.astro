@@ -1,7 +1,9 @@
 ---
 import Base from '@/layouts/Base.astro';
+import { breadcrumbLd } from '@/lib/seo';
+const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: 'About' }]);
 ---
-<Base title="About" description="Who builds Calib.Tools, how we inspect, and why calibration matters. Know your target to the micron.">
+<Base title="About Calib.Tools" description="Who builds Calib.Tools, how we inspect every board, and why calibration target accuracy matters. Know your target to the micron." jsonLd={bcLd}>
   <div class="container-x py-10 md:py-16">
     <div class="prose-calib mx-auto flex max-w-[720px] flex-col gap-8">
       <h1 class="h-display m-0 text-[32px] md:text-[40px]">About Calib.Tools</h1>

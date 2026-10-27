@@ -1,6 +1,6 @@
 ---
-seoTitle: "Calibration pattern generator — Checkerboard, ChArUco, AprilGrid PDF"
-seoDescription: "Generate print-exact calibration patterns as PDF, SVG, PNG and DXF with OpenCV, Kalibr and ROS config files. Checkerboard, ChArUco, AprilGrid, circles. Free, runs in your browser."
+seoTitle: "Pattern generator — free calibration PDF"
+seoDescription: "Generate print-exact calibration patterns as PDF, SVG, PNG, DXF with OpenCV, Kalibr and ROS config. Checkerboard, ChArUco, AprilGrid, circles. Free."
 h1: "Pattern generator"
 faq:
   - q: "Is the PDF output dimensionally accurate?"

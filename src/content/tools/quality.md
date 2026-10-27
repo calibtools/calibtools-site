@@ -1,5 +1,5 @@
 ---
-seoTitle: "Calibration quality analyzer — reprojection error, coverage, diagnostics"
+seoTitle: "Quality analyzer — reprojection error"
 seoDescription: "Paste your OpenCV calibration results and get a quality report: reprojection error analysis, parameter correlation, coverage assessment and actionable findings."
 h1: "Calibration quality analyzer"
 faq:

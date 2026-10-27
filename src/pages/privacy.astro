@@ -1,7 +1,9 @@
 ---
 import Base from '@/layouts/Base.astro';
+import { breadcrumbLd } from '@/lib/seo';
+const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: 'Privacy policy' }]);
 ---
-<Base title="Privacy policy" description="Privacy policy for calib.tools.">
+<Base title="Privacy policy" description="Privacy policy for calib.tools. No analytics, no tracking, no cookies. Browser tools run entirely client-side." jsonLd={bcLd}>
   <div class="container-x py-10 md:py-16">
     <div class="prose-calib mx-auto flex max-w-[720px] flex-col gap-5">
       <h1 class="h-display m-0 text-[32px] md:text-[40px]">Privacy policy</h1>

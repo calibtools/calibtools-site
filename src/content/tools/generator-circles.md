@@ -1,5 +1,5 @@
 ---
-seoTitle: "Circle grid pattern generator — symmetric and asymmetric PDF"
+seoTitle: "Circle grid generator — symmetric PDF"
 seoDescription: "Generate symmetric and asymmetric circle grid calibration patterns. Print-exact PDF for OpenCV cv::findCirclesGrid. Free, runs in your browser."
 h1: "Circle grid pattern generator"
 faq:
