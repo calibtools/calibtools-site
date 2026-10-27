@@ -12,12 +12,17 @@ import {
   wordmarkSvgGroup,
 } from './exportBrand';
 import { GEIST_MONO_WOFF2_B64 } from './geistMonoBase64';
+import type { BrandGeometry, AxesGeometry } from './pageLayout';
 
 export interface SvgContext {
   spec: PatternSpec;
   pw: number; ph: number;
   ox: number; oy: number;
   bw: number; bh: number;
+  /** Layout-computed brand geometry. If absent, falls back to legacy positioning. */
+  brand?: BrandGeometry;
+  /** Layout-computed axes geometry. If absent, falls back to legacy positioning. */
+  axes?: AxesGeometry;
 }
 
 /** Opening `<svg>` tag + embedded font defs + white background rect. */
@@ -59,19 +64,18 @@ export function axesSvg(ctx: SvgContext): string {
   if (s.showAxes === false) return '';
 
   const mono = s.monochromeAxes ?? false;
-  const isKalibr = s.type === 'AprilGrid (Kalibr)' && s.symmetricCorners;
 
-  // Arrow length: 15% of shorter board side, clamped [15, 40] mm
+  // Use layout-computed geometry if available, else legacy inline computation
+  const ax = ctx.axes;
+  const isKalibr = ax ? ax.isKalibr : (s.type === 'AprilGrid (Kalibr)' && (s.symmetricCorners ?? false));
   const shorter = Math.min(bw, bh);
-  const arrowLen = Math.max(15, Math.min(40, shorter * 0.15));
-  const shaft = 0.4;
-  const headLen = Math.min(3, arrowLen * 0.2);
-  const headW = headLen * 0.6;
+  const arrowLen = ax ? ax.arrowLen : Math.max(15, Math.min(40, shorter * 0.15));
+  const shaft = ax ? ax.shaft : 0.4;
+  const headLen = ax ? ax.headLen : Math.min(3, arrowLen * 0.2);
+  const headW = ax ? ax.headW : headLen * 0.6;
 
-  // Origin: 0.5 squares before pattern top-left (OpenCV) or bottom-left (Kalibr)
-  const gap = 0.5 * s.square;
-  const originX = ox - gap;
-  const originY = isKalibr ? oy + bh + gap : oy - gap;
+  const originX = ax ? ax.originX : ox - 0.5 * s.square;
+  const originY = ax ? ax.originY : (isKalibr ? oy + bh + 0.5 * s.square : oy - 0.5 * s.square);
 
   const xColor = mono ? '#000' : '#E60012';
   const yColor = mono ? '#000' : '#1BA55A';
@@ -125,56 +129,78 @@ export function cornerIdBadgeSvg(ctx: SvgContext): string {
   return `<text x="${badgeX}" y="${badgeY}" class="corner-id-badge" font-family="'Geist Mono', monospace" font-size="10" font-weight="700" fill="#333">${text}</text>`;
 }
 
-/** Brand footer group with 3-tier fallback. Never silently omitted. */
+/** Brand footer group. Uses layout geometry when available, else 3-tier fallback. */
 export function brandFooterSvg(ctx: SvgContext): string {
   const { spec: s, pw, ph, oy, bh } = ctx;
+
+  // If layout brand geometry is provided, use it (new path)
+  if (ctx.brand) {
+    return layoutBrandFooter(ctx);
+  }
+
+  // Legacy 3-tier fallback
   const patternBottom = oy + bh;
   const scaleBarEnd = s.scaleBar ? patternBottom + 8 + 6 : patternBottom;
 
-  // Tier 1: Full footer (needs ~12mm below scaleBar or ~2*square below pattern)
   const fullFooterY = Math.max(scaleBarEnd + 4, patternBottom + 2 * s.square);
   if (fullFooterY + 10 < ph) {
-    return fullBrandFooter(ctx, fullFooterY);
+    return legacyFullBrandFooter(ctx, fullFooterY);
   }
 
-  // Tier 2: Compact one-line footer (needs ~6mm)
   const compactY = Math.max(scaleBarEnd + 2, patternBottom + 4);
   if (compactY + 6 < ph) {
-    return compactBrandFooter(ctx, compactY);
+    return legacyCompactBrandFooter(ctx, compactY);
   }
 
-  // Tier 3: Warning text — never silently omit
   return `<text x="${pw / 2}" y="${ph - 2}" font-family="'Geist Mono', monospace" font-size="1.8" text-anchor="middle" fill="#999">Brand footer omitted \u2014 page too small</text>`;
 }
 
-function fullBrandFooter(ctx: SvgContext, footerY: number): string {
+/** Brand footer using layout-computed geometry: wordmark bottom-left, text to its right. */
+function layoutBrandFooter(ctx: SvgContext): string {
+  const { spec: s } = ctx;
+  const b = ctx.brand!;
+  const parts: string[] = [];
+  const summary = patternSummary({
+    type: s.type, rows: s.rows, cols: s.cols, square: s.square,
+    marker: s.marker, dict: s.dict, startId: s.startId,
+  });
+  const provenance = provenanceLine('generator');
+
+  parts.push('<g id="calibtools-brand">');
+  // Bracket-framed wordmark at layout position
+  parts.push(wordmarkSvgGroup({ x: b.wmX, y: b.wmY, heightMm: b.wmH }));
+  // Text lines to the right of the wordmark
+  const fs = 2.47; // 7 pt in mm
+  parts.push(`<text x="${b.textX}" y="${b.textY}" font-family="'Geist Mono', monospace" font-size="${fs}" fill="#333333">${summary}</text>`);
+  parts.push(`<text x="${b.textX}" y="${b.textY + b.textLineH}" font-family="'Geist Mono', monospace" font-size="${fs}" fill="#666666">${provenance}</text>`);
+  parts.push(`<text x="${b.textX}" y="${b.textY + 2 * b.textLineH}" font-family="'Geist Mono', monospace" font-size="${fs}" fill="#999999">${PRINT_NOTE}</text>`);
+  parts.push('</g>');
+  return parts.join('');
+}
+
+function legacyFullBrandFooter(ctx: SvgContext, footerY: number): string {
   const { spec: s, pw, ox, bw } = ctx;
   const parts: string[] = [];
-  const wmHeight = 5; // 5 mm tall wordmark
+  const wmHeight = 5;
   const summary = patternSummary({
     type: s.type, rows: s.rows, cols: s.cols, square: s.square,
     marker: s.marker, dict: s.dict, startId: s.startId,
   });
   const provenance = provenanceLine('generator');
   parts.push('<g id="calibtools-brand">');
-  // Bracket-framed wordmark (positive, 5 mm tall)
   parts.push(wordmarkSvgGroup({ x: ox, y: footerY, heightMm: wmHeight }));
-  const wmWidth = wmHeight * (7796.4 / 1857.4); // ≈ 21 mm
   const textY = footerY + wmHeight + 2;
-  // Parameter line (centred under pattern area)
   parts.push(`<text x="${ox + bw / 2}" y="${textY}" font-family="'Geist Mono', monospace" font-size="2.2" text-anchor="middle" fill="#333333">${summary}</text>`);
-  // Provenance line
   parts.push(`<text x="${ox + bw / 2}" y="${textY + 3.2}" font-family="'Geist Mono', monospace" font-size="1.8" text-anchor="middle" fill="#666666">${provenance}</text>`);
-  // Print note
   parts.push(`<text x="${ox + bw / 2}" y="${textY + 6}" font-family="'Geist Mono', monospace" font-size="1.6" text-anchor="middle" fill="#999999">${PRINT_NOTE}</text>`);
   parts.push('</g>');
   return parts.join('');
 }
 
-function compactBrandFooter(ctx: SvgContext, footerY: number): string {
-  const { spec: s, ox, bw } = ctx;
+function legacyCompactBrandFooter(ctx: SvgContext, footerY: number): string {
+  const { spec: s, ox } = ctx;
   const parts: string[] = [];
-  const wmHeight = 3; // 3 mm tall wordmark (compact)
+  const wmHeight = 3;
   const summary = patternSummary({
     type: s.type, rows: s.rows, cols: s.cols, square: s.square,
     marker: s.marker, dict: s.dict, startId: s.startId,
@@ -182,7 +208,7 @@ function compactBrandFooter(ctx: SvgContext, footerY: number): string {
   const provenance = provenanceLine('generator');
   parts.push('<g id="calibtools-brand">');
   parts.push(wordmarkSvgGroup({ x: ox, y: footerY, heightMm: wmHeight }));
-  const wmWidth = wmHeight * (7796.4 / 1857.4); // ≈ 12.6 mm
+  const wmWidth = wmHeight * (7796.4 / 1857.4);
   const textX = ox + wmWidth + 2;
   const textY = footerY + wmHeight * 0.7;
   parts.push(`<text x="${textX}" y="${textY}" font-family="'Geist Mono', monospace" font-size="1.8" fill="#666">${summary} \u00B7 ${provenance}</text>`);
