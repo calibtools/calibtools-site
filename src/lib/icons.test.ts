@@ -35,6 +35,7 @@ const SVG_ALLOW = [
   'src/lib/renderPuzzleBoard.test.ts',
   'src/lib/exportDxf.ts',
   'src/lib/exportDxf.test.ts',
+  'src/lib/exportBrand.ts',
   'src/lib/brand.ts',
   'src/lib/brand.test.ts',
   'src/lib/brand-overlay.test.ts',

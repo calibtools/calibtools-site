@@ -3,15 +3,15 @@
  * Pure string generators — no DOM, no side effects.
  */
 import type { PatternSpec } from './patterns';
-import { BRAND_NAME, BRAND_URL, patternSummary } from './brand';
+import { BRAND_NAME, SITE_URL, patternSummary, provenanceLine } from './exportBrand';
 import { idRange } from './idRange';
 
 function brandHeader(s: PatternSpec, commentChar = '#'): string {
   const summary = patternSummary(s);
-  const date = new Date().toISOString().slice(0, 10);
+  const provenance = provenanceLine('generator');
   return [
-    `${commentChar} ${summary} · generated ${date} · ${BRAND_URL}`,
-    `${commentChar} Patterns and files © ${BRAND_NAME}, free to use; targets available at ${BRAND_URL}/targets`,
+    `${commentChar} ${summary}`,
+    `${commentChar} ${provenance}`,
     commentChar,
   ].join('\n');
 }
@@ -159,7 +159,7 @@ export function opencvJson(s: PatternSpec): string {
   const obj: Record<string, unknown> = {
     _generator: {
       name: BRAND_NAME,
-      url: `https://${BRAND_URL}`,
+      url: `https://${SITE_URL}`,
       generated: new Date().toISOString().slice(0, 10),
       pattern: summary,
     },

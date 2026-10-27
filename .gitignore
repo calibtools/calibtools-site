@@ -9,6 +9,7 @@ test-output/
 .venv/
 .datasheet-cache.json
 .DS_Store
+*\ [0-9]*
 src/assets/products/report.md
 docs/superpowers/
 .claude/settings.local.json

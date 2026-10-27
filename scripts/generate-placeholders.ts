@@ -19,9 +19,14 @@ import {
   BRAND_EMAIL,
   BRAND_RED_RGB,
   BRAND_INK_RGB,
-  LOGO_CELLS,
-  logoSvgPaths,
 } from '../src/lib/brand';
+import {
+  wordmarkSvgGroup,
+  WORDMARK_PATHS,
+  WORDMARK_FRAME_RECTS as WM_FRAME_RECTS,
+  WORDMARK_DOT_RECT as WM_DOT,
+  WORDMARK_VB,
+} from '../src/lib/exportBrand';
 
 const ROOT = resolve('public');
 
@@ -29,8 +34,8 @@ const ROOT = resolve('public');
 
 mkdirSync(resolve(ROOT, 'og'), { recursive: true });
 
-// 3×3 logo grid from brand.ts
-const logoGrid = logoSvgPaths({ x: 460, y: 220, cellSize: 18, gap: 2 }).join('\n    ');
+// Bracket-framed wordmark for OG image (screen context — 40px tall)
+const ogWordmark = wordmarkSvgGroup({ x: 350, y: 240, heightMm: 40 });
 
 // Pattern fragment — a small checkerboard in the bottom-right
 const patternRects: string[] = [];
@@ -48,13 +53,8 @@ const ogSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630"
   <g opacity="0.5">
     ${patternRects.join('\n    ')}
   </g>
-  <!-- Logo grid -->
-  <g>
-    ${logoGrid}
-  </g>
   <!-- Wordmark -->
-  <text x="540" y="310" font-family="'Geist', system-ui, sans-serif" font-size="48" font-weight="800" fill="${BRAND_INK}">Calib</text>
-  <text x="710" y="310" font-family="'Geist', system-ui, sans-serif" font-size="48" font-weight="800" fill="${BRAND_RED}">.Tools</text>
+  ${ogWordmark}
   <!-- Tagline -->
   <text x="600" y="360" font-family="'Geist', system-ui, sans-serif" font-size="20" fill="#6B6B6B" text-anchor="middle">Know your target to the micron</text>
   <!-- URL -->
@@ -92,42 +92,32 @@ const { width, height } = page.getSize();
 
 // --- Page header ---
 
-// Left: Logo mark (small rects) + wordmark
-const logoX = 50;
-const logoY = height - 58;
-const cellSize = 6;
-const gap = 1;
-const step = cellSize + gap;
-
-for (const cell of LOGO_CELLS) {
-  const cx = logoX + cell.col * step;
-  const cy = logoY - cell.row * step; // PDF y is bottom-up
-  const isRed = cell.fill === BRAND_RED;
+// Left: Bracket-framed wordmark (PDF drawSvgPath)
+{
+  const wmH = 16; // 16 pt tall wordmark
+  const wmScale = wmH / WORDMARK_VB.height;
+  const pdfX = 50 - WORDMARK_VB.minX * wmScale;
+  const pdfY = height - 42 + WORDMARK_VB.minY * wmScale;
+  for (const d of WORDMARK_PATHS) {
+    page.drawSvgPath(d, {
+      x: pdfX, y: pdfY, scale: wmScale,
+      color: rgb(BRAND_INK_RGB.r, BRAND_INK_RGB.g, BRAND_INK_RGB.b),
+    });
+  }
+  for (const [rx, ry, rw, rh] of WM_FRAME_RECTS) {
+    page.drawRectangle({
+      x: pdfX + rx * wmScale, y: pdfY - (ry + rh) * wmScale,
+      width: rw * wmScale, height: rh * wmScale,
+      color: rgb(BRAND_INK_RGB.r, BRAND_INK_RGB.g, BRAND_INK_RGB.b),
+    });
+  }
+  const [dx, dy, dw, dh] = WM_DOT;
   page.drawRectangle({
-    x: cx,
-    y: cy,
-    width: cellSize,
-    height: cellSize,
-    color: isRed
-      ? rgb(BRAND_RED_RGB.r, BRAND_RED_RGB.g, BRAND_RED_RGB.b)
-      : rgb(BRAND_INK_RGB.r, BRAND_INK_RGB.g, BRAND_INK_RGB.b),
+    x: pdfX + dx * wmScale, y: pdfY - (dy + dh) * wmScale,
+    width: dw * wmScale, height: dh * wmScale,
+    color: rgb(BRAND_RED_RGB.r, BRAND_RED_RGB.g, BRAND_RED_RGB.b),
   });
 }
-
-// Wordmark next to logo — split colour "Calib" + ".Tools"
-const wordmarkX = logoX + 3 * step + 8;
-const wordmarkY = height - 55;
-page.drawText('Calib', {
-  x: wordmarkX, y: wordmarkY,
-  size: 24, font: fontSemiBold,
-  color: rgb(BRAND_INK_RGB.r, BRAND_INK_RGB.g, BRAND_INK_RGB.b),
-});
-const calibWidth = fontSemiBold.widthOfTextAtSize('Calib', 24);
-page.drawText('.Tools', {
-  x: wordmarkX + calibWidth, y: wordmarkY,
-  size: 24, font: fontSemiBold,
-  color: rgb(BRAND_RED_RGB.r, BRAND_RED_RGB.g, BRAND_RED_RGB.b),
-});
 
 // Right: DOC-001 + Rev A in Geist Mono
 const docIdText = 'DOC-001';
@@ -224,11 +214,7 @@ for (const { handle, title } of productHandles) {
   <g opacity="0.5">
     ${patternRects.join('\n    ')}
   </g>
-  <g>
-    ${logoGrid}
-  </g>
-  <text x="540" y="280" font-family="'Geist', system-ui, sans-serif" font-size="48" font-weight="800" fill="${BRAND_INK}">Calib</text>
-  <text x="710" y="280" font-family="'Geist', system-ui, sans-serif" font-size="48" font-weight="800" fill="${BRAND_RED}">.Tools</text>
+  ${ogWordmark}
   <text x="600" y="340" font-family="'Geist', system-ui, sans-serif" font-size="28" font-weight="700" fill="${BRAND_INK}" text-anchor="middle">${title.replace(/&/g, '&amp;')}</text>
   <text x="600" y="380" font-family="'Geist', system-ui, sans-serif" font-size="18" fill="#6B6B6B" text-anchor="middle">Precision calibration target</text>
   <text x="600" y="580" font-family="monospace" font-size="16" fill="#9A9A9A" text-anchor="middle">${BRAND_URL}</text>

@@ -71,8 +71,16 @@ describe('exportDxf', () => {
     expect(solidOnZero!.length).toBe(70);
   });
 
-  it('has 9 brand SOLID entities for logo grid', () => {
+  it('has POLYLINE entities for wordmark on CALIBTOOLS_BRAND layer', () => {
     const dxf = exportDxf({ spec, pw: 210, ph: 297 });
+    expect(dxf).toContain('POLYLINE\n8\nCALIBTOOLS_BRAND');
+    // At least one SEQEND for closing polylines
+    expect(dxf).toContain('SEQEND');
+  });
+
+  it('has SOLID entities for wordmark frame/dot on CALIBTOOLS_BRAND layer', () => {
+    const dxf = exportDxf({ spec, pw: 210, ph: 297 });
+    // 8 frame rects + 1 dot = 9 SOLID on brand layer
     const brandSolids = dxf.match(/\n0\nSOLID\n8\nCALIBTOOLS_BRAND\n/g);
     expect(brandSolids).not.toBeNull();
     expect(brandSolids!.length).toBe(9);

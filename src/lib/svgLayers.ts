@@ -2,11 +2,15 @@
  * Shared SVG layers used by all pattern renderers:
  * opening/closing tags, white background, scale bar, and brand footer.
  */
-import {
-  BRAND_RED, BRAND_INK, BRAND_URL, patternSummary, logoSvgPaths,
-} from './brand';
 import type { PatternSpec } from './patterns';
 import { idRange } from './idRange';
+import {
+  patternSummary,
+  provenanceLine,
+  PRINT_NOTE,
+  SITE_URL,
+  wordmarkSvgGroup,
+} from './exportBrand';
 
 export interface SvgContext {
   spec: PatternSpec;
@@ -34,7 +38,7 @@ export function scaleBarSvg(ctx: SvgContext): string {
   const y = oy + bh + 8;
   parts.push(`<rect x="${ox}" y="${y}" width="100" height="0.6" fill="#000"/>`);
   parts.push(`<text x="${ox}" y="${y + 4}" font-family="monospace" font-size="2.6" fill="#333">100 mm scale check</text>`);
-  parts.push(`<text x="${ox + bw}" y="${y + 4}" font-family="monospace" font-size="2.6" fill="#333" text-anchor="end">${s.type.toLowerCase()} ${s.rows}x${s.cols} · ${s.square}/${s.marker} mm · ${s.dict} · Calib.Tools</text>`);
+  parts.push(`<text x="${ox + bw}" y="${y + 4}" font-family="monospace" font-size="2.6" fill="#333" text-anchor="end">${s.type.toLowerCase()} ${s.rows}x${s.cols} · ${s.square}/${s.marker} mm · ${s.dict} · ${SITE_URL}</text>`);
   return parts.join('');
 }
 
@@ -141,40 +145,42 @@ export function brandFooterSvg(ctx: SvgContext): string {
 function fullBrandFooter(ctx: SvgContext, footerY: number): string {
   const { spec: s, pw, ox, bw } = ctx;
   const parts: string[] = [];
-  const logoRects = logoSvgPaths({ x: ox, y: footerY, cellSize: 1.8, gap: 0.3 });
-  const logoWidth = 3 * 1.8 + 2 * 0.3;
-  const textX = ox + logoWidth + 2;
-  const textY = footerY + 4.2;
+  const wmHeight = 5; // 5 mm tall wordmark
   const summary = patternSummary({
     type: s.type, rows: s.rows, cols: s.cols, square: s.square,
     marker: s.marker, dict: s.dict, startId: s.startId,
   });
-  const iso = new Date().toISOString().slice(0, 10);
+  const provenance = provenanceLine('generator');
   parts.push('<g id="calibtools-brand">');
-  parts.push(...logoRects);
-  parts.push(`<text x="${textX}" y="${textY}" font-family="'Geist', system-ui, sans-serif" font-size="4" font-weight="600" fill="${BRAND_INK}">calib<tspan fill="${BRAND_RED}">.tools</tspan></text>`);
-  parts.push(`<path data-wordmark="outlined" aria-hidden="true" d=""/>`);
-  parts.push(`<text x="${pw / 2}" y="${textY}" font-family="'Geist Mono', monospace" font-size="2.4" text-anchor="middle" fill="#333333">${summary}</text>`);
-  parts.push(`<text x="${ox + bw}" y="${textY}" font-family="'Geist Mono', monospace" font-size="2.4" text-anchor="end" fill="#666666">${BRAND_URL} · ${iso}</text>`);
+  // Bracket-framed wordmark (positive, 5 mm tall)
+  parts.push(wordmarkSvgGroup({ x: ox, y: footerY, heightMm: wmHeight }));
+  const wmWidth = wmHeight * (7796.4 / 1857.4); // ≈ 21 mm
+  const textY = footerY + wmHeight + 2;
+  // Parameter line (centred under pattern area)
+  parts.push(`<text x="${ox + bw / 2}" y="${textY}" font-family="'Geist Mono', monospace" font-size="2.2" text-anchor="middle" fill="#333333">${summary}</text>`);
+  // Provenance line
+  parts.push(`<text x="${ox + bw / 2}" y="${textY + 3.2}" font-family="'Geist Mono', monospace" font-size="1.8" text-anchor="middle" fill="#666666">${provenance}</text>`);
+  // Print note
+  parts.push(`<text x="${ox + bw / 2}" y="${textY + 6}" font-family="'Geist Mono', monospace" font-size="1.6" text-anchor="middle" fill="#999999">${PRINT_NOTE}</text>`);
   parts.push('</g>');
   return parts.join('');
 }
 
 function compactBrandFooter(ctx: SvgContext, footerY: number): string {
-  const { spec: s, ox } = ctx;
+  const { spec: s, ox, bw } = ctx;
   const parts: string[] = [];
-  // Smaller logo: cellSize 1.2, gap 0.2
-  const logoRects = logoSvgPaths({ x: ox, y: footerY, cellSize: 1.2, gap: 0.2 });
-  const logoWidth = 3 * 1.2 + 2 * 0.2;
-  const textX = ox + logoWidth + 1.5;
-  const textY = footerY + 2.8;
+  const wmHeight = 3; // 3 mm tall wordmark (compact)
   const summary = patternSummary({
     type: s.type, rows: s.rows, cols: s.cols, square: s.square,
     marker: s.marker, dict: s.dict, startId: s.startId,
   });
+  const provenance = provenanceLine('generator');
   parts.push('<g id="calibtools-brand">');
-  parts.push(...logoRects);
-  parts.push(`<text x="${textX}" y="${textY}" font-family="'Geist Mono', monospace" font-size="2" fill="#666">${summary} \u00B7 calib.tools</text>`);
+  parts.push(wordmarkSvgGroup({ x: ox, y: footerY, heightMm: wmHeight }));
+  const wmWidth = wmHeight * (7796.4 / 1857.4); // ≈ 12.6 mm
+  const textX = ox + wmWidth + 2;
+  const textY = footerY + wmHeight * 0.7;
+  parts.push(`<text x="${textX}" y="${textY}" font-family="'Geist Mono', monospace" font-size="1.8" fill="#666">${summary} \u00B7 ${provenance}</text>`);
   parts.push('</g>');
   return parts.join('');
 }

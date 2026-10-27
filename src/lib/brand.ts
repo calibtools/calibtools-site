@@ -25,49 +25,6 @@ export const BRAND_NAME = 'Calib.Tools';
 export const BRAND_EMAIL = 'hello@calib.tools';
 
 // ---------------------------------------------------------------------------
-// Logo grid — 3×3, row-major, matching Logo.astro:
-//   i % 2 === 0 → bg-brand (BRAND_RED), else bg-ink (BRAND_INK)
-// ---------------------------------------------------------------------------
-
-export interface LogoCell {
-  readonly col: number;
-  readonly row: number;
-  readonly fill: string;
-}
-
-export const LOGO_CELLS: readonly LogoCell[] = Array.from({ length: 9 }, (_, i) => ({
-  col: i % 3,
-  row: Math.floor(i / 3),
-  fill: i % 2 === 0 ? BRAND_RED : BRAND_INK,
-}));
-
-// ---------------------------------------------------------------------------
-// SVG logo mark
-// ---------------------------------------------------------------------------
-
-/**
- * Returns 9 SVG `<rect>` strings for the 3×3 logo mark.
- * @param opts.x     Left origin (SVG user units)
- * @param opts.y     Top origin (SVG user units)
- * @param opts.cellSize  Width/height of each cell
- * @param opts.gap   Gap between cells
- */
-export function logoSvgPaths(opts: {
-  x: number;
-  y: number;
-  cellSize: number;
-  gap: number;
-}): string[] {
-  const { x, y, cellSize, gap } = opts;
-  const step = cellSize + gap;
-  return LOGO_CELLS.map(cell => {
-    const cx = x + cell.col * step;
-    const cy = y + cell.row * step;
-    return `<rect x="${cx}" y="${cy}" width="${cellSize}" height="${cellSize}" fill="${cell.fill}"/>`;
-  });
-}
-
-// ---------------------------------------------------------------------------
 // Pattern summary
 // ---------------------------------------------------------------------------
 

@@ -48,3 +48,16 @@ export const INSPECTION_CLAIM_SHORT = 'Measured before it ships';
 
 /** Primary tagline — used for the home H1, <title> suffix, OG fallback. */
 export const TAGLINE = 'Know your target to the micron';
+
+// ── Brand identity for exports ──────────────────────────────────────
+
+export const BRAND_NAME = 'Calib.Tools';
+export const SITE_URL = 'calib.tools';
+export const CONTACT_EMAIL = 'hello@calib.tools';
+
+/** Disclaimer on printed pattern files — no sales line. */
+export const PRINT_NOTE =
+  'Printed patterns are not measured. Check square size with a ruler after printing.';
+
+/** App version for provenance lines. */
+export const APP_VERSION = '0.1.0';
