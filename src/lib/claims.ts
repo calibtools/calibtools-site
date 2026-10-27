@@ -22,3 +22,6 @@ export const CERT_CLAIM =
 
 /** Default Incoterm (to be confirmed). */
 export const INCOTERM = 'DAP' as const;
+
+/** Primary tagline — used for the home H1, <title> suffix, OG fallback. */
+export const TAGLINE = 'Measured before it ships';

@@ -12,6 +12,7 @@ import { getProductImages } from '@/lib/product-images';
 import { getImageMetadata } from '@/lib/productImageImports';
 import { Tag, Truck, FileCheck, Files, RotateCcw, Grid2x2 as Grid2X2, ScanLine, ListChecks, Package, Ruler, CircleDot, Plug, ArrowRight, Mail } from 'lucide-astro';
 import { getAllPublishedReviews, HOW_REVIEWS_WORK_SHORT } from '@/lib/reviews';
+import { TAGLINE } from '@/lib/claims';
 import Stars from '@/components/Stars';
 import heroTight from '@/assets/products/brand/dark/hero-boards-tight.webp';
 import heroTightMobile from '@/assets/products/brand/dark/hero-boards-tight-mobile.webp';
@@ -72,7 +73,7 @@ const featuredReviews = allReviews
   })
   .slice(0, 3);
 ---
-<Base title="Calibrate with confidence" theme="dark" ogImage="/og/boards.png" description="Precision checkerboards, ChArUco, AprilGrid and metrology-grade glass targets, plus free browser tools to generate, size and verify your calibration. Made to order, shipped worldwide.">
+<Base title={TAGLINE} theme="dark" ogImage="/og/boards.png" description={`${TAGLINE}. Precision checkerboards, ChArUco, AprilGrid and metrology-grade glass targets, plus free browser tools to generate, size and verify your calibration. Made to order, shipped worldwide.`}>
 
   {/* ── Hero ── */}
   <section id="top" class="pb-[72px] md:pb-0">
@@ -84,7 +85,7 @@ const featuredReviews = allReviews
           Calibration targets &amp; tools for machine vision
         </span>
         <h1 class="m-0 text-[52px] font-[800] uppercase leading-[1.02] tracking-[-0.02em]" data-hero-h1>
-          Calibrate with<br /><span class="text-brand">confidence</span>
+          Measured before<br /><span class="text-brand">it ships</span>
         </h1>
         <p class="m-0 max-w-[460px] text-[18px] leading-[1.5] text-ink-muted">
           Precision checkerboards, ChArUco, AprilGrid and metrology-grade glass targets &mdash; with free browser tools to generate, size and verify your calibration. Made to order, shipped worldwide.
@@ -118,7 +119,7 @@ const featuredReviews = allReviews
           Calibration targets &amp; tools for machine vision
         </span>
         <h1 class="m-0 text-[38px] font-[800] uppercase leading-[1.02] tracking-[-0.02em]">
-          Calibrate with<br /><span class="text-brand">confidence</span>
+          Measured before<br /><span class="text-brand">it ships</span>
         </h1>
         <p class="m-0 max-w-[480px] text-[17px] leading-[1.5] text-ink-muted">
           Precision checkerboards, ChArUco, AprilGrid and metrology-grade glass targets &mdash; with free browser tools to generate, size and verify your calibration. Made to order, shipped worldwide.
@@ -198,7 +199,7 @@ const featuredReviews = allReviews
   {/* ── Why us ── */}
   <section id="why" class="border-y border-[#262626] bg-[#0A0A0A]">
     <div class="container-x flex flex-col gap-10 py-12 md:py-[72px]">
-      <h2 class="h-display m-0 max-w-[720px] text-[28px] md:text-[36px]">Built flat. Measured twice. Shipped fast.</h2>
+      <h2 class="h-display m-0 max-w-[720px] text-[28px] md:text-[36px]">Built flat. Checked twice.</h2>
       <div class="grid grid-cols-1 gap-8 md:grid-cols-5">
         {why.map(([title, desc], i) => {
           const icons = [Tag, Truck, FileCheck, Files, RotateCcw];
