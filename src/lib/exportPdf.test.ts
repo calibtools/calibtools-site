@@ -117,6 +117,49 @@ describe('exportPdf', () => {
     expect(doc.getProducer()).toBe('Calib.Tools pdf-lib');
   });
 
+  it('content stream contains X-axis red and Y-axis green colour operators', async () => {
+    const pako = await import('pako');
+    const { PDFName, PDFRawStream, PDFArray } = await import('pdf-lib');
+    const bytes = await exportPdf({ spec: { ...base, showAxes: true }, pw: 210, ph: 297, fontBytes });
+    const doc = await PDFDocument.load(bytes);
+    const node = doc.getPage(0).node;
+    const contentsRef = node.get(PDFName.of('Contents'));
+    const contentsObj = doc.context.lookup(contentsRef);
+    let stream = '';
+    const streams = contentsObj instanceof PDFArray
+      ? Array.from({ length: contentsObj.size() }, (_, i) => doc.context.lookup(contentsObj.get(i)))
+      : [contentsObj];
+    for (const s of streams) {
+      if (s instanceof PDFRawStream) {
+        try { stream += new TextDecoder('latin1').decode(pako.inflate(s.contents)); } catch {}
+      }
+    }
+    // X-axis E60012
+    expect(stream).toContain('0.9019607843137255 0 0.07058823529411765 rg');
+    // Y-axis 1BA55A
+    expect(stream).toContain('0.10588235294117647 0.6470588235294118 0.35294117647058826 rg');
+  });
+
+  it('content stream contains wordmark path coordinate 383 (letter C)', async () => {
+    const pako = await import('pako');
+    const { PDFName, PDFRawStream, PDFArray } = await import('pdf-lib');
+    const bytes = await exportPdf({ spec: base, pw: 210, ph: 297, fontBytes });
+    const doc = await PDFDocument.load(bytes);
+    const node = doc.getPage(0).node;
+    const contentsRef = node.get(PDFName.of('Contents'));
+    const contentsObj = doc.context.lookup(contentsRef);
+    let stream = '';
+    const streams = contentsObj instanceof PDFArray
+      ? Array.from({ length: contentsObj.size() }, (_, i) => doc.context.lookup(contentsObj.get(i)))
+      : [contentsObj];
+    for (const s of streams) {
+      if (s instanceof PDFRawStream) {
+        try { stream += new TextDecoder('latin1').decode(pako.inflate(s.contents)); } catch {}
+      }
+    }
+    expect(stream).toContain('383');
+  });
+
   it('produces a valid PDF with brand content (>5000 bytes)', async () => {
     const bytes = await exportPdf({ spec: base, pw: 210, ph: 297, fontBytes });
     expect(bytes.length).toBeGreaterThan(5000);

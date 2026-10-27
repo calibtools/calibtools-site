@@ -249,6 +249,88 @@ export async function exportPdf({ spec, pw, ph, fontBytes }: PdfExportOptions): 
     }
   }
 
+  // --- XY orientation axes (same geometry as SVG/DXF) ---
+  if (spec.showAxes !== false) {
+    const isKalibr = spec.type === 'AprilGrid (Kalibr)' && spec.symmetricCorners;
+    const shorter = Math.min(bw, bh);
+    const arrowLen = Math.max(15, Math.min(40, shorter * 0.15));
+    const shaftW = 0.4;
+    const headLen = Math.min(3, arrowLen * 0.2);
+    const headW = headLen * 0.6;
+    const axGap = 0.5 * spec.square;
+
+    // Origin in mm (y-down pattern coords)
+    const axOx = ox - axGap;
+    const axOy = isKalibr ? oy + bh + axGap : oy - axGap;
+
+    const xColor = rgb(230 / 255, 0, 18 / 255); // #E60012
+    const yColor = rgb(27 / 255, 165 / 255, 90 / 255); // #1BA55A
+
+    // X arrow: pointing right
+    const xEnd = axOx + arrowLen;
+    const [xShaftX, xShaftY] = pt(axOx, axOy);
+    const [xShaftEndX] = pt(xEnd - headLen, axOy);
+    page.drawRectangle({
+      x: xShaftX, y: xShaftY - shaftW / 2 * MM,
+      width: (arrowLen - headLen) * MM, height: shaftW * MM,
+      color: xColor,
+    });
+    // X arrowhead (triangle via SVG path)
+    const [xTipX, xTipY] = pt(xEnd, axOy);
+    page.drawSvgPath(
+      `M 0 0 L ${-headLen * MM} ${-headW * MM} L ${-headLen * MM} ${headW * MM} Z`,
+      { x: xTipX, y: xTipY, color: xColor },
+    );
+    // X label
+    const [xlX, xlY] = pt(xEnd + 1, axOy + 1);
+    page.drawText('X', { x: xlX, y: xlY, size: 2.5 * MM, font: fontMono, color: xColor });
+
+    // Y arrow: pointing down (OpenCV) or up (Kalibr)
+    const yDir = isKalibr ? -1 : 1;
+    const yEnd = axOy + yDir * arrowLen;
+    const [yShaftX2, yShaftY2] = pt(axOx, axOy);
+    // Shaft as a thin rectangle
+    const yShaftLen = (arrowLen - headLen) * MM;
+    if (isKalibr) {
+      // y-up in pattern coords → y-down in PDF → draw upward from origin
+      page.drawRectangle({
+        x: yShaftY2 - shaftW / 2 * MM, y: yShaftY2,
+        width: shaftW * MM, height: yShaftLen,
+        color: yColor,
+      });
+    }
+    // Use line approach: draw shaft as a very thin rect along Y axis
+    const yShaftTopMm = Math.min(axOy, yEnd - yDir * headLen);
+    const yShaftBotMm = Math.max(axOy, yEnd - yDir * headLen);
+    const [ysX, ysTopY] = pt(axOx - shaftW / 2, yShaftTopMm);
+    const [, ysBotY] = pt(axOx, yShaftBotMm);
+    page.drawRectangle({
+      x: ysX, y: ysBotY,
+      width: shaftW * MM, height: (yShaftBotMm - yShaftTopMm) * MM,
+      color: yColor,
+    });
+    // Y arrowhead
+    const [yTipX, yTipY] = pt(axOx, yEnd);
+    const yHeadDir = isKalibr ? 1 : -1; // In PDF y-up coords: OpenCV arrow points down (negative), Kalibr up (positive)
+    page.drawSvgPath(
+      `M 0 0 L ${-headW * MM} ${yHeadDir * headLen * MM} L ${headW * MM} ${yHeadDir * headLen * MM} Z`,
+      { x: yTipX, y: yTipY, color: yColor },
+    );
+    // Y label
+    const [ylX, ylY] = pt(axOx + 1.5, yEnd + yDir * 2.5);
+    page.drawText('Y', { x: ylX, y: ylY, size: 2.5 * MM, font: fontMono, color: yColor });
+
+    // Origin dot
+    const [odX, odY] = pt(axOx, axOy);
+    drawCircle(page, pt, axOx, axOy, 0.8);
+
+    // Caption
+    const caption = isKalibr ? 'Kalibr frame \u00B7 origin bottom-left' : 'OpenCV frame \u00B7 origin top-left';
+    const captionFontSize = 1.8 * MM;
+    const [capX, capY] = pt(axOx + 3, axOy + (isKalibr ? 3 : -2));
+    page.drawText(caption, { x: capX, y: capY, size: captionFontSize, font: fontMono, color: rgb(0.4, 0.4, 0.4) });
+  }
+
   // --- PDF metadata ---
   const summary = patternSummary(spec);
   doc.setTitle(`${summary} \u2014 ${BRAND_NAME} pattern`);

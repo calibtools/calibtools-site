@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { axesSvg, brandFooterSvg, cornerIdBadgeSvg, type SvgContext } from './svgLayers';
+import { axesSvg, brandFooterSvg, cornerIdBadgeSvg, svgOpen, type SvgContext } from './svgLayers';
 import type { PatternSpec } from './patterns';
 
 function makeCtx(specOverrides: Partial<PatternSpec> = {}): SvgContext {
@@ -123,6 +123,15 @@ describe('brandFooterSvg fallback tiers', () => {
     expect(svg).not.toContain('Inter');
     expect(svg).not.toContain('JetBrains');
     expect(svg).toContain("'Geist Mono'");
+  });
+});
+
+describe('svgOpen font embedding', () => {
+  it('embeds Geist Mono @font-face with woff2 data URI', () => {
+    const svgTag = svgOpen(makeCtx());
+    expect(svgTag).toContain('@font-face');
+    expect(svgTag).toContain("font-family:'Geist Mono'");
+    expect(svgTag).toContain("data:font/woff2;base64,");
   });
 });
 
