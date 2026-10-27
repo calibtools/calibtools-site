@@ -138,17 +138,10 @@ export async function exportPdf({ spec, pw: rawPw, ph: rawPh, fontBytes, layout 
     // 100 mm horizontal line, 0.6 mm thick
     page.drawRectangle({ x: sx, y: sy - 0.6 * MM, width: 100 * MM, height: 0.6 * MM, color: rgb(0, 0, 0) });
 
-    // Label text (left) — use Geist Mono
+    // Label text — use Geist Mono
     const fontSize = 2.6 * MM;
     const [tx, ty] = pt(ox, sbY + 4);
     page.drawText('100 mm scale check', { x: tx, y: ty, size: fontSize, font: fontMono, color: rgb(0.2, 0.2, 0.2) });
-
-    // Label text (right) — use patternSummary + brand
-    const summary = patternSummary(spec);
-    const rightText = `${summary} \u00B7 ${SITE_URL}`;
-    const rightW = fontMono.widthOfTextAtSize(rightText, fontSize);
-    const [rx, ry] = pt(ox + bw, sbY + 4);
-    page.drawText(rightText, { x: rx - rightW, y: ry, size: fontSize, font: fontMono, color: rgb(0.2, 0.2, 0.2) });
 
     scaleBarBottom = sbY + 4 + 2.6; // sbY + label offset + approx text height
   }
