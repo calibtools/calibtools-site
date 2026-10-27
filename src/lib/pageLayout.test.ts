@@ -58,29 +58,30 @@ describe('layout constants', () => {
     expect(patternQuietZone(25)).toBe(25);
   });
 
-  it('wordmark is 28 mm wide on A4', () => {
-    expect(wordmarkWidth(a4W, a4H)).toBe(28);
+  it('wordmark is 20 mm wide on A4', () => {
+    expect(wordmarkWidth(a4W, a4H)).toBe(20);
     // Landscape — uses shorter dim, same result
-    expect(wordmarkWidth(a4H, a4W)).toBe(28);
+    expect(wordmarkWidth(a4H, a4W)).toBe(20);
   });
 
-  it('wordmark never below 25 mm', () => {
-    expect(wordmarkWidth(100, 150)).toBeGreaterThanOrEqual(25);
+  it('wordmark never below 20 mm', () => {
+    expect(wordmarkWidth(100, 150)).toBeGreaterThanOrEqual(20);
   });
 
-  it('wordmark height ≈ 6.7 mm at 28 mm width', () => {
-    const wmH = 28 / WM_ASPECT;
-    expect(wmH).toBeCloseTo(6.67, 1);
+  it('wordmark height from aspect ratio (compact)', () => {
+    const wmH = 20 / WM_ASPECT;
+    // 20 / 9.313 ≈ 2.15 mm
+    expect(wmH).toBeCloseTo(2.15, 1);
   });
 
   it('clear space = wmH / 2.3', () => {
-    const wmH = 28 / WM_ASPECT;
+    const wmH = 20 / WM_ASPECT;
     const cs = wordmarkClearSpace(wmH);
     expect(cs).toBeCloseTo(wmH / 2.3, 2);
   });
 
-  it('brandBlockHeight = max(wmH + clearSpace, 3 text lines at 1.3lh)', () => {
-    const wmW = 28;
+  it('brandBlockHeight governed by 3 text lines (compact wordmark is short)', () => {
+    const wmW = 20;
     const wmH = wmW / WM_ASPECT;
     const cs = wordmarkClearSpace(wmH);
     const wordmarkBlock = wmH + cs;
@@ -222,10 +223,10 @@ describe('computeGridReduction', () => {
 // ---------------------------------------------------------------------------
 
 describe('computeLayout — brand block geometry', () => {
-  it('wordmark is 28 mm wide on A4', () => {
+  it('wordmark is 20 mm wide on A4', () => {
     const s = spec({ rows: 5, cols: 5, square: 20 });
     const layout = computeLayout(s, a4W, a4H, 'portrait');
-    expect(layout.brand.wmW).toBe(28);
+    expect(layout.brand.wmW).toBe(20);
   });
 
   it('wordmark at bottom-left inside margin', () => {

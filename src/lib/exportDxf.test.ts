@@ -80,10 +80,10 @@ describe('exportDxf', () => {
 
   it('has SOLID entities for wordmark frame/dot on CALIBTOOLS_BRAND layer', () => {
     const dxf = exportDxf({ spec, pw: 210, ph: 297 });
-    // 8 frame rects + 1 dot = 9 SOLID on brand layer
+    // Compact wordmark: 0 frame rects + 1 dot = 1 SOLID on brand layer
     const brandSolids = dxf.match(/\n0\nSOLID\n8\nCALIBTOOLS_BRAND\n/g);
     expect(brandSolids).not.toBeNull();
-    expect(brandSolids!.length).toBe(9);
+    expect(brandSolids!.length).toBe(1);
   });
 
   it('works for Checkerboard pattern type', () => {

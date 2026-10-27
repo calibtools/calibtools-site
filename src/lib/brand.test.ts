@@ -54,7 +54,7 @@ describe('brand constants', () => {
 
 describe('wordmark SVG (bracket-framed)', () => {
   it('positive SVG contains CALIB.TOOLS title', () => {
-    expect(WORDMARK_SVG_POSITIVE).toContain('CALIB.TOOLS wordmark-framed positive');
+    expect(WORDMARK_SVG_POSITIVE).toContain('CALIB.TOOLS wordmark-compact positive');
   });
 
   it('has 10 letter outline paths', () => {
@@ -62,8 +62,8 @@ describe('wordmark SVG (bracket-framed)', () => {
   });
 
   it('viewBox has correct dimensions', () => {
-    expect(WORDMARK_VB.width).toBeCloseTo(7796.4, 1);
-    expect(WORDMARK_VB.height).toBeCloseTo(1857.4, 1);
+    expect(WORDMARK_VB.width).toBeCloseTo(7174.4, 1);
+    expect(WORDMARK_VB.height).toBeCloseTo(770.4, 1);
   });
 
   it('positive SVG contains red dot #E60012', () => {

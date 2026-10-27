@@ -20,7 +20,7 @@ SVGs have non-standard viewBoxes (negative origins). Size only with CSS `height`
 
 | Context | Mark |
 |---|---|
-| **Print and exported files** (tool exports, inspection reports, datasheets, all customer documents) | Bracket-framed wordmark only |
+| **Exports and print** (tool exports, datasheets, all customer documents) | Framed wordmark at \u2265 25 mm; where the brand block must be narrower, the compact wordmark at \u2265 20 mm |
 | **Screen — desktop** (site header, marketing pages) | Horizontal lockup |
 | **Screen — mobile** (header, app icons, social) | C.T icon |
 
