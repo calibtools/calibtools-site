@@ -193,8 +193,21 @@ page.drawText(footerText, {
   color: rgb(0.6, 0.6, 0.6),
 });
 
+// Fix metadata dates to make builds deterministic (no Date.now() variance)
+const FIXED_DATE = new Date('2026-01-01T00:00:00Z');
+doc.setCreationDate(FIXED_DATE);
+doc.setModificationDate(FIXED_DATE);
+
 const pdfBytes = await doc.save();
-writeFileSync(resolve(ROOT, 'downloads/sample-inspection-report.pdf'), Buffer.from(pdfBytes));
+
+// Zero out the two random-ID hex strings that pdf-lib writes into the trailer.
+// They appear as /ID [<hex> <hex>] and change on every save.
+let pdfStr = Buffer.from(pdfBytes).toString('latin1');
+pdfStr = pdfStr.replace(
+  /\/ID\s*\[\s*<[0-9A-Fa-f]+>\s*<[0-9A-Fa-f]+>\s*\]/,
+  '/ID [<00000000000000000000000000000000> <00000000000000000000000000000000>]',
+);
+writeFileSync(resolve(ROOT, 'downloads/sample-inspection-report.pdf'), Buffer.from(pdfStr, 'latin1'));
 console.log('[placeholders] Generated public/downloads/sample-inspection-report.pdf');
 
 // --- 3. Per-product OG images ---
