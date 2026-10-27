@@ -179,10 +179,10 @@ import { computeLayout } from './pageLayout';
 
 describe('exportPdf with layout (e2e)', () => {
 
-  it('7×12 ChArUco 25mm on A4 → landscape PDF, pattern unscaled', async () => {
-    // bw = 300, bh = 175 → landscape (300 > 175)
+  it('6×10 ChArUco 20mm on A4 → landscape PDF, pattern unscaled', async () => {
+    // bw = 200, bh = 120 → landscape (200 > 120), fits A4 landscape
     const wideSpec: PatternSpec = {
-      ...base, rows: 7, cols: 12, square: 25,
+      ...base, rows: 6, cols: 10, square: 20, marker: 14,
     };
     const layout = computeLayout(wideSpec, 210, 297);
     expect(layout.orientation).toBe('landscape');
@@ -195,7 +195,6 @@ describe('exportPdf with layout (e2e)', () => {
     const { width, height } = page.getSize();
     // Landscape: width > height
     expect(width).toBeGreaterThan(height);
-    // Page is A4 landscape: 297 × 210 mm
     expect(width).toBeCloseTo(297 * MM, 1);
     expect(height).toBeCloseTo(210 * MM, 1);
   });

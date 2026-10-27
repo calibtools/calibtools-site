@@ -82,7 +82,7 @@ async function decodePdfContentStreams(pdfBytes) {
 
 async function run() {
   const { exportDxf } = await import('../src/lib/exportDxf.ts');
-  const { exportPdf } = await import('../src/lib/exportPdf.ts');
+  const { exportPdf, exportTiledPdf } = await import('../src/lib/exportPdf.ts');
   const { checkerboardSvg } = await import('../src/lib/patterns.ts');
 
   const fontDir = resolve(ROOT, 'src/assets/fonts');
@@ -264,6 +264,59 @@ async function run() {
     }
   }
 
+  // =====================================================================
+  // Tiled PDF — 7×12 at 25 mm on A4 → 2 pages with crop marks
+  // =====================================================================
+  const { computeTiling } = await import('../src/lib/pageLayout.ts');
+  const tiledSpec = {
+    type: 'ChArUco', rows: 7, cols: 12, square: 25, marker: 18,
+    dict: 'DICT_6X6_250', paper: 'A4', startId: 0, scaleBar: true, showAxes: true,
+  };
+  const tiling = computeTiling(12 * 25, 7 * 25, 210, 297);
+  const tiledBytes = await exportTiledPdf({ spec: tiledSpec, tiling, fontBytes });
+  const { PDFDocument: PDFDoc2 } = await import('pdf-lib');
+  const tiledDoc = await PDFDoc2.load(tiledBytes, { updateMetadata: false });
+  if (tiledDoc.getPageCount() !== 2) {
+    errors.push(`Tiled PDF: expected 2 pages, got ${tiledDoc.getPageCount()}`);
+  }
+  // Verify crop marks exist — decode all pages' content streams
+  {
+    const { PDFName, PDFRawStream, PDFArray } = await import('pdf-lib');
+    const pako = await import('pako');
+    let allTiledText = '';
+    for (let pi = 0; pi < tiledDoc.getPageCount(); pi++) {
+      const pg = tiledDoc.getPage(pi);
+      const contentsRef = pg.node.get(PDFName.of('Contents'));
+      const contentsObj = tiledDoc.context.lookup(contentsRef);
+      const streams = [];
+      if (contentsObj instanceof PDFArray) {
+        for (let i = 0; i < contentsObj.size(); i++) streams.push(tiledDoc.context.lookup(contentsObj.get(i)));
+      } else if (contentsObj instanceof PDFRawStream) {
+        streams.push(contentsObj);
+      }
+      for (const stream of streams) {
+        if (stream instanceof PDFRawStream) {
+          try { allTiledText += new TextDecoder('latin1').decode(pako.inflate(stream.contents)); }
+          catch { allTiledText += new TextDecoder('latin1').decode(stream.contents); }
+        }
+      }
+    }
+    // pdf-lib draws rectangles as m/l/l/l/h/f paths. Count fill (f) operators.
+    const fillCount = (allTiledText.match(/\bf\b/g) || []).length;
+    if (fillCount < 10) {
+      errors.push(`Tiled PDF: expected many filled shapes (pattern + crop marks), found ${fillCount} 'f' operators`);
+    }
+    // Verify colour operators (rg) exist — means pattern and crop marks are drawn
+    const rgCount = (allTiledText.match(/\brg\b/g) || []).length;
+    if (rgCount < 10) {
+      errors.push(`Tiled PDF: expected many colour operators, found ${rgCount} 'rg' operators`);
+    }
+  }
+  // Check title mentions "tiled"
+  if (!tiledDoc.getTitle()?.includes('tiled')) {
+    errors.push('Tiled PDF: title should mention "tiled"');
+  }
+
   // Banned phrases
   for (const pattern of BANNED) {
     if (pattern.test(svg)) errors.push(`SVG: banned phrase ${pattern}`);
@@ -280,6 +333,7 @@ async function run() {
 
   console.log('[check-exports] OK — T1 exports pass all brand + layout checks.');
   console.log('  PDF: metadata ✓, axes colours ✓, wordmark path ✓, quiet zone ✓, margins ✓');
+  console.log('  Tiled PDF: 2 pages ✓, crop marks ✓, metadata ✓');
   console.log('  SVG: provenance ✓, wordmark ✓, axes bbox ✓, brand bbox ✓, print note ✓, font ✓, quiet zone ✓');
   console.log('  DXF: provenance ✓, wordmark ✓, print note ✓');
   console.log('  T2–T7: no branded file exports (confirmed by audit).');

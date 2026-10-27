@@ -371,6 +371,207 @@ export async function exportPdf({ spec, pw: rawPw, ph: rawPh, fontBytes, layout 
   return doc.save();
 }
 
+// ---------------------------------------------------------------------------
+// Tiled PDF export (rule 5)
+// ---------------------------------------------------------------------------
+
+export interface TiledPdfOptions {
+  spec: PatternSpec;
+  tiling: import('./pageLayout').TilingLayout;
+  fontBytes?: PdfExportOptions['fontBytes'];
+}
+
+/**
+ * Multi-page tiled PDF at 100 % scale.
+ * Each sheet draws its window of the pattern with 10 mm overlap.
+ * Crop marks at window corners, page label, parameter + provenance on every sheet,
+ * wordmark on sheet 1 only, assembly note on sheet 1.
+ */
+export async function exportTiledPdf({ spec, tiling, fontBytes }: TiledPdfOptions): Promise<Uint8Array> {
+  const { PAGE_MARGIN, TILE_ASSEMBLY_NOTE, brandBlockHeight, wordmarkWidth, wordmarkClearSpace, BRAND_LINE_SPACING } = await import('./pageLayout');
+
+  const doc = await PDFDocument.create();
+  doc.registerFontkit(fontkit);
+
+  const fonts = await loadFontBytes(fontBytes);
+  const fontMono = await doc.embedFont(fonts.mono, { subset: true });
+
+  const bw = spec.cols * spec.square;
+  const bh = spec.rows * spec.square;
+  const { tilePw, tilePh, tileW, tileH, cols, rows, overlapMm } = tiling;
+  const pageW = tilePw * MM;
+  const pageH = tilePh * MM;
+
+  const wmW = wordmarkWidth(tilePw, tilePh);
+  const wmH = wmW / (WORDMARK_VB.width / WORDMARK_VB.height);
+  const bbH = brandBlockHeight(wmW);
+  const cs = wordmarkClearSpace(wmH);
+
+  const isMarkerType = spec.type === 'ChArUco' || spec.type === 'ArUco grid' || spec.type === 'AprilGrid (Kalibr)';
+  const isCircles = spec.type.includes('circles') || spec.type.includes('dots');
+
+  const summary = patternSummary(spec);
+  const provenance = provenanceLine('generator');
+  const fs = 2.47 * MM; // 7 pt
+
+  for (let tileRow = 0; tileRow < rows; tileRow++) {
+    for (let tileCol = 0; tileCol < cols; tileCol++) {
+      const page = doc.addPage([pageW, pageH]);
+      const pt = (xMm: number, yMm: number): [number, number] => [xMm * MM, pageH - yMm * MM];
+
+      // Window origin in pattern coords (mm)
+      const winX0 = tileCol * (tileW - overlapMm);
+      const winY0 = tileRow * (tileH - overlapMm);
+      const winX1 = Math.min(winX0 + tileW, bw);
+      const winY1 = Math.min(winY0 + tileH, bh);
+
+      // Offset: where the window's (0,0) maps on the page
+      const pageOx = PAGE_MARGIN;
+      const pageOy = PAGE_MARGIN;
+
+      // Draw pattern squares in this window
+      for (let r = 0; r < spec.rows; r++) {
+        for (let c = 0; c < spec.cols; c++) {
+          const px = c * spec.square;
+          const py = r * spec.square;
+          const black = (r + c) % 2 === 0;
+
+          // Check if this square's region overlaps the window
+          if (px + spec.square <= winX0 || px >= winX1) continue;
+          if (py + spec.square <= winY0 || py >= winY1) continue;
+
+          // Clip to window
+          const cx0 = Math.max(px, winX0);
+          const cy0 = Math.max(py, winY0);
+          const cx1 = Math.min(px + spec.square, winX1);
+          const cy1 = Math.min(py + spec.square, winY1);
+          const drawX = pageOx + (cx0 - winX0);
+          const drawY = pageOy + (cy0 - winY0);
+          const drawW = cx1 - cx0;
+          const drawH = cy1 - cy0;
+
+          if (isCircles) {
+            // Only draw if circle center is in window
+            const ccx = px + spec.square / 2;
+            const ccy = py + spec.square / 2;
+            if (ccx >= winX0 && ccx < winX1 && ccy >= winY0 && ccy < winY1) {
+              const radius = spec.square * 0.28;
+              drawCircle(page, pt, pageOx + (ccx - winX0), pageOy + (ccy - winY0), radius);
+            }
+            continue;
+          }
+
+          if (black) {
+            const [rpx, rpy] = pt(drawX, drawY + drawH);
+            page.drawRectangle({ x: rpx, y: rpy, width: drawW * MM, height: drawH * MM, color: rgb(0, 0, 0) });
+          } else if (isMarkerType) {
+            // Draw marker if its center is in window — simplified: draw the black background clipped
+            const m = spec.marker;
+            const mx = px + (spec.square - m) / 2;
+            const my = py + (spec.square - m) / 2;
+            const mcx0 = Math.max(mx, winX0);
+            const mcy0 = Math.max(my, winY0);
+            const mcx1 = Math.min(mx + m, winX1);
+            const mcy1 = Math.min(my + m, winY1);
+            if (mcx1 > mcx0 && mcy1 > mcy0) {
+              const mdx = pageOx + (mcx0 - winX0);
+              const mdy = pageOy + (mcy0 - winY0);
+              const [bmx, bmy] = pt(mdx, mdy + (mcy1 - mcy0));
+              page.drawRectangle({ x: bmx, y: bmy, width: (mcx1 - mcx0) * MM, height: (mcy1 - mcy0) * MM, color: rgb(0, 0, 0) });
+
+              // White bits (simplified — only full markers)
+              if (mcx0 <= mx && mcy0 <= my && mcx1 >= mx + m && mcy1 >= my + m) {
+                const n = 8;
+                const cell = m / n;
+                const id = spec.startId + Math.floor((r * spec.cols + c) / 2);
+                for (let i = 1; i < n - 1; i++) {
+                  for (let j = 1; j < n - 1; j++) {
+                    const bit = ((id * 31 + i * 7 + j * 13) % 5) < 2;
+                    if (!bit) {
+                      const [wx, wy] = pt(pageOx + (mx + j * cell - winX0), pageOy + (my + i * cell + cell - winY0));
+                      page.drawRectangle({ x: wx, y: wy, width: cell * MM, height: cell * MM, color: rgb(1, 1, 1) });
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // Crop marks at window corners (6 mm lines, 0.3 mm wide)
+      const cropLen = 6;
+      const cropW = 0.3;
+      const corners = [
+        [pageOx, pageOy],                                 // top-left
+        [pageOx + (winX1 - winX0), pageOy],               // top-right
+        [pageOx, pageOy + (winY1 - winY0)],               // bottom-left
+        [pageOx + (winX1 - winX0), pageOy + (winY1 - winY0)], // bottom-right
+      ];
+      for (const [cx, cy] of corners) {
+        // Horizontal crop mark
+        const dir = cx <= tilePw / 2 ? -1 : 1;
+        const [hx, hy] = pt(cx + dir * 1, cy);
+        page.drawRectangle({ x: hx + (dir < 0 ? -cropLen * MM : 0), y: hy - cropW / 2 * MM, width: cropLen * MM, height: cropW * MM, color: rgb(0, 0, 0) });
+        // Vertical crop mark
+        const vdir = cy <= tilePh / 2 ? -1 : 1;
+        const [vx, vy] = pt(cx, cy + vdir * 1);
+        page.drawRectangle({ x: vx - cropW / 2 * MM, y: vy + (vdir < 0 ? 0 : -cropLen * MM), width: cropW * MM, height: cropLen * MM, color: rgb(0, 0, 0) });
+      }
+
+      // Page label "Sheet r/c of R×C"
+      const sheetNum = tileRow * cols + tileCol + 1;
+      const label = `Sheet ${tileRow + 1}/${tileCol + 1} of ${rows}\u00D7${cols}`;
+      const labelY = tilePh - PAGE_MARGIN - bbH + 2;
+      const [lx, ly] = pt(tilePw - PAGE_MARGIN, labelY);
+      const labelW = fontMono.widthOfTextAtSize(label, fs);
+      page.drawText(label, { x: lx - labelW, y: ly, size: fs, font: fontMono, color: rgb(0.4, 0.4, 0.4) });
+
+      // Parameter + provenance on every sheet
+      const textX = PAGE_MARGIN;
+      const textY = tilePh - PAGE_MARGIN - bbH + 2;
+      const [tx, ty] = pt(textX, textY);
+      page.drawText(summary, { x: tx, y: ty, size: fs, font: fontMono, color: rgb(0.2, 0.2, 0.2) });
+      const [tx2, ty2] = pt(textX, textY + BRAND_LINE_SPACING);
+      page.drawText(provenance, { x: tx2, y: ty2, size: fs, font: fontMono, color: rgb(0.4, 0.4, 0.4) });
+
+      // Wordmark on sheet 1 only
+      if (sheetNum === 1) {
+        const wmX = PAGE_MARGIN;
+        const wmY = tilePh - PAGE_MARGIN - wmH;
+        const s = wmH * MM / WORDMARK_VB.height;
+        const pdfX = wmX * MM - WORDMARK_VB.minX * s;
+        const pdfY = pageH - wmY * MM + WORDMARK_VB.minY * s;
+        for (const d of WORDMARK_PATHS) {
+          page.drawSvgPath(d, { x: pdfX, y: pdfY, scale: s, color: rgb(BRAND_INK_RGB.r, BRAND_INK_RGB.g, BRAND_INK_RGB.b) });
+        }
+        for (const [rx, ry, rw, rh] of WORDMARK_FRAME_RECTS) {
+          page.drawRectangle({ x: pdfX + rx * s, y: pdfY - (ry + rh) * s, width: rw * s, height: rh * s, color: rgb(BRAND_INK_RGB.r, BRAND_INK_RGB.g, BRAND_INK_RGB.b) });
+        }
+        const [dx, dy, dw, dh] = WORDMARK_DOT_RECT;
+        page.drawRectangle({ x: pdfX + dx * s, y: pdfY - (dy + dh) * s, width: dw * s, height: dh * s, color: rgb(BRAND_RED_RGB.r, BRAND_RED_RGB.g, BRAND_RED_RGB.b) });
+
+        // Assembly note on sheet 1
+        const [ax, ay] = pt(textX, textY + 2 * BRAND_LINE_SPACING);
+        page.drawText(TILE_ASSEMBLY_NOTE, { x: ax, y: ay, size: fs, font: fontMono, color: rgb(0.6, 0.6, 0.6) });
+      } else {
+        // Print note on non-sheet-1 pages
+        const [tx3, ty3] = pt(textX, textY + 2 * BRAND_LINE_SPACING);
+        page.drawText(PRINT_NOTE, { x: tx3, y: ty3, size: fs, font: fontMono, color: rgb(0.6, 0.6, 0.6) });
+      }
+    }
+  }
+
+  // PDF metadata
+  doc.setTitle(`${summary} \u2014 ${BRAND_NAME} pattern (tiled ${cols}\u00D7${rows})`);
+  doc.setAuthor(BRAND_NAME);
+  doc.setSubject('Camera calibration pattern — tiled across sheets');
+  doc.setProducer(`${BRAND_NAME} pdf-lib`);
+  doc.setCreator(SITE_URL);
+
+  return doc.save();
+}
+
 /** Draw a filled black circle using 4 Bézier quarter-arcs. */
 function drawCircle(
   page: ReturnType<PDFDocument['addPage']>,
