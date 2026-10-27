@@ -16,7 +16,7 @@ Lithographed chrome pattern on a white alumina ceramic substrate. Feature accura
 | Part number | Size (W × H) | Squares (rows × cols) | Square / marker | Dictionary | Corners | Markers |
 |---|---|---|---|---|---|---|
 | CT-CHA-C-110085-{DICT} | 110 × 85 mm | 7 × 10 | 10 / 7.5 mm | 6X6 · 5X5 · 4X4 · AT36 | 54 | 35 |
-| CT-CHA-C-150100-{DICT} | 150 × 100 mm | 7 × 11 | 12.5 / 9.5 mm | | 60 | 39 |
+| CT-CHA-C-150100-{DICT} | 150 × 100 mm | 7 × 11 | 12.5 / 9.5 mm | | 60 | 38 |
 | CT-CHA-C-185110-{DICT} | 185 × 110 mm | 7 × 12 | 14 / 10.5 mm | | 66 | 42 |
 | CT-CHA-C-230140-{DICT} | 230 × 140 mm | 8 × 14 | 15 / 11 mm | | 91 | 56 |
 

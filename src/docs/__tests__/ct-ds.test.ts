@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { parseFrontMatter, _parseDatasheet } from '../build/ct-ds';
+import { parseFrontMatter, _parseDatasheet, charucoCornerCount, charucoMarkerCount } from '../build/ct-ds';
 import { Doc } from '../ctdoc';
 
 // ── Load test data ──
@@ -186,5 +186,54 @@ describe('Doc HTML output for CHA-C', () => {
     d.addPage('<p>content</p>');
     const html = d.html('A4');
     expect(html).toContain('hello@calib.tools');
+  });
+});
+
+// ── ChArUco marker/corner count derivation ──
+
+describe('charucoCornerCount / charucoMarkerCount', () => {
+  it('corners = (rows-1)(cols-1) and markers = floor(rows*cols/2) for every CHA-C ordering row', () => {
+    const ds = _parseDatasheet(CHA_C_MD);
+    expect(ds.ordering).not.toBeNull();
+
+    for (const row of ds.ordering!.rows) {
+      const squaresMatch = row[2].match(/(\d+)\s*[×x]\s*(\d+)/);
+      if (!squaresMatch) continue;
+      const r = Number(squaresMatch[1]);
+      const c = Number(squaresMatch[2]);
+
+      const cornersInTable = Number(row[5]);
+      const markersInTable = Number(row[6]);
+
+      expect(charucoCornerCount(r, c)).toBe(cornersInTable);
+      expect(charucoMarkerCount(r, c)).toBe(markersInTable);
+    }
+  });
+
+  it('corners = (rows-1)(cols-1) and markers = floor(rows*cols/2) for every CHA-P ordering row', () => {
+    const CHA_P_MD = readFileSync(
+      resolve(process.cwd(), 'docs/datasheets/CT-DS-CHA-P.md'),
+      'utf-8',
+    );
+    const ds = _parseDatasheet(CHA_P_MD);
+    expect(ds.ordering).not.toBeNull();
+
+    for (const row of ds.ordering!.rows) {
+      const squaresMatch = row[2].match(/(\d+)\s*[×x]\s*(\d+)/);
+      if (!squaresMatch) continue;
+      const r = Number(squaresMatch[1]);
+      const c = Number(squaresMatch[2]);
+
+      const cornersInTable = Number(row[5]);
+      const markersInTable = Number(row[6]);
+
+      expect(charucoCornerCount(r, c)).toBe(cornersInTable);
+      expect(charucoMarkerCount(r, c)).toBe(markersInTable);
+    }
+  });
+
+  it('known values: 7×11 → 60 corners, 38 markers (not 39)', () => {
+    expect(charucoCornerCount(7, 11)).toBe(60);
+    expect(charucoMarkerCount(7, 11)).toBe(38);
   });
 });
