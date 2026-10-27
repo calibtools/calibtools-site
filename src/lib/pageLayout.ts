@@ -19,7 +19,8 @@ export const PAPERS: Record<string, [number, number]> = {
 };
 
 // ---------------------------------------------------------------------------
-// Layout constants — used everywhere: placement, orientation, tests, exports
+// Layout constants — defined once, used by placement, orientation, tiling,
+// tests, and check-exports.
 // ---------------------------------------------------------------------------
 
 /** Printer non-printable edge (mm). */
@@ -27,39 +28,48 @@ export const PAGE_MARGIN = 8;
 
 /**
  * Quiet zone around the pattern (mm).
- * Detectors need a white zone free of brand elements, axes, text or crop marks.
+ * No brand element, axis, text or crop mark inside it.
  * Value = max(one square size of the current pattern, 10 mm).
  */
 export function patternQuietZone(squareSize: number): number {
   return Math.max(squareSize, 10);
 }
 
-/** Wordmark width on A4/Letter (mm). Scaled proportionally for other sizes. */
-const WM_WIDTH_A4 = 42;
+/** Wordmark width on A4/Letter (mm). Brand guidelines §04: print minimum 25 mm. */
+const WM_WIDTH_A4 = 28;
 
 /** Minimum wordmark width (mm). */
-const WM_WIDTH_MIN = 36;
+const WM_WIDTH_MIN = 25;
 
-/** Wordmark aspect ratio (width / height). */
-const WM_ASPECT = WORDMARK_VB.width / WORDMARK_VB.height; // ≈ 4.197
+/** Wordmark aspect ratio (width / height) from the kit. */
+const WM_ASPECT = WORDMARK_VB.width / WORDMARK_VB.height; // 7796.4 / 1857.4 ≈ 4.197
+
+/**
+ * Clear space around the wordmark (mm).
+ * Brand guidelines §03: brackets sit 0.65 H above and below the letters,
+ * where H = cap height = wordmark height / 2.3.
+ * Kept free on all four sides of the wordmark.
+ */
+export function wordmarkClearSpace(wmH: number): number {
+  return wmH / 2.3;
+}
 
 /** Brand text: 7 pt in mm (7 × 25.4 / 72). */
 export const BRAND_TEXT_SIZE_MM = 7 * 25.4 / 72; // ≈ 2.47
 
 /** Line spacing for brand text lines (mm between baselines). */
-export const BRAND_LINE_SPACING = 3;
+export const BRAND_LINE_SPACING = BRAND_TEXT_SIZE_MM * 1.3; // 7 pt × 1.3 ≈ 3.21 mm
 
 /**
- * Compute brand block height from the wordmark height.
- * Takes the larger of:
- *  - wordmark height at the given width
- *  - three 7 pt Geist Mono lines at 1.3× line-height
- * Then adds a 2 mm gap.
+ * Compute brand block height.
+ * max(wordmark height + CLEAR_SPACE, three 7 pt Geist Mono lines at 1.3× line-height).
  */
 export function brandBlockHeight(wmW: number): number {
   const wmH = wmW / WM_ASPECT;
-  const textBlockH = 3 * BRAND_TEXT_SIZE_MM * 1.3; // 3 lines at 1.3 line-height ≈ 9.6 mm
-  return Math.max(wmH, textBlockH) + 2; // 2 mm gap between pattern area and brand
+  const cs = wordmarkClearSpace(wmH);
+  const wordmarkBlock = wmH + cs;
+  const textBlockH = 3 * BRAND_TEXT_SIZE_MM * 1.3;
+  return Math.max(wordmarkBlock, textBlockH);
 }
 
 /** Tiling overlap (mm). */
@@ -74,6 +84,7 @@ export const TILE_ASSEMBLY_NOTE =
 // ---------------------------------------------------------------------------
 
 export type Orientation = 'auto' | 'portrait' | 'landscape';
+export type FitOrientation = 'portrait' | 'landscape' | 'none';
 export type FitMode = 'single' | 'tile' | 'reduce' | 'upsize';
 
 export interface BrandGeometry {
@@ -101,6 +112,7 @@ export interface TilingLayout {
   tilePw: number;    // tile page width (mm)
   tilePh: number;    // tile page height (mm)
   totalPages: number;
+  orientation: 'portrait' | 'landscape';
 }
 
 export interface PageLayout {
@@ -119,17 +131,18 @@ export interface PageLayout {
   axes: AxesGeometry;
   margin: number;
   quietZone: number;
-  /** Human-readable usable grid for the UI, e.g. "A4 portrait fits up to 7 × 11 squares at 20 mm" */
+  /** Human-readable usable grid for the UI */
   usableGrid?: string;
 }
 
 // ---------------------------------------------------------------------------
-// Orientation — fit-based (rule 1)
+// Orientation — fit-based (rule 2)
 // ---------------------------------------------------------------------------
 
 /**
  * Required page dimensions for a pattern (mm).
- * Brand block sits below the pattern in both orientations.
+ * reqW = bw + 2·QUIET + 2·MARGIN
+ * reqH = bh + 2·QUIET + BRAND_BLOCK_HEIGHT + 2·MARGIN
  */
 export function requiredDimensions(
   bw: number, bh: number, square: number, wmW: number,
@@ -145,9 +158,8 @@ export function requiredDimensions(
 /**
  * Decide page orientation using fit-based logic.
  *
- * `auto`: choose the orientation in which the required box fits.
- * If it fits both, use the one with more spare area.
- * If neither fits, prefer the one with less deficit (for the tiling path).
+ * `auto`: returns the orientation in which the required box fits.
+ * If both fit, the one with more spare area. If neither, returns 'none'.
  * Manual override forces the named orientation.
  */
 export function decideOrientation(
@@ -157,39 +169,30 @@ export function decideOrientation(
   paperW?: number,
   paperH?: number,
   square?: number,
-): 'portrait' | 'landscape' {
+): FitOrientation {
   if (orient === 'portrait') return 'portrait';
   if (orient === 'landscape') return 'landscape';
 
-  // If no paper dimensions given, fall back to aspect ratio heuristic
   if (paperW == null || paperH == null || square == null) {
     return bw > bh ? 'landscape' : 'portrait';
   }
 
   const [portW, portH] = orientPaper(paperW, paperH, 'portrait');
   const [landW, landH] = orientPaper(paperW, paperH, 'landscape');
-
-  // Wordmark width depends on the shorter page dimension (always the same for both orientations)
   const wmW = wordmarkWidth(portW, portH);
-
   const { reqW, reqH } = requiredDimensions(bw, bh, square, wmW);
 
   const fitsPort = reqW <= portW && reqH <= portH;
   const fitsLand = reqW <= landW && reqH <= landH;
 
   if (fitsPort && fitsLand) {
-    // Both fit — pick the one with more spare area
     const sparePort = (portW - reqW) * (portH - reqH);
     const spareLand = (landW - reqW) * (landH - reqH);
     return sparePort >= spareLand ? 'portrait' : 'landscape';
   }
   if (fitsPort) return 'portrait';
   if (fitsLand) return 'landscape';
-
-  // Neither fits — prefer the orientation with less total deficit
-  const deficitPort = Math.max(0, reqW - portW) + Math.max(0, reqH - portH);
-  const deficitLand = Math.max(0, reqW - landW) + Math.max(0, reqH - landH);
-  return deficitPort <= deficitLand ? 'portrait' : 'landscape';
+  return 'none';
 }
 
 /**
@@ -212,12 +215,9 @@ export function orientPaper(
 
 /**
  * Compute wordmark width for a given page size.
- * 42 mm on A4/Letter, proportionally scaled for other sizes, minimum 36 mm.
- * Uses the shorter page dimension as reference to avoid oversized brand blocks
- * on landscape pages.
+ * 28 mm on A4/Letter, proportionally scaled for other sizes, minimum 25 mm.
  */
 export function wordmarkWidth(pw: number, ph: number): number {
-  // Reference: A4 short side = 210 mm → 42 mm wordmark.
   const refDim = Math.min(pw, ph);
   const scale = refDim / 210;
   return Math.max(WM_WIDTH_MIN, Math.round(WM_WIDTH_A4 * scale * 10) / 10);
@@ -229,7 +229,6 @@ export function wordmarkWidth(pw: number, ph: number): number {
 
 /**
  * Check whether a pattern fits on a single page at 100% scale.
- * Uses the full required-dimensions formula (quiet zone + brand block + margins).
  */
 export function patternFits(
   bw: number,
@@ -244,14 +243,16 @@ export function patternFits(
 }
 
 // ---------------------------------------------------------------------------
-// Tiling
+// Tiling (rule 3)
 // ---------------------------------------------------------------------------
 
 /**
  * Compute tiling layout for a pattern that doesn't fit on one sheet.
- * Each sheet's window = page minus PAGE_MARGIN, minus BRAND_BLOCK_HEIGHT at the bottom.
- * The quiet zone applies only at the pattern's outer boundary, not at seams.
- * Chooses the tile orientation that needs the fewest sheets.
+ * Window per sheet = page − 2·MARGIN horizontally, page − 2·MARGIN − BRAND_BLOCK_HEIGHT vertically.
+ * Neighbouring windows overlap TILE_OVERLAP.
+ * The quiet zone applies only at the pattern's outer boundary.
+ * Compute sheets for both orientations and return the one with fewer sheets
+ * (ties → fewer seams crossing the pattern).
  */
 export function computeTiling(
   bw: number,
@@ -269,13 +270,12 @@ export function computeTiling(
     const tileH = tilePh - 2 * PAGE_MARGIN - bbH;
     const cols = tileW >= bw ? 1 : 1 + Math.ceil((bw - tileW) / (tileW - overlapMm));
     const rows = tileH >= bh ? 1 : 1 + Math.ceil((bh - tileH) / (tileH - overlapMm));
-    return { cols, rows, tileW, tileH, tilePw, tilePh, totalPages: cols * rows, orient };
+    return { cols, rows, tileW, tileH, tilePw, tilePh, totalPages: cols * rows, orientation: orient };
   }
 
   const port = tilingForOrient('portrait');
   const land = tilingForOrient('landscape');
 
-  // Pick the orientation that needs the fewest sheets; ties → fewer seams (lower max of rows,cols)
   let best = port;
   if (land.totalPages < port.totalPages) {
     best = land;
@@ -290,17 +290,17 @@ export function computeTiling(
     tileW: best.tileW, tileH: best.tileH,
     tilePw: best.tilePw, tilePh: best.tilePh,
     totalPages: best.totalPages,
+    orientation: best.orientation,
   };
 }
 
 // ---------------------------------------------------------------------------
-// Grid reduction
+// Grid reduction (rule 4)
 // ---------------------------------------------------------------------------
 
 /**
- * Compute the largest grid (rows × cols) that fits one page,
- * keeping the square size unchanged.
- * Returns the best orientation too.
+ * Keep square size, try both orientations, return the largest rows × cols
+ * that fit one sheet together with the orientation.
  */
 export function computeGridReduction(
   spec: PatternSpec,
@@ -335,10 +335,6 @@ export function computeGridReduction(
 // Smallest fitting paper
 // ---------------------------------------------------------------------------
 
-/**
- * Find the smallest standard paper that fits the pattern at 100%.
- * Returns paper name or null if none fits.
- */
 export function smallestFittingPaper(
   bw: number,
   bh: number,
@@ -363,7 +359,6 @@ export function smallestFittingPaper(
 
 /**
  * Compute the usable grid for the chosen paper and orientation.
- * Returns a human-readable string like "A4 portrait fits up to 7 × 11 at 20 mm".
  */
 export function usableGridNotice(
   paperName: string,
@@ -386,9 +381,6 @@ export function usableGridNotice(
 // Main layout computation
 // ---------------------------------------------------------------------------
 
-/**
- * Compute the full page layout for a given pattern and paper size.
- */
 export function computeLayout(
   spec: PatternSpec,
   paperW: number,
@@ -399,18 +391,20 @@ export function computeLayout(
   const bh = spec.rows * spec.square;
   const qz = patternQuietZone(spec.square);
 
-  // Orientation (fit-based)
-  const orientation = decideOrientation(bw, bh, orientOverride, paperW, paperH, spec.square);
+  // Orientation (fit-based). 'none' means neither fits → default to portrait for display.
+  const fitOrient = decideOrientation(bw, bh, orientOverride, paperW, paperH, spec.square);
+  const orientation: 'portrait' | 'landscape' = fitOrient === 'none' ? 'portrait' : fitOrient;
   const [pw, ph] = orientPaper(paperW, paperH, orientation);
 
   // Brand block sizing
   const wmW = wordmarkWidth(pw, ph);
   const wmH = wmW / WM_ASPECT;
+  const cs = wordmarkClearSpace(wmH);
   const bbH = brandBlockHeight(wmW);
 
   // Check fit
-  const fits = patternFits(bw, bh, pw, ph, spec.square);
-  const isInch = paperW < 220 && paperH < 300; // rough heuristic for US sizes
+  const fits = fitOrient !== 'none' && patternFits(bw, bh, pw, ph, spec.square);
+  const isInch = paperW < 220 && paperH < 300;
 
   let fit: FitMode = 'single';
   let tiling: TilingLayout | undefined;
@@ -418,14 +412,14 @@ export function computeLayout(
   let upsizePaper: string | undefined;
 
   if (!fits) {
-    fit = 'tile'; // default recommendation
+    fit = 'tile';
     tiling = computeTiling(bw, bh, paperW, paperH);
     reducedSpec = computeGridReduction(spec, paperW, paperH);
     upsizePaper = smallestFittingPaper(bw, bh, spec.square, isInch) ?? undefined;
   }
 
-  // Pattern placement — centred in the available window above the brand block.
-  // Vertical layout (top→bottom): PAGE_MARGIN, qz, [pattern], qz, bbH, PAGE_MARGIN
+  // Pattern placement — centred in available window above the brand block.
+  // Vertical: PAGE_MARGIN, qz, [pattern], qz, bbH, PAGE_MARGIN
   const patternWindowTop = PAGE_MARGIN + qz;
   const patternWindowBottom = ph - PAGE_MARGIN - bbH - qz;
   const patternWindowH = patternWindowBottom - patternWindowTop;
@@ -433,15 +427,15 @@ export function computeLayout(
   const patternWindowRight = pw - PAGE_MARGIN - qz;
   const patternWindowW = patternWindowRight - patternWindowLeft;
 
-  // Centre the pattern in the available window (clamp if it doesn't fit)
   const oxFinal = patternWindowLeft + Math.max(0, (patternWindowW - bw) / 2);
   const oyFinal = patternWindowTop + Math.max(0, (patternWindowH - bh) / 2);
 
-  // Brand block — bottom-left inside margins
+  // Brand block — bottom-left inside margins.
+  // Text column starts CLEAR_SPACE to the right of the wordmark's bracket.
   const brandWmX = PAGE_MARGIN;
   const brandWmY = ph - PAGE_MARGIN - wmH;
-  const brandTextX = PAGE_MARGIN + wmW + 4; // 4 mm gap right of wordmark
-  const brandTextY = brandWmY + 2; // align top of first line near top of wordmark
+  const brandTextX = PAGE_MARGIN + wmW + cs;
+  const brandTextY = brandWmY + 2;
 
   const brand: BrandGeometry = {
     wmX: brandWmX,
@@ -461,29 +455,16 @@ export function computeLayout(
   const headW = headLen * 0.6;
   const shaft = 0.4;
 
-  // Ideal origin: 0.5 squares before pattern top-left (or bottom-left for Kalibr)
   const idealAxOx = oxFinal - 0.5 * spec.square;
   const idealAxOy = isKalibr ? oyFinal + bh + 0.5 * spec.square : oyFinal - 0.5 * spec.square;
 
-  // Clamp: origin and all drawn elements must be inside PAGE_MARGIN
-  // and outside PATTERN_QUIET_ZONE (axes live in the gap between margin and quiet zone).
-  // The caption sits ~4 mm above origin (OpenCV) or ~3 mm below (Kalibr).
-  // X arrow extends arrowLen + ~5 mm label to the right.
   const minEdge = PAGE_MARGIN;
   const axOriginX = Math.max(minEdge, idealAxOx);
   let axOriginY: number;
   if (isKalibr) {
     axOriginY = Math.min(ph - minEdge - arrowLen - 3, idealAxOy);
   } else {
-    // Caption is above origin (~4 mm), Y arrow goes down arrowLen
     axOriginY = Math.max(minEdge + 4, idealAxOy);
-  }
-
-  // Ensure X arrow + label fits within page
-  const xEnd = axOriginX + arrowLen + 5; // 5 mm for "X" label
-  if (xEnd > pw - minEdge) {
-    // Shorten arrow or move origin left (origin already clamped to minEdge)
-    // Just accept it — the arrow auto-scales with pattern size
   }
 
   const axes: AxesGeometry = {
@@ -513,18 +494,10 @@ export function computeLayout(
   };
 }
 
-/**
- * Human-readable fit notice for the UI.
- * E.g. "Pattern 300 × 175 mm does not fit A4 at 100 %."
- */
 export function fitNotice(bw: number, bh: number, paperName: string): string {
   return `Pattern ${bw} \u00D7 ${bh} mm does not fit ${paperName} at 100 %.`;
 }
 
-/**
- * Human-readable grid reduction description.
- * E.g. "7 × 12 → 5 × 9 at 25 mm, landscape"
- */
 export function reductionNotice(
   origRows: number,
   origCols: number,

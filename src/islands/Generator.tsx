@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Grid2X2 } from '@/lib/icons';
 import { checkerboardSvg, type PatternSpec } from '@/lib/patterns';
-import { exportPdf } from '@/lib/exportPdf';
+import { exportPdf, exportTiledPdf } from '@/lib/exportPdf';
 import { exportPng } from '@/lib/exportPng';
 import { exportDxf } from '@/lib/exportDxf';
 import { kalibrYaml, ros2Yaml, halconDescr, opencvJson } from '@/lib/exportConfig';
@@ -539,7 +539,21 @@ export default function Generator({ initialSpec }: GeneratorProps = {}) {
           <div role="alert" className="rounded border border-brand bg-brand-tint px-4 py-3 text-sm text-brand-dark">
             <p className="m-0 mb-2 font-semibold">{fitNotice(boardW, boardH, spec.paper)}</p>
             <ul className="m-0 list-none space-y-1 pl-0 text-[13px]">
-              <li>(a) <strong>Tile</strong> across {layout.tiling ? `${layout.tiling.cols} \u00D7 ${layout.tiling.rows} = ${layout.tiling.totalPages}` : ''} {spec.paper} sheets at 100 % scale with 10 mm overlap and crop marks.</li>
+              <li>(a) <strong>Tile</strong> across {layout.tiling ? `${layout.tiling.cols} \u00D7 ${layout.tiling.rows} = ${layout.tiling.totalPages}` : ''} {spec.paper} sheets at 100 % scale with 10 mm overlap and crop marks.{' '}
+                {layout.tiling && (
+                  <button type="button" className="font-semibold underline" disabled={busy !== null} onClick={async () => {
+                    setBusy('pdf');
+                    try {
+                      const bytes = await exportTiledPdf({ spec, tiling: layout.tiling! });
+                      const a = document.createElement('a');
+                      a.href = URL.createObjectURL(new Blob([bytes.buffer as ArrayBuffer], { type: 'application/pdf' }));
+                      a.download = `${slug}-tiled.pdf`;
+                      a.click();
+                      URL.revokeObjectURL(a.href);
+                    } finally { setBusy(null); }
+                  }}>Download tiled PDF</button>
+                )}
+              </li>
               {layout.reducedSpec && (
                 <li>(b) <strong>Reduce grid</strong>: {reductionNotice(spec.rows, spec.cols, layout.reducedSpec.rows, layout.reducedSpec.cols, spec.square, layout.reducedSpec.orientation)}.{' '}
                   <button type="button" className="font-semibold underline" onClick={() => { set('rows', layout.reducedSpec!.rows); set('cols', layout.reducedSpec!.cols); }}>Apply</button>
