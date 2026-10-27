@@ -18,6 +18,7 @@ import { optimizeProductImage } from '@/lib/optimizeProductImage';
 import { Ruler, Package, PackageOpen, Plug, CircleDot, Truck, HelpCircle, Plus, Download, Wand2, Columns2, MessageSquare, ArrowRight, ArrowUp, Clock, FileCheck as FileCheckIcon } from 'lucide-astro';
 import { getProductData } from '@/lib/productData';
 import ReviewsSection from '@/islands/ReviewsSection';
+import { LEAD_TIME } from '@/lib/claims';
 import Stars from '@/components/Stars';
 import { getReviewsForProduct, summarize } from '@/lib/reviews';
 import { getImage, Picture } from 'astro:assets';
@@ -56,7 +57,7 @@ const eyebrow = m.lead_time
   : handle === 'certificate-ilac'
     ? 'Made to order'
     : anyAvailable
-      ? 'Made to order \u00B7 ships in 2\u20133 weeks'
+      ? LEAD_TIME
       : 'Made to order';
 
 // Positioning: datasheet first sentence → product.description
@@ -557,7 +558,7 @@ const orderingRows = (productData?.orderingRows ?? []).map((row) => {
         <table class="mb-6 w-full border-collapse text-[14px]">
           <tbody>
             {([
-              ['Lead time', m.lead_time || 'Ships in 1\u20132 business days'],
+              ['Lead time', m.lead_time || LEAD_TIME],
               ['Shipping', 'Tracked express from the factory. Import VAT and duties are settled at import (DAP) unless agreed otherwise.'],
               ['Returns', '30 days, unused, in original case.'],
               ['Warranty', '2 years against manufacturing defects.'],

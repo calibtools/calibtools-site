@@ -1,6 +1,7 @@
 ---
 import Base from '@/layouts/Base.astro';
 import { breadcrumbLd } from '@/lib/seo';
+import { RETURNS_LINE } from '@/lib/claims';
 const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: 'Returns' }]);
 ---
 <Base title="Returns" description="Return and refund policy for Calib.Tools calibration targets. 30-day return window, no questions asked." jsonLd={bcLd}>
@@ -9,7 +10,7 @@ const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: 'Returns' }]);
       <h1 class="h-display m-0 text-[32px] md:text-[40px]">Returns &amp; refunds</h1>
 
       <h2>30-day return window</h2>
-      <p>Not flat, not accurate, not what you ordered — send it back within 30 days of delivery for a full refund or replacement. No questions asked.</p>
+      <p>{RETURNS_LINE} Within 30 days of delivery for a full refund or replacement. No questions asked.</p>
 
       <h2>How to return</h2>
       <p>Email <a href="mailto:hello@calib.tools">hello@calib.tools</a> with your order number. We will send a prepaid return label (EU) or shipping instructions (rest of world).</p>
