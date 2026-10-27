@@ -7,18 +7,17 @@ import { Picture } from 'astro:assets';
 import { tools } from '@/lib/tools';
 import { stats } from '@/lib/site';
 import { getCollections } from '@/lib/shopify';
-import { getCollection } from 'astro:content';
+import { getCollection, getEntry } from 'astro:content';
 import { getProductImages } from '@/lib/product-images';
 import { getImageMetadata } from '@/lib/productImageImports';
 import { Tag, Truck, FileCheck, Files, RotateCcw, Grid2x2 as Grid2X2, ScanLine, ListChecks, Package, Ruler, CircleDot, Plug, ArrowRight, Mail } from 'lucide-astro';
 import { getAllPublishedReviews, HOW_REVIEWS_WORK_SHORT } from '@/lib/reviews';
-import { TAGLINE } from '@/lib/claims';
+import { TAGLINE, IN_DEVELOPMENT } from '@/lib/claims';
 import Stars from '@/components/Stars';
 import heroTight from '@/assets/products/brand/dark/hero-boards-tight.webp';
 import heroTightMobile from '@/assets/products/brand/dark/hero-boards-tight-mobile.webp';
 import familyComposite from '@/assets/products/brand/dark/family-composite.webp';
 import familyCeramic from '@/assets/products/brand/dark/family-ceramic.webp';
-import familySet from '@/assets/products/brand/dark/family-set.webp';
 import familyMounts from '@/assets/products/brand/dark/family-mounts.webp';
 import type { ImageMetadata } from 'astro';
 
@@ -26,15 +25,16 @@ import type { ImageMetadata } from 'astro';
 const collectionHeroOverrides: Record<string, ImageMetadata> = {
   'composite-boards': familyComposite,
   'ceramic-glass': familyCeramic,
-  'lidar-image-quality': familySet,       // TODO: proper multi-board-sets collection
   'mounts-accessories': familyMounts,
-};
-/* Override titles where needed */
-const collectionTitleOverrides: Record<string, string> = {
-  'lidar-image-quality': 'Multi-board sets', // TODO: update when collection handle changes
 };
 
 const collections = await getCollections();
+/* Overlay local title + description from src/content/collections when available */
+const localCollectionData = new Map<string, { title: string; description: string }>();
+for (const c of collections) {
+  const entry = await getEntry('collections', c.handle);
+  if (entry) localCollectionData.set(c.handle, { title: entry.data.title, description: entry.data.description });
+}
 const allGuides = await getCollection('guides');
 
 const heroImageMap = new Map<string, ImageMetadata>();
@@ -180,13 +180,17 @@ const featuredReviews = allReviews
         const firstProduct = c.products[0];
         const overrideImage = collectionHeroOverrides[c.handle];
         const localHero = overrideImage ?? (firstProduct ? heroImageMap.get(firstProduct.handle) : undefined);
-        const displayTitle = collectionTitleOverrides[c.handle] ?? c.title;
+        const local = localCollectionData.get(c.handle);
+        const displayTitle = local?.title ?? c.title;
+        const displayDesc = local?.description ?? c.description;
+        const hasPurchasable = c.products.length > 0;
         return (
           <ProductCard
             href={`/targets/collection/${c.handle}/`}
             title={displayTitle}
-            sub={c.description}
-            from={firstProduct?.priceFrom ?? ''}
+            sub={displayDesc}
+            from={hasPurchasable ? (firstProduct?.priceFrom ?? '') : ''}
+            tag={!hasPurchasable ? IN_DEVELOPMENT : undefined}
             localImage={localHero}
             image={!localHero ? (c.image ?? firstProduct?.image) : undefined}
             placeholder={displayTitle.toUpperCase()}

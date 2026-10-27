@@ -25,8 +25,12 @@ const collectionData = await getCollectionProducts(handle!);
 if (!collectionData) return Astro.redirect('/targets/');
 const collection = collectionData;
 
-// Content collection entry for editorial data
+// Content collection entry for editorial data — local title/description wins over Shopify
 const entry = await getEntry('collections', handle!);
+if (entry) {
+  collection.title = entry.data.title;
+  collection.description = entry.data.description;
+}
 const allProducts = await getProducts();
 
 // Render markdown body and parse into sections

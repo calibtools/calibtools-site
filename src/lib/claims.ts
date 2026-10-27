@@ -49,6 +49,9 @@ export const INSPECTION_CLAIM_SHORT = 'Measured before it ships';
 /** Primary tagline — used for the home H1, <title> suffix, OG fallback. */
 export const TAGLINE = 'Know your target to the micron';
 
+/** Label shown on collection cards when no products are purchasable yet. */
+export const IN_DEVELOPMENT = 'In development';
+
 // ── Brand identity for exports ──────────────────────────────────────
 
 export const BRAND_NAME = 'Calib.Tools';
