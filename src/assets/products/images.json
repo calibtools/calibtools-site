@@ -63,7 +63,7 @@
     "handle": "charuco-ceramic",
     "file": "01-hero.webp",
     "kind": "ai",
-    "alt": "Calib.Tools 200 by 150 mm white ceramic ChArUco calibration plate propped upright on a seamless white background."
+    "alt": "Calib.Tools 185 by 110 mm white ceramic 7 × 12 ChArUco calibration plate propped upright on a seamless white background."
   },
   {
     "handle": "charuco-ceramic",
@@ -87,7 +87,7 @@
     "handle": "charuco-ceramic",
     "file": "05-scale.webp",
     "kind": "ai",
-    "alt": "Calib.Tools ceramic ChArUco calibration plate photographed from above on dark granite next to a 200 mm steel ruler and a 1-euro coin."
+    "alt": "Calib.Tools ceramic 7 × 12 ChArUco calibration plate photographed from above on dark granite next to a steel ruler and a 1-euro coin."
   },
   {
     "handle": "mounting-fixture",

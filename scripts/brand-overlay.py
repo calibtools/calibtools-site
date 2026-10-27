@@ -38,9 +38,9 @@ BOARDS = {
         "text": "CT-CHA-P-300200-6X6   ChArUco 7\u00d710 \u00b7 25/18 mm \u00b7 DICT_6X6_250 \u00b7 IDs 0\u201334   SN 000127 \u00b7 Rev A",
     },
     "B3": {
-        "board_mm": (200, 150),
-        "pattern_mm": (170, 120),
-        "text": "CT-CHA-C-200150-1007   ChArUco 12\u00d717 \u00b7 10/7 mm \u00b7 DICT_6X6_250 \u00b7 IDs 0\u2013101   SN 000311 \u00b7 Rev A",
+        "board_mm": (185, 110),
+        "pattern_mm": (168, 98),
+        "text": "CT-CHA-C-185110-6X6   ChArUco 7\u00d712 \u00b7 14/10.5 mm \u00b7 DICT_6X6_250 \u00b7 IDs 0\u201341   SN 000311 \u00b7 Rev A",
     },
 }
 
@@ -73,14 +73,10 @@ def order_corners(pts):
     return [top[0], top[1], bot[1], bot[0]]      # TL, TR, BR, BL
 
 
-def detect_boards(img):
-    """Detect white quadrilateral boards in a BGR image."""
-    h, w = img.shape[:2]
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    _, thresh = cv2.threshold(gray, 150, 255, cv2.THRESH_BINARY)
+def _find_quads(gray, min_area, thresh_val=150):
+    """Find quadrilateral contours in a grayscale image above min_area."""
+    _, thresh = cv2.threshold(gray, thresh_val, 255, cv2.THRESH_BINARY)
     contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    min_area = 0.02 * h * w
-
     quads = []
     for c in contours:
         area = cv2.contourArea(c)
@@ -88,7 +84,7 @@ def detect_boards(img):
             continue
         peri = cv2.arcLength(c, True)
         approx = None
-        for eps in [0.02, 0.03, 0.04]:
+        for eps in [0.02, 0.03, 0.04, 0.05]:
             a = cv2.approxPolyDP(c, eps * peri, True)
             if len(a) == 4:
                 approx = a
@@ -100,6 +96,34 @@ def detect_boards(img):
         cx = sum(p[0] for p in corners) / 4
         cy = sum(p[1] for p in corners) / 4
         quads.append({"corners": corners, "cx": cx, "cy": cy, "area": area})
+    return quads
+
+
+def detect_boards(img, expected=0):
+    """Detect white quadrilateral boards in a BGR image.
+
+    If the full-image pass finds fewer quads than *expected*, retry on just
+    the top 65 % of the image (cutting reflections) with a lower threshold.
+    """
+    h, w = img.shape[:2]
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    min_area = 0.02 * h * w
+
+    quads = _find_quads(gray, min_area, thresh_val=150)
+
+    # Fallback: crop reflections and sweep threshold + min_area
+    if len(quads) < expected:
+        top_h = int(h * 0.65)
+        gray_top = gray[:top_h, :]
+        for ma_frac in [0.01, 0.005]:
+            min_area_top = ma_frac * top_h * w
+            for tv in [100, 110, 120, 130, 140]:
+                quads2 = _find_quads(gray_top, min_area_top, thresh_val=tv)
+                if len(quads2) >= expected:
+                    quads = quads2
+                    break
+            if len(quads) >= expected:
+                break
 
     # sort reading order: by row (cy), then by column (cx)
     quads.sort(key=lambda q: (q["cy"], q["cx"]))
@@ -161,7 +185,7 @@ def cmd_detect(args):
 
         img = cv2.imread(str(src_path))
         h, w = img.shape[:2]
-        quads = detect_boards(img)
+        quads = detect_boards(img, expected=len(board_ids))
         print(f"  {fname} ({w}x{h}): {len(quads)} quads detected, {len(board_ids)} expected")
 
         boards = []
@@ -457,6 +481,26 @@ def boards_bbox(img):
     return int(pts[:, 0].min()), int(pts[:, 1].min()), int(pts[:, 0].max()), int(pts[:, 1].max())
 
 
+def boards_bbox_from_json(data, source_png, webp_w, webp_h):
+    """Get bounding box of all boards from the detection JSON corners, scaled to WebP size."""
+    png_key = source_png.replace(".webp", ".png")
+    entry = data.get(png_key)
+    if not entry:
+        return None
+    orig_w, orig_h = entry["dims"]
+    sx = webp_w / orig_w
+    sy = webp_h / orig_h
+    all_pts = []
+    for board in entry.get("boards", []):
+        corners = board.get("corners")
+        if corners:
+            all_pts.extend([[c[0] * sx, c[1] * sy] for c in corners])
+    if not all_pts:
+        return None
+    pts = np.array(all_pts)
+    return int(pts[:, 0].min()), int(pts[:, 1].min()), int(pts[:, 0].max()), int(pts[:, 1].max())
+
+
 def cmd_crop(args):
     """Crop overlaid hero images tight around the boards."""
     # Load existing json to append crop boxes
@@ -466,11 +510,11 @@ def cmd_crop(args):
     crops = {
         "hero-three-boards.webp": {
             "output": "hero-boards-tight.webp",
-            "margins": {"left": 0.07, "right": 0.07, "top": 0.30, "bottom": 0.80},
+            "margins": {"left": 0.06, "right": 0.06, "top": 0.10, "bottom": 0.90},
         },
         "hero-three-boards-mobile.webp": {
             "output": "hero-boards-tight-mobile.webp",
-            "margins": {"left": 0.06, "right": 0.06, "top": 0.10, "bottom": 0.30},
+            "margins": {"left": 0.06, "right": 0.06, "top": 0.06, "bottom": 0.12},
         },
     }
 
@@ -482,7 +526,7 @@ def cmd_crop(args):
 
         img = cv2.imread(str(src_path))
         h, w = img.shape[:2]
-        bbox = boards_bbox(img)
+        bbox = boards_bbox_from_json(data, src_name, w, h) or boards_bbox(img)
         if not bbox:
             print(f"  SKIP {src_name} (no boards detected)")
             continue

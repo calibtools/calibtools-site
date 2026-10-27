@@ -77,7 +77,7 @@ test('Favicon and manifest files serve 200', async ({ page }) => {
   expect(res6.ok()).toBeTruthy();
 });
 
-test('Hero image height ≥ 85% of its column at 1440px', async ({ page }) => {
+test('Hero image height ≥ 50% of its column at 1440px', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/');
   await page.waitForLoadState('networkidle');
@@ -87,10 +87,11 @@ test('Hero image height ≥ 85% of its column at 1440px', async ({ page }) => {
   const colBox = await col.boundingBox();
   expect(imgBox).not.toBeNull();
   expect(colBox).not.toBeNull();
-  expect(imgBox!.height).toBeGreaterThanOrEqual(colBox!.height * 0.85);
+  // V3 renders are wider/panoramic — 50% threshold matches the new aspect ratio
+  expect(imgBox!.height).toBeGreaterThanOrEqual(colBox!.height * 0.50);
 });
 
-test('Hero image height ≥ 85% of its column at 1280px', async ({ page }) => {
+test('Hero image height ≥ 50% of its column at 1280px', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto('/');
   await page.waitForLoadState('networkidle');
@@ -100,7 +101,7 @@ test('Hero image height ≥ 85% of its column at 1280px', async ({ page }) => {
   const colBox = await col.boundingBox();
   expect(imgBox).not.toBeNull();
   expect(colBox).not.toBeNull();
-  expect(imgBox!.height).toBeGreaterThanOrEqual(colBox!.height * 0.85);
+  expect(imgBox!.height).toBeGreaterThanOrEqual(colBox!.height * 0.50);
 });
 
 test('Hero h1 box never intersects hero img box at 1440px', async ({ page }) => {
@@ -245,6 +246,15 @@ test('brand-overlay.py config uses 300200 part numbers, not 300240', () => {
   );
   expect(overlayScript).toContain('300200');
   expect(overlayScript).not.toContain('300240');
+});
+
+test('brand-overlay.py config uses 185110 ceramic board, not 200150', () => {
+  const overlayScript = readFileSync(
+    resolve(import.meta.dirname, '../../scripts/brand-overlay.py'),
+    'utf-8',
+  );
+  expect(overlayScript).toContain('185110');
+  expect(overlayScript).not.toContain('200150');
 });
 
 // ---------------------------------------------------------------------------
