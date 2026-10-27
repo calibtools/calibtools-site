@@ -6,9 +6,17 @@ import { getCollections, getProducts } from '@/lib/shopify';
 import { getProductImages } from '@/lib/product-images';
 import { getImageMetadata } from '@/lib/productImageImports';
 import { breadcrumbLd } from '@/lib/seo';
+import { getEntry } from 'astro:content';
+import { IN_DEVELOPMENT } from '@/lib/claims';
 const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: 'Calibration targets' }]);
 
 const collections = await getCollections();
+/* Overlay local title + description from content collection */
+const localCollectionData = new Map<string, { title: string; description: string }>();
+for (const c of collections) {
+  const entry = await getEntry('collections', c.handle);
+  if (entry) localCollectionData.set(c.handle, { title: entry.data.title, description: entry.data.description });
+}
 const products = await getProducts();
 
 // Build hero image map for all products
@@ -34,15 +42,20 @@ for (const p of products) {
       {collections.map((c) => {
         const firstProduct = c.products[0];
         const localHero = firstProduct ? heroImageMap.get(firstProduct.handle) : undefined;
+        const local = localCollectionData.get(c.handle);
+        const displayTitle = local?.title ?? c.title;
+        const displayDesc = local?.description ?? c.description;
+        const hasPurchasable = c.products.length > 0;
         return (
           <ProductCard
             href={`/targets/collection/${c.handle}/`}
-            title={c.title}
-            sub={c.description}
-            from={firstProduct?.priceFrom ?? ''}
+            title={displayTitle}
+            sub={displayDesc}
+            from={hasPurchasable ? (firstProduct?.priceFrom ?? '') : ''}
+            tag={!hasPurchasable ? IN_DEVELOPMENT : undefined}
             localImage={localHero}
             image={!localHero ? (c.image ?? firstProduct?.image) : undefined}
-            placeholder={c.title.toUpperCase()}
+            placeholder={displayTitle.toUpperCase()}
           />
         );
       })}

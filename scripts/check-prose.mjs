@@ -41,6 +41,9 @@ const BANNED_PATTERNS = [
   /\bverified\s+purchase\b/i,
   /100\s*%?\s*real\s+reviews/i,
   /\ball\s+5[- ]star\b/i,
+  /±0\.5[\u2013-]2/,
+  /±1[\u2013-]2/,
+  /0\.5[\u2013-]2\s*µm/,
 ];
 
 /** Phrases that are allowed even when they contain a banned word. */
