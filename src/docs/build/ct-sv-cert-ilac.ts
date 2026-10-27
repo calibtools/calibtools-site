@@ -104,7 +104,7 @@ export async function buildILACCert(opts: {
         'CNAS-accredited laboratory',
       ],
       [
-        'DAkkS certificate',
+        'Calibration certificate from a DAkkS-accredited laboratory (on request)',
         'On request for specific requirements',
         'DAkkS-accredited laboratory',
       ],
