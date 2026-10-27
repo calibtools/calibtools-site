@@ -19,3 +19,15 @@ Structure
 - `docs/design.md`, `docs/plan.md` — design tokens and tool roadmap
 
 Deploy: Cloudflare Pages, build command `pnpm build`, output `dist`.
+
+## GitHub Actions secrets
+
+The **Review invites** workflow (`.github/workflows/review-invites.yml`) runs daily
+and requires four repository secrets under **Settings → Secrets and variables → Actions**:
+
+| Secret | Source | Purpose |
+|---|---|---|
+| `CF_ACCOUNT_ID` | Cloudflare dashboard → Account ID | Identifies the CF account |
+| `CF_KV_REVIEWS_NAMESPACE_ID` | Workers & Pages → KV → REVIEWS namespace ID | KV namespace holding invite tokens |
+| `CF_API_TOKEN` | Cloudflare API Tokens → Create Token (Account / Workers KV Storage / Edit) | Read/write invite records |
+| `RESEND_API_KEY` | Resend dashboard → API Keys | Send invite emails from `reviews@calib.tools` |
