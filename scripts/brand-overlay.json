@@ -431,25 +431,6 @@
   },
   "crops": {
     "hero-boards-tight.webp": {
-      "source": "hero-three-boards.webp",
-      "boards_bbox": [
-        1185,
-        644,
-        2345,
-        1014
-      ],
-      "crop_box": [
-        1116,
-        607,
-        2414,
-        1347
-      ],
-      "output_dims": [
-        1298,
-        740
-      ]
-    },
-    "hero-boards-tight-mobile.webp": {
       "source": "hero-three-boards-mobile.webp",
       "boards_bbox": [
         129,
@@ -464,8 +445,27 @@
         1997
       ],
       "output_dims": [
-        1513,
-        1342
+        902,
+        707
+      ]
+    },
+    "hero-boards-tight-mobile.webp": {
+      "source": "hero-three-boards.webp",
+      "boards_bbox": [
+        1185,
+        644,
+        2345,
+        1014
+      ],
+      "crop_box": [
+        1116,
+        622,
+        2414,
+        1058
+      ],
+      "output_dims": [
+        1664,
+        553
       ]
     }
   }

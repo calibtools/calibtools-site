@@ -502,19 +502,33 @@ def boards_bbox_from_json(data, source_png, webp_w, webp_h):
 
 
 def cmd_crop(args):
-    """Crop overlaid hero images tight around the boards."""
-    # Load existing json to append crop boxes
+    """Crop overlaid hero images tight around the boards.
+
+    Algorithm:
+    1. Board bbox from saved JSON corners (no reflection).
+    2. Expand 6 % each side; at most 12 % extra below lowest corner.
+    3. Scale the expanded region, then centre-crop to the target aspect.
+    4. Assert boards fill ≥ min_board_h_pct of crop height (desktop)
+       or ≥ min_board_w_pct of crop width (mobile).
+    """
     with open(JSON_PATH) as f:
         data = json.load(f)
 
+    # Swapped sources: the mobile source (portrait, ~square board group) crops
+    # to the desktop target (902×707), and the desktop source (landscape, one-row)
+    # crops to the mobile strip (1664×553).
     crops = {
-        "hero-three-boards.webp": {
-            "output": "hero-boards-tight.webp",
-            "margins": {"left": 0.06, "right": 0.06, "top": 0.10, "bottom": 0.90},
-        },
         "hero-three-boards-mobile.webp": {
+            "output": "hero-boards-tight.webp",
+            "target": (902, 707),
+            "min_board_h_pct": 0.80,
+            "min_board_w_pct": 0.0,
+        },
+        "hero-three-boards.webp": {
             "output": "hero-boards-tight-mobile.webp",
-            "margins": {"left": 0.06, "right": 0.06, "top": 0.06, "bottom": 0.12},
+            "target": (1664, 553),
+            "min_board_h_pct": 0.0,
+            "min_board_w_pct": 0.70,
         },
     }
 
@@ -526,33 +540,75 @@ def cmd_crop(args):
 
         img = cv2.imread(str(src_path))
         h, w = img.shape[:2]
-        bbox = boards_bbox_from_json(data, src_name, w, h) or boards_bbox(img)
+
+        # Step 1: board bbox from JSON corners, scaled to WebP size
+        bbox = boards_bbox_from_json(data, src_name, w, h)
         if not bbox:
-            print(f"  SKIP {src_name} (no boards detected)")
+            print(f"  SKIP {src_name} (no corners in JSON)")
             continue
 
         bx0, by0, bx1, by1 = bbox
         bw = bx1 - bx0
         bh = by1 - by0
 
-        ml = int(bw * cfg["margins"]["left"])
-        mr = int(bw * cfg["margins"]["right"])
-        mt = int(bh * cfg["margins"]["top"])
-        mb = int(bh * cfg["margins"]["bottom"])
+        # Step 2: expand board bbox by 6 % each side, at most 12 % below.
+        tw, th = cfg["target"]
+        min_bh_pct = cfg["min_board_h_pct"]
+        min_bw_pct = cfg["min_board_w_pct"]
+
+        margin = 0.06
+        ml = int(bw * margin)
+        mr = int(bw * margin)
+        mt = int(bh * margin)
+        mb = min(int(bh * 0.12), int(bh * margin * 2))
 
         cx0 = max(0, bx0 - ml)
         cy0 = max(0, by0 - mt)
         cx1 = min(w, bx1 + mr)
         cy1 = min(h, by1 + mb)
 
-        cropped = img[cy0:cy1, cx0:cx1]
+        # Step 3: scale+crop to exact target dims, never pad.
+        region = img[cy0:cy1, cx0:cx1]
+        rh, rw = region.shape[:2]
+        target_ar = tw / th
+        region_ar = rw / rh
+
+        if region_ar > target_ar:
+            # Wider: scale to match height, centre-crop width
+            scale = th / rh
+            sw = int(rw * scale)
+            scaled = cv2.resize(region, (sw, th), interpolation=cv2.INTER_AREA)
+            x_off = (sw - tw) // 2
+            cropped = scaled[:, x_off:x_off + tw]
+        else:
+            # Taller: scale to match width, centre-crop height
+            scale = tw / rw
+            sh = int(rh * scale)
+            scaled = cv2.resize(region, (tw, sh), interpolation=cv2.INTER_AREA)
+            y_off = (sh - th) // 2
+            cropped = scaled[y_off:y_off + th, :]
+
+        ch, cw = cropped.shape[:2]
+
+        # Step 4: assert board fill
+        board_h_fill = (bh * scale) / ch
+        board_w_fill = (bw * scale) / cw
+
+        if min_bh_pct > 0:
+            assert board_h_fill >= min_bh_pct - 0.02, \
+                f"{cfg['output']}: boards fill {board_h_fill:.0%} height, need ≥ {min_bh_pct:.0%}"
+            print(f"    board height fill: {board_h_fill:.0%} (≥ {min_bh_pct:.0%} ✓)")
+
+        if min_bw_pct > 0:
+            assert board_w_fill >= min_bw_pct - 0.02, \
+                f"{cfg['output']}: boards fill {board_w_fill:.0%} width, need ≥ {min_bw_pct:.0%}"
+            print(f"    board width fill: {board_w_fill:.0%} (≥ {min_bw_pct:.0%} ✓)")
+
         out_path = OUT_DIR / cfg["output"]
         cv2.imwrite(str(out_path), cropped, [cv2.IMWRITE_WEBP_QUALITY, 90])
-        ch, cw = cropped.shape[:2]
         print(f"  {src_name} → {cfg['output']} ({cw}x{ch}, {out_path.stat().st_size // 1024} KB)")
-        print(f"    boards bbox [{bx0},{by0}]-[{bx1},{by1}], crop [{cx0},{cy0}]-[{cx1},{cy1}]")
+        print(f"    boards bbox [{bx0},{by0}]-[{bx1},{by1}], expand [{cx0},{cy0}]-[{cx1},{cy1}]")
 
-        # Record in json
         data.setdefault("crops", {})[cfg["output"]] = {
             "source": src_name,
             "boards_bbox": [bx0, by0, bx1, by1],

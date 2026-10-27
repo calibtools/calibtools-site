@@ -77,7 +77,7 @@ test('Favicon and manifest files serve 200', async ({ page }) => {
   expect(res6.ok()).toBeTruthy();
 });
 
-test('Hero image height ≥ 50% of its column at 1440px', async ({ page }) => {
+test('Hero image height ≥ 85% of its column at 1440px', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/');
   await page.waitForLoadState('networkidle');
@@ -87,11 +87,10 @@ test('Hero image height ≥ 50% of its column at 1440px', async ({ page }) => {
   const colBox = await col.boundingBox();
   expect(imgBox).not.toBeNull();
   expect(colBox).not.toBeNull();
-  // V3 renders are wider/panoramic — 50% threshold matches the new aspect ratio
-  expect(imgBox!.height).toBeGreaterThanOrEqual(colBox!.height * 0.50);
+  expect(imgBox!.height).toBeGreaterThanOrEqual(colBox!.height * 0.85);
 });
 
-test('Hero image height ≥ 50% of its column at 1280px', async ({ page }) => {
+test('Hero image height ≥ 85% of its column at 1280px', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto('/');
   await page.waitForLoadState('networkidle');
@@ -101,7 +100,7 @@ test('Hero image height ≥ 50% of its column at 1280px', async ({ page }) => {
   const colBox = await col.boundingBox();
   expect(imgBox).not.toBeNull();
   expect(colBox).not.toBeNull();
-  expect(imgBox!.height).toBeGreaterThanOrEqual(colBox!.height * 0.50);
+  expect(imgBox!.height).toBeGreaterThanOrEqual(colBox!.height * 0.85);
 });
 
 test('Hero h1 box never intersects hero img box at 1440px', async ({ page }) => {
