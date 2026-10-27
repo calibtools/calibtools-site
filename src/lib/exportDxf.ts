@@ -4,8 +4,20 @@
  * Pattern geometry on layer "0"; brand elements on layer "CALIBTOOLS_BRAND".
  */
 import type { PatternSpec } from './patterns';
-import { BRAND_URL, LOGO_CELLS, patternSummary, brandLine } from './brand';
 import { idRange } from './idRange';
+import {
+  patternSummary,
+  provenanceLine,
+  PRINT_NOTE,
+  SITE_URL,
+  brandLine,
+} from './exportBrand';
+import {
+  WORDMARK_POLYLINES,
+  WORDMARK_FRAME_RECTS as WM_FRAME_RECTS,
+  WORDMARK_DOT_RECT as WM_DOT_RECT,
+  WORDMARK_VIEWBOX as WM_VB,
+} from './wordmarkDxf';
 
 export interface DxfExportOptions {
   spec: PatternSpec;
@@ -90,6 +102,16 @@ function textRight(layer: string, x: number, y: number, height: number, str: str
     gc(11, f(x)) + gc(21, f(y)) +
     gc(1, str)
   );
+}
+
+/** POLYLINE entity (2D) with VERTEX entries. */
+function polyline(layer: string, verts: readonly [number, number][], closed = true): string {
+  let out = gc(0, 'POLYLINE') + gc(8, layer) + gc(66, 1) + gc(70, closed ? 1 : 0);
+  for (const [vx, vy] of verts) {
+    out += gc(0, 'VERTEX') + gc(8, layer) + gc(10, f(vx)) + gc(20, f(vy));
+  }
+  out += gc(0, 'SEQEND') + gc(8, layer);
+  return out;
 }
 
 /** TEXT entity centre-aligned (group 72=1, with alignment point group 11/21). */
@@ -195,44 +217,56 @@ function entitiesSection(spec: PatternSpec, pw: number, ph: number): string {
     }
   }
 
-  // --- Brand footer ---
-  // patternBottomDxf: the DXF Y of the bottom edge of the pattern grid (y-up)
+  // --- Brand footer: bracket-framed wordmark as polylines ---
   const patternBottomDxf = dxfY(oy + bh, ph);
-  const footerY = patternBottomDxf - 2 * spec.square;
+  const footerTopMm = oy + bh + 2 * spec.square; // y-down mm
+  const footerTopDxf = dxfY(footerTopMm, ph);
+  const wmHMm = 5; // wordmark height in mm
+  const wmScale = wmHMm / WM_VB.height;
 
-  const cellSize = 1.8;
-  const gap = 0.3;
-  const step = cellSize + gap;
-  const textBaseY = footerY + cellSize; // approximate vertical centre of logo
+  // Transform SVG (y-down) to DXF (y-up):
+  // dxfX = ox + (svgX - WM_VB.minX) * wmScale
+  // dxfY = footerTopDxf - (svgY - WM_VB.minY) * wmScale (flip y, top of wordmark at footerTopDxf)
+  const wmOffX = ox - WM_VB.minX * wmScale;
+  const wmOffY = footerTopDxf + WM_VB.minY * wmScale;
 
-  // Logo: 3x3 grid of SOLID entities
-  for (const cell of LOGO_CELLS) {
-    const cx = ox + cell.col * step;
-    // Logo rows: row 0 is top in screen coords → row 0 should be at top in DXF (highest Y)
-    // Flip rows: cy_dxf = footerY + (2 - cell.row) * step
-    const cyDxfBottom = footerY + (2 - cell.row) * step;
-    parts.push(solid('CALIBTOOLS_BRAND', cx, cyDxfBottom, cellSize, cellSize));
+  // Letter outlines as POLYLINE
+  for (const pl of WORDMARK_POLYLINES) {
+    const verts: [number, number][] = pl.map(([sx, sy]) => [
+      wmOffX + sx * wmScale,
+      wmOffY - sy * wmScale,
+    ]);
+    parts.push(polyline('CALIBTOOLS_BRAND', verts));
   }
 
-  const logoWidth = 3 * cellSize + 2 * gap; // = 6.0 mm
-  const textX = ox + logoWidth + 2;
+  // Frame bracket rects as SOLID
+  for (const [rx, ry, rw, rh] of WM_FRAME_RECTS) {
+    const x1 = wmOffX + rx * wmScale;
+    const y1 = wmOffY - (ry + rh) * wmScale;
+    parts.push(solid('CALIBTOOLS_BRAND', x1, y1, rw * wmScale, rh * wmScale));
+  }
 
-  // Wordmark: "calib.tools"
-  parts.push(text('CALIBTOOLS_BRAND', textX, textBaseY, 3, 'calib.tools'));
+  // Red dot as SOLID
+  {
+    const [dx, dy, dw, dh] = WM_DOT_RECT;
+    const x1 = wmOffX + dx * wmScale;
+    const y1 = wmOffY - (dy + dh) * wmScale;
+    parts.push(solid('CALIBTOOLS_BRAND', x1, y1, dw * wmScale, dh * wmScale));
+  }
 
-  // Pattern summary (centred at pattern midpoint)
+  // Text lines below wordmark
+  const textBaseY = footerTopDxf - wmHMm - 2;
   const summary = patternSummary({
     type: spec.type, rows: spec.rows, cols: spec.cols, square: spec.square,
     marker: spec.marker, dict: spec.dict, startId: spec.startId,
   });
   const centrePt = ox + bw / 2;
-  parts.push(textCentre('CALIBTOOLS_BRAND', centrePt, textBaseY, 2.4, summary));
+  parts.push(textCentre('CALIBTOOLS_BRAND', centrePt, textBaseY, 2.2, summary));
 
-  // URL + date (right-aligned)
-  const iso = new Date().toISOString().slice(0, 10);
-  const rightText = `${BRAND_URL} · ${iso}`;
-  const rightX = ox + bw;
-  parts.push(textRight('CALIBTOOLS_BRAND', rightX, textBaseY, 2.4, rightText));
+  const provenance = provenanceLine('generator');
+  parts.push(textCentre('CALIBTOOLS_BRAND', centrePt, textBaseY - 3.2, 1.8, provenance));
+
+  parts.push(textCentre('CALIBTOOLS_BRAND', centrePt, textBaseY - 6, 1.6, PRINT_NOTE));
 
   // --- Corner ID badge ---
   if (spec.startId !== 0 && spec.showCornerBadge !== false) {

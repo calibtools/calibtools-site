@@ -16,6 +16,14 @@ The new system has four marks, each in positive (light bg) and negative (dark bg
 
 SVGs have non-standard viewBoxes (negative origins). Size only with CSS `height`; never set both `width` and `height`.
 
+### Logo usage by context
+
+| Context | Mark |
+|---|---|
+| **Print and exported files** (tool exports, inspection reports, datasheets, all customer documents) | Bracket-framed wordmark only |
+| **Screen — desktop** (site header, marketing pages) | Horizontal lockup |
+| **Screen — mobile** (header, app icons, social) | C.T icon |
+
 ### Clear-space rules
 
 - Around lockups/wordmarks: clear space = cap-height H of the word "CALIB" in that mark.

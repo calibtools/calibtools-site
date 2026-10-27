@@ -31,26 +31,21 @@ describe('checkerboardSvg brand group', () => {
     expect(svg).toContain('id="calibtools-brand"');
   });
 
-  it('brand group has ≥ 9 logo rects', () => {
+  it('brand group contains bracket-framed wordmark SVG', () => {
     const svg = checkerboardSvg(spec, 210, 297);
-    const match = svg.match(/<g id="calibtools-brand">([\s\S]*?)<\/g>/);
-    expect(match).not.toBeNull();
-    const rects = match![1].match(/<rect /g);
-    expect(rects!.length).toBeGreaterThanOrEqual(9);
+    expect(svg).toContain('CALIB.TOOLS wordmark-framed');
+    // Wordmark has letter paths
+    expect(svg).toContain('<path d="M383.0');
   });
 
-  it('brand group contains wordmark text with font fallback', () => {
+  it('brand group contains provenance line', () => {
     const svg = checkerboardSvg(spec, 210, 297);
-    const match = svg.match(/<g id="calibtools-brand">([\s\S]*?)<\/g>/);
-    expect(match![1]).toContain('calib');
-    expect(match![1]).toContain('.tools');
-    expect(match![1]).toContain('font-family');
+    expect(svg).toContain('Generated with calib.tools/tools/generator');
   });
 
-  it('brand group contains outlined wordmark path', () => {
+  it('brand group contains print note', () => {
     const svg = checkerboardSvg(spec, 210, 297);
-    const match = svg.match(/<g id="calibtools-brand">([\s\S]*?)<\/g>/);
-    expect(match![1]).toContain('<path');
+    expect(svg).toContain('not measured');
   });
 
   it('brand group is after pattern rects', () => {

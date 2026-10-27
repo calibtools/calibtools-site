@@ -1,6 +1,6 @@
 import type { PatternSpec } from './patterns';
 import { idRange, type IdRangeResult } from './idRange';
-import { BRAND_NAME, BRAND_URL } from './brand';
+import { BRAND_NAME, SITE_URL } from './exportBrand';
 
 export interface SetBoard {
   index: number;
@@ -37,7 +37,7 @@ export function computeSetBoards(
 /** Build set-manifest.json string. */
 export function buildSetManifest(baseSpec: PatternSpec, boards: SetBoard[]): string {
   return JSON.stringify({
-    _generator: { name: BRAND_NAME, url: `https://${BRAND_URL}`, generated: new Date().toISOString().slice(0, 10) },
+    _generator: { name: BRAND_NAME, url: `https://${SITE_URL}`, generated: new Date().toISOString().slice(0, 10) },
     pattern: baseSpec.type,
     rows: baseSpec.rows,
     cols: baseSpec.cols,

@@ -7,11 +7,16 @@ import {
   BRAND_EMAIL,
   BRAND_RED_RGB,
   BRAND_INK_RGB,
-  LOGO_CELLS,
-  logoSvgPaths,
   patternSummary,
   brandLine,
 } from './brand';
+import {
+  WORDMARK_SVG_POSITIVE,
+  WORDMARK_PATHS,
+  WORDMARK_VB,
+  provenanceLine,
+  PRINT_NOTE,
+} from './exportBrand';
 
 describe('brand constants', () => {
   it('BRAND_RED is correct hex', () => {
@@ -47,80 +52,36 @@ describe('brand constants', () => {
   });
 });
 
-describe('LOGO_CELLS', () => {
-  it('has exactly 9 entries', () => {
-    expect(LOGO_CELLS).toHaveLength(9);
+describe('wordmark SVG (bracket-framed)', () => {
+  it('positive SVG contains CALIB.TOOLS title', () => {
+    expect(WORDMARK_SVG_POSITIVE).toContain('CALIB.TOOLS wordmark-framed positive');
   });
 
-  it('even indices (0,2,4,6,8) use BRAND_RED', () => {
-    for (const idx of [0, 2, 4, 6, 8]) {
-      expect(LOGO_CELLS[idx].fill).toBe(BRAND_RED);
-    }
+  it('has 10 letter outline paths', () => {
+    expect(WORDMARK_PATHS).toHaveLength(10);
   });
 
-  it('odd indices (1,3,5,7) use BRAND_INK', () => {
-    for (const idx of [1, 3, 5, 7]) {
-      expect(LOGO_CELLS[idx].fill).toBe(BRAND_INK);
-    }
+  it('viewBox has correct dimensions', () => {
+    expect(WORDMARK_VB.width).toBeCloseTo(7796.4, 1);
+    expect(WORDMARK_VB.height).toBeCloseTo(1857.4, 1);
   });
 
-  it('cells have col and row from 0 to 2 in row-major order', () => {
-    expect(LOGO_CELLS[0]).toMatchObject({ col: 0, row: 0 });
-    expect(LOGO_CELLS[1]).toMatchObject({ col: 1, row: 0 });
-    expect(LOGO_CELLS[2]).toMatchObject({ col: 2, row: 0 });
-    expect(LOGO_CELLS[3]).toMatchObject({ col: 0, row: 1 });
-    expect(LOGO_CELLS[8]).toMatchObject({ col: 2, row: 2 });
+  it('positive SVG contains red dot #E60012', () => {
+    expect(WORDMARK_SVG_POSITIVE).toContain('#E60012');
   });
 });
 
-describe('logoSvgPaths', () => {
-  const opts = { x: 0, y: 0, cellSize: 10, gap: 2 };
-
-  it('returns exactly 9 <rect> strings', () => {
-    const paths = logoSvgPaths(opts);
-    expect(paths).toHaveLength(9);
-    for (const p of paths) {
-      expect(p).toMatch(/^<rect /);
-    }
+describe('exportBrand helpers', () => {
+  it('provenanceLine includes site URL, date and version', () => {
+    const line = provenanceLine('generator', '2026-10-28');
+    expect(line).toContain('calib.tools/tools/generator');
+    expect(line).toContain('2026-10-28');
+    expect(line).toContain('v0.1.0');
   });
 
-  it('first cell (even, BRAND_RED) is at x=0, y=0', () => {
-    const paths = logoSvgPaths(opts);
-    expect(paths[0]).toContain('x="0"');
-    expect(paths[0]).toContain('y="0"');
-    expect(paths[0]).toContain(`fill="${BRAND_RED}"`);
-  });
-
-  it('second cell (odd, BRAND_INK) is offset by cellSize+gap', () => {
-    const paths = logoSvgPaths(opts);
-    expect(paths[1]).toContain('x="12"');
-    expect(paths[1]).toContain('y="0"');
-    expect(paths[1]).toContain(`fill="${BRAND_INK}"`);
-  });
-
-  it('fourth cell (index 3, BRAND_INK) starts second row', () => {
-    // row 1, col 0 → x=0, y=cellSize+gap=12
-    const paths = logoSvgPaths(opts);
-    expect(paths[3]).toContain('x="0"');
-    expect(paths[3]).toContain('y="12"');
-  });
-
-  it('uses width and height equal to cellSize', () => {
-    const paths = logoSvgPaths(opts);
-    for (const p of paths) {
-      expect(p).toContain('width="10"');
-      expect(p).toContain('height="10"');
-    }
-  });
-
-  it('respects non-zero x and y origin', () => {
-    const paths = logoSvgPaths({ x: 5, y: 20, cellSize: 8, gap: 1 });
-    // first cell: x=5, y=20
-    expect(paths[0]).toContain('x="5"');
-    expect(paths[0]).toContain('y="20"');
-    // second cell: x=5+8+1=14, y=20
-    expect(paths[1]).toContain('x="14"');
-    expect(paths[1]).toContain('y="20"');
+  it('PRINT_NOTE is the correct disclaimer', () => {
+    expect(PRINT_NOTE).toContain('not measured');
+    expect(PRINT_NOTE).toContain('ruler');
   });
 });
 

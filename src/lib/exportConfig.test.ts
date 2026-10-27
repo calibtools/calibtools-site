@@ -27,7 +27,7 @@ describe('kalibrYaml', () => {
   });
 
   it('contains generator attribution', () => {
-    expect(kalibrYaml(checker)).toContain('Calib.Tools');
+    expect(kalibrYaml(checker)).toContain('calib.tools/tools/generator');
   });
 });
 
@@ -90,8 +90,8 @@ describe('config brand headers', () => {
   it('kalibrYaml has 3-line brand header at top', () => {
     const y = kalibrYaml(checker);
     const lines = y.split('\n');
-    expect(lines[0]).toMatch(/^# .+ · generated \d{4}-\d{2}-\d{2} · calib\.tools$/);
-    expect(lines[1]).toMatch(/^# Patterns and files © Calib\.Tools/);
+    expect(lines[0]).toMatch(/^# Checkerboard/);
+    expect(lines[1]).toMatch(/^# Generated with calib\.tools\/tools\/generator/);
     expect(lines[2]).toBe('#');
   });
 
@@ -104,7 +104,8 @@ describe('config brand headers', () => {
   it('ros2Yaml has 3-line brand header at top', () => {
     const y = ros2Yaml(checker);
     const lines = y.split('\n');
-    expect(lines[0]).toMatch(/^# .+ · generated \d{4}-\d{2}-\d{2} · calib\.tools$/);
+    expect(lines[0]).toMatch(/^# Checkerboard/);
+    expect(lines[1]).toMatch(/^# Generated with calib\.tools/);
   });
 
   it('ros2Yaml still parses', () => {
@@ -116,7 +117,8 @@ describe('config brand headers', () => {
   it('halconDescr has 3-line brand header at top', () => {
     const d = halconDescr(checker);
     const lines = d.split('\n');
-    expect(lines[0]).toMatch(/^# .+ · generated \d{4}-\d{2}-\d{2} · calib\.tools$/);
+    expect(lines[0]).toMatch(/^# Checkerboard/);
+    expect(lines[1]).toMatch(/^# Generated with calib\.tools/);
   });
 
   it('halconDescr still has all inner corner positions', () => {

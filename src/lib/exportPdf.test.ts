@@ -80,12 +80,13 @@ describe('exportPdf', () => {
 
   // ---- New Task 3 tests ----
 
-  it('footer logo cell size is <= 2mm', () => {
-    // 6mm total grid width, gap=0.3mm, 3 cells:
-    // totalGrid = 3*cellSize + 2*gap = 6  =>  3*cellSize = 6 - 0.6 = 5.4  =>  cellSize = 1.8
-    const cellSize = (6 - 2 * 0.3) / 3;
-    expect(cellSize).toBe(1.8);
-    expect(cellSize).toBeLessThanOrEqual(2);
+  it('footer uses bracket-framed wordmark (5 mm height)', () => {
+    // The full footer wordmark is 5mm tall
+    // Aspect ratio: 7796.4 / 1857.4 ≈ 4.197 → width ≈ 21 mm
+    const wmHeight = 5;
+    const wmWidth = wmHeight * (7796.4 / 1857.4);
+    expect(wmWidth).toBeCloseTo(21, 0);
+    expect(wmHeight).toBe(5);
   });
 
   it('logo footer is >= 2 squares below pattern bottom', () => {

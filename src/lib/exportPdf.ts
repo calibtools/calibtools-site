@@ -6,14 +6,18 @@
 import { PDFDocument, rgb } from 'pdf-lib';
 import fontkit from '@pdf-lib/fontkit';
 import type { PatternSpec } from './patterns';
+import { BRAND_RED_RGB, BRAND_INK_RGB } from './brand';
 import {
-  BRAND_RED_RGB,
-  BRAND_INK_RGB,
   BRAND_NAME,
-  BRAND_URL,
-  LOGO_CELLS,
+  SITE_URL,
+  PRINT_NOTE,
   patternSummary,
-} from './brand';
+  provenanceLine,
+  WORDMARK_PATHS,
+  WORDMARK_FRAME_RECTS,
+  WORDMARK_DOT_RECT,
+  WORDMARK_VB,
+} from './exportBrand';
 
 /** Conversion factor: millimetres → PDF points. */
 export const MM = 72 / 25.4;
@@ -136,7 +140,7 @@ export async function exportPdf({ spec, pw, ph, fontBytes }: PdfExportOptions): 
 
     // Label text (right) — use patternSummary + brand
     const summary = patternSummary(spec);
-    const rightText = `${summary} \u00B7 ${BRAND_NAME}`;
+    const rightText = `${summary} \u00B7 ${SITE_URL}`;
     const rightW = fontMono.widthOfTextAtSize(rightText, fontSize);
     const [rx, ry] = pt(ox + bw, sbY + 4);
     page.drawText(rightText, { x: rx - rightW, y: ry, size: fontSize, font: fontMono, color: rgb(0.2, 0.2, 0.2) });
@@ -148,87 +152,85 @@ export async function exportPdf({ spec, pw, ph, fontBytes }: PdfExportOptions): 
   const patternBottom = oy + bh;
   const fullFooterY = Math.max(scaleBarBottom + 4, patternBottom + 2 * spec.square);
 
-  if (fullFooterY + 10 < ph) {
-    // Tier 1: Full footer
-    const cellSize = 1.8;
-    const gap = 0.3;
-    const step = cellSize + gap;
-
-    for (const cell of LOGO_CELLS) {
-      const cx = ox + cell.col * step;
-      const cy = fullFooterY + cell.row * step;
-      const fillRgb = cell.fill === '#E60012' ? BRAND_RED_RGB : BRAND_INK_RGB;
-      const [rx, ry] = pt(cx, cy + cellSize);
-      page.drawRectangle({
-        x: rx, y: ry,
-        width: cellSize * MM, height: cellSize * MM,
-        color: rgb(fillRgb.r, fillRgb.g, fillRgb.b),
+  /** Draw the bracket-framed wordmark at (xMm, yMm) with given height in mm. */
+  const drawWordmark = (xMm: number, yMm: number, hMm: number) => {
+    const s = hMm * MM / WORDMARK_VB.height;
+    // PDF drawSvgPath: pdfX = x + svgX*s, pdfY = y - svgY*s
+    const pdfX = xMm * MM - WORDMARK_VB.minX * s;
+    const pdfY = pageH - yMm * MM + WORDMARK_VB.minY * s;
+    // Letter outlines (black)
+    for (const d of WORDMARK_PATHS) {
+      page.drawSvgPath(d, {
+        x: pdfX, y: pdfY, scale: s,
+        color: rgb(BRAND_INK_RGB.r, BRAND_INK_RGB.g, BRAND_INK_RGB.b),
       });
     }
-
-    const wordmarkX = ox + 6 + 2;
-    const wordmarkFontSize = 4 * MM;
-    const wordmarkY = fullFooterY + 3;
-    const [wmx, wmy] = pt(wordmarkX, wordmarkY + 4);
-
-    const calibWidth = fontSemiBold.widthOfTextAtSize('calib', wordmarkFontSize);
-    page.drawText('calib', {
-      x: wmx, y: wmy, size: wordmarkFontSize, font: fontSemiBold,
-      color: rgb(BRAND_INK_RGB.r, BRAND_INK_RGB.g, BRAND_INK_RGB.b),
-    });
-    page.drawText('.tools', {
-      x: wmx + calibWidth, y: wmy, size: wordmarkFontSize, font: fontSemiBold,
+    // Frame bracket rects (black)
+    for (const [rx, ry, rw, rh] of WORDMARK_FRAME_RECTS) {
+      page.drawRectangle({
+        x: pdfX + rx * s,
+        y: pdfY - (ry + rh) * s,
+        width: rw * s, height: rh * s,
+        color: rgb(BRAND_INK_RGB.r, BRAND_INK_RGB.g, BRAND_INK_RGB.b),
+      });
+    }
+    // Red dot
+    const [dx, dy, dw, dh] = WORDMARK_DOT_RECT;
+    page.drawRectangle({
+      x: pdfX + dx * s,
+      y: pdfY - (dy + dh) * s,
+      width: dw * s, height: dh * s,
       color: rgb(BRAND_RED_RGB.r, BRAND_RED_RGB.g, BRAND_RED_RGB.b),
     });
+  };
+
+  if (fullFooterY + 14 < ph) {
+    // Tier 1: Full footer — wordmark + parameter + provenance + print note
+    drawWordmark(ox, fullFooterY, 5);
 
     const summary = patternSummary(spec);
-    const centreText = `${summary} \u00B7 ${bw} \u00D7 ${bh} mm`;
-    const centreFontSize = 2.4 * MM;
-    const centreW = fontMono.widthOfTextAtSize(centreText, centreFontSize);
-    const centreXPt = (ox + bw / 2) * MM - centreW / 2;
-    const centreYPt = pageH - (fullFooterY + 3 + 2.4) * MM;
-    page.drawText(centreText, {
-      x: centreXPt, y: centreYPt, size: centreFontSize, font: fontMono,
+    const provenance = provenanceLine('generator');
+    const paramFontSize = 2.2 * MM;
+    const provFontSize = 1.8 * MM;
+    const noteFontSize = 1.6 * MM;
+
+    const textCentreX = (ox + bw / 2) * MM;
+
+    // Parameter line
+    const paramText = summary;
+    const paramW = fontMono.widthOfTextAtSize(paramText, paramFontSize);
+    const paramYPt = pageH - (fullFooterY + 5 + 2) * MM;
+    page.drawText(paramText, {
+      x: textCentreX - paramW / 2, y: paramYPt, size: paramFontSize, font: fontMono,
+      color: rgb(0.2, 0.2, 0.2),
+    });
+
+    // Provenance line
+    const provW = fontMono.widthOfTextAtSize(provenance, provFontSize);
+    const provYPt = paramYPt - 3.2 * MM;
+    page.drawText(provenance, {
+      x: textCentreX - provW / 2, y: provYPt, size: provFontSize, font: fontMono,
       color: rgb(0.4, 0.4, 0.4),
     });
 
-    const dateStr = new Date().toISOString().slice(0, 10);
-    const rightText = `${BRAND_URL} \u00B7 ${dateStr}`;
-    const rightFontSize = 2.4 * MM;
-    const rightW = fontRegular.widthOfTextAtSize(rightText, rightFontSize);
-    const rightXPt = (ox + bw) * MM - rightW;
-    const rightYPt = pageH - (fullFooterY + 3 + 2.4) * MM;
-    page.drawText(rightText, {
-      x: rightXPt, y: rightYPt, size: rightFontSize, font: fontRegular,
-      color: rgb(0.4, 0.4, 0.4),
+    // Print note
+    const noteW = fontMono.widthOfTextAtSize(PRINT_NOTE, noteFontSize);
+    const noteYPt = provYPt - 2.8 * MM;
+    page.drawText(PRINT_NOTE, {
+      x: textCentreX - noteW / 2, y: noteYPt, size: noteFontSize, font: fontMono,
+      color: rgb(0.6, 0.6, 0.6),
     });
   } else {
     // Tier 2: Compact one-line footer
     const compactY = Math.max(scaleBarBottom + 2, patternBottom + 4);
     if (compactY + 6 < ph) {
-      const cellSize = 1.2;
-      const gap = 0.2;
-      const step = cellSize + gap;
-
-      for (const cell of LOGO_CELLS) {
-        const cx = ox + cell.col * step;
-        const cy = compactY + cell.row * step;
-        const fillRgb = cell.fill === '#E60012' ? BRAND_RED_RGB : BRAND_INK_RGB;
-        const [rx, ry] = pt(cx, cy + cellSize);
-        page.drawRectangle({
-          x: rx, y: ry,
-          width: cellSize * MM, height: cellSize * MM,
-          color: rgb(fillRgb.r, fillRgb.g, fillRgb.b),
-        });
-      }
-
-      const logoWidth = 3 * cellSize + 2 * gap;
-      const textX = ox + logoWidth + 1.5;
-      const textY = compactY + 2.8;
+      drawWordmark(ox, compactY, 3);
+      const wmWidth = 3 * (WORDMARK_VB.width / WORDMARK_VB.height);
       const summary = patternSummary(spec);
-      const compactText = `${summary} \u00B7 calib.tools`;
-      const compactFontSize = 2 * MM;
-      const [tx, ty] = pt(textX, textY);
+      const provenance = provenanceLine('generator');
+      const compactText = `${summary} \u00B7 ${provenance}`;
+      const compactFontSize = 1.8 * MM;
+      const [tx, ty] = pt(ox + wmWidth + 2, compactY + 3 * 0.7);
       page.drawText(compactText, {
         x: tx, y: ty, size: compactFontSize, font: fontMono,
         color: rgb(0.4, 0.4, 0.4),
@@ -261,7 +263,7 @@ export async function exportPdf({ spec, pw, ph, fontBytes }: PdfExportOptions): 
     BRAND_NAME,
   ]);
   doc.setProducer(`${BRAND_NAME} pdf-lib`);
-  doc.setCreator(BRAND_URL);
+  doc.setCreator(SITE_URL);
 
   return doc.save();
 }

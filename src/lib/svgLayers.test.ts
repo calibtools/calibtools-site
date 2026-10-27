@@ -83,19 +83,23 @@ describe('brandFooterSvg fallback tiers', () => {
     const ctx = makeCtx();
     const svg = brandFooterSvg(ctx);
     expect(svg).toContain('id="calibtools-brand"');
-    // Full footer has the wordmark "calib" text
-    expect(svg).toContain('font-size="4"');
+    // Full footer has the bracket-framed wordmark SVG
+    expect(svg).toContain('CALIB.TOOLS wordmark-framed');
+    // And the provenance line
+    expect(svg).toContain('Generated with calib.tools/tools/generator');
+    // And the print note
+    expect(svg).toContain('not measured');
   });
 
   it('tier 2: compact footer when page is tight', () => {
     const ctx = makeCtx();
-    // patternBottom=230, scaleBarEnd=244, fullFooterY=280 (needs 290)
-    // compactY=246 (needs 252). Set ph=260: too small for full, enough for compact.
-    ctx.ph = 260;
+    // Set page height tight — too small for full footer, enough for compact.
+    ctx.ph = 256;
     const svg = brandFooterSvg(ctx);
-    // Should have brand group but with compact styling
+    // Should have brand group with compact wordmark
     expect(svg).toContain('calibtools-brand');
-    expect(svg).toContain('font-size="2"');
+    expect(svg).toContain('CALIB.TOOLS wordmark-framed');
+    expect(svg).toContain('font-size="1.8"');
   });
 
   it('tier 3: warning when even compact does not fit', () => {
@@ -114,11 +118,10 @@ describe('brandFooterSvg fallback tiers', () => {
     expect(svg).toContain('Brand footer omitted');
   });
 
-  it('full footer uses Geist font families, not Inter or JetBrains', () => {
+  it('full footer uses Geist Mono font, not Inter or JetBrains', () => {
     const svg = brandFooterSvg(makeCtx());
     expect(svg).not.toContain('Inter');
     expect(svg).not.toContain('JetBrains');
-    expect(svg).toContain("'Geist'");
     expect(svg).toContain("'Geist Mono'");
   });
 });
