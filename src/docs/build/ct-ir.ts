@@ -474,7 +474,7 @@ export async function buildIR(opts: {
 
   // ── top grid ──
   const top =
-    `<div style="display:grid;grid-template-columns:1fr 1fr;gap:8mm;align-items:start;margin-bottom:3.2mm">` +
+    `<div style="display:grid;grid-template-columns:1fr 1fr;gap:8mm;align-items:start;margin-bottom:2.5mm">` +
     `<div><div class="tag" style="margin-bottom:1.2mm">Item</div>${identBlock(data)}</div>` +
     `<div><div class="tag" style="margin-bottom:1.2mm">Inspection</div>${inspectionBlock(data, meas, pending)}</div></div>${res}`;
 
@@ -484,11 +484,15 @@ export async function buildIR(opts: {
   const flatnessPoints = meas?.flatness_points ?? 25;
   const Uk2 = meas?.U_k2_um ?? 1.5;
   const refC = meas?.ref_c ?? 20;
+  const instrumentType = meas?.instrument?.type ?? 'optical CMM';
+  const gsName = `GS-${data.part_number.replace('CT-', '')}`;
   const methodText =
-    `Positions of all ${data.corners} ChArUco corners ${verb} on an optical CMM (${instrumentId}); flatness ` +
-    `${pending ? 'will be' : 'was'} measured at ${flatnessPoints} points. Expanded uncertainty U = ${Uk2} \u00b5m (k = 2). Results are corrected ` +
-    `to the reference temperature of ${refC} \u00b0C` +
-    (pending ? '.' : `; ambient temperature during measurement ${meas!.ambient_c} \u00b0C.`);
+    `All ${data.corners} ChArUco corners ${verb} by comparison against golden sample ${gsName} ` +
+    `(DAkkS-calibrated, certificate [number]) on ${instrumentType} (${instrumentId}); ` +
+    `flatness ${pending ? 'will be' : 'was'} measured at ${flatnessPoints} points. ` +
+    `Expanded uncertainty U = ${Uk2} \u00b5m (k = 2), combining golden-sample certificate and comparison uncertainties. ` +
+    `Results corrected to ${refC} \u00b0C reference` +
+    (pending ? '.' : `; ambient ${meas!.ambient_c} \u00b0C.`);
 
   // ── page 1 ──
   const page1 =
