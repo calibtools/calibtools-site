@@ -125,7 +125,7 @@ export default function Generator({ initialSpec }: GeneratorProps = {}) {
   useEffect(() => {
     if (!autoSize) return;
     const isInch = spec.paper === 'Letter' || spec.paper === 'Tabloid';
-    const best = smallestFittingPaper(boardW, boardH, spec.scaleBar, isInch);
+    const best = smallestFittingPaper(boardW, boardH, spec.square, isInch);
     if (best && best !== spec.paper) {
       set('paper', best);
     }
@@ -133,9 +133,8 @@ export default function Generator({ initialSpec }: GeneratorProps = {}) {
 
   const corners = (spec.rows - 1) * (spec.cols - 1);
   const markers = Math.floor((spec.rows * spec.cols) / 2);
-  const margin = 10;
   const fits = layout.fit === 'single';
-  const maxSquare = Math.floor(Math.min((pw - 2 * margin) / spec.cols, (ph - 2 * margin - 14) / spec.rows) * 10) / 10;
+  const maxSquare = Math.floor(Math.min((pw - 2 * layout.margin) / spec.cols, (ph - 2 * layout.margin - layout.quietZone * 2) / spec.rows) * 10) / 10;
 
   const download = (name: string, text: string, mime: string) => {
     const a = document.createElement('a');
@@ -529,7 +528,7 @@ export default function Generator({ initialSpec }: GeneratorProps = {}) {
       <div className="flex min-w-0 flex-1 basis-[520px] flex-col gap-4">
         <div className="flex flex-wrap justify-between gap-3 text-sm text-ink-muted">
           {!compactInfo && (
-            <span>Preview · {spec.paper} {layout.orientation} · {spec.rows} × {spec.cols} {spec.type}, {spec.square} mm squares</span>
+            <span>Preview · {spec.paper} {layout.orientation} · {spec.rows} × {spec.cols} {spec.type}, {spec.square} mm squares{layout.usableGrid ? ` · ${layout.usableGrid}` : ''}</span>
           )}
           <span className="font-mono">Board {boardW} × {boardH} mm <span className="text-ink-soft">({mmToIn(boardW)} × {mmToIn(boardH)} in)</span> · {corners} corners · {markers} markers</span>
           {productMatch && (
@@ -542,7 +541,7 @@ export default function Generator({ initialSpec }: GeneratorProps = {}) {
             <ul className="m-0 list-none space-y-1 pl-0 text-[13px]">
               <li>(a) <strong>Tile</strong> across {layout.tiling ? `${layout.tiling.cols} \u00D7 ${layout.tiling.rows} = ${layout.tiling.totalPages}` : ''} {spec.paper} sheets at 100 % scale with 10 mm overlap and crop marks.</li>
               {layout.reducedSpec && (
-                <li>(b) <strong>Reduce grid</strong>: {reductionNotice(spec.rows, spec.cols, layout.reducedSpec.rows, layout.reducedSpec.cols, spec.square)}.{' '}
+                <li>(b) <strong>Reduce grid</strong>: {reductionNotice(spec.rows, spec.cols, layout.reducedSpec.rows, layout.reducedSpec.cols, spec.square, layout.reducedSpec.orientation)}.{' '}
                   <button type="button" className="font-semibold underline" onClick={() => { set('rows', layout.reducedSpec!.rows); set('cols', layout.reducedSpec!.cols); }}>Apply</button>
                 </li>
               )}

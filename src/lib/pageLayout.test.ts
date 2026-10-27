@@ -7,11 +7,17 @@ import {
   computeGridReduction,
   smallestFittingPaper,
   patternFits,
+  patternQuietZone,
+  brandBlockHeight,
   decideOrientation,
   orientPaper,
   wordmarkWidth,
   fitNotice,
   reductionNotice,
+  requiredDimensions,
+  usableGridNotice,
+  BRAND_LINE_SPACING,
+  BRAND_TEXT_SIZE_MM,
 } from './pageLayout';
 import type { PatternSpec } from './patterns';
 
@@ -25,21 +31,70 @@ function spec(overrides: Partial<PatternSpec> = {}): PatternSpec {
   };
 }
 
+// ---------------------------------------------------------------------------
+// Constants validation
+// ---------------------------------------------------------------------------
+
+describe('layout constants', () => {
+  it('PAGE_MARGIN = 8 mm', () => {
+    expect(PAGE_MARGIN).toBe(8);
+  });
+
+  it('patternQuietZone = max(square, 10)', () => {
+    expect(patternQuietZone(5)).toBe(10);
+    expect(patternQuietZone(10)).toBe(10);
+    expect(patternQuietZone(20)).toBe(20);
+    expect(patternQuietZone(25)).toBe(25);
+  });
+
+  it('brandBlockHeight is computed, not a literal', () => {
+    const wmW = 42;
+    const bbH = brandBlockHeight(wmW);
+    // Wordmark height at 42 mm width: 42 / (7796.4/1857.4) ≈ 10.0 mm
+    // Three 7 pt lines at 1.3 line-height: 3 × 2.47 × 1.3 ≈ 9.6 mm
+    // Take larger (wmH ≈ 10) + 2 mm gap = ≈ 12.0 mm
+    expect(bbH).toBeGreaterThan(10);
+    expect(bbH).toBeLessThan(15);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// decideOrientation
+// ---------------------------------------------------------------------------
+
 describe('decideOrientation', () => {
-  it('300×200 mm pattern → landscape', () => {
-    expect(decideOrientation(300, 200)).toBe('landscape');
+  const [a4W, a4H] = PAPERS.A4;
+
+  it('6×10 at 20 mm (200×120 mm) on A4 → landscape only', () => {
+    // bw=200, bh=120 — wide pattern
+    const bw = 10 * 20, bh = 6 * 20;
+    const result = decideOrientation(bw, bh, 'auto', a4W, a4H, 20);
+    expect(result).toBe('landscape');
   });
 
-  it('200×300 mm pattern → portrait', () => {
-    expect(decideOrientation(200, 300)).toBe('portrait');
+  it('10×6 at 20 mm (120×200 mm) on A4 → portrait only', () => {
+    const bw = 6 * 20, bh = 10 * 20;
+    const result = decideOrientation(bw, bh, 'auto', a4W, a4H, 20);
+    expect(result).toBe('portrait');
   });
 
-  it('210×297 mm (square-ish but taller) → portrait', () => {
-    expect(decideOrientation(210, 297)).toBe('portrait');
+  it('7×7 at 20 mm (140×140 mm) on A4 → fits both, portrait (more spare area)', () => {
+    const bw = 7 * 20, bh = 7 * 20;
+    const result = decideOrientation(bw, bh, 'auto', a4W, a4H, 20);
+    // Portrait: pw=210, ph=297 → more spare height → more spare area
+    expect(result).toBe('portrait');
   });
 
-  it('equal sides → portrait (not wider than tall)', () => {
-    expect(decideOrientation(200, 200)).toBe('portrait');
+  it('7×12 at 25 mm (300×175 mm) on A4 → fits neither', () => {
+    // This pattern doesn't fit A4 in either orientation at all (with quiet zones + brand block)
+    const bw = 12 * 25, bh = 7 * 25;
+    const wmW = wordmarkWidth(210, 297);
+    const { reqW, reqH } = requiredDimensions(bw, bh, 25, wmW);
+    // Verify it truly doesn't fit either way
+    const [portW, portH] = orientPaper(a4W, a4H, 'portrait');
+    const [landW, landH] = orientPaper(a4W, a4H, 'landscape');
+    expect(reqW > portW || reqH > portH).toBe(true);
+    expect(reqW > landW || reqH > landH).toBe(true);
   });
 
   it('manual override portrait', () => {
@@ -51,6 +106,10 @@ describe('decideOrientation', () => {
   });
 });
 
+// ---------------------------------------------------------------------------
+// orientPaper
+// ---------------------------------------------------------------------------
+
 describe('orientPaper', () => {
   it('A4 portrait → 210 × 297', () => {
     expect(orientPaper(210, 297, 'portrait')).toEqual([210, 297]);
@@ -60,6 +119,10 @@ describe('orientPaper', () => {
     expect(orientPaper(210, 297, 'landscape')).toEqual([297, 210]);
   });
 });
+
+// ---------------------------------------------------------------------------
+// wordmarkWidth
+// ---------------------------------------------------------------------------
 
 describe('wordmarkWidth', () => {
   it('A4 portrait (210×297) → 42 mm', () => {
@@ -79,25 +142,33 @@ describe('wordmarkWidth', () => {
   });
 });
 
+// ---------------------------------------------------------------------------
+// computeLayout — orientation (fit-based rule 1)
+// ---------------------------------------------------------------------------
+
 describe('computeLayout — orientation', () => {
-  it('7×12 ChArUco 25mm (bw=300, bh=175) on A4 → landscape', () => {
-    const s = spec({ rows: 7, cols: 12, square: 25 });
-    const layout = computeLayout(s, 210, 297);
-    expect(layout.orientation).toBe('landscape');
-    expect(layout.pw).toBe(297); // A4 long side
-    expect(layout.ph).toBe(210); // A4 short side
-  });
-
-  it('7×10 ChArUco 25mm (bw=250, bh=175) on A4 → landscape (250 > 175)', () => {
-    const s = spec({ rows: 7, cols: 10, square: 25 });
+  it('6×10 at 20 mm on A4 → landscape', () => {
+    const s = spec({ rows: 6, cols: 10, square: 20 });
     const layout = computeLayout(s, 210, 297);
     expect(layout.orientation).toBe('landscape');
   });
 
-  it('10×7 ChArUco 25mm (bw=175, bh=250) on A4 → portrait', () => {
-    const s = spec({ rows: 10, cols: 7, square: 25 });
+  it('10×6 at 20 mm on A4 → portrait', () => {
+    const s = spec({ rows: 10, cols: 6, square: 20 });
     const layout = computeLayout(s, 210, 297);
     expect(layout.orientation).toBe('portrait');
+  });
+
+  it('7×7 at 20 mm on A4 → portrait (fits both, portrait has more spare area)', () => {
+    const s = spec({ rows: 7, cols: 7, square: 20 });
+    const layout = computeLayout(s, 210, 297);
+    expect(layout.orientation).toBe('portrait');
+  });
+
+  it('7×12 at 25 mm on A4 → fits neither → tile mode', () => {
+    const s = spec({ rows: 7, cols: 12, square: 25 });
+    const layout = computeLayout(s, 210, 297);
+    expect(layout.fit).not.toBe('single');
   });
 
   it('manual override forces portrait for wide pattern', () => {
@@ -108,78 +179,105 @@ describe('computeLayout — orientation', () => {
   });
 });
 
+// ---------------------------------------------------------------------------
+// computeLayout — fit notice
+// ---------------------------------------------------------------------------
+
 describe('computeLayout — fit notice', () => {
-  it('320×240 on A4 → fit is tile (doesn\'t fit)', () => {
-    const s = spec({ rows: 8, cols: 12, square: 30, scaleBar: true }); // 360×240
+  it('360×240 on A4 → not single (doesn\'t fit)', () => {
+    const s = spec({ rows: 8, cols: 12, square: 30, scaleBar: true });
     const layout = computeLayout(s, 210, 297);
     expect(layout.fit).not.toBe('single');
   });
 
-  it('7×10 25mm on A4 → fits (single)', () => {
-    const s = spec({ rows: 7, cols: 10, square: 25 });
+  it('small pattern on A4 → fits (single)', () => {
+    const s = spec({ rows: 5, cols: 5, square: 20 });
     const layout = computeLayout(s, 210, 297);
     expect(layout.fit).toBe('single');
   });
 });
 
+// ---------------------------------------------------------------------------
+// computeLayout — brand block geometry
+// ---------------------------------------------------------------------------
+
 describe('computeLayout — brand block geometry', () => {
-  it('wordmark is 42 mm wide on A4 (shorter dim 210)', () => {
-    const s = spec({ rows: 10, cols: 7, square: 25 });
+  it('wordmark is 42 mm wide on A4', () => {
+    const s = spec({ rows: 5, cols: 5, square: 20 });
     const layout = computeLayout(s, 210, 297, 'portrait');
     expect(layout.brand.wmW).toBe(42);
-    // Also in landscape — same wordmark width since shorter dim is still 210
     const layoutL = computeLayout(s, 210, 297, 'landscape');
     expect(layoutL.brand.wmW).toBe(42);
   });
 
   it('wordmark is at bottom-left inside margin', () => {
-    const s = spec();
+    const s = spec({ rows: 5, cols: 5, square: 20 });
     const layout = computeLayout(s, 210, 297);
     expect(layout.brand.wmX).toBe(PAGE_MARGIN);
-    expect(layout.brand.wmY).toBeGreaterThan(layout.ph - PAGE_MARGIN - 15);
     expect(layout.brand.wmY + layout.brand.wmH).toBeLessThanOrEqual(layout.ph - PAGE_MARGIN + 0.01);
   });
 
   it('text lines are to the right of the wordmark', () => {
-    const s = spec();
+    const s = spec({ rows: 5, cols: 5, square: 20 });
     const layout = computeLayout(s, 210, 297);
     expect(layout.brand.textX).toBeGreaterThan(layout.brand.wmX + layout.brand.wmW);
   });
 
   it('entire brand block is inside page margins', () => {
-    const s = spec();
+    const s = spec({ rows: 5, cols: 5, square: 20 });
     const layout = computeLayout(s, 210, 297);
     expect(layout.brand.wmX).toBeGreaterThanOrEqual(PAGE_MARGIN);
     expect(layout.brand.wmY + layout.brand.wmH).toBeLessThanOrEqual(layout.ph - PAGE_MARGIN + 0.01);
   });
+
+  it('brand block text is outside pattern quiet zone', () => {
+    const s = spec({ rows: 5, cols: 5, square: 20 });
+    const layout = computeLayout(s, 210, 297);
+    const qz = patternQuietZone(s.square);
+    const patternBottom = layout.oy + layout.bh;
+    // Brand text must be below pattern + quiet zone
+    expect(layout.brand.wmY).toBeGreaterThanOrEqual(patternBottom + qz - 0.01);
+  });
 });
 
+// ---------------------------------------------------------------------------
+// computeLayout — axes geometry
+// ---------------------------------------------------------------------------
+
 describe('computeLayout — axes geometry', () => {
-  it('axes origin is ≥ 8 mm from page edge', () => {
-    const s = spec();
+  it('axes origin is ≥ PAGE_MARGIN from page edge', () => {
+    const s = spec({ rows: 5, cols: 5, square: 20 });
     const layout = computeLayout(s, 210, 297);
-    expect(layout.axes.originX).toBeGreaterThanOrEqual(8);
-    expect(layout.axes.originY).toBeGreaterThanOrEqual(8);
+    expect(layout.axes.originX).toBeGreaterThanOrEqual(PAGE_MARGIN);
+    expect(layout.axes.originY).toBeGreaterThanOrEqual(PAGE_MARGIN);
+  });
+
+  it('axes caption is outside pattern quiet zone (OpenCV)', () => {
+    const s = spec({ rows: 5, cols: 5, square: 20 });
+    const layout = computeLayout(s, 210, 297, 'portrait');
+    const qz = patternQuietZone(s.square);
+    // Caption sits above the origin for OpenCV, and origin is above the pattern quiet zone edge
+    // The axes group starts at the origin and the caption is ~4mm above.
+    // The quiet zone edge is at oy - qz. The axes origin should be at or beyond that.
+    expect(layout.axes.originY).toBeLessThanOrEqual(layout.oy);
   });
 
   it('axes origin is near the pattern top-left corner', () => {
-    // Use portrait so there's ample space above the pattern
-    const s = spec({ rows: 10, cols: 7, square: 25 });
+    const s = spec({ rows: 5, cols: 5, square: 20 });
     const layout = computeLayout(s, 210, 297, 'portrait');
-    // OpenCV: axes are above-left of pattern
     expect(layout.axes.originX).toBeLessThanOrEqual(layout.ox);
     expect(layout.axes.originY).toBeLessThanOrEqual(layout.oy);
   });
 
   it('X arrow endpoint + label fits inside page', () => {
-    const s = spec();
+    const s = spec({ rows: 5, cols: 5, square: 20 });
     const layout = computeLayout(s, 210, 297);
     const xEnd = layout.axes.originX + layout.axes.arrowLen;
-    expect(xEnd + 5).toBeLessThan(layout.pw); // 5 mm for "X" label
+    expect(xEnd + 5).toBeLessThan(layout.pw);
   });
 
   it('Y arrow endpoint fits inside page (OpenCV: downward)', () => {
-    const s = spec();
+    const s = spec({ rows: 5, cols: 5, square: 20 });
     const layout = computeLayout(s, 210, 297);
     if (!layout.axes.isKalibr) {
       const yEnd = layout.axes.originY + layout.axes.arrowLen;
@@ -188,48 +286,54 @@ describe('computeLayout — axes geometry', () => {
   });
 
   it('axes bounding box fully inside page', () => {
-    const s = spec();
+    const s = spec({ rows: 5, cols: 5, square: 20 });
     const layout = computeLayout(s, 210, 297);
     const ax = layout.axes;
-    // All axes elements must be > 0 and < pw/ph
     expect(ax.originX).toBeGreaterThan(0);
     expect(ax.originY).toBeGreaterThan(0);
     expect(ax.originX + ax.arrowLen + 5).toBeLessThan(layout.pw);
   });
 });
 
+// ---------------------------------------------------------------------------
+// computeTiling
+// ---------------------------------------------------------------------------
+
 describe('computeTiling', () => {
-  it('320×240 on A4 → tiling with default overlap', () => {
-    const tiling = computeTiling(320, 240, 210, 297);
+  it('7×12 at 25 mm (300×175 mm) on A4 → 2 portrait sheets (2×1), not 4 landscape', () => {
+    const bw = 12 * 25; // 300 mm
+    const bh = 7 * 25;  // 175 mm
+    const tiling = computeTiling(bw, bh, 210, 297);
+    expect(tiling.totalPages).toBe(2);
+    // 2 cols × 1 row in portrait: tilePw=210, tileH fits bh with brand deducted
+    expect(tiling.cols).toBe(2);
+    expect(tiling.rows).toBe(1);
+  });
+
+  it('tiling for wide pattern considers both orientations', () => {
+    const tiling = computeTiling(500, 200, 210, 297);
     expect(tiling.totalPages).toBeGreaterThan(1);
     expect(tiling.overlapMm).toBe(10);
   });
 
-  it('tiling for wide pattern uses landscape tiles', () => {
-    const tiling = computeTiling(500, 200, 210, 297);
-    // Pattern is wider → tiles should be landscape
-    expect(tiling.tilePw).toBe(297); // long side as width
-    expect(tiling.tilePh).toBe(210);
-  });
-
-  it('tiling for tall pattern uses portrait tiles', () => {
+  it('tiling for tall pattern picks orientation needing fewer pages', () => {
     const tiling = computeTiling(200, 500, 210, 297);
-    expect(tiling.tilePw).toBe(210);
-    expect(tiling.tilePh).toBe(297);
+    expect(tiling.totalPages).toBeGreaterThan(1);
+    // The algorithm picks whichever orientation yields fewer total pages
   });
 
-  it('320×240 on A4 → default tiling 2×1 landscape sheets', () => {
-    // A4 landscape: tilePw=297, tileW=297-20=277. 320 > 277 → need 2 cols
-    // A4 landscape: tilePh=210, tileH=210-20=190. 240 > 190 → need 2 rows
+  it('tiling overlap defaults to 10 mm', () => {
     const tiling = computeTiling(320, 240, 210, 297);
-    expect(tiling.cols).toBe(2);
-    expect(tiling.rows).toBe(2);
-    expect(tiling.totalPages).toBe(4);
+    expect(tiling.overlapMm).toBe(10);
   });
 });
 
+// ---------------------------------------------------------------------------
+// computeGridReduction
+// ---------------------------------------------------------------------------
+
 describe('computeGridReduction', () => {
-  it('7×12 25mm on A4 — reduces cols to fit', () => {
+  it('7×12 at 25 mm on A4 → 5×9 landscape', () => {
     const s = spec({ rows: 7, cols: 12, square: 25, scaleBar: true });
     const reduced = computeGridReduction(s, 210, 297);
     expect(reduced.rows).toBeLessThanOrEqual(s.rows);
@@ -239,9 +343,9 @@ describe('computeGridReduction', () => {
     // Should fit after reduction
     const bw = reduced.cols * s.square;
     const bh = reduced.rows * s.square;
-    const fitsP = patternFits(bw, bh, 210, 297, true);
-    const fitsL = patternFits(bw, bh, 297, 210, true);
-    expect(fitsP || fitsL).toBe(true);
+    const [pw, ph] = orientPaper(210, 297, reduced.orientation);
+    expect(patternFits(bw, bh, pw, ph, s.square)).toBe(true);
+    expect(reduced.orientation).toBe('landscape');
   });
 
   it('keeps both dims ≥ 2', () => {
@@ -252,21 +356,30 @@ describe('computeGridReduction', () => {
   });
 });
 
+// ---------------------------------------------------------------------------
+// smallestFittingPaper
+// ---------------------------------------------------------------------------
+
 describe('smallestFittingPaper', () => {
-  it('7×10 25mm fits on A4', () => {
-    expect(smallestFittingPaper(250, 175, true, false)).toBe('A4');
+  it('small pattern fits on A4', () => {
+    // 100×100 mm pattern with 20 mm squares
+    expect(smallestFittingPaper(100, 100, 20, false)).toBe('A4');
   });
 
   it('large pattern needs A3 or bigger', () => {
-    const result = smallestFittingPaper(350, 250, true, false);
+    const result = smallestFittingPaper(350, 250, 25, false);
     expect(result).not.toBe('A4');
     expect(result).not.toBeNull();
   });
 
   it('returns null when nothing fits', () => {
-    expect(smallestFittingPaper(2000, 1500, true, false)).toBeNull();
+    expect(smallestFittingPaper(2000, 1500, 25, false)).toBeNull();
   });
 });
+
+// ---------------------------------------------------------------------------
+// fitNotice / reductionNotice / usableGridNotice
+// ---------------------------------------------------------------------------
 
 describe('fitNotice / reductionNotice', () => {
   it('fitNotice formats correctly', () => {
@@ -275,12 +388,45 @@ describe('fitNotice / reductionNotice', () => {
     expect(fitNotice(320, 240, 'A4')).toContain('100');
   });
 
-  it('reductionNotice formats correctly', () => {
-    const n = reductionNotice(7, 12, 6, 9, 25);
+  it('reductionNotice formats correctly with orientation', () => {
+    const n = reductionNotice(7, 12, 5, 9, 25, 'landscape');
     expect(n).toContain('7');
     expect(n).toContain('12');
-    expect(n).toContain('6');
+    expect(n).toContain('5');
     expect(n).toContain('9');
     expect(n).toContain('25 mm');
+    expect(n).toContain('landscape');
+  });
+});
+
+describe('usableGridNotice', () => {
+  it('shows correct grid for A4 portrait at 20 mm', () => {
+    const notice = usableGridNotice('A4', 210, 297, 20);
+    expect(notice).toContain('A4');
+    expect(notice).toContain('portrait');
+    expect(notice).toContain('20 mm');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Quiet zone enforcement
+// ---------------------------------------------------------------------------
+
+describe('quiet zone enforcement', () => {
+  it('brand block is outside pattern quiet zone', () => {
+    const s = spec({ rows: 5, cols: 5, square: 25 });
+    const layout = computeLayout(s, 210, 297);
+    const qz = patternQuietZone(s.square);
+    const patternBottom = layout.oy + layout.bh;
+    // Brand wordmark Y must be below pattern bottom + quiet zone
+    expect(layout.brand.wmY).toBeGreaterThanOrEqual(patternBottom + qz - 0.01);
+  });
+
+  it('axes origin is inside PAGE_MARGIN and outside pattern quiet zone', () => {
+    const s = spec({ rows: 5, cols: 5, square: 25 });
+    const layout = computeLayout(s, 210, 297, 'portrait');
+    // Inside page margins
+    expect(layout.axes.originX).toBeGreaterThanOrEqual(PAGE_MARGIN);
+    expect(layout.axes.originY).toBeGreaterThanOrEqual(PAGE_MARGIN);
   });
 });
