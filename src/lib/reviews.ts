@@ -18,6 +18,8 @@ export interface ReviewReply {
   date: string;
 }
 
+export type MaterialConnection = 'none' | 'free_sample' | 'discount' | 'insider';
+
 export interface Review {
   id: string;
   handle: string;
@@ -35,6 +37,20 @@ export interface Review {
   created: string;
   status: 'published' | `removed:${string}`;
   reply?: ReviewReply;
+  /** 'order' for invite-based reviews, 'imported' for external reviews. */
+  source: 'order' | 'imported';
+  /** Batch identifier for imported reviews. */
+  importBatch?: string;
+  /** Written permission on file (required for imported reviews). */
+  consent?: true;
+  /** Relationship between reviewer and Calib.Tools (required for imported reviews). */
+  materialConnection?: MaterialConnection;
+  /** Reviewer's organisation (optional, imported only). */
+  reviewerOrg?: string;
+  /** ISO-2 country code (optional, imported only). */
+  country?: string;
+  /** Language code (optional, imported only). */
+  language?: string;
 }
 
 export interface InviteToken {
@@ -59,21 +75,27 @@ export interface ReviewSummary {
   average: number;
   count: number;
   distribution: number[];
+  orderCount: number;
+  importedCount: number;
 }
 
 export function summarize(reviews: Review[]): ReviewSummary {
   const published = reviews.filter((r) => r.status === 'published');
   if (published.length === 0) {
-    return { average: 0, count: 0, distribution: [0, 0, 0, 0, 0] };
+    return { average: 0, count: 0, distribution: [0, 0, 0, 0, 0], orderCount: 0, importedCount: 0 };
   }
   const distribution = [0, 0, 0, 0, 0];
   let sum = 0;
+  let orderCount = 0;
+  let importedCount = 0;
   for (const r of published) {
     distribution[r.stars - 1]++;
     sum += r.stars;
+    if (r.source === 'imported') importedCount++;
+    else orderCount++;
   }
   const average = Math.round((sum / published.length) * 10) / 10;
-  return { average, count: published.length, distribution };
+  return { average, count: published.length, distribution, orderCount, importedCount };
 }
 
 export function sortReviews(
@@ -169,6 +191,6 @@ async function getAllReviews(): Promise<Review[]> {
 // Constants
 // ---------------------------------------------------------------------------
 
-export const HOW_REVIEWS_WORK = 'Only customers we e-mail after delivery can review. Each review is tied to an order number, and all reviews are published, including negative ones. We remove only spam or personal data, and say so where we do. We do not pay or discount for reviews.';
+export const HOW_REVIEWS_WORK = 'Order reviews are invited by e-mail after delivery and tied to an order. Shared reviews come from people who bought elsewhere or evaluated samples, published with their written permission; any free sample, discount or company connection is stated on the card. We publish every review we receive, positive or negative. We never offer anything in return for a favourable review and we do not edit review text. Reviews are never moved between products. We remove only spam or personal data, and say so where we do.';
 
-export const HOW_REVIEWS_WORK_SHORT = 'Reviews come only from customers we e-mail after delivery, are tied to an order, and are all published, negative ones included. No paid reviews.';
+export const HOW_REVIEWS_WORK_SHORT = 'Order reviews are invited after delivery; shared reviews are published with written permission. All reviews are published, negative ones included. No paid reviews.';

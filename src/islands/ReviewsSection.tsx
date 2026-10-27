@@ -6,6 +6,7 @@ import {
   HOW_REVIEWS_WORK,
   type Review, type ReviewSummary,
 } from '@/lib/reviews';
+import { MATERIAL_CONNECTION_LABEL } from '@/lib/claims';
 
 interface Props {
   reviews: Review[];
@@ -60,7 +61,9 @@ export default function ReviewsSection({ reviews, handle }: Props) {
           <p className="m-0 text-sm text-ink-muted">
             {summary.count === 0
               ? 'No ratings yet'
-              : `${summary.count} review${summary.count !== 1 ? 's' : ''}`}
+              : summary.importedCount > 0
+                ? `${summary.count} review${summary.count !== 1 ? 's' : ''} \u00B7 ${summary.orderCount} from orders \u00B7 ${summary.importedCount} shared with permission`
+                : `${summary.count} review${summary.count !== 1 ? 's' : ''}`}
           </p>
 
           {/* Distribution bars — only when count >= 6 */}
@@ -227,7 +230,13 @@ function ReviewCard({ review }: { review: Review }) {
       <div className="flex flex-wrap items-center gap-2 pt-1 text-xs text-ink-muted">
         <span className="font-semibold text-ink">{review.author.initials}</span>
         {review.author.companyType && <span>· {review.author.companyType}</span>}
-        <span>· Invited after delivery · order linked</span>
+        {review.source === 'imported' ? (
+          <span className="text-xs text-ink">
+            · {MATERIAL_CONNECTION_LABEL[review.materialConnection ?? 'none']}
+          </span>
+        ) : (
+          <span>· Invited after delivery · order linked</span>
+        )}
       </div>
 
       {/* Seller reply */}

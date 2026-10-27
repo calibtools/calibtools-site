@@ -37,6 +37,10 @@ const BANNED_PATTERNS = [
   /our\s+DAkkS\s+certificate/i,
   /\blab[- ]grade\b/i,
   /\bfactor\s+10\b/i,
+  /\bverified\s+buyer\b/i,
+  /\bverified\s+purchase\b/i,
+  /100\s*%?\s*real\s+reviews/i,
+  /\ball\s+5[- ]star\b/i,
 ];
 
 /** Phrases that are allowed even when they contain a banned word. */

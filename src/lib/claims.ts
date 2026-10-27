@@ -61,3 +61,15 @@ export const PRINT_NOTE =
 
 /** App version for provenance lines. */
 export const APP_VERSION = '0.1.0';
+
+// ── Review material-connection disclosures (FTC 16 CFR Part 255) ────
+
+import type { MaterialConnection } from './reviews';
+
+/** Visible label shown on each review card, keyed by materialConnection. */
+export const MATERIAL_CONNECTION_LABEL: Record<MaterialConnection, string> = {
+  none: 'Shared with permission \u00B7 bought through another channel',
+  free_sample: 'Reviewer received a free sample',
+  discount: 'Reviewer received a discount',
+  insider: 'Reviewer is connected to Calib.Tools',
+};
