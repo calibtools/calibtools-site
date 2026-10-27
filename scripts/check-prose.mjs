@@ -29,6 +29,12 @@ const BANNED_PATTERNS = [
   /days\s+delivery/i,
   /Calibrate\s+with\s+Confidence/i,
   /Shipped\s+fast/i,
+  /DAkkS[- ]certified/i,
+  /certified\s+by\s+DAkkS/i,
+  /DAkkS\s+certificate\s+included/i,
+  /our\s+DAkkS\s+certificate/i,
+  /\blab[- ]grade\b/i,
+  /\bfactor\s+10\b/i,
 ];
 
 /** Phrases that are allowed even when they contain a banned word. */
@@ -36,7 +42,9 @@ const ALLOWLIST = [
   'accredited third-party laboratory',
   'CNAS-accredited',
   'DAkkS-accredited',
+  'DAkkS-accredited laboratory',
   'DAkkS-calibrated',
+  'certificate from a DAkkS-accredited laboratory',
 ];
 
 /**
