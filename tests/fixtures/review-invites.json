@@ -1,0 +1,52 @@
+{
+  "invite:abc-already-sent": {
+    "email": "sent@example.com",
+    "handle": "charuco-composite",
+    "productTitle": "ChArUco composite board",
+    "token": "abc-already-sent",
+    "sent": true,
+    "used": false,
+    "sendAt": "2026-01-01T00:00:00Z",
+    "expiresAt": "2027-12-31T23:59:59Z"
+  },
+  "invite:def-already-used": {
+    "email": "used@example.com",
+    "handle": "checkerboard-composite",
+    "productTitle": "Checkerboard composite board",
+    "token": "def-already-used",
+    "sent": false,
+    "used": true,
+    "sendAt": "2026-01-01T00:00:00Z",
+    "expiresAt": "2027-12-31T23:59:59Z"
+  },
+  "invite:ghi-due-now": {
+    "email": "ready@example.com",
+    "handle": "charuco-ceramic",
+    "productTitle": "ChArUco ceramic board",
+    "token": "ghi-due-now",
+    "sent": false,
+    "used": false,
+    "sendAt": "2026-01-01T00:00:00Z",
+    "expiresAt": "2027-12-31T23:59:59Z"
+  },
+  "invite:jkl-future": {
+    "email": "future@example.com",
+    "handle": "charuco-composite",
+    "productTitle": "ChArUco composite board",
+    "token": "jkl-future",
+    "sent": false,
+    "used": false,
+    "sendAt": "2099-01-01T00:00:00Z",
+    "expiresAt": "2099-12-31T23:59:59Z"
+  },
+  "invite:mno-expired": {
+    "email": "expired@example.com",
+    "handle": "checkerboard-composite",
+    "productTitle": "Checkerboard composite board",
+    "token": "mno-expired",
+    "sent": false,
+    "used": false,
+    "sendAt": "2024-01-01T00:00:00Z",
+    "expiresAt": "2024-12-31T23:59:59Z"
+  }
+}
