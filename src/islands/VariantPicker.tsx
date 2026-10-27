@@ -6,6 +6,7 @@ import {
   type Product,
 } from '@/lib/shopify';
 import { computeSetBoards } from '@/lib/exportSet';
+import { LEAD_TIME } from '@/lib/claims';
 
 interface BoardSetImage {
   src: string;
@@ -400,7 +401,7 @@ export default function VariantPicker({ product, certVariantId, fixtureVariantId
       <a href="/quote/" className="text-sm text-ink-soft no-underline hover:text-ink">Need a quote or invoice/PO? <ArrowRight size={14} strokeWidth={1.6} aria-hidden="true" className="inline" /></a>
 
       <div className="grid grid-cols-2 gap-3 pt-2 text-sm text-ink-muted">
-        <span className="flex items-center gap-1.5"><Check size={18} strokeWidth={1.6} className="shrink-0 text-brand" aria-hidden="true" /> Ships in 1–2 days, 2–4 days in EU</span>
+        <span className="flex items-center gap-1.5"><Check size={18} strokeWidth={1.6} className="shrink-0 text-brand" aria-hidden="true" /> {LEAD_TIME}</span>
         <span className="flex items-center gap-1.5"><Check size={18} strokeWidth={1.6} className="shrink-0 text-brand" aria-hidden="true" /> Inspection report included</span>
         <span className="flex items-center gap-1.5"><Check size={18} strokeWidth={1.6} className="shrink-0 text-brand" aria-hidden="true" /> 30-day returns</span>
         <span className="flex items-center gap-1.5"><Check size={18} strokeWidth={1.6} className="shrink-0 text-brand" aria-hidden="true" /> Volume pricing from 5 pcs</span>

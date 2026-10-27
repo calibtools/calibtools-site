@@ -29,6 +29,8 @@ const BANNED_PATTERNS = [
   /days\s+delivery/i,
   /Calibrate\s+with\s+Confidence/i,
   /Shipped\s+fast/i,
+  /2[\u2013-]4\s*days/i,
+  /ships?\s+in\s+\d*\s*days/i,
   /DAkkS[- ]certified/i,
   /certified\s+by\s+DAkkS/i,
   /DAkkS\s+certificate\s+included/i,
