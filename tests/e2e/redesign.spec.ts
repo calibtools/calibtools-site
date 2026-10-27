@@ -246,3 +246,47 @@ test('brand-overlay.py config uses 300200 part numbers, not 300240', () => {
   expect(overlayScript).toContain('300200');
   expect(overlayScript).not.toContain('300240');
 });
+
+// ---------------------------------------------------------------------------
+// Tagline and micron claim guard
+// ---------------------------------------------------------------------------
+
+test('Home H1 displays TAGLINE in correct form', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/');
+  const h1 = page.locator('[data-hero-h1]');
+  const text = (await h1.innerText())?.replace(/\s+/g, ' ').trim().toUpperCase();
+  expect(text).toBe('KNOW YOUR TARGET TO THE MICRON');
+});
+
+test('Composite product page does not contain "micron"', async ({ page }) => {
+  await page.goto('/targets/charuco-composite/');
+  const body = await page.locator('main').textContent();
+  expect(body?.toLowerCase()).not.toContain('micron');
+});
+
+test('Composite collection page does not contain "micron"', async ({ page }) => {
+  await page.goto('/targets/collection/composite-boards/');
+  const body = await page.locator('main').textContent();
+  expect(body?.toLowerCase()).not.toContain('micron');
+});
+
+test('Checkerboard composite product page does not contain "micron"', async ({ page }) => {
+  await page.goto('/targets/checkerboard-composite/');
+  const body = await page.locator('main').textContent();
+  expect(body?.toLowerCase()).not.toContain('micron');
+});
+
+test('Composite product page screenshot 1440px', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/targets/charuco-composite/');
+  await page.waitForLoadState('networkidle');
+  await page.screenshot({ path: 'screenshots/product-composite-1440.png', fullPage: true });
+});
+
+test('Ceramic collection screenshot 1440px', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/targets/collection/ceramic-glass/');
+  await page.waitForLoadState('networkidle');
+  await page.screenshot({ path: 'screenshots/collection-ceramic-1440.png', fullPage: true });
+});

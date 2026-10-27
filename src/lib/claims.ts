@@ -23,5 +23,8 @@ export const CERT_CLAIM =
 /** Default Incoterm (to be confirmed). */
 export const INCOTERM = 'DAP' as const;
 
+/** Short inspection claim — used where the full INSPECTION_CLAIM is too long. */
+export const INSPECTION_CLAIM_SHORT = 'Measured before it ships';
+
 /** Primary tagline — used for the home H1, <title> suffix, OG fallback. */
-export const TAGLINE = 'Measured before it ships';
+export const TAGLINE = 'Know your target to the micron';
