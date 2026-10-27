@@ -23,23 +23,24 @@ OUT_DIR    = REPO / "src/assets/products/brand/dark"
 PREVIEW_DIR= SCRIPT_DIR / "brand-overlay-preview"
 JSON_PATH  = SCRIPT_DIR / "brand-overlay.json"
 FONT_DIR   = REPO / "public/fonts"
+WORDMARK_SVG = Path.home() / "Documents/Calib.Tools/05-品牌与设计/Logo/calibtools-brand-kit/05-product-marking/laser-wordmark-compact-mono.svg"
 
 # ── board specs (mm) ───────────────────────────────────────────────────
 BOARDS = {
     "B1": {
-        "board_mm": (300, 240),
+        "board_mm": (300, 200),
         "pattern_mm": (250, 175),
-        "text": "CALIB.TOOLS   CT-CHT-P-300240-2500   Checkerboard 7\u00d710 \u00b7 25 mm   SN 000093 \u00b7 Rev A",
+        "text": "CT-CHT-P-300200-F   Checkerboard 7\u00d710 \u00b7 25 mm   SN 000093 \u00b7 Rev A",
     },
     "B2": {
-        "board_mm": (300, 240),
+        "board_mm": (300, 200),
         "pattern_mm": (250, 175),
-        "text": "CALIB.TOOLS   CT-CHA-P-300240-2518   ChArUco 7\u00d710 \u00b7 25/18 mm \u00b7 DICT_6X6_250 \u00b7 IDs 0\u201334   SN 000127 \u00b7 Rev A",
+        "text": "CT-CHA-P-300200-6X6   ChArUco 7\u00d710 \u00b7 25/18 mm \u00b7 DICT_6X6_250 \u00b7 IDs 0\u201334   SN 000127 \u00b7 Rev A",
     },
     "B3": {
         "board_mm": (200, 150),
         "pattern_mm": (170, 120),
-        "text": "CALIB.TOOLS   CT-CHA-C-200150-1007   ChArUco 12\u00d717 \u00b7 10/7 mm \u00b7 DICT_6X6_250 \u00b7 IDs 0\u2013101   SN 000311 \u00b7 Rev A",
+        "text": "CT-CHA-C-200150-1007   ChArUco 12\u00d717 \u00b7 10/7 mm \u00b7 DICT_6X6_250 \u00b7 IDs 0\u2013101   SN 000311 \u00b7 Rev A",
     },
 }
 
@@ -115,6 +116,35 @@ def load_font(name, size):
     if path and path.exists():
         return ImageFont.truetype(str(path), size)
     return ImageFont.load_default()
+
+
+def load_font_black(size):
+    """Load Geist-Black (900) font for the wordmark."""
+    # Prefer OTF (reliable with Pillow) over woff2
+    otf = REPO / "src/assets/fonts/Geist-Black.otf"
+    if otf.exists():
+        return ImageFont.truetype(str(otf), size)
+    woff = FONT_DIR / "Geist-Black.woff2"
+    if woff.exists():
+        return ImageFont.truetype(str(woff), size)
+    return ImageFont.load_default()
+
+
+def render_wordmark_text(cap_h_px):
+    """Render 'CALIB.TOOLS' in Geist Black at the given cap height and return RGBA PIL Image."""
+    text = "CALIB.TOOLS"
+    font_size = max(8, int(round(cap_h_px)))
+    font = load_font_black(font_size)
+    colour = (51, 51, 51, 255)  # #333333
+
+    bbox = font.getbbox(text)
+    w = bbox[2] - bbox[0]
+    h = bbox[3] - bbox[1]
+
+    img = Image.new("RGBA", (w + 4, h + 4), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    draw.text((-bbox[0], -bbox[1]), text, font=font, fill=colour)
+    return img
 
 
 # ── detect command ─────────────────────────────────────────────────────
@@ -194,30 +224,32 @@ def make_overlay(board_spec, board_px_w, board_px_h, text_override=None, id_labe
     cap_h_mm = 0.01 * bh_mm  # 1% of board height
     cap_h_px = cap_h_mm * mm_to_px
 
-    # Font sizes — Pillow point size ≈ pixel size for screen
-    font_size = max(8, int(round(cap_h_px)))
-    font_sans = load_font("sans", font_size)
-    font_mono = load_font("mono", font_size)
+    # Render compact wordmark SVG at cap height
+    wm_img = render_wordmark_text(cap_h_px)
+    wm_w, wm_h = wm_img.size
 
-    # Split text: "CALIB.TOOLS" in sans, rest in mono
-    wordmark = "CALIB.TOOLS"
-    rest = text[len(wordmark):]
+    # Three-space gap between wordmark and the rest of the label
+    mono_font_size = max(6, int(round(cap_h_px * 0.86)))
+    font_mono = load_font("mono", mono_font_size)
+    gap_text = "   "
+    gap_bbox = font_mono.getbbox(gap_text)
+    gap_w = gap_bbox[2] - gap_bbox[0] if gap_bbox else int(mono_font_size * 1.5)
 
-    wm_bbox = font_sans.getbbox(wordmark)
-    wm_w = wm_bbox[2] - wm_bbox[0]
+    rest = "   " + text  # three-space gap before the text fields
     rest_bbox = font_mono.getbbox(rest)
     rest_w = rest_bbox[2] - rest_bbox[0]
+
     total_w = wm_w + rest_w
 
-    # Ensure ≤ 45% of board width
+    # Ensure ≤ 45% of board width — scale down if needed
     max_w = 0.45 * ow
     if total_w > max_w:
         ratio = max_w / total_w
-        font_size = max(6, int(font_size * ratio))
-        font_sans = load_font("sans", font_size)
-        font_mono = load_font("mono", font_size)
-        wm_bbox = font_sans.getbbox(wordmark)
-        wm_w = wm_bbox[2] - wm_bbox[0]
+        cap_h_px_scaled = cap_h_px * ratio
+        wm_img = render_wordmark_text(cap_h_px_scaled)
+        wm_w, wm_h = wm_img.size
+        mono_font_size = max(6, int(round(cap_h_px_scaled * 0.86)))
+        font_mono = load_font("mono", mono_font_size)
         rest_bbox = font_mono.getbbox(rest)
         rest_w = rest_bbox[2] - rest_bbox[0]
         total_w = wm_w + rest_w
@@ -226,9 +258,14 @@ def make_overlay(board_spec, board_px_w, board_px_h, text_override=None, id_labe
     baseline_y = oh - int(0.30 * margin_bot * mm_to_px)
     text_x = ow - int(margin_left * mm_to_px * 0.5) - total_w  # right-aligned within board
 
-    colour = (74, 74, 74, int(255 * 0.85))  # #4A4A4A at 85%
-    draw.text((text_x, baseline_y - font_size), wordmark, font=font_sans, fill=colour)
-    draw.text((text_x + wm_w, baseline_y - font_size), rest, font=font_mono, fill=colour)
+    colour = (51, 51, 51, 255)  # #333333 at 100%
+
+    # Paste wordmark SVG image
+    wm_y = baseline_y - wm_h
+    overlay.paste(wm_img, (text_x, wm_y), wm_img)
+
+    # Draw mono text after the wordmark
+    draw.text((text_x + wm_w, baseline_y - mono_font_size), rest, font=font_mono, fill=colour)
 
     # ── top-left margin: coordinate axes ──
     arrow_len_mm = 0.03 * bh_mm  # 3% of board height
@@ -362,7 +399,7 @@ def cmd_overlay(args):
             id_label = None
             if is_family_set and i < len(FAMILY_SET_OVERRIDES):
                 ov = FAMILY_SET_OVERRIDES[i]
-                base_text = "CALIB.TOOLS   CT-CHA-P-300240-2518   ChArUco 7\u00d710 \u00b7 25/18 mm \u00b7 DICT_6X6_250 \u00b7 "
+                base_text = "CT-CHA-P-300200-6X6   ChArUco 7\u00d710 \u00b7 25/18 mm \u00b7 DICT_6X6_250 \u00b7 "
                 text_override = f"{base_text}{ov['ids']}   {ov['sn']} \u00b7 Rev A"
                 id_label = ov["id_label"]
 

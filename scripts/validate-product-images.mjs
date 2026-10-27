@@ -50,7 +50,7 @@ for (const entry of catalog) {
 }
 
 // 4. Every WebP in handle folders is listed in JSON (skip brand/, report.md)
-const SKIP_DIRS = new Set(['brand']);
+const SKIP_DIRS = new Set(['brand', 'packaging']);
 for (const dirName of readdirSync(ROOT)) {
   const dirPath = join(ROOT, dirName);
   if (!statSync(dirPath).isDirectory()) continue;

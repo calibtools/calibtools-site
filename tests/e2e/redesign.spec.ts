@@ -1,4 +1,6 @@
 import { test, expect } from '@playwright/test';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 
 test('Desktop shows horizontal lockup on light page', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
@@ -133,4 +135,114 @@ test('Home page screenshot 390px', async ({ page }) => {
   await page.goto('/');
   await page.waitForLoadState('networkidle');
   await page.screenshot({ path: 'screenshots/home-390.png', fullPage: true });
+});
+
+// ---------------------------------------------------------------------------
+// Brand compliance: no red backgrounds except CTA buttons
+// ---------------------------------------------------------------------------
+
+test('No red background on home page except CTA buttons at 1440px', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/');
+  await page.waitForLoadState('networkidle');
+
+  const redBgElements = await page.evaluate(() => {
+    const results: { tag: string; classes: string; text: string }[] = [];
+    const isRedBg = (color: string) => {
+      // Match brand red backgrounds: rgb(230,0,18) or similar reds
+      const m = color.match(/rgb\((\d+),\s*(\d+),\s*(\d+)/);
+      if (!m) return false;
+      const [r, g, b] = [parseInt(m[1]), parseInt(m[2]), parseInt(m[3])];
+      return r > 180 && g < 60 && b < 60;
+    };
+
+    document.querySelectorAll('*').forEach((el) => {
+      const style = getComputedStyle(el);
+      if (isRedBg(style.backgroundColor)) {
+        const tag = el.tagName.toLowerCase();
+        const classes = el.className?.toString() ?? '';
+        const text = el.textContent?.trim().slice(0, 40) ?? '';
+        // Skip small decorative accents (dots, rule segments < 32px in any dimension)
+        const rect = el.getBoundingClientRect();
+        if (rect.width < 32 || rect.height < 8) return;
+        results.push({ tag, classes, text });
+      }
+    });
+    return results;
+  });
+
+  // Only <a> CTA buttons should have red backgrounds
+  for (const el of redBgElements) {
+    expect(
+      el.tag === 'a' || el.tag === 'button',
+      `Non-button element <${el.tag}> has red background: "${el.text}" (${el.classes})`
+    ).toBe(true);
+  }
+});
+
+test('No red background on home page except CTA buttons at 390px', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  await page.waitForLoadState('networkidle');
+
+  const redBgElements = await page.evaluate(() => {
+    const results: { tag: string; classes: string; text: string }[] = [];
+    const isRedBg = (color: string) => {
+      const m = color.match(/rgb\((\d+),\s*(\d+),\s*(\d+)/);
+      if (!m) return false;
+      const [r, g, b] = [parseInt(m[1]), parseInt(m[2]), parseInt(m[3])];
+      return r > 180 && g < 60 && b < 60;
+    };
+
+    document.querySelectorAll('*').forEach((el) => {
+      const style = getComputedStyle(el);
+      if (isRedBg(style.backgroundColor)) {
+        const tag = el.tagName.toLowerCase();
+        const classes = el.className?.toString() ?? '';
+        const text = el.textContent?.trim().slice(0, 40) ?? '';
+        const rect = el.getBoundingClientRect();
+        if (rect.width < 32 || rect.height < 8) return;
+        results.push({ tag, classes, text });
+      }
+    });
+    return results;
+  });
+
+  for (const el of redBgElements) {
+    expect(
+      el.tag === 'a' || el.tag === 'button',
+      `Non-button element <${el.tag}> has red background: "${el.text}" (${el.classes})`
+    ).toBe(true);
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Nav links font-weight 600
+// ---------------------------------------------------------------------------
+
+test('Nav links use font-weight 600 (SemiBold)', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/');
+  const navLinks = page.locator('nav a[href]:not([aria-label])').filter({ hasNotText: /Shop targets/ });
+  const count = await navLinks.count();
+  expect(count).toBeGreaterThan(0);
+  for (let i = 0; i < count; i++) {
+    const weight = await navLinks.nth(i).evaluate(
+      (el) => getComputedStyle(el).fontWeight,
+    );
+    expect(weight).toBe('600');
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Overlay config: correct part numbers
+// ---------------------------------------------------------------------------
+
+test('brand-overlay.py config uses 300200 part numbers, not 300240', () => {
+  const overlayScript = readFileSync(
+    resolve(import.meta.dirname, '../../scripts/brand-overlay.py'),
+    'utf-8',
+  );
+  expect(overlayScript).toContain('300200');
+  expect(overlayScript).not.toContain('300240');
 });

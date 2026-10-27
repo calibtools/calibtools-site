@@ -16,11 +16,24 @@ The new system has four marks, each in positive (light bg) and negative (dark bg
 
 SVGs have non-standard viewBoxes (negative origins). Size only with CSS `height`; never set both `width` and `height`.
 
+### Clear-space rules
+
+- Around lockups/wordmarks: clear space = cap-height H of the word "CALIB" in that mark.
+- Around the C.T icon: clear space = 0.25 × icon diameter D.
+- Minimum rendered widths: lockup 140 px, compact wordmark 90 px, icon 16 px.
+
 ## Colour — red accent rule
 
-Red `#E60012` is used **only as an accent**: the square point, the X-axis arrow, and small highlights.
-It is never used as a background fill, full-width stripe, or large typographic element.
+Red `#E60012` is used **only as an accent** — roughly 1 % of any layout: the square point, the X-axis arrow,
+CTA buttons, and small highlights. It is never used as a background fill, full-width stripe, body-text colour,
+or large typographic element. On the home page only the two CTA buttons may use red as a background.
 Source: `06-colours/colours.json` in the brand kit.
+
+### Dark-theme red text token
+
+For text set against the dark ground (`#0A0A0A`), use `#FF3B47` instead of `#E60012` to meet 4.5:1 contrast.
+This is **not** in the brand kit — it is a site-derived token for WCAG compliance. The kit red stays for anything
+≥ 18 px and for decorative accents that are not essential text.
 
 ## Favicons and app icons
 
@@ -37,6 +50,33 @@ Manifest: `/site.webmanifest` (standalone, references `android-chrome-*.png` and
 - Static woff2 from kit: `public/fonts/Geist-Medium.woff2`, `Geist-Black.woff2`, `GeistMono-Medium.woff2`
 - OTF for PDF/stamp pipeline: `src/assets/fonts/Geist-Medium.otf`, `Geist-Black.otf`
 - License: SIL OFL 1.1 (`public/fonts/OFL.txt`)
+
+### Type weight hierarchy
+
+| Weight | Use |
+|---|---|
+| Geist Black (900) | Logo mark and short display lines only — never body or UI |
+| Bold (700) | Section headings |
+| SemiBold (600) | Sub-headings, labels, nav links |
+| Regular (400) | Body text |
+| Geist Mono | Technical data, code, product specs |
+
+### Deliberate additions outside the brand kit
+
+- **Geist Pixel Square** — used only for the inspection stamp centre word and rare display accents.
+  Never for body text, UI elements, or headings.
+- **Dark-theme red text `#FF3B47`** — see Colour section above.
+
+### Label line on product images
+
+The label at the bottom of each target image uses: compact wordmark outline
+(`05-product-marking/laser-wordmark-compact-mono.svg`) scaled so its cap height = 1 % of board height,
+followed by Geist Mono at 0.86 × that cap height, colour Grey 80 `#333333` at 100 % opacity,
+three-space gaps between fields: wordmark, part number, pattern summary, serial + revision.
+
+> **Note:** the kit's own label-line example (`label-line-example.pdf`) still shows the superseded
+> part number `300240-2500`. The site's `scripts/brand-overlay.py` config block is the source of truth
+> for current part numbers.
 
 ## Grey tokens
 
