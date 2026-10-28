@@ -66,9 +66,10 @@ function splitLive(items: { label: string; href: string; live?: boolean }[]) {
               {group.columns ? (
                 /* ── Mega-menu (Targets) ── */
                 <div
-                  class="absolute left-1/2 -translate-x-1/2 top-full mt-1 hidden w-[660px] rounded-lg border border-line bg-ground shadow-lg"
+                  class="absolute left-1/2 -translate-x-1/2 top-full pt-1 hidden w-[660px]"
                   data-nav-panel
                 >
+                  <div class="rounded-lg border border-line bg-ground shadow-lg">
                   <div class="grid grid-cols-3 gap-0 p-[var(--nav-space-5)]" data-mega-grid>
                     {group.columns.map((col) => {
                       const { live: liveItems, coming } = splitLive(col.items);
@@ -94,13 +95,15 @@ function splitLive(items: { label: string; href: string; live?: boolean }[]) {
                       );
                     })}
                   </div>
+                  </div>
                 </div>
               ) : (
                 /* ── Regular dropdown (Tools / Support) ── */
                 <div
-                  class="absolute left-0 top-full mt-1 hidden w-[280px] rounded-lg border border-line bg-ground shadow-lg"
+                  class="absolute left-0 top-full pt-1 hidden w-[280px]"
                   data-nav-panel
                 >
+                  <div class="rounded-lg border border-line bg-ground shadow-lg">
                   <div class="flex flex-col p-[var(--nav-space-1)]">
                     {group.items!.map((item, idx) => (
                       <a
@@ -119,6 +122,7 @@ function splitLive(items: { label: string; href: string; live?: boolean }[]) {
                         )}
                       </a>
                     ))}
+                  </div>
                   </div>
                 </div>
               )}
@@ -226,7 +230,7 @@ function splitLive(items: { label: string; href: string; live?: boolean }[]) {
               {allItems.map((item) => {
                 if (item.isHeading) {
                   return (
-                    <div class="font-mono text-[length:var(--nav-text-xs)] font-medium uppercase tracking-[0.06em] text-ink-soft mt-[var(--nav-space-3)] mb-[var(--nav-space-1)] px-[var(--nav-space-3)]">{item.label}</div>
+                    <div class="font-mono text-[length:var(--nav-text-sm)] font-bold uppercase tracking-[0.10em] text-ink mt-[var(--nav-space-3)] mb-[var(--nav-space-1)] px-[var(--nav-space-3)]">{item.label}</div>
                   );
                 }
                 if ('isComing' in item && item.isComing) {
@@ -277,8 +281,35 @@ function splitLive(items: { label: string; href: string; live?: boolean }[]) {
   }
   window.addEventListener('scroll', onScroll, { passive: true });
 
-  // ── Desktop disclosure navigation (APG pattern) ──
+  // ── Desktop disclosure navigation (APG pattern + menu-aim) ──
   const disclosures = document.querySelectorAll('[data-nav-disclosure]');
+  const hoverEnabled = matchMedia('(hover: hover)').matches;
+
+  // Menu-aim: ray-cast from prev→curr against panel rect
+  function shouldKeepOpen(prev: {x:number;y:number}, curr: {x:number;y:number}, r: DOMRect): boolean {
+    const dx = curr.x - prev.x, dy = curr.y - prev.y;
+    if (dx === 0 && dy === 0) return false;
+    let tMin = 0, tMax = Infinity;
+    if (dx !== 0) {
+      const t1 = (r.left - curr.x) / dx, t2 = (r.right - curr.x) / dx;
+      tMin = Math.max(tMin, Math.min(t1, t2));
+      tMax = Math.min(tMax, Math.max(t1, t2));
+    } else if (curr.x < r.left || curr.x > r.right) return false;
+    if (dy !== 0) {
+      const t1 = (r.top - curr.y) / dy, t2 = (r.bottom - curr.y) / dy;
+      tMin = Math.max(tMin, Math.min(t1, t2));
+      tMax = Math.min(tMax, Math.max(t1, t2));
+    } else if (curr.y < r.top || curr.y > r.bottom) return false;
+    return tMax >= tMin && tMax >= 0;
+  }
+
+  let closeTimer: ReturnType<typeof setTimeout> | null = null;
+  let intentTimer: ReturnType<typeof setTimeout> | null = null;
+  let prevPoint = { x: 0, y: 0 };
+  let activeDisc: Element | null = null;
+
+  function clearCloseTimer() { if (closeTimer) { clearTimeout(closeTimer); closeTimer = null; } }
+  function clearIntentTimer() { if (intentTimer) { clearTimeout(intentTimer); intentTimer = null; } }
 
   function openPanel(disc: Element) {
     const btn = disc.querySelector('[data-nav-trigger]') as HTMLButtonElement;
@@ -288,6 +319,7 @@ function splitLive(items: { label: string; href: string; live?: boolean }[]) {
     btn.setAttribute('aria-expanded', 'true');
     panel.classList.remove('hidden');
     chevron?.classList.add('rotate-180');
+    activeDisc = disc;
   }
 
   function closePanel(disc: Element) {
@@ -298,25 +330,66 @@ function splitLive(items: { label: string; href: string; live?: boolean }[]) {
     btn.setAttribute('aria-expanded', 'false');
     panel.classList.add('hidden');
     chevron?.classList.remove('rotate-180');
+    if (activeDisc === disc) activeDisc = null;
   }
 
   function closeAll(except?: Element) {
+    clearCloseTimer();
+    clearIntentTimer();
     disclosures.forEach((d) => { if (d !== except) closePanel(d); });
   }
+
+  // Track pointer for menu-aim
+  document.addEventListener('pointermove', (e) => {
+    prevPoint = { x: e.clientX, y: e.clientY };
+  }, { passive: true });
 
   disclosures.forEach((disc) => {
     const btn = disc.querySelector('[data-nav-trigger]') as HTMLButtonElement;
     const panel = disc.querySelector('[data-nav-panel]') as HTMLElement;
     if (!btn || !panel) return;
 
+    // Click toggle (keyboard & mouse)
     btn.addEventListener('click', () => {
       const isOpen = btn.getAttribute('aria-expanded') === 'true';
       closeAll(disc);
       if (isOpen) closePanel(disc); else openPanel(disc);
     });
 
-    disc.addEventListener('mouseenter', () => { closeAll(disc); openPanel(disc); });
-    disc.addEventListener('mouseleave', () => { closePanel(disc); });
+    if (hoverEnabled) {
+      // Pointer enters a trigger area
+      (disc as HTMLElement).addEventListener('pointerenter', (e: PointerEvent) => {
+        if (e.pointerType === 'touch') return;
+        clearCloseTimer();
+
+        if (activeDisc && activeDisc !== disc) {
+          // Another menu is open — use intent delay + menu-aim
+          clearIntentTimer();
+          intentTimer = setTimeout(() => {
+            const panelRect = (activeDisc!.querySelector('[data-nav-panel]') as HTMLElement)?.getBoundingClientRect();
+            const curr = { x: e.clientX, y: e.clientY };
+            if (panelRect && shouldKeepOpen(prevPoint, curr, panelRect)) {
+              // User is aiming at the active panel — don't switch yet
+              return;
+            }
+            closeAll(disc);
+            openPanel(disc);
+          }, 120);
+        } else {
+          closeAll(disc);
+          openPanel(disc);
+        }
+      });
+
+      // Pointer leaves the trigger+panel zone — start close timer
+      (disc as HTMLElement).addEventListener('pointerleave', (e: PointerEvent) => {
+        if (e.pointerType === 'touch') return;
+        clearIntentTimer();
+        closeTimer = setTimeout(() => { closePanel(disc); }, 220);
+      });
+    }
+
+    // Keyboard focus
     disc.addEventListener('focusin', () => { closeAll(disc); openPanel(disc); });
 
     panel.addEventListener('keydown', (e: KeyboardEvent) => {

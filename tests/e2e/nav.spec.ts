@@ -133,7 +133,16 @@ test.describe('Navigation — Mobile drawer', () => {
 });
 
 test.describe('Navigation — Accessibility', () => {
-  test('axe-core: nav and footer on FAQ page — 0 violations', async ({ page }) => {
+  test('axe-core: homepage nav and footer — 0 violations', async ({ page }) => {
+    await page.goto('/');
+    const results = await new AxeBuilder({ page })
+      .include('nav[aria-label="Main"]')
+      .include('footer')
+      .analyze();
+    expect(results.violations).toEqual([]);
+  });
+
+  test('axe-core: FAQ page nav and footer — 0 violations', async ({ page }) => {
     await page.goto('/faq/');
     const results = await new AxeBuilder({ page })
       .include('nav[aria-label="Main"]')
@@ -142,13 +151,97 @@ test.describe('Navigation — Accessibility', () => {
     expect(results.violations).toEqual([]);
   });
 
-  test('axe-core: targets page nav — 0 violations', async ({ page }) => {
+  test('axe-core: targets page nav and footer — 0 violations', async ({ page }) => {
     await page.goto('/targets/');
     const results = await new AxeBuilder({ page })
       .include('nav[aria-label="Main"]')
       .include('footer')
       .analyze();
     expect(results.violations).toEqual([]);
+  });
+});
+
+test.describe('Navigation — Mega-menu hover reliability', () => {
+  test.use({ viewport: { width: 1440, height: 900 } });
+
+  async function smoothMove(page: any, from: {x:number;y:number}, to: {x:number;y:number}, steps = 40, totalMs = 300) {
+    for (let s = 0; s <= steps; s++) {
+      const t = s / steps;
+      await page.mouse.move(from.x + (to.x - from.x) * t, from.y + (to.y - from.y) * t);
+      await page.waitForTimeout(Math.round(totalMs / steps));
+    }
+  }
+
+  test('path (i): straight down into panel keeps menu open', async ({ page }) => {
+    await page.goto('/');
+    const trigger = page.locator('[data-nav-trigger]').first();
+    await trigger.hover();
+    await page.waitForTimeout(200);
+    const panel = page.locator('[data-nav-panel]').first();
+    await expect(panel).toBeVisible();
+
+    const tBox = await trigger.boundingBox();
+    const pBox = await panel.boundingBox();
+    await smoothMove(page,
+      { x: tBox!.x + tBox!.width / 2, y: tBox!.y + tBox!.height },
+      { x: tBox!.x + tBox!.width / 2, y: pBox!.y + 40 },
+    );
+    await expect(panel).toBeVisible();
+  });
+
+  test('path (ii): diagonal to far column keeps menu open', async ({ page }) => {
+    await page.goto('/');
+    const trigger = page.locator('[data-nav-trigger]').first();
+    await trigger.hover();
+    await page.waitForTimeout(200);
+    const panel = page.locator('[data-nav-panel]').first();
+    await expect(panel).toBeVisible();
+
+    const tBox = await trigger.boundingBox();
+    const pBox = await panel.boundingBox();
+    await smoothMove(page,
+      { x: tBox!.x + tBox!.width / 2, y: tBox!.y + tBox!.height / 2 },
+      { x: pBox!.x + pBox!.width - 20, y: pBox!.y + pBox!.height / 2 },
+    );
+    await expect(panel).toBeVisible();
+  });
+
+  test('path (iii): exit sideways and return within 150ms keeps menu open', async ({ page }) => {
+    await page.goto('/');
+    const trigger = page.locator('[data-nav-trigger]').first();
+    await trigger.hover();
+    await page.waitForTimeout(200);
+    const panel = page.locator('[data-nav-panel]').first();
+    await expect(panel).toBeVisible();
+
+    const tBox = await trigger.boundingBox();
+    await page.mouse.move(tBox!.x - 50, tBox!.y + tBox!.height / 2);
+    await page.waitForTimeout(100);
+    await page.mouse.move(tBox!.x + tBox!.width / 2, tBox!.y + tBox!.height / 2);
+    await page.waitForTimeout(50);
+    await expect(panel).toBeVisible();
+  });
+
+  test('path (iv): slow drift 6px outside for 100ms does not close', async ({ page }) => {
+    await page.goto('/');
+    const trigger = page.locator('[data-nav-trigger]').first();
+    await trigger.hover();
+    await page.waitForTimeout(300);
+    const panel = page.locator('[data-nav-panel]').first();
+    await expect(panel).toBeVisible();
+
+    const pBox = await panel.boundingBox();
+    const cx = pBox!.x + pBox!.width / 2;
+    // Move inside panel
+    await page.mouse.move(cx, pBox!.y + pBox!.height - 2);
+    await page.waitForTimeout(50);
+    // Drift 6px outside
+    await page.mouse.move(cx, pBox!.y + pBox!.height + 6);
+    await page.waitForTimeout(100);
+    // Return
+    await page.mouse.move(cx, pBox!.y + pBox!.height - 10);
+    await page.waitForTimeout(50);
+    await expect(panel).toBeVisible();
   });
 });
 
