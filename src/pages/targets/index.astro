@@ -8,6 +8,8 @@ import { getImageMetadata } from '@/lib/productImageImports';
 import { breadcrumbLd } from '@/lib/seo';
 import { getEntry } from 'astro:content';
 import { IN_DEVELOPMENT } from '@/lib/claims';
+import { getReviewsForProduct, summarize } from '@/lib/reviews';
+import { getProductData } from '@/lib/productData';
 const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: 'Calibration targets' }]);
 
 const collections = await getCollections();
@@ -28,6 +30,33 @@ for (const p of products) {
     const meta = getImageMetadata(hero.handle, hero.file);
     if (meta) heroImageMap.set(p.handle, meta);
   }
+}
+
+// Build review + content data for cards
+const cardDataMap = new Map<string, { rating: number; count: number; summary?: string; chips?: Array<{ label: string; value: string }> }>();
+for (const p of products) {
+  const reviews = await getReviewsForProduct(p.handle);
+  const s = summarize(reviews.filter(r => r.status === 'published'));
+  const productContent = await getEntry('products', p.handle);
+  const pd = getProductData(p.handle, p.metafields ?? {});
+
+  let chips: Array<{ label: string; value: string }> | undefined;
+  if (productContent?.data.decideSpecs && pd) {
+    const allRows = pd.specGroups.flatMap(g => g.rows);
+    chips = productContent.data.decideSpecs
+      .map(key => {
+        const row = allRows.find(r => r.label === key);
+        return row ? { label: row.label, value: row.value } : null;
+      })
+      .filter((c): c is { label: string; value: string } => c !== null);
+  }
+
+  cardDataMap.set(p.handle, {
+    rating: s.average,
+    count: s.count,
+    summary: productContent?.data.summary,
+    chips,
+  });
 }
 ---
 <Base title="Calibration targets" section="targets" description="Checkerboard, ChArUco, AprilGrid, ceramic and glass calibration targets with inspection report. Made to order, shipped worldwide." jsonLd={bcLd}>
@@ -68,14 +97,18 @@ for (const p of products) {
         <div class="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
           {products.map((p) => {
             const localHero = heroImageMap.get(p.handle);
+            const cd = cardDataMap.get(p.handle);
             return (
               <ProductCard
                 href={p.url}
                 title={p.title}
+                summary={cd?.summary}
                 sub={p.description}
                 from={p.priceFrom}
                 localImage={localHero}
                 image={!localHero ? p.image : undefined}
+                rating={cd?.rating}
+                reviewCount={cd?.count}
               />
             );
           })}

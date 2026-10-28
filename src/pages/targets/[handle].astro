@@ -6,7 +6,7 @@ import type { GalleryImageData } from '@/islands/ImageGallery';
 import DownloadPicker from '@/islands/DownloadPicker';
 import MobileBottomCluster from '@/islands/MobileBottomCluster';
 import ProductCard from '@/components/ProductCard.astro';
-import { getProducts, getProductByHandle, sanitizeHtml } from '@/lib/shopify';
+import { getProducts, getProductByHandle } from '@/lib/shopify';
 import { kalibrYaml, ros2Yaml, halconDescr } from '@/lib/exportConfig';
 import { checkerboardSvg, type PatternSpec } from '@/lib/patterns';
 import { getProductFaq } from '@/lib/faq';
@@ -15,11 +15,12 @@ import { WARRANTY_TEXT, COMPLIANCE, PRODUCT_TO_COLLECTION } from '@/lib/constant
 import { getProductImages } from '@/lib/product-images';
 import { getImageMetadata } from '@/lib/productImageImports';
 import { optimizeProductImage } from '@/lib/optimizeProductImage';
-import { Ruler, Package, PackageOpen, Plug, CircleDot, Truck, HelpCircle, Plus, Download, Wand2, Columns2, MessageSquare, ArrowRight, ArrowUp, Clock, FileCheck as FileCheckIcon } from 'lucide-astro';
+import { Ruler, Package, Plug, CircleDot, Truck, HelpCircle, Plus, Download, Wand2, Columns2, MessageSquare, ArrowRight, ArrowUp, Clock, FileCheck as FileCheckIcon } from 'lucide-astro';
 import { getProductData } from '@/lib/productData';
 import ReviewsSection from '@/islands/ReviewsSection';
 import { LEAD_TIME } from '@/lib/claims';
 import Stars from '@/components/Stars';
+import Rating from '@/components/Rating.astro';
 import { getReviewsForProduct, summarize } from '@/lib/reviews';
 import { getImage, Picture } from 'astro:assets';
 import homeSetImage from '@/assets/products/brand/home-set.webp';
@@ -48,7 +49,7 @@ const fixtureVariantId = fixtureProduct?.variants[0]?.id;
 const certPrice = certProduct?.variants[0]?.price;
 const fixturePrice = fixtureProduct?.variants[0]?.price;
 
-const cleanDescription = sanitizeHtml(product.descriptionHtml);
+// descriptionHtml no longer rendered — story from product content replaces it
 
 // Lead-time eyebrow
 const anyAvailable = product.variants.some((v) => v.availableForSale);
@@ -60,26 +61,12 @@ const eyebrow = m.lead_time
       ? LEAD_TIME
       : 'Made to order';
 
-// Positioning: datasheet first sentence → product.description
-const positioning = productData?.positioning || product.description;
+// Product content from collection
+const productContent = await getEntry('products', handle!);
 
-// Key-specs strip cells
-type KeySpec = { label: string; value: string };
-const keySpecs: KeySpec[] = [];
-if (m.feature_tolerance) keySpecs.push({ label: 'Accuracy', value: m.feature_tolerance });
-const substrate = [m.material, m.thickness_mm ? `${m.thickness_mm} mm` : ''].filter(Boolean).join(' \u00B7 ');
-if (substrate) keySpecs.push({ label: 'Substrate', value: substrate });
-// Sizes: min–max from variant size options
-const sizeValues = product.variants
-  .map((v) => v.selectedOptions.find((o) => o.name === 'Size')?.value)
-  .filter(Boolean) as string[];
-if (sizeValues.length > 1) {
-  const nums = sizeValues.map((s) => parseInt(s, 10)).filter((n) => n > 0).sort((a, b) => a - b);
-  if (nums.length >= 2) keySpecs.push({ label: 'Sizes', value: `${nums[0]}\u2013${nums[nums.length - 1]} mm` });
-} else if (sizeValues.length === 1) {
-  keySpecs.push({ label: 'Size', value: sizeValues[0] });
-}
-if (m.flatness) keySpecs.push({ label: 'Flatness', value: m.flatness });
+// Summary from product content, fallback to positioning
+const positioning = productData?.positioning || product.description;
+const displaySummary = productContent?.data.summary || positioning;
 
 // Spec groups: prefer datasheet, fall back to metafield-based groups
 type SpecRow = { label: string; value: string };
@@ -120,6 +107,31 @@ if (productData && productData.specGroups.length > 0) {
     specGroup('Accuracy', ['feature_tolerance', 'flatness', 'cte', 'operating_temp']),
     specGroup('Deliverables', ['files_included', 'lead_time']),
   ].filter((g): g is SpecGroup => g !== null);
+}
+
+// Decide-specs chips: resolve keys against specGroups
+type KeySpec = { label: string; value: string };
+const keySpecs: KeySpec[] = [];
+if (productContent?.data.decideSpecs && specGroups.length > 0) {
+  const allRows = specGroups.flatMap(g => g.rows);
+  for (const key of productContent.data.decideSpecs) {
+    const row = allRows.find(r => r.label === key);
+    if (row) keySpecs.push({ label: row.label, value: row.value });
+  }
+} else {
+  if (m.feature_tolerance) keySpecs.push({ label: 'Accuracy', value: m.feature_tolerance });
+  const substrate = [m.material, m.thickness_mm ? `${m.thickness_mm} mm` : ''].filter(Boolean).join(' \u00B7 ');
+  if (substrate) keySpecs.push({ label: 'Substrate', value: substrate });
+  const sizeValues = product.variants
+    .map((v) => v.selectedOptions.find((o) => o.name === 'Size')?.value)
+    .filter(Boolean) as string[];
+  if (sizeValues.length > 1) {
+    const nums = sizeValues.map((s) => parseInt(s, 10)).filter((n) => n > 0).sort((a, b) => a - b);
+    if (nums.length >= 2) keySpecs.push({ label: 'Sizes', value: `${nums[0]}\u2013${nums[nums.length - 1]} mm` });
+  } else if (sizeValues.length === 1) {
+    keySpecs.push({ label: 'Size', value: sizeValues[0] });
+  }
+  if (m.flatness) keySpecs.push({ label: 'Flatness', value: m.flatness });
 }
 
 // --- Downloads ---
@@ -250,6 +262,24 @@ if (reviewSummary.count > 0) {
     bestRating: '5',
     worstRating: '1',
   };
+  // Up to 5 most recent published reviews
+  const recentReviews = productReviews
+    .filter(r => r.status === 'published')
+    .sort((a, b) => new Date(b.created).getTime() - new Date(a.created).getTime())
+    .slice(0, 5);
+  if (recentReviews.length > 0) {
+    productLd.review = recentReviews.map(r => ({
+      '@type': 'Review',
+      author: { '@type': 'Person', name: r.author.initials },
+      datePublished: r.created.split('T')[0],
+      reviewBody: r.body,
+      reviewRating: {
+        '@type': 'Rating',
+        ratingValue: r.stars,
+        bestRating: 5,
+      },
+    }));
+  }
 }
 
 // ── Spec explainers ("What this means" lines) ──
@@ -294,6 +324,17 @@ else if (handle?.includes('-ceramic')) compareProduct = allProducts.find((p) => 
 
 const collectionHandle = PRODUCT_TO_COLLECTION[handle!] ?? '';
 const collectionTitle = collectionHandle ? collectionHandle.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()) : '';
+
+// Pairs-with card data
+import { getEntry } from 'astro:content';
+const pairsWithCardData = new Map<string, { rating: number; count: number; summary?: string }>();
+for (const p of pairsWith) {
+  if (!p) continue;
+  const reviews = await getReviewsForProduct(p.handle);
+  const s = summarize(reviews.filter(r => r.status === 'published'));
+  const pc = await getEntry('products', p.handle);
+  pairsWithCardData.set(p.handle, { rating: s.average, count: s.count, summary: pc?.data.summary });
+}
 
 // FAQ
 const faqItems = getProductFaq(handle!);
@@ -352,17 +393,18 @@ const orderingRows = (productData?.orderingRows ?? []).map((row) => {
       {/* h1 */}
       <h1 class="h-display m-0 text-[28px] leading-[1.1] md:text-[36px]">{product.title}</h1>
 
-      {/* Review summary link */}
-      <a href="#reviews" class="inline-flex items-center gap-2 text-sm text-ink-muted no-underline hover:text-ink">
-        <Stars client:load rating={Math.round(reviewSummary.average)} size={14} />
-        {reviewSummary.count === 0
-          ? <span>No reviews yet · <span class="text-brand-dark">how reviews work ↓</span></span>
-          : <span>{reviewSummary.average.toFixed(1)} · {reviewSummary.count} review{reviewSummary.count !== 1 ? 's' : ''}</span>
-        }
-      </a>
+      {/* Review summary */}
+      {reviewSummary.count > 0 ? (
+        <Rating average={reviewSummary.average} count={reviewSummary.count} href="#reviews" size={14} />
+      ) : (
+        <a href="#reviews" class="inline-flex items-center gap-2 text-sm text-ink-muted no-underline hover:text-ink">
+          <Stars client:load rating={0} size={14} />
+          <span>No reviews yet · <span class="text-brand-dark">how reviews work ↓</span></span>
+        </a>
+      )}
 
-      {/* One-line positioning */}
-      <p class="m-0 text-[17px] leading-relaxed text-ink-muted">{positioning}</p>
+      {/* Summary */}
+      <p class="m-0 text-[17px] leading-relaxed text-ink-muted">{displaySummary}</p>
 
       {/* Key-specs strip */}
       {keySpecs.length > 0 && (
@@ -388,6 +430,15 @@ const orderingRows = (productData?.orderingRows ?? []).map((row) => {
       />
     </div>
   </section>
+
+  {/* ── Story ── */}
+  {productContent?.data.story && (
+    <div class="container-x pb-8 md:pb-12">
+      <div class="max-w-[640px] text-[15px] leading-relaxed text-ink-muted whitespace-pre-line">
+        {productContent.data.story}
+      </div>
+    </div>
+  )}
 
   {/* ── Sizes and part numbers ── */}
   {orderingRows.length > 0 && (
@@ -437,74 +488,113 @@ const orderingRows = (productData?.orderingRows ?? []).map((row) => {
     {/* Left column: accordions */}
     <div class="flex min-w-0 flex-[2] basis-[520px] flex-col divide-y divide-line border-y border-line">
 
-      {/* 1. Specifications */}
+      {/* 1. Specifications — always visible, never in disclosure */}
       {specGroups.length > 0 && (
-        <details class="group" id="specs-accordion" open>
-          <summary class="flex cursor-pointer list-none items-center justify-between gap-4 py-5 text-[20px] font-semibold [&::-webkit-details-marker]:hidden">
-            <span class="flex items-center gap-3"><Ruler size={22} stroke-width={1.6} class="text-ink-soft" aria-hidden="true" />Specifications</span>
-            <Plus size={22} stroke-width={1.6} class="shrink-0 text-ink-soft transition-transform group-open:rotate-45" aria-hidden="true" />
-          </summary>
-          <div class="flex flex-col gap-6 pb-6">
-            {specGroups.map((group) => (
-              <div>
-                <h3 class="m-0 pb-2 font-mono text-[12px] uppercase tracking-[0.16em] text-brand-dark">{group.title}</h3>
-                <table class="w-full border-collapse text-[14px]">
-                  <tbody>
-                    {group.rows.map((row, i) => (
-                      <>
-                        <tr class={`border-t border-line ${i % 2 === 1 ? 'bg-ground-alt' : ''}`}>
-                          <td class="w-[38%] py-2.5 pr-3 text-ink-muted">{row.label}</td>
-                          <td class="py-2.5 font-mono text-[14px]">{row.value}</td>
+        <section id="specifications" class="flex flex-col gap-6 pb-6 border-b border-line">
+          <h2 class="flex items-center gap-3 pt-5 text-[20px] font-semibold">
+            <Ruler size={22} stroke-width={1.6} class="text-ink-soft" aria-hidden="true" />
+            Specifications
+          </h2>
+          {specGroups.map((group) => (
+            <div>
+              <h3 class="m-0 pb-2 font-mono text-[12px] uppercase tracking-[0.16em] text-brand-dark">{group.title}</h3>
+              <table class="w-full border-collapse text-[14px]">
+                <tbody>
+                  {group.rows.map((row, i) => (
+                    <>
+                      <tr class={`border-t border-line ${i % 2 === 1 ? 'bg-ground-alt' : ''}`}>
+                        <td class="w-[38%] py-2.5 pr-3 text-ink-muted">{row.label}</td>
+                        <td class="py-2.5 font-mono text-[14px]">{row.value}</td>
+                      </tr>
+                      {specExplainers[row.label] && (
+                        <tr class={i % 2 === 1 ? 'bg-ground-alt' : ''}>
+                          <td colspan="2" class="px-3 pb-2.5 text-[12px] italic text-ink-soft" data-explainer>{specExplainers[row.label]}</td>
                         </tr>
-                        {specExplainers[row.label] && (
-                          <tr class={i % 2 === 1 ? 'bg-ground-alt' : ''}>
-                            <td colspan="2" class="px-3 pb-2.5 text-[12px] italic text-ink-soft" data-explainer>{specExplainers[row.label]}</td>
-                          </tr>
-                        )}
-                      </>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            ))}
-            {productData && (
-              <p class="m-0 text-[13px] text-ink-soft">
-                Values at 20&nbsp;&deg;C unless stated. Full tolerances in datasheet <code class="text-[12px]">{productData.datasheetCode}</code> rev&nbsp;{productData.rev}.
-              </p>
-            )}
-          </div>
-        </details>
+                      )}
+                    </>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ))}
+          {productData && (
+            <p class="m-0 text-[13px] text-ink-soft">
+              Values at 20&nbsp;&deg;C unless stated. Full tolerances in datasheet <code class="text-[12px]">{productData.datasheetCode}</code> rev&nbsp;{productData.rev}.
+            </p>
+          )}
+        </section>
       )}
 
       {/* 2. What's in the box & files */}
-      <details class="group">
+      <details class="group" id="in-the-box">
         <summary class="flex cursor-pointer list-none items-center justify-between gap-4 py-5 text-[20px] font-semibold [&::-webkit-details-marker]:hidden">
           <span class="flex items-center gap-3"><Package size={22} stroke-width={1.6} class="text-ink-soft" aria-hidden="true" />What&rsquo;s in the box &amp; files</span>
           <Plus size={22} stroke-width={1.6} class="shrink-0 text-ink-soft transition-transform group-open:rotate-45" aria-hidden="true" />
         </summary>
-        <div class="grid grid-cols-1 gap-4 pb-6 sm:grid-cols-2">
-          <div class="flex flex-col gap-2 text-[15px]">
-            <strong class="text-[13px] uppercase tracking-[0.08em] text-ink-muted">In the box</strong>
-            <ul class="m-0 flex flex-col gap-1.5 pl-4 text-[15px]">
-              <li>Calibration board in protective case</li>
-              <li>Dimensional inspection report (PDF)</li>
-              <li>Edge label with serial number</li>
-            </ul>
-          </div>
-          <div class="flex flex-col gap-2 text-[15px]">
-            <strong class="text-[13px] uppercase tracking-[0.08em] text-ink-muted">Digital files</strong>
-            <ul class="m-0 flex flex-col gap-1.5 pl-4 text-[15px]">
-              <li>Datasheet PDF &middot; DXF drawing</li>
-              <li>OpenCV JSON &middot; Kalibr YAML</li>
-              <li>HALCON .descr &middot; ROS 2 YAML</li>
-              <li>Per-feature coordinates CSV</li>
-            </ul>
+        <div class="flex flex-col gap-6 pb-6">
+          {isBoardProduct && (
+            <div class="grid grid-cols-2 gap-3">
+              <button type="button" class="overflow-hidden rounded border border-line" data-lightbox-trigger data-lightbox-src={pkgOpenImage.src}>
+                <Picture
+                  src={pkgOpenImage}
+                  widths={[280, 400]}
+                  formats={['avif', 'webp']}
+                  alt="Calib.Tools packaging — mailer box open, showing the board in closed-cell foam insert"
+                  class="w-full"
+                />
+              </button>
+              <button type="button" class="overflow-hidden rounded border border-line" data-lightbox-trigger data-lightbox-src={pkgExplodedImage.src}>
+                <Picture
+                  src={pkgExplodedImage}
+                  widths={[280, 400]}
+                  formats={['avif', 'webp']}
+                  alt="Calib.Tools packaging — exploded view showing box, foam inserts and board"
+                  class="w-full"
+                />
+              </button>
+            </div>
+          )}
+          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div class="flex flex-col gap-2 text-[15px]">
+              <strong class="text-[13px] uppercase tracking-[0.08em] text-ink-muted">In the box</strong>
+              <ul class="m-0 flex flex-col gap-1.5 pl-4 text-[15px]">
+                {isBoardProduct ? (
+                  <>
+                    <li>Calibration board</li>
+                    <li>Inspection report CT-IR-<em class="font-mono text-[13px] not-italic text-ink-muted">&lt;SN&gt;</em> (printed, and online at <a href="/verify/">/verify</a>)</li>
+                    <li>Datasheet</li>
+                    <li>Download card for pattern files</li>
+                    <li>Tamper seal with the serial number</li>
+                  </>
+                ) : (
+                  <>
+                    <li>Calibration board in protective case</li>
+                    <li>Dimensional inspection report (PDF)</li>
+                    <li>Edge label with serial number</li>
+                  </>
+                )}
+              </ul>
+              {isBoardProduct && (
+                <p class="m-0 text-[14px] leading-relaxed text-ink-muted">
+                  Self-locking mailer with closed-cell foam inserts. Box size S/M/L by board size.
+                </p>
+              )}
+            </div>
+            <div class="flex flex-col gap-2 text-[15px]">
+              <strong class="text-[13px] uppercase tracking-[0.08em] text-ink-muted">Digital files</strong>
+              <ul class="m-0 flex flex-col gap-1.5 pl-4 text-[15px]">
+                <li>Datasheet PDF &middot; DXF drawing</li>
+                <li>OpenCV JSON &middot; Kalibr YAML</li>
+                <li>HALCON .descr &middot; ROS 2 YAML</li>
+                <li>Per-feature coordinates CSV</li>
+              </ul>
+            </div>
           </div>
         </div>
       </details>
 
       {/* 3. Compatibility */}
-      <details class="group">
+      <details class="group" id="compatibility">
         <summary class="flex cursor-pointer list-none items-center justify-between gap-4 py-5 text-[20px] font-semibold [&::-webkit-details-marker]:hidden">
           <span class="flex items-center gap-3"><Plug size={22} stroke-width={1.6} class="text-ink-soft" aria-hidden="true" />Compatibility</span>
           <Plus size={22} stroke-width={1.6} class="shrink-0 text-ink-soft transition-transform group-open:rotate-45" aria-hidden="true" />
@@ -528,7 +618,7 @@ const orderingRows = (productData?.orderingRows ?? []).map((row) => {
       </details>
 
       {/* 4. Inspection report & certificate */}
-      <details class="group">
+      <details class="group" id="inspection">
         <summary class="flex cursor-pointer list-none items-center justify-between gap-4 py-5 text-[20px] font-semibold [&::-webkit-details-marker]:hidden">
           <span class="flex items-center gap-3"><CircleDot size={22} stroke-width={1.6} class="text-ink-soft" aria-hidden="true" />Inspection report &amp; certificate</span>
           <Plus size={22} stroke-width={1.6} class="shrink-0 text-ink-soft transition-transform group-open:rotate-45" aria-hidden="true" />
@@ -550,7 +640,7 @@ const orderingRows = (productData?.orderingRows ?? []).map((row) => {
       </details>
 
       {/* 5. Shipping, returns & warranty */}
-      <details class="group">
+      <details class="group" id="shipping">
         <summary class="flex cursor-pointer list-none items-center justify-between gap-4 py-5 text-[20px] font-semibold [&::-webkit-details-marker]:hidden">
           <span class="flex items-center gap-3"><Truck size={22} stroke-width={1.6} class="text-ink-soft" aria-hidden="true" />Shipping, returns &amp; warranty</span>
           <Plus size={22} stroke-width={1.6} class="shrink-0 text-ink-soft transition-transform group-open:rotate-45" aria-hidden="true" />
@@ -574,7 +664,7 @@ const orderingRows = (productData?.orderingRows ?? []).map((row) => {
 
       {/* 6. FAQ */}
       {faqItems.length > 0 && (
-        <details class="group">
+        <details class="group" id="faq">
           <summary class="flex cursor-pointer list-none items-center justify-between gap-4 py-5 text-[20px] font-semibold [&::-webkit-details-marker]:hidden">
             <span class="flex items-center gap-3"><HelpCircle size={22} stroke-width={1.6} class="text-ink-soft" aria-hidden="true" />Frequently asked questions</span>
             <Plus size={22} stroke-width={1.6} class="shrink-0 text-ink-soft transition-transform group-open:rotate-45" aria-hidden="true" />
@@ -627,56 +717,6 @@ const orderingRows = (productData?.orderingRows ?? []).map((row) => {
     </div>
   </section>
 
-  {/* ── What's in the box ── */}
-  {isBoardProduct && (
-    <section class="container-x flex flex-col gap-5 pb-12 md:pb-16">
-      <details class="group border-y border-line" open>
-        <summary class="flex cursor-pointer list-none items-center justify-between gap-4 py-5 text-[20px] font-semibold [&::-webkit-details-marker]:hidden">
-          <span class="flex items-center gap-3"><PackageOpen size={22} stroke-width={1.6} class="text-ink-soft" aria-hidden="true" />What&rsquo;s in the box</span>
-          <Plus size={22} stroke-width={1.6} class="shrink-0 text-ink-soft transition-transform group-open:rotate-45" aria-hidden="true" />
-        </summary>
-        <div class="grid grid-cols-1 gap-8 pb-8 md:grid-cols-2">
-          {/* Left: packaging renders */}
-          <div class="flex flex-col gap-4">
-            <div class="grid grid-cols-2 gap-3">
-              <button type="button" class="overflow-hidden rounded border border-line" data-lightbox-trigger data-lightbox-src={pkgOpenImage.src}>
-                <Picture
-                  src={pkgOpenImage}
-                  widths={[280, 400]}
-                  formats={['avif', 'webp']}
-                  alt="Calib.Tools packaging — mailer box open, showing the board in closed-cell foam insert"
-                  class="w-full"
-                />
-              </button>
-              <button type="button" class="overflow-hidden rounded border border-line" data-lightbox-trigger data-lightbox-src={pkgExplodedImage.src}>
-                <Picture
-                  src={pkgExplodedImage}
-                  widths={[280, 400]}
-                  formats={['avif', 'webp']}
-                  alt="Calib.Tools packaging — exploded view showing box, foam inserts and board"
-                  class="w-full"
-                />
-              </button>
-            </div>
-          </div>
-          {/* Right: contents list */}
-          <div class="flex flex-col gap-4">
-            <ul class="m-0 flex flex-col gap-2.5 pl-4 text-[15px]">
-              <li>Calibration board</li>
-              <li>Inspection report CT-IR-<em class="font-mono text-[13px] not-italic text-ink-muted">&lt;SN&gt;</em> (printed, and online at <a href="/verify/">/verify</a>)</li>
-              <li>Datasheet</li>
-              <li>Download card for pattern files</li>
-              <li>Tamper seal with the serial number</li>
-            </ul>
-            <p class="m-0 text-[14px] leading-relaxed text-ink-muted">
-              Ships in a self-locking mailer (FEFCO 0427) with closed-cell foam inserts; box size S&thinsp;/&thinsp;M&thinsp;/&thinsp;L by board size.
-            </p>
-          </div>
-        </div>
-      </details>
-    </section>
-  )}
-
   {/* ── Reviews ── */}
   <ReviewsSection client:load reviews={productReviews} handle={handle!} />
 
@@ -685,9 +725,22 @@ const orderingRows = (productData?.orderingRows ?? []).map((row) => {
     <section class="container-x flex flex-col gap-5 pb-16">
       <h2 class="h-display m-0 text-2xl">Pairs with</h2>
       <div class="grid grid-cols-2 gap-4 md:grid-cols-4">
-        {pairsWith.map((p) => p && (
-          <ProductCard href={p.url} title={p.title} sub={p.description} from={p.priceFrom} image={p.image} placeholder={p.title.toUpperCase()} />
-        ))}
+        {pairsWith.map((p) => p && (() => {
+          const cd = pairsWithCardData.get(p.handle);
+          return (
+            <ProductCard
+              href={p.url}
+              title={p.title}
+              summary={cd?.summary}
+              sub={p.description}
+              from={p.priceFrom}
+              image={p.image}
+              placeholder={p.title.toUpperCase()}
+              rating={cd?.rating}
+              reviewCount={cd?.count}
+            />
+          );
+        })())}
       </div>
     </section>
   )}
@@ -703,11 +756,21 @@ const orderingRows = (productData?.orderingRows ?? []).map((row) => {
 </Base>
 
 <script>
-  // Close specs accordion on mobile by default
-  if (window.innerWidth < 768) {
-    const specs = document.getElementById('specs-accordion');
-    if (specs) specs.removeAttribute('open');
+  // Open disclosure matching URL hash on load
+  if (location.hash) {
+    const id = location.hash.slice(1);
+    const el = document.getElementById(id);
+    if (el && el.tagName === 'DETAILS' && !(el as HTMLDetailsElement).open) (el as HTMLDetailsElement).open = true;
   }
+
+  // Update URL hash when a disclosure is toggled
+  document.querySelectorAll('details[id]').forEach((d) => {
+    d.addEventListener('toggle', () => {
+      if ((d as HTMLDetailsElement).open) {
+        history.replaceState(null, '', `#${d.id}`);
+      }
+    });
+  });
 
   // Ordering table row click → select size in VariantPicker
   document.querySelectorAll('[data-select-size]').forEach((row) => {

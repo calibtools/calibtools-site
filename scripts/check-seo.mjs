@@ -207,6 +207,26 @@ for (const file of htmlFiles) {
           if (!vo.availability) errors.push({ file: rel, rule: 'jsonld-product-availability', detail: `Variant "${variant.name}" offers missing availability` });
         }
       }
+      // aggregateRating shape validation
+      if (ld['@type'] === 'ProductGroup' && ld.aggregateRating) {
+        const ar = ld.aggregateRating;
+        if (ar['@type'] !== 'AggregateRating') errors.push({ file: rel, rule: 'jsonld-aggregate-type', detail: 'aggregateRating @type must be AggregateRating' });
+        if (typeof ar.ratingValue === 'undefined') errors.push({ file: rel, rule: 'jsonld-aggregate-rating', detail: 'aggregateRating missing ratingValue' });
+        if (typeof ar.reviewCount === 'undefined') errors.push({ file: rel, rule: 'jsonld-aggregate-count', detail: 'aggregateRating missing reviewCount' });
+        if (ar.bestRating !== '5' && ar.bestRating !== 5) errors.push({ file: rel, rule: 'jsonld-aggregate-best', detail: `aggregateRating bestRating must be 5, got ${ar.bestRating}` });
+      }
+      // review objects shape
+      if (ld['@type'] === 'ProductGroup' && ld.review) {
+        if (!Array.isArray(ld.review)) {
+          errors.push({ file: rel, rule: 'jsonld-review-array', detail: 'review must be an array' });
+        } else {
+          for (const rv of ld.review) {
+            if (rv['@type'] !== 'Review') errors.push({ file: rel, rule: 'jsonld-review-type', detail: 'review @type must be Review' });
+            if (!rv.author) errors.push({ file: rel, rule: 'jsonld-review-author', detail: 'review missing author' });
+            if (!rv.reviewRating) errors.push({ file: rel, rule: 'jsonld-review-rating', detail: 'review missing reviewRating' });
+          }
+        }
+      }
     }
   }
 

@@ -4,6 +4,7 @@ import ProductCard from '@/components/ProductCard.astro';
 import { ArrowRight, FileText, ExternalLink } from 'lucide-astro';
 import { getCollection, getEntry } from 'astro:content';
 import { getProducts } from '@/lib/shopify';
+import { getReviewsForProduct, summarize } from '@/lib/reviews';
 
 export async function getStaticPaths() {
   const guides = await getCollection('guides');
@@ -20,6 +21,16 @@ const allProducts = await getProducts();
 const linkedProducts = d.products
   .map((h: string) => allProducts.find((p) => p.handle === h))
   .filter(Boolean);
+
+// Review + content data for related product cards
+const guideCardData = new Map<string, { rating: number; count: number; summary?: string }>();
+for (const p of linkedProducts) {
+  if (!p) continue;
+  const reviews = await getReviewsForProduct(p.handle);
+  const s = summarize(reviews.filter(r => r.status === 'published'));
+  const pc = await getEntry('products', p.handle);
+  guideCardData.set(p.handle, { rating: s.average, count: s.count, summary: pc?.data.summary });
+}
 
 // Sample-file links
 const sampleLinks = {
@@ -157,9 +168,22 @@ const jsonLdItems = [articleLd, breadcrumbLd, ...(faqLd ? [faqLd] : [])];
         <div class="flex flex-col gap-4 border-t border-line pt-6">
           <span class="text-[13px] font-bold uppercase tracking-[0.06em] text-ink-soft">Related products</span>
           <div class="grid grid-cols-2 gap-4">
-            {linkedProducts.map((p) => p && (
-              <ProductCard href={p.url} title={p.title} sub={p.description} from={p.priceFrom} image={p.image} placeholder={p.title.toUpperCase()} />
-            ))}
+            {linkedProducts.map((p) => p && (() => {
+              const cd = guideCardData.get(p.handle);
+              return (
+                <ProductCard
+                  href={p.url}
+                  title={p.title}
+                  summary={cd?.summary}
+                  sub={p.description}
+                  from={p.priceFrom}
+                  image={p.image}
+                  placeholder={p.title.toUpperCase()}
+                  rating={cd?.rating}
+                  reviewCount={cd?.count}
+                />
+              );
+            })())}
           </div>
         </div>
       )}

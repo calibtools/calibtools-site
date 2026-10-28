@@ -7,7 +7,7 @@ import { globSync } from 'node:fs';
 import { readFileSync } from 'node:fs';
 import { resolve, relative } from 'node:path';
 
-const THRESHOLD = 360;
+const THRESHOLD = 300;
 const ROOT = resolve(import.meta.dirname, '..');
 
 // ---------------------------------------------------------------------------
@@ -185,3 +185,46 @@ if (banned.length > 0) {
 }
 
 console.log('[check-prose] OK — no banned phrases found.');
+
+// ---------------------------------------------------------------------------
+// Card text check (build-breaking) — [data-card] elements <= 220 chars
+// ---------------------------------------------------------------------------
+
+import { existsSync, readdirSync } from 'node:fs';
+import { join as pathJoin } from 'node:path';
+
+const CARD_THRESHOLD = 220;
+const distDir = resolve(ROOT, 'dist');
+const cardErrors = [];
+
+if (existsSync(distDir)) {
+  function findHtmlFiles(dir) {
+    const results = [];
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      const full = pathJoin(dir, entry.name);
+      if (entry.isDirectory()) results.push(...findHtmlFiles(full));
+      else if (entry.name.endsWith('.html')) results.push(full);
+    }
+    return results;
+  }
+
+  for (const file of findHtmlFiles(distDir)) {
+    const html = readFileSync(file, 'utf-8');
+    const cardRe = /<a[^>]*data-card[^>]*>([\s\S]*?)<\/a>/gi;
+    let cm;
+    while ((cm = cardRe.exec(html)) !== null) {
+      const text = cm[1].replace(/<[^>]+>/g, '').replace(/&\w+;/g, ' ').replace(/\s+/g, ' ').trim();
+      if (text.length > CARD_THRESHOLD) {
+        cardErrors.push({ file: relative(ROOT, file), chars: text.length, snippet: text.slice(0, 60) });
+      }
+    }
+  }
+}
+
+if (cardErrors.length > 0) {
+  console.error(`\n[check-prose] CARD TEXT TOO LONG (max ${CARD_THRESHOLD} chars):`);
+  for (const e of cardErrors) {
+    console.error(`  ${e.file} (${e.chars} chars) ${e.snippet}...`);
+  }
+  process.exit(1);
+}

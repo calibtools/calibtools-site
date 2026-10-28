@@ -1,0 +1,37 @@
+---
+/**
+ * Star rating display — renders nothing when count is 0.
+ * Used on product cards (no link) and product pages (with link to #reviews).
+ */
+interface Props {
+  average: number;
+  count: number;
+  /** When set, the component renders as an <a> linking to this href. */
+  href?: string;
+  size?: number;
+}
+
+const { average, count, href, size = 14 } = Astro.props;
+if (count === 0) return;
+const filled = Math.round(average);
+const label = `Rated ${average.toFixed(1)} out of 5 from ${count} review${count !== 1 ? 's' : ''}`;
+const Tag = href ? 'a' : 'span';
+---
+<Tag
+  {...(href ? { href } : {})}
+  class:list={[
+    'inline-flex items-center gap-1.5 text-sm',
+    href && 'no-underline text-ink-muted hover:text-ink',
+  ]}
+  aria-label={label}
+>
+  <span class="inline-flex gap-px" aria-hidden="true">
+    {Array.from({ length: 5 }, (_, i) => (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill={i < filled ? 'var(--color-brand)' : 'none'} stroke={i < filled ? 'none' : 'currentColor'} stroke-width="1.5" class={i >= filled ? 'text-line' : ''}>
+        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+      </svg>
+    ))}
+  </span>
+  <span class="text-ink-soft">{average.toFixed(1)}</span>
+  <span class="text-ink-soft">({count})</span>
+</Tag>
