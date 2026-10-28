@@ -1,0 +1,45 @@
+/**
+ * Nav typography tokens — 4px grid spacing, 14px base × 1.2 ratio type scale.
+ *
+ * Type scale (rounded to 4px grid):
+ *   --nav-text-xs:  11px  (14 / 1.2²  → 9.7 → 12 → 11 actual, mono headings)
+ *   --nav-text-sm:  12px  (14 / 1.2   → 11.7 → 12)
+ *   --nav-text-base:14px  (base)
+ *   --nav-text-md:  17px  (14 × 1.2   → 16.8 → 17, not used in nav currently)
+ *   --nav-text-lg:  20px  (14 × 1.2²  → 20.2 → 20, not used in nav currently)
+ *
+ * 4px spacing scale:
+ *   0, 4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48
+ */
+
+:root {
+  /* ── Type scale ── */
+  --nav-text-xs:   11px;
+  --nav-text-sm:   12px;
+  --nav-text-base: 14px;
+
+  /* ── Spacing (4px grid) ── */
+  --nav-space-1:   4px;
+  --nav-space-2:   8px;
+  --nav-space-3:  12px;
+  --nav-space-4:  16px;
+  --nav-space-5:  20px;
+  --nav-space-6:  24px;
+  --nav-space-8:  32px;
+  --nav-space-10: 40px;
+  --nav-space-11: 44px;
+  --nav-space-12: 48px;
+
+  /* ── Header heights ── */
+  --nav-header-h:          64px;   /* 16×4 grid */
+  --nav-header-h-scrolled: 56px;   /* 14×4, 8px smaller */
+
+  /* ── Button heights ── */
+  --nav-btn-h:    36px;  /* 9×4 */
+  --nav-cart-h:   40px;  /* 10×4 */
+
+  /* ── Weights ── */
+  --nav-weight-normal: 400;
+  --nav-weight-medium: 500;
+  --nav-weight-semi:   600;
+}

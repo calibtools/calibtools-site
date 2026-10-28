@@ -3,21 +3,21 @@ import { FOOTER_LINE } from '@/lib/claims';
 import { footerGroups } from '@/lib/nav';
 ---
 <footer class="border-t border-line-strong">
-  <div class="container-x grid grid-cols-2 gap-8 py-10 md:grid-cols-4 md:py-14">
+  <div class="container-x grid grid-cols-2 gap-[var(--nav-space-8)] py-[var(--nav-space-10)] md:grid-cols-4 md:py-[var(--nav-space-12)]">
     {footerGroups.map((group) => (
-      <div class="flex flex-col gap-3">
-        <span class="font-mono text-[12px] uppercase tracking-[0.08em] text-ink-soft">{group.heading}</span>
+      <div class="flex flex-col gap-[var(--nav-space-3)]">
+        <span class="font-mono text-[length:var(--nav-text-xs)] font-medium uppercase tracking-[0.06em] text-ink-soft">{group.heading}</span>
         {group.items.map((item) => (
-          <a href={item.href} class="text-sm text-ink-soft no-underline hover:text-ink">{item.label}</a>
+          <a href={item.href} class="text-[length:var(--nav-text-base)] leading-[20px] text-ink-soft no-underline hover:text-ink">{item.label}</a>
         ))}
       </div>
     ))}
   </div>
-  <div class="container-x border-t border-line-strong py-6">
-    <div class="flex items-center gap-3">
-      <img src="/brand/wordmark-framed-light.svg" alt="Calib.Tools" class="h-7 [html[data-theme=dark]_&]:hidden" />
-      <img src="/brand/wordmark-framed-dark.svg" alt="" class="h-7 hidden [html[data-theme=dark]_&]:block" aria-hidden="true" />
-      <span class="text-sm text-ink-soft">{FOOTER_LINE}</span>
+  <div class="container-x border-t border-line-strong py-[var(--nav-space-6)]">
+    <div class="flex items-center gap-[var(--nav-space-3)]">
+      <img src="/brand/wordmark-framed-light.svg" alt="Calib.Tools" class="h-6 [html[data-theme=dark]_&]:hidden" />
+      <img src="/brand/wordmark-framed-dark.svg" alt="" class="h-6 hidden [html[data-theme=dark]_&]:block" aria-hidden="true" />
+      <span class="text-[length:var(--nav-text-sm)] text-ink-soft">{FOOTER_LINE}</span>
     </div>
   </div>
 </footer>
