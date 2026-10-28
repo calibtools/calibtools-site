@@ -139,7 +139,7 @@ describe('AprilTag families', () => {
 
   it('decodeAprilBits returns correct grid size', () => {
     const f = getAprilFamily('36h11')!;
-    const grid = decodeAprilBits(f.codes[0], f.d);
+    const grid = decodeAprilBits(f.codes[0], f.d, f.bit_x, f.bit_y);
     expect(grid).toHaveLength(6);
     expect(grid[0]).toHaveLength(6);
     grid.flat().forEach(b => expect(b === 0 || b === 1).toBe(true));
@@ -147,5 +147,44 @@ describe('AprilTag families', () => {
 
   it('getAprilFamily returns undefined for unknown name', () => {
     expect(getAprilFamily('99h99')).toBeUndefined();
+  });
+
+  it('decodeAprilBits matches OpenCV reference PNGs', async () => {
+    const fixtureDir = resolve(__dirname, '../../../tests/fixtures/aruco');
+    const cases: { family: string; cvName: string; id: number; d: number }[] = [
+      { family: '16h5', cvName: 'APRILTAG_16h5', id: 0, d: 4 },
+      { family: '16h5', cvName: 'APRILTAG_16h5', id: 1, d: 4 },
+      { family: '16h5', cvName: 'APRILTAG_16h5', id: 29, d: 4 },
+      { family: '25h9', cvName: 'APRILTAG_25h9', id: 0, d: 5 },
+      { family: '25h9', cvName: 'APRILTAG_25h9', id: 1, d: 5 },
+      { family: '36h11', cvName: 'APRILTAG_36h11', id: 0, d: 6 },
+      { family: '36h11', cvName: 'APRILTAG_36h11', id: 1, d: 6 },
+      { family: '36h11', cvName: 'APRILTAG_36h11', id: 586, d: 6 },
+    ];
+
+    for (const { family, cvName, id, d } of cases) {
+      const pngPath = resolve(fixtureDir, `${cvName}_id${id}.png`);
+      if (!existsSync(pngPath)) continue;
+
+      const { data, info } = await sharp(pngPath)
+        .greyscale()
+        .raw()
+        .toBuffer({ resolveWithObject: true });
+      const cell = info.width / (d + 2);
+      const refGrid: number[][] = [];
+      for (let r = 0; r < d; r++) {
+        const row: number[] = [];
+        for (let c = 0; c < d; c++) {
+          const y = Math.floor((r + 1) * cell + cell / 2);
+          const x = Math.floor((c + 1) * cell + cell / 2);
+          row.push(data[y * info.width + x] > 127 ? 1 : 0);
+        }
+        refGrid.push(row);
+      }
+
+      const f = getAprilFamily(family)!;
+      const ourGrid = decodeAprilBits(f.codes[id], f.d, f.bit_x, f.bit_y);
+      expect(ourGrid, `AprilTag ${family} id ${id}`).toEqual(refGrid);
+    }
   });
 });
