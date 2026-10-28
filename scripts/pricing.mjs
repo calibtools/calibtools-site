@@ -105,7 +105,7 @@ export function checkMonotonicity(rows) {
 // Two anchor points (after applying ×1.175 rule):
 //   110×85  (93.5 cm²):  anchor €680 → €798  → €/cm² = 8.5348
 //   150×100 (150 cm²):   anchor €915 → €1076 → €/cm² = 7.1733
-const CERAMIC_P1 = { areaCm2: 93.5, eurPerCm2: 798 / 93.5 };
+const CERAMIC_P1 = { areaCm2: 93.5, eurPerCm2: 797 / 93.5 };
 const CERAMIC_P2 = { areaCm2: 150,  eurPerCm2: 1076 / 150 };
 export const CERAMIC_FIT = fitPowerLaw(
   CERAMIC_P1.areaCm2, CERAMIC_P1.eurPerCm2,
@@ -159,7 +159,7 @@ const CATALOGUE = [
   { sku: 'CT-CHA-P-800600', sizeKey: 'CHA-P-800600', handle: 'charuco-composite', family: 'CHA-P', widthMm: 800, heightMm: 600, anchorEur: 273, anchorSource: 'calib.io CCT800600 Alu/LDPE', note: '' },
 
   // ChArUco ceramic — owner decision A: calib.io anchor, power-law extrapolation
-  { sku: 'CT-CHA-C-110085', sizeKey: 'CHA-C-110085', handle: 'charuco-ceramic', family: 'CHA-C', widthMm: 110, heightMm: 85, anchorEur: 680, anchorSource: 'calib.io CCT100075F ceramic 100×75', note: 'Anchor one size smaller (calib.io 100×75 → our 110×85)' },
+  { sku: 'CT-CHA-C-110085', sizeKey: 'CHA-C-110085', handle: 'charuco-ceramic', family: 'CHA-C', widthMm: 110, heightMm: 85, anchorEur: 680, anchorSource: 'calib.io CCT100075F ceramic 100×75', note: 'Owner override €797/$887 (avoid repeated-digit look of 798/888)', ownerEur: 797, ownerUsd: 887 },
   { sku: 'CT-CHA-C-150100', sizeKey: 'CHA-C-150100', handle: 'charuco-ceramic', family: 'CHA-C', widthMm: 150, heightMm: 100, anchorEur: 915, anchorSource: 'calib.io CCT150100F ceramic 150×100', note: 'Like-for-like; not yet in Shopify' },
   { sku: 'CT-CHA-C-185110', sizeKey: 'CHA-C-185110', handle: 'charuco-ceramic', family: 'CHA-C', widthMm: 185, heightMm: 110, anchorEur: null, anchorSource: 'Power-law extrapolation from 110×85 + 150×100', note: `Extrapolated: €/cm² = ${CERAMIC_FIT.a.toFixed(2)} × area^${CERAMIC_FIT.b.toFixed(4)}` },
   { sku: 'CT-CHA-C-230140', sizeKey: 'CHA-C-230140', handle: 'charuco-ceramic', family: 'CHA-C', widthMm: 230, heightMm: 140, anchorEur: null, anchorSource: 'Power-law extrapolation from 110×85 + 150×100', note: `Extrapolated: €/cm² = ${CERAMIC_FIT.a.toFixed(2)} × area^${CERAMIC_FIT.b.toFixed(4)}` },
@@ -179,7 +179,14 @@ function generateLadder() {
     let proposedEur, proposedUsd, pctAbove;
     const sv = SHOPIFY_VARIANTS[item.sizeKey];
 
-    if (item.sku === 'CT-ACC-A-FIX-14') {
+    if (item.ownerEur != null) {
+      // Owner override with explicit EUR + USD
+      proposedEur = item.ownerEur;
+      proposedUsd = item.ownerUsd ?? convertToUsd(item.ownerEur);
+      pctAbove = item.anchorEur != null
+        ? (((proposedEur - item.anchorEur) / item.anchorEur) * 100).toFixed(1)
+        : null;
+    } else if (item.sku === 'CT-ACC-A-FIX-14') {
       // Owner override: €163
       proposedEur = 163;
       proposedUsd = convertToUsd(163);

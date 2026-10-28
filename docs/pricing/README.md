@@ -34,6 +34,7 @@ These prices were set by owner decision, not derived from the rule:
 
 | SKU | Decision | Rationale |
 |-----|----------|-----------|
+| CT-CHA-C-110085 (ceramic 110×85) | €797 / $887 | Avoid repeated-digit look of rule-derived €798/$888 |
 | CT-ACC-A-FIX-14 (fixture) | €163 / $181 | Owner band €140–180; different construction from calib.io MNTFIX01 (€240) |
 | CT-SVC-X-CERT-ILAC (certificate) | $307 / €276 | Anchored to Calibvision CNAS cert ≈$260/PN; owner markup to $307 |
 
