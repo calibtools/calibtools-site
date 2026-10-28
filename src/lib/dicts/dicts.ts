@@ -36,8 +36,9 @@ import DICT_ARUCO_MIP_36h12 from './DICT_ARUCO_MIP_36h12.json';
 import AT_16h5 from './apriltag-16h5.json';
 import AT_25h9 from './apriltag-25h9.json';
 import AT_36h11 from './apriltag-36h11.json';
-import AT_41h12 from './apriltag-41h12.json';
-import AT_52h13 from './apriltag-52h13.json';
+// 41h12 and 52h13 removed: bit_x/bit_y layouts not yet derived, renders incorrect.
+// import AT_41h12 from './apriltag-41h12.json';
+// import AT_52h13 from './apriltag-52h13.json';
 
 const ARUCO_DICTS: Record<string, ArUcoDict> = {
   DICT_4X4_50: DICT_4X4_50 as unknown as ArUcoDict,
@@ -83,8 +84,7 @@ const APRILTAG_FAMILIES: Record<string, AprilTagFamily> = {
   '16h5': AT_16h5 as unknown as AprilTagFamily,
   '25h9': AT_25h9 as unknown as AprilTagFamily,
   '36h11': AT_36h11 as unknown as AprilTagFamily,
-  '41h12': AT_41h12 as unknown as AprilTagFamily,
-  '52h13': AT_52h13 as unknown as AprilTagFamily,
+  // 41h12 and 52h13 removed — bit_x/bit_y layouts not yet derived.
 };
 
 export function getAprilFamily(name: string): AprilTagFamily | undefined {

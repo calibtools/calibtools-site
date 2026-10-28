@@ -22,8 +22,7 @@ const APRILTAG_CHECKSUMS: Record<string, {code0: string; code1: string}> = {
   "16h5": { code0: "00000000000027c8", code1: "00000000000031b6" },
   "25h9": { code0: "000000000156f1f4", code1: "0000000001f28cd5" },
   "36h11": { code0: "0000000d7e00984b", code1: "0000000dda664ca7" },
-  "41h12": { code0: "000001bd8a64ad10", code1: "000001bdc4f3b2d5" },
-  "52h13": { code0: "0004064a19651ff1", code1: "0004064a53f425b6" },
+  // 41h12 and 52h13 removed: bit_x/bit_y not yet derived, renders incorrect.
 };
 
 describe('ArUco dictionaries', () => {
@@ -114,11 +113,12 @@ describe('ArUco dictionaries', () => {
 });
 
 describe('AprilTag families', () => {
-  it('all 5 families load', () => {
+  it('all 3 verified families load', () => {
     const names = aprilFamilyNames();
-    expect(names).toHaveLength(5);
+    expect(names).toHaveLength(3);
     expect(names).toContain('36h11');
     expect(names).toContain('16h5');
+    expect(names).toContain('25h9');
   });
 
   it('36h11 has 587 codes and d=6', () => {

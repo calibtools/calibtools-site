@@ -21,7 +21,6 @@ import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
-
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
 const OUT_DIR = resolve(ROOT, 'docs/audit/2026-10-28-brand-block');
@@ -69,9 +68,39 @@ const CASES = [
   },
 ];
 
+/**
+ * Rasterise an SVG string to a PNG file via Playwright headless Chromium.
+ * Viewport is sized so 1 mm = 300/25.4 px (true 300 DPI).
+ */
+async function rasteriseSvgToFile(svgMarkup, pw, ph, outPath) {
+  const mmToPx = 300 / 25.4;
+  const widthPx = Math.round(pw * mmToPx);
+  const heightPx = Math.round(ph * mmToPx);
+
+  const { chromium } = await import('@playwright/test');
+  const browser = await chromium.launch();
+  const page = await browser.newPage({
+    viewport: { width: widthPx, height: heightPx },
+    deviceScaleFactor: 1,
+  });
+
+  // Build a minimal HTML page with the SVG filling the viewport exactly
+  const html = `<!DOCTYPE html>
+<html><head><style>
+  * { margin: 0; padding: 0; }
+  body { width: ${widthPx}px; height: ${heightPx}px; overflow: hidden; background: #fff; }
+  svg { display: block; width: ${widthPx}px; height: ${heightPx}px; }
+</style></head><body>${svgMarkup}</body></html>`;
+
+  await page.setContent(html, { waitUntil: 'networkidle' });
+  await page.screenshot({ path: outPath, type: 'png', fullPage: false });
+  await browser.close();
+}
+
 async function run() {
   const { exportPdf, exportTiledPdf } = await import('../src/lib/exportPdf.ts');
   const { computeLayout, computeTiling } = await import('../src/lib/pageLayout.ts');
+  const { checkerboardSvg } = await import('../src/lib/patterns.ts');
 
   const fontDir = resolve(ROOT, 'src/assets/fonts');
   const fontBytes = {
@@ -83,35 +112,77 @@ async function run() {
   const errors = [];
   const results = [];
 
-  for (const tc of CASES) {
+  // ── SVG & PNG cases (same ChArUco spec, rasterised via Playwright) ────────
+  const svgPngSpec = CASES[0].spec; // charuco-6x10-20-a4-landscape
+  const svgPngLayout = computeLayout(svgPngSpec, 210, 297);
+  const svgMarkup = checkerboardSvg(svgPngSpec, svgPngLayout.pw, svgPngLayout.ph, svgPngLayout);
+
+  const SVG_PNG_CASES = [
+    {
+      name: 'charuco-6x10-20-svg',
+      spec: svgPngSpec,
+      paperW: 210, paperH: 297,
+      detector: 'charuco',
+      description: 'ChArUco 6×10 @ 20 mm, SVG via Playwright',
+      format: 'svg',
+    },
+    {
+      name: 'charuco-6x10-20-png',
+      spec: svgPngSpec,
+      paperW: 210, paperH: 297,
+      detector: 'charuco',
+      description: 'ChArUco 6×10 @ 20 mm, PNG via Playwright',
+      format: 'png',
+    },
+  ];
+
+  const ALL_CASES = [...CASES, ...SVG_PNG_CASES];
+
+  for (const tc of ALL_CASES) {
     console.log(`\n[check-detection] ${tc.description}`);
 
     const layout = computeLayout(tc.spec, tc.paperW, tc.paperH);
-    let pdfBytes;
+    let renderedPng;
 
-    if (tc.tiled) {
-      const bw = tc.spec.cols * tc.spec.square;
-      const bh = tc.spec.rows * tc.spec.square;
-      const tiling = computeTiling(bw, bh, tc.paperW, tc.paperH);
-      pdfBytes = await exportTiledPdf({ spec: tc.spec, tiling, fontBytes });
+    if (tc.format === 'svg' || tc.format === 'png') {
+      // Rasterise SVG via Playwright headless Chromium at 300 DPI
+      const svgPath = resolve(OUT_DIR, `${tc.name}.svg`);
+      writeFileSync(svgPath, svgMarkup);
+      renderedPng = resolve(OUT_DIR, `${tc.name}.png`);
+      try {
+        await rasteriseSvgToFile(svgMarkup, layout.pw, layout.ph, renderedPng);
+      } catch (e) {
+        errors.push(`${tc.name}: Playwright rasterisation failed: ${e.message}`);
+        continue;
+      }
     } else {
-      pdfBytes = await exportPdf({ spec: tc.spec, pw: layout.pw, ph: layout.ph, fontBytes, layout });
+      // PDF path (existing)
+      let pdfBytes;
+
+      if (tc.tiled) {
+        const bw = tc.spec.cols * tc.spec.square;
+        const bh = tc.spec.rows * tc.spec.square;
+        const tiling = computeTiling(bw, bh, tc.paperW, tc.paperH);
+        pdfBytes = await exportTiledPdf({ spec: tc.spec, tiling, fontBytes });
+      } else {
+        pdfBytes = await exportPdf({ spec: tc.spec, pw: layout.pw, ph: layout.ph, fontBytes, layout });
+      }
+
+      const pdfPath = resolve(OUT_DIR, `${tc.name}.pdf`);
+      writeFileSync(pdfPath, pdfBytes);
+
+      const pngBase = resolve(OUT_DIR, tc.name);
+      try {
+        execFileSync('pdftoppm', ['-r', '300', '-png', '-f', '1', '-l', '1', pdfPath, pngBase], { stdio: 'pipe' });
+      } catch (e) {
+        errors.push(`${tc.name}: pdftoppm failed: ${e.message}`);
+        continue;
+      }
+
+      renderedPng = `${pngBase}-1.png`;
+      if (!existsSync(renderedPng)) renderedPng = `${pngBase}-01.png`;
+      if (!existsSync(renderedPng)) { errors.push(`${tc.name}: PNG not found`); continue; }
     }
-
-    const pdfPath = resolve(OUT_DIR, `${tc.name}.pdf`);
-    writeFileSync(pdfPath, pdfBytes);
-
-    const pngBase = resolve(OUT_DIR, tc.name);
-    try {
-      execFileSync('pdftoppm', ['-r', '300', '-png', '-f', '1', '-l', '1', pdfPath, pngBase], { stdio: 'pipe' });
-    } catch (e) {
-      errors.push(`${tc.name}: pdftoppm failed: ${e.message}`);
-      continue;
-    }
-
-    let renderedPng = `${pngBase}-1.png`;
-    if (!existsSync(renderedPng)) renderedPng = `${pngBase}-01.png`;
-    if (!existsSync(renderedPng)) { errors.push(`${tc.name}: PNG not found`); continue; }
 
     const isTiled = !!tc.tiled;
     const dpi = 300;
