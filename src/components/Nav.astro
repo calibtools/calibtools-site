@@ -2,11 +2,18 @@
 import Logo from './Logo.astro';
 import CartBadge from '@/islands/CartBadge';
 import { ShoppingCart, Menu, X, ChevronDown } from 'lucide-astro';
-import { headerGroups, targetsMega, type NavGroup } from '@/lib/nav';
+import { headerGroups, type MegaMenuColumn } from '@/lib/nav';
 
 interface Props { section?: string; theme?: 'dark' | 'light' }
 const { section, theme = 'light' } = Astro.props;
 const dark = theme === 'dark';
+
+/** Separate live items from coming-soon items for the "Coming:" line. */
+function splitLive(items: { label: string; href: string; live?: boolean }[]) {
+  const live = items.filter(i => i.live !== false);
+  const coming = items.filter(i => i.live === false);
+  return { live, coming };
+}
 ---
 
 <nav
@@ -17,23 +24,23 @@ const dark = theme === 'dark';
       : 'bg-[rgba(255,255,255,0.86)] border-b border-black/[0.08]',
   ]}
   aria-label="Main"
+  data-nav-bar
 >
-  <div class="container-x py-[18px]">
+  <div class="container-x flex items-center h-[var(--nav-header-h)] transition-[height] duration-150">
     {/* ── Desktop header ── */}
-    <div class="hidden lg:flex items-center justify-between gap-4">
+    <div class="hidden lg:flex items-center justify-between gap-[var(--nav-space-2)] w-full">
       <Logo theme={theme} />
 
-      <div class="flex items-center gap-1">
+      <div class="flex items-center gap-[var(--nav-space-1)]">
         {headerGroups.map((group) => {
           const isDropdown = group.items || group.columns;
           const isCurrent = section === group.key;
           if (!isDropdown) {
-            /* Direct link */
             return (
               <a
                 href={group.href}
                 class:list={[
-                  'inline-flex items-center gap-1 px-3 py-2 text-[15px] font-semibold no-underline rounded transition-colors',
+                  'inline-flex items-center gap-0.5 px-[var(--nav-space-3)] py-[var(--nav-space-2)] text-[length:var(--nav-text-base)] font-medium whitespace-nowrap no-underline rounded transition-colors',
                   isCurrent ? 'text-brand' : 'text-ink hover:text-brand',
                 ]}
               >
@@ -41,69 +48,66 @@ const dark = theme === 'dark';
               </a>
             );
           }
-          /* Disclosure button (dropdown or mega-menu) */
           return (
             <div class="relative" data-nav-disclosure>
               <button
                 type="button"
                 class:list={[
-                  'inline-flex items-center gap-1 px-3 py-2 text-[15px] font-semibold rounded transition-colors',
+                  'inline-flex items-center gap-0.5 px-[var(--nav-space-3)] py-[var(--nav-space-2)] text-[length:var(--nav-text-base)] font-medium whitespace-nowrap rounded transition-colors',
                   isCurrent ? 'text-brand' : 'text-ink hover:text-brand',
                 ]}
                 aria-expanded="false"
                 data-nav-trigger
               >
                 {group.label}
-                <ChevronDown size={14} stroke-width={2} aria-hidden="true" class="transition-transform duration-150" data-chevron />
+                <ChevronDown size={12} stroke-width={2} aria-hidden="true" class="ml-0.5 transition-transform duration-150" data-chevron />
               </button>
 
-              {/* Dropdown panel */}
               {group.columns ? (
-                /* Mega-menu (Targets) */
                 <div
-                  class="absolute left-1/2 -translate-x-1/2 top-full mt-2 hidden w-[680px] rounded-lg border border-line bg-ground shadow-lg"
+                  class="absolute left-1/2 -translate-x-1/2 top-full mt-1 hidden w-[660px] rounded-lg border border-line bg-ground shadow-lg"
                   data-nav-panel
                 >
-                  <div class="grid grid-cols-3 gap-0 p-5">
-                    {group.columns.map((col) => (
-                      <div>
-                        <div class="font-mono text-[11px] uppercase tracking-[0.08em] text-ink-soft mb-2">{col.heading}</div>
-                        <div class="flex flex-col gap-0.5">
-                          {col.items.map((item) => (
-                            <a
-                              href={item.live === false ? undefined : item.href}
-                              class:list={[
-                                'block rounded px-2 py-1.5 text-[14px] no-underline transition-colors',
-                                item.live === false
-                                  ? 'text-ink-soft/50 cursor-default'
-                                  : 'text-ink hover:bg-brand-tint hover:text-brand',
-                              ]}
-                              {...(item.live === false ? { 'aria-disabled': 'true', tabindex: -1 } : {})}
-                            >
-                              {item.label}
-                              {item.live === false && <span class="ml-1 text-[11px] text-ink-soft/50">(soon)</span>}
-                            </a>
-                          ))}
+                  <div class="grid grid-cols-3 gap-0 p-[var(--nav-space-5)]">
+                    {group.columns.map((col) => {
+                      const { live: liveItems, coming } = splitLive(col.items);
+                      return (
+                        <div>
+                          <div class="font-mono text-[length:var(--nav-text-xs)] font-medium uppercase tracking-[0.06em] text-ink-soft mb-[var(--nav-space-2)] whitespace-nowrap">{col.heading}</div>
+                          <div class="flex flex-col gap-px">
+                            {liveItems.map((item) => (
+                              <a
+                                href={item.href}
+                                class="block rounded px-[var(--nav-space-2)] py-[6px] text-[length:var(--nav-text-base)] whitespace-nowrap no-underline transition-colors text-ink hover:bg-brand-tint hover:text-brand"
+                              >
+                                {item.label}
+                              </a>
+                            ))}
+                            {coming.length > 0 && (
+                              <div class="px-[var(--nav-space-2)] py-[6px] text-[length:var(--nav-text-sm)] text-ink-soft/50 whitespace-nowrap">
+                                Coming: {coming.map(c => c.label).join(', ')}
+                              </div>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               ) : (
-                /* Regular dropdown */
                 <div
-                  class="absolute left-0 top-full mt-2 hidden w-[300px] rounded-lg border border-line bg-ground shadow-lg"
+                  class="absolute left-0 top-full mt-1 hidden w-[280px] rounded-lg border border-line bg-ground shadow-lg"
                   data-nav-panel
                 >
-                  <div class="flex flex-col p-2">
+                  <div class="flex flex-col p-[var(--nav-space-1)]">
                     {group.items!.map((item) => (
                       <a
                         href={item.href}
-                        class="flex flex-col gap-0.5 rounded px-3 py-2.5 no-underline transition-colors text-ink hover:bg-brand-tint hover:text-brand"
+                        class="flex flex-col gap-0.5 rounded px-[var(--nav-space-3)] py-[var(--nav-space-2)] no-underline transition-colors text-ink hover:bg-brand-tint hover:text-brand"
                       >
-                        <span class="text-[14px] font-medium">{item.label}</span>
+                        <span class="text-[length:var(--nav-text-base)] font-medium whitespace-nowrap">{item.label}</span>
                         {item.description && (
-                          <span class="text-[12px] text-ink-soft leading-snug line-clamp-2">{item.description}</span>
+                          <span class="text-[length:var(--nav-text-sm)] text-ink-soft leading-snug line-clamp-2">{item.description}</span>
                         )}
                       </a>
                     ))}
@@ -115,17 +119,18 @@ const dark = theme === 'dark';
         })}
       </div>
 
-      <div class="flex items-center gap-3">
-        <a href="/targets/" class="btn bg-brand text-white hover:bg-brand-dark hover:text-white px-5 py-2.5 text-[14px] font-semibold uppercase tracking-[0.08em] no-underline">
+      <div class="flex items-center gap-[var(--nav-space-2)]">
+        <a href="/targets/" class="btn bg-brand text-white hover:bg-brand-dark hover:text-white h-[var(--nav-btn-h)] px-[var(--nav-space-5)] text-[length:var(--nav-text-base)] font-semibold uppercase tracking-[0.04em] whitespace-nowrap no-underline">
           Shop targets
         </a>
-        <a href="/quote/" class="btn border-[1.5px] border-ink text-ink hover:text-ink hover:bg-ground-alt px-5 py-[9px] text-[14px] font-semibold uppercase tracking-[0.08em] no-underline">
+        <a href="/quote/" class="btn border-[1.5px] border-ink text-ink hover:text-ink hover:bg-ground-alt h-[var(--nav-btn-h)] px-[var(--nav-space-5)] text-[length:var(--nav-text-base)] font-semibold uppercase tracking-[0.04em] whitespace-nowrap no-underline hidden xl:inline-flex">
           Request a quote
         </a>
         <button
           type="button"
           class:list={[
-            'relative flex h-11 w-11 items-center justify-center rounded',
+            'relative flex items-center justify-center rounded',
+            'h-[var(--nav-cart-h)] w-[var(--nav-cart-h)]',
             dark
               ? 'border-[1.5px] border-white/20 hover:border-white/40'
               : 'border-[1.5px] border-line hover:border-ink',
@@ -133,33 +138,34 @@ const dark = theme === 'dark';
           aria-label="Open cart"
           data-open-cart
         >
-          <ShoppingCart size={20} stroke-width={1.6} aria-hidden="true" />
+          <ShoppingCart size={18} stroke-width={1.6} aria-hidden="true" />
           <span class="absolute -right-1.5 -top-1.5"><CartBadge client:load /></span>
         </button>
       </div>
     </div>
 
     {/* ── Mobile header ── */}
-    <div class="flex lg:hidden items-center justify-between">
+    <div class="flex lg:hidden items-center justify-between w-full">
       <button
         type="button"
         class:list={[
-          'flex h-11 w-11 items-center justify-center rounded',
+          'flex items-center justify-center rounded',
+          'h-[var(--nav-cart-h)] w-[var(--nav-cart-h)]',
           dark ? 'border-[1.5px] border-white/20' : 'border-[1.5px] border-ink',
         ]}
         aria-label="Open menu"
         aria-expanded="false"
         data-mobile-toggle
       >
-        <Menu size={20} stroke-width={1.6} aria-hidden="true" data-menu-icon />
-        <X size={20} stroke-width={1.6} aria-hidden="true" class="hidden" data-close-icon />
+        <Menu size={18} stroke-width={1.6} aria-hidden="true" data-menu-icon />
+        <X size={18} stroke-width={1.6} aria-hidden="true" class="hidden" data-close-icon />
       </button>
 
       <div class="absolute left-1/2 -translate-x-1/2">
         <Logo theme={theme} />
       </div>
 
-      <div class="h-11 w-11" aria-hidden="true"></div>
+      <div class="h-[var(--nav-cart-h)] w-[var(--nav-cart-h)]" aria-hidden="true"></div>
     </div>
   </div>
 
@@ -169,56 +175,58 @@ const dark = theme === 'dark';
       'hidden lg:!hidden overflow-y-auto',
       dark ? 'border-t border-white/[0.08]' : 'border-t border-black/[0.08]',
     ]}
-    style="max-height: calc(100dvh - 80px);"
+    style="max-height: calc(100dvh - var(--nav-header-h));"
     data-mobile-drawer
     role="dialog"
     aria-label="Navigation menu"
   >
-    <div class="container-x py-4 flex flex-col gap-1">
+    <div class="container-x py-[var(--nav-space-2)] flex flex-col gap-0">
       {headerGroups.map((group) => {
         const isDropdown = group.items || group.columns;
         if (!isDropdown) {
           return (
             <a
               href={group.href}
-              class="block px-3 py-3 text-[16px] font-semibold no-underline text-ink hover:text-brand rounded"
+              class="flex items-center min-h-[48px] px-[var(--nav-space-3)] text-[length:var(--nav-text-base)] font-medium no-underline text-ink hover:text-brand rounded"
             >
               {group.label}
             </a>
           );
         }
-        /* Accordion group */
         const allItems = group.columns
-          ? group.columns.flatMap((col) => [
-              { label: col.heading, isHeading: true, href: '', live: true },
-              ...col.items.map((i) => ({ ...i, isHeading: false })),
-            ])
+          ? group.columns.flatMap((col) => {
+              const { live: liveItems, coming } = splitLive(col.items);
+              return [
+                { label: col.heading, isHeading: true, href: '', live: true, items: [] as any[] },
+                ...liveItems.map((i) => ({ ...i, isHeading: false })),
+                ...(coming.length > 0 ? [{ label: 'Coming: ' + coming.map(c => c.label).join(', '), isHeading: false, href: '', live: false, isComing: true }] : []),
+              ];
+            })
           : (group.items || []).map((i) => ({ ...i, isHeading: false }));
         return (
           <details class="group">
-            <summary class="flex cursor-pointer items-center justify-between px-3 py-3 text-[16px] font-semibold select-none text-ink hover:text-brand rounded [&::-webkit-details-marker]:hidden list-none">
+            <summary class="flex cursor-pointer items-center justify-between min-h-[48px] px-[var(--nav-space-3)] text-[length:var(--nav-text-base)] font-medium select-none text-ink hover:text-brand rounded [&::-webkit-details-marker]:hidden list-none">
               <span>{group.label}</span>
-              <ChevronDown size={16} stroke-width={2} aria-hidden="true" class="text-ink-soft transition-transform duration-150 group-open:rotate-180" />
+              <ChevronDown size={14} stroke-width={2} aria-hidden="true" class="text-ink-soft transition-transform duration-150 group-open:rotate-180" />
             </summary>
-            <div class="flex flex-col gap-0 pb-2 pl-3">
+            <div class="flex flex-col gap-0 pb-[var(--nav-space-2)] pl-[var(--nav-space-3)]">
               {allItems.map((item) => {
                 if (item.isHeading) {
                   return (
-                    <div class="font-mono text-[11px] uppercase tracking-[0.08em] text-ink-soft mt-3 mb-1 px-3">{item.label}</div>
+                    <div class="font-mono text-[length:var(--nav-text-xs)] font-medium uppercase tracking-[0.06em] text-ink-soft mt-[var(--nav-space-3)] mb-[var(--nav-space-1)] px-[var(--nav-space-3)]">{item.label}</div>
                   );
                 }
-                const disabled = 'live' in item && item.live === false;
+                if ('isComing' in item && item.isComing) {
+                  return (
+                    <div class="min-h-[44px] flex items-center px-[var(--nav-space-3)] text-[length:var(--nav-text-sm)] text-ink-soft/50">{item.label}</div>
+                  );
+                }
                 return (
                   <a
-                    href={disabled ? undefined : item.href}
-                    class:list={[
-                      'block rounded px-3 py-2 text-[15px] no-underline',
-                      disabled ? 'text-ink-soft/50 cursor-default' : 'text-ink hover:text-brand hover:bg-brand-tint',
-                    ]}
-                    {...(disabled ? { 'aria-disabled': 'true', tabindex: -1 } : {})}
+                    href={item.href}
+                    class="flex items-center min-h-[44px] rounded px-[var(--nav-space-3)] text-[length:var(--nav-text-base)] no-underline text-ink hover:text-brand hover:bg-brand-tint"
                   >
                     {item.label}
-                    {disabled && <span class="ml-1 text-[11px] text-ink-soft/50">(soon)</span>}
                   </a>
                 );
               })}
@@ -227,9 +235,8 @@ const dark = theme === 'dark';
         );
       })}
 
-      {/* Request a quote in mobile Support area */}
-      <div class="mt-2 border-t border-line pt-3">
-        <a href="/quote/" class="block px-3 py-3 text-[16px] font-semibold no-underline text-ink hover:text-brand rounded">
+      <div class="mt-[var(--nav-space-2)] border-t border-line pt-[var(--nav-space-2)]">
+        <a href="/quote/" class="flex items-center min-h-[48px] px-[var(--nav-space-3)] text-[length:var(--nav-text-base)] font-medium no-underline text-ink hover:text-brand rounded">
           Request a quote
         </a>
       </div>
@@ -238,6 +245,20 @@ const dark = theme === 'dark';
 </nav>
 
 <script>
+  // ── Scroll-aware header height ──
+  const navBar = document.querySelector('[data-nav-bar]') as HTMLElement;
+  let lastScroll = 0;
+  function onScroll() {
+    const y = window.scrollY;
+    if (y > 20 && lastScroll <= 20) {
+      navBar?.style.setProperty('--nav-header-h', 'var(--nav-header-h-scrolled)');
+    } else if (y <= 20 && lastScroll > 20) {
+      navBar?.style.removeProperty('--nav-header-h');
+    }
+    lastScroll = y;
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+
   // ── Desktop disclosure navigation (APG pattern) ──
   const disclosures = document.querySelectorAll('[data-nav-disclosure]');
 
@@ -270,46 +291,31 @@ const dark = theme === 'dark';
     const panel = disc.querySelector('[data-nav-panel]') as HTMLElement;
     if (!btn || !panel) return;
 
-    // Click toggles
     btn.addEventListener('click', () => {
       const isOpen = btn.getAttribute('aria-expanded') === 'true';
       closeAll(disc);
-      if (isOpen) closePanel(disc);
-      else openPanel(disc);
+      if (isOpen) closePanel(disc); else openPanel(disc);
     });
 
-    // Hover opens (desktop)
     disc.addEventListener('mouseenter', () => { closeAll(disc); openPanel(disc); });
     disc.addEventListener('mouseleave', () => { closePanel(disc); });
-
-    // Focus within keeps open
     disc.addEventListener('focusin', () => { closeAll(disc); openPanel(disc); });
 
-    // Esc closes and returns focus to trigger
     panel.addEventListener('keydown', (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        closePanel(disc);
-        btn.focus();
-      }
+      if (e.key === 'Escape') { closePanel(disc); btn.focus(); }
     });
     btn.addEventListener('keydown', (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        closePanel(disc);
-      }
+      if (e.key === 'Escape') { closePanel(disc); }
     });
   });
 
-  // Close on click outside
   document.addEventListener('click', (e) => {
-    const target = e.target as HTMLElement;
-    if (!target.closest('[data-nav-disclosure]')) closeAll();
+    if (!(e.target as HTMLElement).closest('[data-nav-disclosure]')) closeAll();
   });
 
-  // Close on focusout from nav area
-  document.querySelector('nav[aria-label="Main"]')?.addEventListener('focusout', (e) => {
+  document.querySelector('nav[aria-label="Main"]')?.addEventListener('focusout', () => {
     requestAnimationFrame(() => {
-      const active = document.activeElement;
-      if (!active?.closest('[data-nav-disclosure]')) closeAll();
+      if (!document.activeElement?.closest('[data-nav-disclosure]')) closeAll();
     });
   });
 
@@ -325,7 +331,6 @@ const dark = theme === 'dark';
     mobileToggle.setAttribute('aria-expanded', 'true');
     menuIcon.classList.add('hidden');
     closeIcon.classList.remove('hidden');
-    // Trap focus: find first focusable
     const first = drawer.querySelector('a, button, summary, [tabindex]') as HTMLElement;
     first?.focus();
   }
@@ -340,20 +345,15 @@ const dark = theme === 'dark';
   }
 
   mobileToggle?.addEventListener('click', () => {
-    const isOpen = mobileToggle.getAttribute('aria-expanded') === 'true';
-    if (isOpen) closeDrawer();
-    else openDrawer();
+    mobileToggle.getAttribute('aria-expanded') === 'true' ? closeDrawer() : openDrawer();
   });
 
-  // Esc closes mobile drawer
   drawer?.addEventListener('keydown', (e: KeyboardEvent) => {
     if (e.key === 'Escape') closeDrawer();
   });
 
   // ── Cart ──
   document.querySelectorAll('[data-open-cart]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      window.dispatchEvent(new Event('open-cart-drawer'));
-    });
+    btn.addEventListener('click', () => window.dispatchEvent(new Event('open-cart-drawer')));
   });
 </script>
