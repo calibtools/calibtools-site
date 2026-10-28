@@ -1,17 +1,14 @@
 ---
 import Logo from './Logo.astro';
 import CartBadge from '@/islands/CartBadge';
-import { ShoppingCart, Menu } from 'lucide-astro';
+import { ShoppingCart, Menu, X, ChevronDown } from 'lucide-astro';
+import { headerGroups, targetsMega, type NavGroup } from '@/lib/nav';
+
 interface Props { section?: string; theme?: 'dark' | 'light' }
 const { section, theme = 'light' } = Astro.props;
 const dark = theme === 'dark';
-const items = [
-  { href: '/tools/', label: 'Free tools', key: 'tools' },
-  { href: '/targets/', label: 'Targets', key: 'targets' },
-  { href: '/#why', label: 'Why us', key: 'why' },
-  { href: '/guides/', label: 'Guides', key: 'guides' },
-];
 ---
+
 <nav
   class:list={[
     'sticky top-0 z-50 backdrop-blur-[14px]',
@@ -19,31 +16,111 @@ const items = [
       ? 'bg-[rgba(10,10,10,0.82)] border-b border-white/[0.08]'
       : 'bg-[rgba(255,255,255,0.86)] border-b border-black/[0.08]',
   ]}
+  aria-label="Main"
 >
-  <div class="container-x py-[22px]">
-    {/* Desktop header */}
-    <div class="hidden md:flex items-center justify-between gap-6">
+  <div class="container-x py-[18px]">
+    {/* ── Desktop header ── */}
+    <div class="hidden lg:flex items-center justify-between gap-4">
       <Logo theme={theme} />
-      <div class="flex items-center gap-8">
-        {items.map((i) => (
-          <a
-            href={i.href}
-            class:list={[
-              'text-[16px] font-semibold uppercase tracking-[0.08em] no-underline',
-              section === i.key
-                ? 'text-brand'
-                : dark
-                  ? 'text-ink hover:text-brand'
-                  : 'text-ink hover:text-brand',
-            ]}
-          >
-            {i.label}
-          </a>
-        ))}
+
+      <div class="flex items-center gap-1">
+        {headerGroups.map((group) => {
+          const isDropdown = group.items || group.columns;
+          const isCurrent = section === group.key;
+          if (!isDropdown) {
+            /* Direct link */
+            return (
+              <a
+                href={group.href}
+                class:list={[
+                  'inline-flex items-center gap-1 px-3 py-2 text-[15px] font-semibold no-underline rounded transition-colors',
+                  isCurrent ? 'text-brand' : 'text-ink hover:text-brand',
+                ]}
+              >
+                {group.label}
+              </a>
+            );
+          }
+          /* Disclosure button (dropdown or mega-menu) */
+          return (
+            <div class="relative" data-nav-disclosure>
+              <button
+                type="button"
+                class:list={[
+                  'inline-flex items-center gap-1 px-3 py-2 text-[15px] font-semibold rounded transition-colors',
+                  isCurrent ? 'text-brand' : 'text-ink hover:text-brand',
+                ]}
+                aria-expanded="false"
+                data-nav-trigger
+              >
+                {group.label}
+                <ChevronDown size={14} stroke-width={2} aria-hidden="true" class="transition-transform duration-150" data-chevron />
+              </button>
+
+              {/* Dropdown panel */}
+              {group.columns ? (
+                /* Mega-menu (Targets) */
+                <div
+                  class="absolute left-1/2 -translate-x-1/2 top-full mt-2 hidden w-[680px] rounded-lg border border-line bg-ground shadow-lg"
+                  data-nav-panel
+                >
+                  <div class="grid grid-cols-3 gap-0 p-5">
+                    {group.columns.map((col) => (
+                      <div>
+                        <div class="font-mono text-[11px] uppercase tracking-[0.08em] text-ink-soft mb-2">{col.heading}</div>
+                        <div class="flex flex-col gap-0.5">
+                          {col.items.map((item) => (
+                            <a
+                              href={item.live === false ? undefined : item.href}
+                              class:list={[
+                                'block rounded px-2 py-1.5 text-[14px] no-underline transition-colors',
+                                item.live === false
+                                  ? 'text-ink-soft/50 cursor-default'
+                                  : 'text-ink hover:bg-brand-tint hover:text-brand',
+                              ]}
+                              {...(item.live === false ? { 'aria-disabled': 'true', tabindex: -1 } : {})}
+                            >
+                              {item.label}
+                              {item.live === false && <span class="ml-1 text-[11px] text-ink-soft/50">(soon)</span>}
+                            </a>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                /* Regular dropdown */
+                <div
+                  class="absolute left-0 top-full mt-2 hidden w-[300px] rounded-lg border border-line bg-ground shadow-lg"
+                  data-nav-panel
+                >
+                  <div class="flex flex-col p-2">
+                    {group.items!.map((item) => (
+                      <a
+                        href={item.href}
+                        class="flex flex-col gap-0.5 rounded px-3 py-2.5 no-underline transition-colors text-ink hover:bg-brand-tint hover:text-brand"
+                      >
+                        <span class="text-[14px] font-medium">{item.label}</span>
+                        {item.description && (
+                          <span class="text-[12px] text-ink-soft leading-snug line-clamp-2">{item.description}</span>
+                        )}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
+
       <div class="flex items-center gap-3">
-        <a href="/targets/" class="btn bg-brand text-white hover:bg-brand-dark hover:text-white px-5 py-3 text-[16px] font-semibold uppercase tracking-[0.1em] no-underline">
+        <a href="/targets/" class="btn bg-brand text-white hover:bg-brand-dark hover:text-white px-5 py-2.5 text-[14px] font-semibold uppercase tracking-[0.08em] no-underline">
           Shop targets
+        </a>
+        <a href="/quote/" class="btn border-[1.5px] border-ink text-ink hover:text-ink hover:bg-ground-alt px-5 py-[9px] text-[14px] font-semibold uppercase tracking-[0.08em] no-underline">
+          Request a quote
         </a>
         <button
           type="button"
@@ -62,61 +139,218 @@ const items = [
       </div>
     </div>
 
-    {/* Mobile header: hamburger | logo | spacer */}
-    <div class="flex md:hidden items-center justify-between">
+    {/* ── Mobile header ── */}
+    <div class="flex lg:hidden items-center justify-between">
       <button
         type="button"
         class:list={[
           'flex h-11 w-11 items-center justify-center rounded',
-          dark
-            ? 'border-[1.5px] border-white/20'
-            : 'border-[1.5px] border-ink',
+          dark ? 'border-[1.5px] border-white/20' : 'border-[1.5px] border-ink',
         ]}
         aria-label="Open menu"
-        data-menu-toggle
+        aria-expanded="false"
+        data-mobile-toggle
       >
-        <Menu size={20} stroke-width={1.6} aria-hidden="true" />
+        <Menu size={20} stroke-width={1.6} aria-hidden="true" data-menu-icon />
+        <X size={20} stroke-width={1.6} aria-hidden="true" class="hidden" data-close-icon />
       </button>
 
       <div class="absolute left-1/2 -translate-x-1/2">
         <Logo theme={theme} />
       </div>
 
-      {/* Spacer to balance the hamburger */}
       <div class="h-11 w-11" aria-hidden="true"></div>
     </div>
   </div>
 
-  {/* Mobile menu panel */}
+  {/* ── Mobile drawer ── */}
   <div
     class:list={[
-      'container-x hidden flex-col gap-3 pb-5 md:!hidden',
+      'hidden lg:!hidden overflow-y-auto',
       dark ? 'border-t border-white/[0.08]' : 'border-t border-black/[0.08]',
     ]}
-    data-menu
+    style="max-height: calc(100dvh - 80px);"
+    data-mobile-drawer
+    role="dialog"
+    aria-label="Navigation menu"
   >
-    {items.map((i) => (
-      <a
-        href={i.href}
-        class:list={[
-          'text-[16px] font-semibold uppercase tracking-[0.08em] no-underline py-2',
-          dark ? 'text-ink hover:text-brand' : 'text-ink hover:text-brand',
-        ]}
-      >
-        {i.label}
-      </a>
-    ))}
+    <div class="container-x py-4 flex flex-col gap-1">
+      {headerGroups.map((group) => {
+        const isDropdown = group.items || group.columns;
+        if (!isDropdown) {
+          return (
+            <a
+              href={group.href}
+              class="block px-3 py-3 text-[16px] font-semibold no-underline text-ink hover:text-brand rounded"
+            >
+              {group.label}
+            </a>
+          );
+        }
+        /* Accordion group */
+        const allItems = group.columns
+          ? group.columns.flatMap((col) => [
+              { label: col.heading, isHeading: true, href: '', live: true },
+              ...col.items.map((i) => ({ ...i, isHeading: false })),
+            ])
+          : (group.items || []).map((i) => ({ ...i, isHeading: false }));
+        return (
+          <details class="group">
+            <summary class="flex cursor-pointer items-center justify-between px-3 py-3 text-[16px] font-semibold select-none text-ink hover:text-brand rounded [&::-webkit-details-marker]:hidden list-none">
+              <span>{group.label}</span>
+              <ChevronDown size={16} stroke-width={2} aria-hidden="true" class="text-ink-soft transition-transform duration-150 group-open:rotate-180" />
+            </summary>
+            <div class="flex flex-col gap-0 pb-2 pl-3">
+              {allItems.map((item) => {
+                if (item.isHeading) {
+                  return (
+                    <div class="font-mono text-[11px] uppercase tracking-[0.08em] text-ink-soft mt-3 mb-1 px-3">{item.label}</div>
+                  );
+                }
+                const disabled = 'live' in item && item.live === false;
+                return (
+                  <a
+                    href={disabled ? undefined : item.href}
+                    class:list={[
+                      'block rounded px-3 py-2 text-[15px] no-underline',
+                      disabled ? 'text-ink-soft/50 cursor-default' : 'text-ink hover:text-brand hover:bg-brand-tint',
+                    ]}
+                    {...(disabled ? { 'aria-disabled': 'true', tabindex: -1 } : {})}
+                  >
+                    {item.label}
+                    {disabled && <span class="ml-1 text-[11px] text-ink-soft/50">(soon)</span>}
+                  </a>
+                );
+              })}
+            </div>
+          </details>
+        );
+      })}
+
+      {/* Request a quote in mobile Support area */}
+      <div class="mt-2 border-t border-line pt-3">
+        <a href="/quote/" class="block px-3 py-3 text-[16px] font-semibold no-underline text-ink hover:text-brand rounded">
+          Request a quote
+        </a>
+      </div>
+    </div>
   </div>
 </nav>
 
 <script>
-  const t = document.querySelector('[data-menu-toggle]');
-  const m = document.querySelector('[data-menu]');
-  t?.addEventListener('click', () => {
-    m?.classList.toggle('hidden');
-    m?.classList.toggle('flex');
+  // ── Desktop disclosure navigation (APG pattern) ──
+  const disclosures = document.querySelectorAll('[data-nav-disclosure]');
+
+  function openPanel(disc: Element) {
+    const btn = disc.querySelector('[data-nav-trigger]') as HTMLButtonElement;
+    const panel = disc.querySelector('[data-nav-panel]') as HTMLElement;
+    const chevron = disc.querySelector('[data-chevron]') as HTMLElement;
+    if (!btn || !panel) return;
+    btn.setAttribute('aria-expanded', 'true');
+    panel.classList.remove('hidden');
+    chevron?.classList.add('rotate-180');
+  }
+
+  function closePanel(disc: Element) {
+    const btn = disc.querySelector('[data-nav-trigger]') as HTMLButtonElement;
+    const panel = disc.querySelector('[data-nav-panel]') as HTMLElement;
+    const chevron = disc.querySelector('[data-chevron]') as HTMLElement;
+    if (!btn || !panel) return;
+    btn.setAttribute('aria-expanded', 'false');
+    panel.classList.add('hidden');
+    chevron?.classList.remove('rotate-180');
+  }
+
+  function closeAll(except?: Element) {
+    disclosures.forEach((d) => { if (d !== except) closePanel(d); });
+  }
+
+  disclosures.forEach((disc) => {
+    const btn = disc.querySelector('[data-nav-trigger]') as HTMLButtonElement;
+    const panel = disc.querySelector('[data-nav-panel]') as HTMLElement;
+    if (!btn || !panel) return;
+
+    // Click toggles
+    btn.addEventListener('click', () => {
+      const isOpen = btn.getAttribute('aria-expanded') === 'true';
+      closeAll(disc);
+      if (isOpen) closePanel(disc);
+      else openPanel(disc);
+    });
+
+    // Hover opens (desktop)
+    disc.addEventListener('mouseenter', () => { closeAll(disc); openPanel(disc); });
+    disc.addEventListener('mouseleave', () => { closePanel(disc); });
+
+    // Focus within keeps open
+    disc.addEventListener('focusin', () => { closeAll(disc); openPanel(disc); });
+
+    // Esc closes and returns focus to trigger
+    panel.addEventListener('keydown', (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        closePanel(disc);
+        btn.focus();
+      }
+    });
+    btn.addEventListener('keydown', (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        closePanel(disc);
+      }
+    });
   });
 
+  // Close on click outside
+  document.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+    if (!target.closest('[data-nav-disclosure]')) closeAll();
+  });
+
+  // Close on focusout from nav area
+  document.querySelector('nav[aria-label="Main"]')?.addEventListener('focusout', (e) => {
+    requestAnimationFrame(() => {
+      const active = document.activeElement;
+      if (!active?.closest('[data-nav-disclosure]')) closeAll();
+    });
+  });
+
+  // ── Mobile drawer ──
+  const mobileToggle = document.querySelector('[data-mobile-toggle]') as HTMLButtonElement;
+  const drawer = document.querySelector('[data-mobile-drawer]') as HTMLElement;
+  const menuIcon = document.querySelector('[data-menu-icon]') as HTMLElement;
+  const closeIcon = document.querySelector('[data-close-icon]') as HTMLElement;
+
+  function openDrawer() {
+    drawer.classList.remove('hidden');
+    drawer.classList.add('flex', 'flex-col');
+    mobileToggle.setAttribute('aria-expanded', 'true');
+    menuIcon.classList.add('hidden');
+    closeIcon.classList.remove('hidden');
+    // Trap focus: find first focusable
+    const first = drawer.querySelector('a, button, summary, [tabindex]') as HTMLElement;
+    first?.focus();
+  }
+
+  function closeDrawer() {
+    drawer.classList.add('hidden');
+    drawer.classList.remove('flex', 'flex-col');
+    mobileToggle.setAttribute('aria-expanded', 'false');
+    menuIcon.classList.remove('hidden');
+    closeIcon.classList.add('hidden');
+    mobileToggle.focus();
+  }
+
+  mobileToggle?.addEventListener('click', () => {
+    const isOpen = mobileToggle.getAttribute('aria-expanded') === 'true';
+    if (isOpen) closeDrawer();
+    else openDrawer();
+  });
+
+  // Esc closes mobile drawer
+  drawer?.addEventListener('keydown', (e: KeyboardEvent) => {
+    if (e.key === 'Escape') closeDrawer();
+  });
+
+  // ── Cart ──
   document.querySelectorAll('[data-open-cart]').forEach((btn) => {
     btn.addEventListener('click', () => {
       window.dispatchEvent(new Event('open-cart-drawer'));

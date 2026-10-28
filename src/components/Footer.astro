@@ -1,35 +1,17 @@
 ---
-import { Github } from 'lucide-astro';
 import { FOOTER_LINE } from '@/lib/claims';
-const shop = [
-  { href: '/targets/', label: 'Calibration targets' },
-  { href: '/tools/', label: 'Free tools' },
-  { href: '/guides/', label: 'Knowledge base' },
-  { href: '/shipping/', label: 'Shipping' },
-  { href: '/returns/', label: 'Returns' },
-];
-const company = [
-  { href: '/imprint/', label: 'Imprint' },
-  { href: '/privacy/', label: 'Privacy' },
-  { href: 'https://github.com/calibtools', label: 'GitHub' },
-];
+import { footerGroups } from '@/lib/nav';
 ---
 <footer class="border-t border-line-strong">
-  <div class="container-x flex flex-wrap gap-10 py-10 md:py-14">
-    <div class="flex min-w-0 flex-1 basis-[240px] flex-col gap-3">
-      <span class="text-[15px] font-bold">Shop</span>
-      {shop.map((l) => <a href={l.href} class="text-sm text-ink-soft no-underline hover:text-ink">{l.label}</a>)}
-    </div>
-    <div class="flex min-w-0 flex-1 basis-[240px] flex-col gap-3">
-      <span class="text-[15px] font-bold">Company</span>
-      {company.map((l) => (
-        <a href={l.href} class="inline-flex items-center gap-1.5 text-sm text-ink-soft no-underline hover:text-ink">
-          {l.label === 'GitHub' && <Github size={16} stroke-width={1.6} aria-hidden="true" />}
-          {l.label}
-        </a>
-      ))}
-      <a href="mailto:hello@calib.tools" class="text-sm text-ink-soft no-underline hover:text-ink">hello@calib.tools</a>
-    </div>
+  <div class="container-x grid grid-cols-2 gap-8 py-10 md:grid-cols-4 md:py-14">
+    {footerGroups.map((group) => (
+      <div class="flex flex-col gap-3">
+        <span class="font-mono text-[12px] uppercase tracking-[0.08em] text-ink-soft">{group.heading}</span>
+        {group.items.map((item) => (
+          <a href={item.href} class="text-sm text-ink-soft no-underline hover:text-ink">{item.label}</a>
+        ))}
+      </div>
+    ))}
   </div>
   <div class="container-x border-t border-line-strong py-6">
     <div class="flex items-center gap-3">
