@@ -18,15 +18,11 @@ import { join, resolve } from 'node:path';
 const DIST = resolve('dist');
 const MAX_DEPTH = 2;
 
-// Pages that are not navigation targets or are reached via JS tabs/redirects
+// Pages that are not navigation targets
 const EXCLUDED = new Set([
   '/404/',
-  '/review/',
-  '/verify/unknown/',            // fallback for invalid serial numbers
-  '/tools/generator/charuco/',   // tab within /tools/generator/
-  '/tools/generator/checkerboard/', // tab within /tools/generator/
-  '/tools/generator/aprilgrid/', // tab within /tools/generator/
-  '/tools/generator/circles/',   // tab within /tools/generator/
+  '/review/',          // internal review submission flow (noindex)
+  '/verify/unknown/',  // fallback for invalid serial numbers (noindex)
 ]);
 
 // Duplicate-named pages (e.g. "index 2.html") are build artifacts, skip
@@ -58,8 +54,8 @@ function extractLinks(htmlPath) {
   if (!existsSync(htmlPath)) return [];
   const html = readFileSync(htmlPath, 'utf-8');
   const links = new Set();
-  // Match href="/..." (internal absolute paths)
-  const re = /href="(\/[^"#]*?)"/g;
+  // Match href="/..." (internal absolute paths, strip query strings)
+  const re = /href="(\/[^"#?]*?)(?:[?#][^"]*)?"/g;
   let m;
   while ((m = re.exec(html)) !== null) {
     let href = m[1];
@@ -153,6 +149,86 @@ for (const href of broken) {
   errors.push(`broken nav href: ${href}`);
 }
 
+// Nav-group membership: no page in more than two groups
+const MAX_GROUPS = 2;
+{
+  const htmlFile = join(DIST, 'index.html');
+  if (existsSync(htmlFile)) {
+    const html = readFileSync(htmlFile, 'utf-8');
+    // Extract nav and footer sections
+    const navStart = html.indexOf('<nav');
+    const navEnd = html.indexOf('</nav>');
+    const footerStart = html.indexOf('<footer');
+    const footerEnd = html.indexOf('</footer>');
+
+    // Collect hrefs per "group" — each [data-nav-panel] (desktop only) and each footer column
+    const groupHrefs = [];
+    const navHtml = navStart >= 0 && navEnd >= 0 ? html.slice(navStart, navEnd) : '';
+    // Exclude mobile drawer from panel counting
+    const drawerIdx = navHtml.indexOf('data-mobile-drawer');
+    const desktopNavHtml = drawerIdx >= 0 ? navHtml.slice(0, drawerIdx) : navHtml;
+    // Find each data-nav-panel block — track nesting depth from the opening div
+    const panelStarts = [...desktopNavHtml.matchAll(/data-nav-panel/g)];
+    for (const ps of panelStarts) {
+      // Find the opening < of this div
+      let divStart = desktopNavHtml.lastIndexOf('<', ps.index);
+      // Walk forward to find the matching closing </div> by counting depth
+      let depth = 0;
+      let pos = divStart;
+      let panelEnd = desktopNavHtml.length;
+      const tagRe = /<\/?div[\s>]/g;
+      tagRe.lastIndex = pos;
+      let tm;
+      while ((tm = tagRe.exec(desktopNavHtml)) !== null) {
+        if (tm[0].startsWith('</')) {
+          depth--;
+          if (depth === 0) { panelEnd = tm.index + tm[0].length; break; }
+        } else {
+          depth++;
+        }
+      }
+      const chunk = desktopNavHtml.slice(divStart, panelEnd);
+      const hrefRe = /href="(\/[^"#]*?)"/g;
+      const group = new Set();
+      let hm;
+      while ((hm = hrefRe.exec(chunk)) !== null) {
+        let h = hm[1];
+        if (!h.endsWith('/')) h += '/';
+        group.add(h);
+      }
+      if (group.size > 0) groupHrefs.push(group);
+    }
+    // Footer columns
+    const footerHtml = footerStart >= 0 && footerEnd >= 0 ? html.slice(footerStart, footerEnd) : '';
+    // Split by group heading pattern (font-mono uppercase)
+    const footerSections = footerHtml.split(/font-mono[^>]*uppercase/);
+    for (const sec of footerSections.slice(1)) {
+      const hrefRe = /href="(\/[^"#]*?)"/g;
+      const group = new Set();
+      let hm;
+      while ((hm = hrefRe.exec(sec)) !== null) {
+        let h = hm[1];
+        if (!h.endsWith('/')) h += '/';
+        group.add(h);
+      }
+      if (group.size > 0) groupHrefs.push(group);
+    }
+
+    // Count how many groups each href appears in
+    const membership = new Map();
+    for (const group of groupHrefs) {
+      for (const href of group) {
+        membership.set(href, (membership.get(href) || 0) + 1);
+      }
+    }
+    for (const [href, count] of membership) {
+      if (count > MAX_GROUPS) {
+        errors.push(`${href} appears in ${count} nav groups (max ${MAX_GROUPS})`);
+      }
+    }
+  }
+}
+
 // ── Report ───────────────────────────────────────────────────────────
 
 if (errors.length > 0) {
@@ -160,6 +236,8 @@ if (errors.length > 0) {
   for (const e of errors) console.error(`  ${e}`);
   process.exit(1);
 } else {
-  const maxDepth = Math.max(...[...depths.values()]);
+  // Max depth among actual HTML pages only
+  const pageDepths = allPages.map((p) => depths.get(p) ?? 0);
+  const maxDepth = Math.max(...pageDepths);
   console.log(`[check-nav] OK — ${allPages.length} pages checked, max depth ${maxDepth}, no errors.`);
 }

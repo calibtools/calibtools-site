@@ -2,7 +2,7 @@
 import Logo from './Logo.astro';
 import CartBadge from '@/islands/CartBadge';
 import { ShoppingCart, Menu, X, ChevronDown } from 'lucide-astro';
-import { headerGroups, type MegaMenuColumn } from '@/lib/nav';
+import { headerGroups } from '@/lib/nav';
 
 interface Props { section?: string; theme?: 'dark' | 'light' }
 const { section, theme = 'light' } = Astro.props;
@@ -64,15 +64,16 @@ function splitLive(items: { label: string; href: string; live?: boolean }[]) {
               </button>
 
               {group.columns ? (
+                /* ── Mega-menu (Targets) ── */
                 <div
                   class="absolute left-1/2 -translate-x-1/2 top-full mt-1 hidden w-[660px] rounded-lg border border-line bg-ground shadow-lg"
                   data-nav-panel
                 >
-                  <div class="grid grid-cols-3 gap-0 p-[var(--nav-space-5)]">
+                  <div class="grid grid-cols-3 gap-0 p-[var(--nav-space-5)]" data-mega-grid>
                     {group.columns.map((col) => {
                       const { live: liveItems, coming } = splitLive(col.items);
                       return (
-                        <div>
+                        <div data-mega-col>
                           <div class="font-mono text-[length:var(--nav-text-xs)] font-medium uppercase tracking-[0.06em] text-ink-soft mb-[var(--nav-space-2)] whitespace-nowrap">{col.heading}</div>
                           <div class="flex flex-col gap-px">
                             {liveItems.map((item) => (
@@ -84,7 +85,7 @@ function splitLive(items: { label: string; href: string; live?: boolean }[]) {
                               </a>
                             ))}
                             {coming.length > 0 && (
-                              <div class="px-[var(--nav-space-2)] py-[6px] text-[length:var(--nav-text-sm)] text-ink-soft/50 whitespace-nowrap">
+                              <div class="max-w-full px-[var(--nav-space-2)] py-[6px] text-[length:var(--nav-text-sm)] leading-[1.5] text-ink-soft/50" data-coming-line>
                                 Coming: {coming.map(c => c.label).join(', ')}
                               </div>
                             )}
@@ -95,17 +96,24 @@ function splitLive(items: { label: string; href: string; live?: boolean }[]) {
                   </div>
                 </div>
               ) : (
+                /* ── Regular dropdown (Tools / Support) ── */
                 <div
                   class="absolute left-0 top-full mt-1 hidden w-[280px] rounded-lg border border-line bg-ground shadow-lg"
                   data-nav-panel
                 >
                   <div class="flex flex-col p-[var(--nav-space-1)]">
-                    {group.items!.map((item) => (
+                    {group.items!.map((item, idx) => (
                       <a
                         href={item.href}
-                        class="flex flex-col gap-0.5 rounded px-[var(--nav-space-3)] py-[var(--nav-space-2)] no-underline transition-colors text-ink hover:bg-brand-tint hover:text-brand"
+                        class:list={[
+                          'flex flex-col gap-0.5 rounded px-[var(--nav-space-3)] py-[var(--nav-space-2)] no-underline transition-colors text-ink hover:bg-brand-tint hover:text-brand',
+                          idx === 0 && group.key === 'tools' ? 'mb-[var(--nav-space-2)] pb-[var(--nav-space-3)] border-b border-line' : '',
+                        ]}
                       >
-                        <span class="text-[length:var(--nav-text-base)] font-medium whitespace-nowrap">{item.label}</span>
+                        <span class:list={[
+                          'text-[length:var(--nav-text-base)] whitespace-nowrap',
+                          idx === 0 && group.key === 'tools' ? 'font-semibold' : 'font-medium',
+                        ]}>{item.label}</span>
                         {item.description && (
                           <span class="text-[length:var(--nav-text-sm)] text-ink-soft leading-snug line-clamp-2">{item.description}</span>
                         )}
@@ -119,28 +127,33 @@ function splitLive(items: { label: string; href: string; live?: boolean }[]) {
         })}
       </div>
 
-      <div class="flex items-center gap-[var(--nav-space-2)]">
-        <a href="/targets/" class="btn bg-brand text-white hover:bg-brand-dark hover:text-white h-[var(--nav-btn-h)] px-[var(--nav-space-5)] text-[length:var(--nav-text-base)] font-semibold uppercase tracking-[0.04em] whitespace-nowrap no-underline">
-          Shop targets
-        </a>
-        <a href="/quote/" class="btn border-[1.5px] border-ink text-ink hover:text-ink hover:bg-ground-alt h-[var(--nav-btn-h)] px-[var(--nav-space-5)] text-[length:var(--nav-text-base)] font-semibold uppercase tracking-[0.04em] whitespace-nowrap no-underline hidden xl:inline-flex">
+      <div class="flex items-center gap-[var(--nav-space-6)]">
+        <a
+          href="/quote/"
+          class="text-[length:var(--nav-text-base)] font-medium whitespace-nowrap no-underline text-ink hover:text-brand hover:underline underline-offset-4 decoration-brand"
+        >
           Request a quote
         </a>
-        <button
-          type="button"
-          class:list={[
-            'relative flex items-center justify-center rounded',
-            'h-[var(--nav-cart-h)] w-[var(--nav-cart-h)]',
-            dark
-              ? 'border-[1.5px] border-white/20 hover:border-white/40'
-              : 'border-[1.5px] border-line hover:border-ink',
-          ]}
-          aria-label="Open cart"
-          data-open-cart
-        >
-          <ShoppingCart size={18} stroke-width={1.6} aria-hidden="true" />
-          <span class="absolute -right-1.5 -top-1.5"><CartBadge client:load /></span>
-        </button>
+        <div class="flex items-center gap-[var(--nav-space-2)]">
+          <a href="/targets/" class="btn bg-brand text-white hover:bg-brand-dark hover:text-white h-[var(--nav-btn-h)] px-[var(--nav-space-5)] text-[length:var(--nav-text-base)] font-semibold uppercase tracking-[0.04em] whitespace-nowrap no-underline">
+            Shop targets
+          </a>
+          <button
+            type="button"
+            class:list={[
+              'relative flex items-center justify-center rounded',
+              'h-[var(--nav-cart-h)] w-[var(--nav-cart-h)]',
+              dark
+                ? 'border-[1.5px] border-white/20 hover:border-white/40'
+                : 'border-[1.5px] border-line hover:border-ink',
+            ]}
+            aria-label="Open cart"
+            data-open-cart
+          >
+            <ShoppingCart size={18} stroke-width={1.6} aria-hidden="true" />
+            <span class="absolute -right-1.5 -top-1.5"><CartBadge client:load /></span>
+          </button>
+        </div>
       </div>
     </div>
 
@@ -202,7 +215,7 @@ function splitLive(items: { label: string; href: string; live?: boolean }[]) {
                 ...(coming.length > 0 ? [{ label: 'Coming: ' + coming.map(c => c.label).join(', '), isHeading: false, href: '', live: false, isComing: true }] : []),
               ];
             })
-          : (group.items || []).map((i) => ({ ...i, isHeading: false }));
+          : (group.items || []).map((i, idx) => ({ ...i, isHeading: false, isFirst: idx === 0 && group.key === 'tools' }));
         return (
           <details class="group">
             <summary class="flex cursor-pointer items-center justify-between min-h-[48px] px-[var(--nav-space-3)] text-[length:var(--nav-text-base)] font-medium select-none text-ink hover:text-brand rounded [&::-webkit-details-marker]:hidden list-none">
@@ -221,10 +234,14 @@ function splitLive(items: { label: string; href: string; live?: boolean }[]) {
                     <div class="min-h-[44px] flex items-center px-[var(--nav-space-3)] text-[length:var(--nav-text-sm)] text-ink-soft/50">{item.label}</div>
                   );
                 }
+                const isPromoted = 'isFirst' in item && item.isFirst;
                 return (
                   <a
                     href={item.href}
-                    class="flex items-center min-h-[44px] rounded px-[var(--nav-space-3)] text-[length:var(--nav-text-base)] no-underline text-ink hover:text-brand hover:bg-brand-tint"
+                    class:list={[
+                      'flex items-center min-h-[44px] rounded px-[var(--nav-space-3)] text-[length:var(--nav-text-base)] no-underline text-ink hover:text-brand hover:bg-brand-tint',
+                      isPromoted ? 'font-semibold' : '',
+                    ]}
                   >
                     {item.label}
                   </a>
@@ -235,6 +252,7 @@ function splitLive(items: { label: string; href: string; live?: boolean }[]) {
         );
       })}
 
+      {/* Request a quote in mobile drawer */}
       <div class="mt-[var(--nav-space-2)] border-t border-line pt-[var(--nav-space-2)]">
         <a href="/quote/" class="flex items-center min-h-[48px] px-[var(--nav-space-3)] text-[length:var(--nav-text-base)] font-medium no-underline text-ink hover:text-brand rounded">
           Request a quote
