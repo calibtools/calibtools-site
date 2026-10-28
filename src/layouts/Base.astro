@@ -4,7 +4,7 @@ import Nav from '@/components/Nav.astro';
 import Footer from '@/components/Footer.astro';
 import CartDrawer from '@/islands/CartDrawer';
 import MobileBottomCluster from '@/islands/MobileBottomCluster';
-import { ORGANIZATION_LD } from '@/lib/seo';
+import { ORGANIZATION_LD, autoBreadcrumbLd } from '@/lib/seo';
 
 interface PreloadImage {
   href: string;
@@ -32,7 +32,10 @@ interface Props {
 const { title, description = 'Precision camera calibration targets and free browser tools for machine vision.', section, jsonLd, ogImage, preloadImages, noindex, theme = 'light' } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const ogImageUrl = ogImage ?? '/og/default.png';
-const jsonLdItems = [...(jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : []), ORGANIZATION_LD];
+const providedLd = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
+const hasBreadcrumb = providedLd.some((ld) => ld['@type'] === 'BreadcrumbList');
+const autoBc = !hasBreadcrumb ? autoBreadcrumbLd(Astro.url.pathname, title) : null;
+const jsonLdItems = [...providedLd, ...(autoBc ? [autoBc] : []), ORGANIZATION_LD];
 ---
 <!doctype html>
 <html lang="en" {...theme === 'dark' ? { 'data-theme': 'dark' } : {}}>

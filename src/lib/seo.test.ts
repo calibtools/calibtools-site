@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { breadcrumbLd, ORGANIZATION_LD } from './seo';
+import { breadcrumbLd, autoBreadcrumbLd, ORGANIZATION_LD } from './seo';
 
 describe('breadcrumbLd', () => {
   it('returns BreadcrumbList with correct structure', () => {
@@ -31,6 +31,32 @@ describe('breadcrumbLd', () => {
   it('prepends site URL to relative paths', () => {
     const ld = breadcrumbLd([{ name: 'Tools', url: '/tools/' }, { name: 'X' }]);
     expect(ld.itemListElement[0].item).toBe('https://calib.tools/tools/');
+  });
+});
+
+describe('autoBreadcrumbLd', () => {
+  it('returns null for home page', () => {
+    expect(autoBreadcrumbLd('/', 'Home')).toBeNull();
+  });
+
+  it('returns null for 404', () => {
+    expect(autoBreadcrumbLd('/404', 'Not found')).toBeNull();
+  });
+
+  it('generates breadcrumbs for a tool page', () => {
+    const ld = autoBreadcrumbLd('/tools/generator/', 'Pattern generator');
+    expect(ld).not.toBeNull();
+    expect(ld!['@type']).toBe('BreadcrumbList');
+    expect(ld!.itemListElement).toHaveLength(3);
+    expect(ld!.itemListElement[0].name).toBe('Home');
+    expect(ld!.itemListElement[1].name).toBe('Free tools');
+    expect(ld!.itemListElement[2].name).toBe('Pattern generator');
+  });
+
+  it('generates breadcrumbs for a nested page', () => {
+    const ld = autoBreadcrumbLd('/targets/collection/composite-boards/', 'Composite boards');
+    expect(ld).not.toBeNull();
+    expect(ld!.itemListElement).toHaveLength(4);
   });
 });
 

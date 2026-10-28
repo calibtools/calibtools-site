@@ -3,7 +3,7 @@ import react from '@astrojs/react';
 import tailwind from '@astrojs/tailwind';
 import sitemap from '@astrojs/sitemap';
 
-const NOINDEX_PATHS = ['/cart/', '/quote/', '/review/', '/verify/'];
+const NOINDEX_PATHS = ['/cart/', '/quote/', '/review/', '/verify/', '/targets/collection/lidar-image-quality/'];
 
 export default defineConfig({
   site: 'https://calib.tools',
