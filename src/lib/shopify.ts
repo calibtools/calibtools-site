@@ -5,6 +5,8 @@
  * Falls back to static data when env vars are missing so builds never fail.
  */
 
+import { fallbackMinEur } from './prices';
+
 // --- Config ---
 
 const domain = import.meta.env.PUBLIC_SHOPIFY_DOMAIN ?? '';
@@ -497,48 +499,40 @@ export function clearStoredCart(): void {
 
 // --- Fallback data ---
 
+function fb(handle: string, title: string, desc: string, opts: Product['options'], url: string): Product {
+  const eur = fallbackMinEur(handle);
+  return {
+    handle, title, description: desc, descriptionHtml: '',
+    priceFrom: `€${eur}`, priceMinAmount: `${eur}.00`, priceMinCurrency: 'EUR',
+    image: undefined, images: [], options: opts, variants: [], metafields: {}, url,
+  };
+}
+
 const FALLBACK_PRODUCTS: Product[] = [
-  {
-    handle: 'checkerboard-composite', title: 'Checkerboard calibration target',
-    description: 'Aluminium composite, fine or coarse pattern.', descriptionHtml: '',
-    priceFrom: '€79', priceMinAmount: '79.00', priceMinCurrency: 'EUR',
-    image: undefined, images: [], options: [
+  fb('checkerboard-composite', 'Checkerboard calibration target',
+    'Aluminium composite, fine or coarse pattern.',
+    [
       { name: 'Size', values: ['200 × 150', '300 × 200', '400 × 300', '600 × 400', '800 × 600'] },
       { name: 'Pattern', values: ['7×10, 25 mm', '9×6, 30 mm', '5×8, 40 mm'] },
-    ], variants: [], metafields: {}, url: '/targets/checkerboard-composite/',
-  },
-  {
-    handle: 'charuco-composite', title: 'ChArUco calibration target',
-    description: 'Aluminium composite, UV-printed matte pattern, 6 mm thick.', descriptionHtml: '',
-    priceFrom: '€89', priceMinAmount: '89.00', priceMinCurrency: 'EUR',
-    image: undefined, images: [], options: [
+    ], '/targets/checkerboard-composite/'),
+  fb('charuco-composite', 'ChArUco calibration target',
+    'Aluminium composite, UV-printed matte pattern, 6 mm thick.',
+    [
       { name: 'Size', values: ['200 × 150', '300 × 200', '400 × 300', '600 × 400', '800 × 600'] },
       { name: 'Dictionary', values: ['DICT_6X6_250', 'DICT_5X5_100', 'DICT_4X4_50', 'AprilTag 36h11'] },
-    ], variants: [], metafields: {}, url: '/targets/charuco-composite/',
-  },
-  {
-    handle: 'charuco-ceramic', title: 'ChArUco ceramic target',
-    description: 'Lithographed blue chrome on alumina, ±2 µm.', descriptionHtml: '',
-    priceFrom: '€189', priceMinAmount: '189.00', priceMinCurrency: 'EUR',
-    image: undefined, images: [], options: [
-      { name: 'Size', values: ['100 × 100', '150 × 150', '200 × 200'] },
+    ], '/targets/charuco-composite/'),
+  fb('charuco-ceramic', 'ChArUco ceramic target',
+    'Lithographed blue chrome on alumina, ±2 µm.',
+    [
+      { name: 'Size', values: ['110 × 85', '150 × 100', '185 × 110', '230 × 140'] },
       { name: 'Dictionary', values: ['DICT_6X6_250', 'DICT_5X5_100'] },
-    ], variants: [], metafields: {}, url: '/targets/charuco-ceramic/',
-  },
-  {
-    handle: 'mounting-fixture', title: 'Mounting fixture',
-    description: '¼″ thread, aluminium, fits all boards.', descriptionHtml: '',
-    priceFrom: '€39', priceMinAmount: '39.00', priceMinCurrency: 'EUR',
-    image: undefined, images: [], options: [], variants: [], metafields: {},
-    url: '/targets/mounting-fixture/',
-  },
-  {
-    handle: 'certificate-ilac', title: 'ILAC calibration certificate',
-    description: 'ILAC-recognised dimensional calibration certificate.', descriptionHtml: '',
-    priceFrom: '€149', priceMinAmount: '149.00', priceMinCurrency: 'EUR',
-    image: undefined, images: [], options: [], variants: [], metafields: {},
-    url: '/targets/certificate-ilac/',
-  },
+    ], '/targets/charuco-ceramic/'),
+  fb('mounting-fixture', 'Mounting fixture',
+    '¼″ thread, aluminium, fits all boards.',
+    [], '/targets/mounting-fixture/'),
+  fb('certificate-ilac', 'ILAC calibration certificate',
+    'ILAC-recognised dimensional calibration certificate.',
+    [], '/targets/certificate-ilac/'),
 ];
 
 const FALLBACK_COLLECTIONS: Collection[] = [
