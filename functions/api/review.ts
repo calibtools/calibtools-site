@@ -105,6 +105,7 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
     photos: [],
     created: new Date().toISOString(),
     status: 'published',
+    source: 'order' as const,
   };
 
   await ctx.env.REVIEWS.put(`review:${id}`, JSON.stringify(review));

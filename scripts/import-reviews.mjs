@@ -143,7 +143,7 @@ async function main() {
 
   const required = [
     'product_handle', 'rating', 'title', 'body', 'reviewer_name',
-    'date', 'language', 'consent', 'material_connection',
+    'date', 'consent', 'material_connection',
   ];
   const missingCols = required.filter((c) => !(c in colMap));
   if (missingCols.length) {
@@ -173,10 +173,9 @@ async function main() {
     const reviewerOrg = cell(row, 'reviewer_org') || undefined;
     const country = cell(row, 'country') || undefined;
     const date = cell(row, 'date');
-    const language = cell(row, 'language') || 'en';
     const consent = cell(row, 'consent');
     const materialConnection = cell(row, 'material_connection');
-    const sourceNote = cell(row, 'source_note') || '';
+    const note = cell(row, 'note') || '';
 
     const errors = [];
 
@@ -211,10 +210,9 @@ async function main() {
       reviewerOrg,
       country,
       date,
-      language,
       consent,
       materialConnection,
-      sourceNote,
+      note,
       errors,
     });
   });
@@ -296,7 +294,6 @@ async function main() {
       materialConnection: row.materialConnection,
       ...(row.reviewerOrg && { reviewerOrg: row.reviewerOrg }),
       ...(row.country && { country: row.country }),
-      ...(row.language && { language: row.language }),
     };
 
     await fetch(`${KV_BASE}/values/${encodeURIComponent(`review:${id}`)}`, {

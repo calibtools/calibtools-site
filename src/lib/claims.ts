@@ -72,10 +72,9 @@ export const APP_VERSION = '0.1.0';
 
 import type { MaterialConnection } from './reviews';
 
-/** Visible label shown on each review card, keyed by materialConnection. */
-export const MATERIAL_CONNECTION_LABEL: Record<MaterialConnection, string> = {
-  none: 'Shared with permission \u00B7 bought through another channel',
-  free_sample: 'Reviewer received a free sample',
-  discount: 'Reviewer received a discount',
-  insider: 'Reviewer is connected to Calib.Tools',
+/** Visible label shown on each review card when materialConnection ≠ 'none'. */
+export const MATERIAL_CONNECTION_LABEL: Record<Exclude<MaterialConnection, 'none'>, string> = {
+  free_sample: 'Received a free sample',
+  discount: 'Received a discount',
+  insider: 'Works with Calib.Tools',
 };
