@@ -53,10 +53,10 @@ export function patternQuietZone(squareSize: number): number {
 const CAP_HEIGHT_SVG = 710;
 
 /** ISO 3098 tier: wordmark cap height on A4 / Letter / Tabloid (mm). */
-const WM_CAP_A4 = 3.5;
+const WM_CAP_A4 = 2.5;
 
 /** ISO 3098 tier: wordmark cap height on A3+ (mm). */
-const WM_CAP_A3 = 5;
+const WM_CAP_A3 = 3.5;
 
 /** Short-side threshold for A3+ papers (mm). */
 const A3_SHORT_SIDE = 297;

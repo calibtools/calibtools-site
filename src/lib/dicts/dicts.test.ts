@@ -1,17 +1,20 @@
 import { describe, it, expect } from 'vitest';
+import { readFileSync, existsSync } from 'node:fs';
+import { resolve } from 'node:path';
+import sharp from 'sharp';
 import {
   getArUcoDict, decodeMarkerBits, arucoDictNames,
   getAprilFamily, decodeAprilBits, aprilFamilyNames,
 } from './dicts';
 
-// ArUco checksums from scripts/gen-dicts.py
+// ArUco checksums — regenerated from OpenCV generateImageMarker (row-major MSB-first)
 const ARUCO_CHECKSUMS: Record<string, {marker0: string; marker1: string}> = {
-  "DICT_4X4_50": { marker0: "b532eb484cad12d7", marker1: "0f9a654759f0e2a6" },
-  "DICT_5X5_100": { marker0: "a2d95e00522ed9013d4da201cdba2500", marker1: "0e037300b0c685006760380050b18601" },
-  "DICT_6X6_250": { marker0: "1e3dd82a06e3ba4631096541bbc70898c625dc07", marker1: "0efba38901d7e618050e891c5df7007a01867e0b" },
-  "DICT_7X7_1000": { marker0: "dd5c6ca5ca0a0163b3ade431b400a829d29b1d5d0116c613dae6e300", marker1: "e41bf13e40ab0011fd890bb52a016a813e47ec1301aa56e848dfc400" },
-  "DICT_ARUCO_ORIGINAL": { marker0: "8421080000000f0108421001f8000000", marker1: "84210b0108420f01e8421001f8210800" },
-  "DICT_ARUCO_MIP_36h12": { marker0: "d2b63a090d45685db704b905c6d40b2edba16a02", marker1: "6001134e051c62609801a72c8800068190646308" },
+  "DICT_4X4_50": { marker0: "b0503020", marker1: "00f090a0" },
+  "DICT_5X5_100": { marker0: "a05860a8e0", marker1: "08c008b830" },
+  "DICT_6X6_250": { marker0: "1c8cdc602898", marker1: "0cbcb88c8844" },
+  "DICT_7X7_1000": { marker0: "dcae1a945c502a", marker1: "e40cfc26e404ac" },
+  "DICT_ARUCO_ORIGINAL": { marker0: "8080808080", marker1: "80808080b8" },
+  "DICT_ARUCO_MIP_36h12": { marker0: "d0ac60e80874", marker1: "6000104c4c94" },
 };
 
 // AprilTag checksums from scripts/gen-apriltag.mjs
@@ -64,6 +67,49 @@ describe('ArUco dictionaries', () => {
 
   it('getArUcoDict returns undefined for unknown name', () => {
     expect(getArUcoDict('DICT_FAKE')).toBeUndefined();
+  });
+
+  it('decodeMarkerBits matches OpenCV reference PNGs', async () => {
+    const fixtureDir = resolve(__dirname, '../../../tests/fixtures/aruco');
+    const cases: { dict: string; id: number; markerSize: number }[] = [
+      { dict: 'DICT_4X4_50', id: 0, markerSize: 4 },
+      { dict: 'DICT_4X4_50', id: 1, markerSize: 4 },
+      { dict: 'DICT_6X6_250', id: 0, markerSize: 6 },
+      { dict: 'DICT_6X6_250', id: 1, markerSize: 6 },
+      { dict: 'DICT_6X6_250', id: 249, markerSize: 6 },
+      { dict: 'DICT_7X7_1000', id: 0, markerSize: 7 },
+      { dict: 'DICT_7X7_1000', id: 999, markerSize: 7 },
+      { dict: 'DICT_ARUCO_ORIGINAL', id: 0, markerSize: 5 },
+      { dict: 'DICT_ARUCO_MIP_36h12', id: 0, markerSize: 6 },
+    ];
+
+    for (const { dict, id, markerSize } of cases) {
+      const pngPath = resolve(fixtureDir, `${dict}_id${id}.png`);
+      if (!existsSync(pngPath)) continue;
+
+      // Read reference PNG and extract inner data bits
+      const { data, info } = await sharp(pngPath)
+        .greyscale()
+        .raw()
+        .toBuffer({ resolveWithObject: true });
+      const cell = info.width / (markerSize + 2);
+      const refGrid: number[][] = [];
+      for (let r = 0; r < markerSize; r++) {
+        const row: number[] = [];
+        for (let c = 0; c < markerSize; c++) {
+          const y = Math.floor((r + 1) * cell + cell / 2);
+          const x = Math.floor((c + 1) * cell + cell / 2);
+          row.push(data[y * info.width + x] > 127 ? 1 : 0);
+        }
+        refGrid.push(row);
+      }
+
+      // Decode from our JSON data
+      const d = getArUcoDict(dict)!;
+      const ourGrid = decodeMarkerBits(d.bits[id], d.markerSize);
+
+      expect(ourGrid, `${dict} id ${id}`).toEqual(refGrid);
+    }
   });
 });
 
