@@ -1,0 +1,11 @@
+{
+  "product": {
+    "title": "Target Stand",
+    "handle": "target-stand",
+    "fetched": "2026-10-29",
+    "source": "https://calib.io/products/target-stand.json"
+  },
+  "variants": [
+    { "id": 40127185158211, "title": "Default Title", "price": "152.00", "available": true, "sku": "TRGSTA01" }
+  ]
+}

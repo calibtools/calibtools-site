@@ -1,0 +1,13 @@
+{
+  "product": {
+    "title": "Robot Flange Mount",
+    "handle": "robot-flange-mount",
+    "fetched": "2026-10-29",
+    "source": "https://calib.io/products/robot-flange-mount.json"
+  },
+  "variants": [
+    { "id": 46960922952011, "title": "Kit (flange fitting + plate adapter)", "price": "367.00", "available": true, "sku": "RBTMNT01" },
+    { "id": 46960922984779, "title": "Flange fitting", "price": "273.00", "available": true, "sku": "RBTMNT01-FLN" },
+    { "id": 46960923017547, "title": "Plate adapter", "price": "136.00", "available": true, "sku": "RBTMNT01-PLT" }
+  ]
+}

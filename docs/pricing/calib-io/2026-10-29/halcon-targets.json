@@ -1,0 +1,15 @@
+{
+  "product": {
+    "title": "Halcon Targets",
+    "handle": "halcon-targets",
+    "fetched": "2026-10-29",
+    "source": "https://calib.io/products/halcon-targets.json"
+  },
+  "variants": [
+    { "id": 9451730632751, "title": "800 x 600", "price": "283.00", "available": true, "sku": "HAL800600F" },
+    { "id": 9451749277743, "title": "600 x 400", "price": "208.00", "available": true, "sku": "HAL600400F" },
+    { "id": 9451763630127, "title": "400 x 300", "price": "142.00", "available": true, "sku": "HAL400300F" },
+    { "id": 9451755798575, "title": "300 x 200", "price": "133.00", "available": true, "sku": "HAL300200F" },
+    { "id": 9451751112751, "title": "200 x 150", "price": "127.00", "available": true, "sku": "HAL200150F" }
+  ]
+}

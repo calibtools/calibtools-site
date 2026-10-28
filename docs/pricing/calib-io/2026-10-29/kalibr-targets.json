@@ -1,0 +1,13 @@
+{
+  "product": {
+    "title": "Kalibr Targets",
+    "handle": "kalibr-targets",
+    "fetched": "2026-10-29",
+    "source": "https://calib.io/products/kalibr-targets.json"
+  },
+  "variants": [
+    { "id": 11666891931695, "title": "400x300", "price": "176.00", "available": true, "sku": "KLB400300" },
+    { "id": 11666891997231, "title": "600x400", "price": "234.00", "available": true, "sku": "KLB600400" },
+    { "id": 11666892062767, "title": "800x600", "price": "315.00", "available": true, "sku": "KLB800600" }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "product": {
+    "title": "Circle Targets",
+    "handle": "circles",
+    "fetched": "2026-10-29",
+    "source": "https://calib.io/products/circles.json"
+  },
+  "variants": [
+    { "id": 8114784600111, "title": "200x150 / Fine", "price": "103.00", "available": true, "sku": "CT200150F" },
+    { "id": 8114784632879, "title": "200x150 / Coarse", "price": "103.00", "available": true, "sku": "CT200150C" },
+    { "id": 8114784534575, "title": "300x200 / Fine", "price": "108.00", "available": true, "sku": "CT300200F" },
+    { "id": 8114784567343, "title": "300x200 / Coarse", "price": "108.00", "available": true, "sku": "CT300200C" },
+    { "id": 8114784469039, "title": "400x300 / Fine", "price": "127.00", "available": true, "sku": "CT400300F" },
+    { "id": 8114784501807, "title": "400x300 / Coarse", "price": "127.00", "available": true, "sku": "CT400300C" },
+    { "id": 8114784403503, "title": "600x400 / Fine", "price": "176.00", "available": true, "sku": "CT600400F" },
+    { "id": 8114784436271, "title": "600x400 / Coarse", "price": "176.00", "available": true, "sku": "CT600400C" },
+    { "id": 9104486006831, "title": "800x600 / Fine", "price": "263.00", "available": true, "sku": "CT800600F" },
+    { "id": 9104489742383, "title": "800x600 / Coarse", "price": "263.00", "available": true, "sku": "CT800600C" }
+  ]
+}

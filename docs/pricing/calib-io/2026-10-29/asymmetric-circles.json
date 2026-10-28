@@ -1,0 +1,20 @@
+{
+  "product": {
+    "title": "Asymmetric Circle Targets",
+    "handle": "asymmetric-circles",
+    "fetched": "2026-10-29",
+    "source": "https://calib.io/products/asymmetric-circles.json"
+  },
+  "variants": [
+    { "id": 8113205215279, "title": "200x150 / Fine", "price": "103.00", "available": true, "sku": "ACT200150F" },
+    { "id": 8113205248047, "title": "200x150 / Coarse", "price": "103.00", "available": true, "sku": "ACT200150C" },
+    { "id": 8113205149743, "title": "300x200 / Fine", "price": "108.00", "available": true, "sku": "ACT300200F" },
+    { "id": 8113205182511, "title": "300x200 / Coarse", "price": "108.00", "available": true, "sku": "ACT300200C" },
+    { "id": 8113205084207, "title": "400x300 / Fine", "price": "121.00", "available": true, "sku": "ACT400300F" },
+    { "id": 8113205116975, "title": "400x300 / Coarse", "price": "121.00", "available": true, "sku": "ACT400300C" },
+    { "id": 8113205018671, "title": "600x400 / Fine", "price": "176.00", "available": true, "sku": "ACT600400F" },
+    { "id": 8113205051439, "title": "600x400 / Coarse", "price": "176.00", "available": true, "sku": "ACT600400C" },
+    { "id": 9104413294639, "title": "800x600 / Fine", "price": "263.00", "available": true, "sku": "ACT800600F" },
+    { "id": 9104438231087, "title": "800x600 / Coarse", "price": "263.00", "available": true, "sku": "ACT800600C" }
+  ]
+}

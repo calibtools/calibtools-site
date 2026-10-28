@@ -1,0 +1,23 @@
+{
+  "product": {
+    "title": "ChArUco Targets",
+    "handle": "charuco-targets",
+    "fetched": "2026-10-29",
+    "source": "https://calib.io/products/charuco-targets.json"
+  },
+  "variants": [
+    { "id": 9400442716207, "title": "200x150 / Coarse / Aluminium/LDPE", "price": "116.00", "available": true, "sku": "CCT200150C" },
+    { "id": 9400454774831, "title": "200x150 / Fine / Aluminium/LDPE", "price": "116.00", "available": true, "sku": "CCT200150F" },
+    { "id": 9400454807599, "title": "300x200 / Coarse / Aluminium/LDPE", "price": "120.00", "available": true, "sku": "CCT300200C" },
+    { "id": 9400454840367, "title": "300x200 / Fine / Aluminium/LDPE", "price": "120.00", "available": true, "sku": "CCT300200F" },
+    { "id": 9400454873135, "title": "400x300 / Coarse / Aluminium/LDPE", "price": "134.00", "available": true, "sku": "CCT400300C" },
+    { "id": 9400454905903, "title": "400x300 / Fine / Aluminium/LDPE", "price": "134.00", "available": true, "sku": "CCT400300F" },
+    { "id": 9400454938671, "title": "600x400 / Coarse / Aluminium/LDPE", "price": "203.00", "available": true, "sku": "CCT600400C" },
+    { "id": 9400454971439, "title": "600x400 / Fine / Aluminium/LDPE", "price": "203.00", "available": true, "sku": "CCT600400F" },
+    { "id": 9400455004207, "title": "800x600 / Coarse / Aluminium/LDPE", "price": "273.00", "available": true, "sku": "CCT800600C" },
+    { "id": 9400455036975, "title": "800x600 / Fine / Aluminium/LDPE", "price": "273.00", "available": true, "sku": "CCT800600F" },
+    { "id": 40014846001219, "title": "75x50 / Fine / Ceramic", "price": "440.00", "available": true, "sku": "CCT075050F" },
+    { "id": 40014846033987, "title": "100x75 / Fine / Ceramic", "price": "680.00", "available": true, "sku": "CCT100075F" },
+    { "id": 40014846066755, "title": "150x100 / Fine / Ceramic", "price": "915.00", "available": true, "sku": "CCT150100F" }
+  ]
+}

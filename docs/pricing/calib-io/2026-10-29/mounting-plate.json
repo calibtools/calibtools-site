@@ -1,0 +1,11 @@
+{
+  "product": {
+    "title": "Mounting Plate",
+    "handle": "mounting-plate",
+    "fetched": "2026-10-29",
+    "source": "https://calib.io/products/mounting-plate.json"
+  },
+  "variants": [
+    { "id": 40144045899843, "title": "Default Title", "price": "135.00", "available": true, "sku": "MNTGPLA01" }
+  ]
+}
