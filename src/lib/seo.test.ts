@@ -1,4 +1,6 @@
 import { describe, it, expect } from 'vitest';
+import { existsSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { breadcrumbLd, autoBreadcrumbLd, ORGANIZATION_LD } from './seo';
 
 describe('breadcrumbLd', () => {
@@ -80,5 +82,41 @@ describe('ORGANIZATION_LD', () => {
     const json = JSON.stringify(ORGANIZATION_LD);
     expect(json).not.toContain('"address"');
     expect(json).not.toContain('"city"');
+  });
+
+  it('logo points to android-chrome-512x512.png', () => {
+    expect(ORGANIZATION_LD.logo).toBe('https://calib.tools/android-chrome-512x512.png');
+  });
+
+  it('every absolute calib.tools URL (except sameAs) resolves to a file under public/ or dist/', () => {
+    const PUBLIC = resolve(__dirname, '../../public');
+    const DIST = resolve(__dirname, '../../dist');
+
+    function extractUrls(obj: any, parentKey?: string): string[] {
+      const urls: string[] = [];
+      if (typeof obj === 'string' && obj.startsWith('https://calib.tools/') && parentKey !== 'sameAs') {
+        urls.push(obj);
+      } else if (Array.isArray(obj)) {
+        for (const item of obj) urls.push(...extractUrls(item, parentKey));
+      } else if (obj && typeof obj === 'object') {
+        for (const [k, v] of Object.entries(obj)) {
+          if (k === 'sameAs') continue;
+          urls.push(...extractUrls(v, k));
+        }
+      }
+      return urls;
+    }
+
+    const urls = extractUrls(ORGANIZATION_LD);
+    expect(urls.length).toBeGreaterThan(0);
+    for (const url of urls) {
+      const path = url.replace('https://calib.tools', '');
+      if (path === '' || path === '/') continue; // root URL is fine
+      const asFile = path.startsWith('/') ? path.slice(1) : path;
+      const inPublic = existsSync(resolve(PUBLIC, asFile));
+      const inDist = existsSync(resolve(DIST, asFile));
+      const isDir = existsSync(resolve(DIST, asFile, 'index.html'));
+      expect(inPublic || inDist || isDir, `${url} → ${asFile} must exist in public/ or dist/`).toBe(true);
+    }
   });
 });

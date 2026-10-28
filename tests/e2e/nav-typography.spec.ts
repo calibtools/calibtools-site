@@ -191,6 +191,35 @@ test.describe('NAV-2 Typography — Mobile (390px)', () => {
   });
 });
 
+test.describe('NAV-3 Mega-menu overflow', () => {
+  test.use({ viewport: { width: 1440, height: 900 } });
+
+  test('no mega-menu text box crosses its column bounding box', async ({ page }) => {
+    await page.goto('/');
+    const trigger = page.locator('[data-nav-trigger]').first();
+    await trigger.hover();
+    await page.waitForTimeout(200);
+
+    const overflows = await page.evaluate(() => {
+      const cols = document.querySelectorAll('[data-mega-col]');
+      const problems: string[] = [];
+      cols.forEach((col, ci) => {
+        const colRect = col.getBoundingClientRect();
+        col.querySelectorAll('a, div, span').forEach(el => {
+          const r = el.getBoundingClientRect();
+          if (r.width === 0 || r.height === 0) return;
+          if (r.right > colRect.right + 1 || r.left < colRect.left - 1) {
+            problems.push(`col ${ci}: "${el.textContent?.trim().slice(0, 30)}" overflows (el.right=${Math.round(r.right)}, col.right=${Math.round(colRect.right)})`);
+          }
+        });
+      });
+      return problems;
+    });
+
+    expect(overflows, 'No mega-menu element should overflow its column').toEqual([]);
+  });
+});
+
 test.describe('NAV-2 Typography — Screenshot baselines', () => {
   test('header closed at 1440px', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });

@@ -12,6 +12,12 @@ const jsonLd = toolJsonLd(entry.data.h1, '/tools/generator/', entry.data.seoDesc
 ---
 <Base title={entry.data.seoTitle} section="tools" description={entry.data.seoDescription} jsonLd={jsonLd}>
   <ToolTabs current="generator" />
+  <nav class="container-x flex flex-wrap gap-2 pt-5 text-sm" aria-label="Pattern types">
+    <a href="/tools/generator/checkerboard/" class="rounded-full border border-line px-3.5 py-2 no-underline text-ink hover:text-brand hover:border-brand">Checkerboard</a>
+    <a href="/tools/generator/charuco/" class="rounded-full border border-line px-3.5 py-2 no-underline text-ink hover:text-brand hover:border-brand">ChArUco</a>
+    <a href="/tools/generator/aprilgrid/" class="rounded-full border border-line px-3.5 py-2 no-underline text-ink hover:text-brand hover:border-brand">AprilGrid</a>
+    <a href="/tools/generator/circles/" class="rounded-full border border-line px-3.5 py-2 no-underline text-ink hover:text-brand hover:border-brand">Circles</a>
+  </nav>
   <div class="container-x py-7 md:pb-16">
     <Generator client:load />
   </div>

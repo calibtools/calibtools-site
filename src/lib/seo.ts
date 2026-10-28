@@ -67,7 +67,7 @@ export const ORGANIZATION_LD: Record<string, any> = {
   '@type': 'Organization',
   name: 'Calib.Tools',
   url: SITE_URL,
-  logo: `${SITE_URL}/logo.svg`,
+  logo: `${SITE_URL}/android-chrome-512x512.png`,
   sameAs: ['https://github.com/calibtools'],
   contactPoint: {
     '@type': 'ContactPoint',

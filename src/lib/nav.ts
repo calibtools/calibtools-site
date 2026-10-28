@@ -68,9 +68,13 @@ export const targetsMega: MegaMenuColumn[] = [
   },
 ];
 
-// ── Tools dropdown (all tools except generator) ──────────────────────
+// ── Tools dropdown (generator first, separated, then other tools) ────
 
+const generatorTool = tools.find((t) => t.key === 'generator')!;
+
+/** The first item (Pattern generator) is promoted with weight 600 and 8px separator after it. */
 export const toolsDropdown: NavItem[] = [
+  { label: generatorTool.title, href: generatorTool.href, description: generatorTool.body },
   ...tools
     .filter((t) => t.key !== 'generator')
     .map((t) => ({ label: t.title, href: t.href, description: t.body })),
@@ -93,7 +97,6 @@ export const supportDropdown: NavItem[] = [
 
 export const headerGroups: NavGroup[] = [
   { key: 'targets', label: 'Targets', columns: targetsMega },
-  { key: 'generator', label: 'Pattern generator', href: '/tools/generator/' },
   { key: 'tools', label: 'Tools', items: toolsDropdown },
   { key: 'guides', label: 'Guides', href: '/guides/' },
   { key: 'support', label: 'Support', items: supportDropdown },

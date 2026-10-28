@@ -238,6 +238,22 @@ for (const url of sitemapUrls) {
   }
 }
 
+// ── robots.txt must not block favicon or android-chrome files ────────
+{
+  const robotsPath = join(DIST, 'robots.txt');
+  if (existsSync(robotsPath)) {
+    const robotsTxt = readFileSync(robotsPath, 'utf-8');
+    const disallowRe = /^Disallow:\s*(.+)/gm;
+    let dm;
+    while ((dm = disallowRe.exec(robotsTxt)) !== null) {
+      const path = dm[1].trim();
+      if (/favicon/i.test(path) || /android-chrome/i.test(path)) {
+        errors.push({ file: 'robots.txt', rule: 'robots-blocks-icons', detail: `Disallow ${path} blocks icon files` });
+      }
+    }
+  }
+}
+
 // ── Print table ──────────────────────────────────────────────────────
 console.log('\n[check-seo] Page audit:\n');
 console.log('  ' + 'File'.padEnd(53) + 'Title'.padEnd(8) + 'Desc'.padEnd(8) + 'H1s'.padEnd(6) + 'NoIdx');
