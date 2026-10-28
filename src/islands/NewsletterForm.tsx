@@ -68,7 +68,7 @@ export default function NewsletterForm() {
         <button
           type="submit"
           disabled={status === 'busy'}
-          className="rounded bg-brand px-[18px] py-3 text-[15px] font-semibold text-white disabled:opacity-50"
+          className="btn-md btn-primary disabled:opacity-50"
         >
           {status === 'busy' ? 'Sending…' : 'Subscribe'}
         </button>

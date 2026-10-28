@@ -78,7 +78,7 @@ export default function NotifyForm({ handle }: Props) {
         <button
           type="submit"
           disabled={status === 'busy'}
-          className="btn-dark shrink-0 text-sm"
+          className="btn-sm btn-primary shrink-0"
         >
           {status === 'busy' ? 'Subscribing…' : 'Notify me'}
         </button>

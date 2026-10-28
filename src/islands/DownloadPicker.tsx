@@ -88,7 +88,7 @@ export default function DownloadPicker({ files }: Props) {
           type="button"
           onClick={handleDownloadAll}
           disabled={busy || selectedFiles.length === 0}
-          className="btn-outline gap-2 text-sm self-start"
+          className="btn-md btn-secondary gap-2 self-start"
         >
           <Download size={16} strokeWidth={1.6} aria-hidden="true" />
           {busy ? 'Zipping…' : `Download all (.zip)`}
