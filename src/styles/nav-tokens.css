@@ -35,7 +35,7 @@
   --nav-header-h-scrolled: 56px;   /* 14×4, 8px smaller */
 
   /* ── Button heights ── */
-  --nav-btn-h:    36px;  /* 9×4 */
+  --nav-btn-h:    40px;  /* 10×4 — matches btn-md */
   --nav-cart-h:   40px;  /* 10×4 */
 
   /* ── Weights ── */
