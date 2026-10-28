@@ -9,7 +9,6 @@ import { breadcrumbLd } from '@/lib/seo';
 import { getEntry } from 'astro:content';
 import { IN_DEVELOPMENT } from '@/lib/claims';
 import { getReviewsForProduct, summarize } from '@/lib/reviews';
-import { getProductData } from '@/lib/productData';
 const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: 'Calibration targets' }]);
 
 const collections = await getCollections();
@@ -33,29 +32,17 @@ for (const p of products) {
 }
 
 // Build review + content data for cards
-const cardDataMap = new Map<string, { rating: number; count: number; summary?: string; chips?: Array<{ label: string; value: string }> }>();
+const cardDataMap = new Map<string, { rating: number; count: number; summary?: string; chips?: string[] }>();
 for (const p of products) {
   const reviews = await getReviewsForProduct(p.handle);
   const s = summarize(reviews.filter(r => r.status === 'published'));
   const productContent = await getEntry('products', p.handle);
-  const pd = getProductData(p.handle, p.metafields ?? {});
-
-  let chips: Array<{ label: string; value: string }> | undefined;
-  if (productContent?.data.decideSpecs && pd) {
-    const allRows = pd.specGroups.flatMap(g => g.rows);
-    chips = productContent.data.decideSpecs
-      .map(key => {
-        const row = allRows.find(r => r.label === key);
-        return row ? { label: row.label, value: row.value } : null;
-      })
-      .filter((c): c is { label: string; value: string } => c !== null);
-  }
 
   cardDataMap.set(p.handle, {
     rating: s.average,
     count: s.count,
     summary: productContent?.data.summary,
-    chips,
+    chips: productContent?.data.chips,
   });
 }
 ---
@@ -109,6 +96,7 @@ for (const p of products) {
                 image={!localHero ? p.image : undefined}
                 rating={cd?.rating}
                 reviewCount={cd?.count}
+                chips={cd?.chips}
               />
             );
           })}

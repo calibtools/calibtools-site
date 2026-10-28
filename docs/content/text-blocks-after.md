@@ -1,11 +1,14 @@
-[measure-text-blocks] 7 blocks >= 300 chars found.
+# Text Blocks After UI-2b
 
-| Page | Tag | Chars | Source | Preview |
+Generated: 2026-10-29
+
+## Blocks >= 300 chars (site-wide)
+
+| Page | Tag | Chars | Source | Status |
 |---|---|---|---|---|
-| /about/ | <p> | 322 | component literal | [WHY WE BUILT THIS — calibration targets should be affordable, well-documented a... |
-| /targets/collection/ceramic-glass/ | <p> | 435 | component literal | White alumina ceramic with matte blue chrome pattern, lithographed in a cleanroo... |
-| /targets/collection/composite-boards/ | <p> | 520 | component literal | ChArUco pattern (checkerboard with embedded ArUco markers) on aluminium/LDPE com... |
-| /targets/collection/composite-boards/ | <p> | 459 | component literal | Aluminium/LDPE composite, 6 mm. UV-printed matte pattern. Feature tolerance 0.3 ... |
-| /tools/capture/ | <p> | 313 | component literal | Mount a ChArUco board on a flat surface. Start the camera, capture “Center” at r... |
-| /tools/check/ | <p> | 340 | component literal | The detection check loads OpenCV.js in your browser and runs the appropriate cor... |
-| /tools/convert/ | <p> | 341 | component literal | The format converter takes a calibration target config in any supported format —... |
+| /about/ | `<p>` | 322 | component literal | **allow-listed** (placeholder, dated 2026-10-29) |
+
+**0 blocks >= 300 chars outside the allow-list.**
+
+All product pages, tool pages, guide pages, and collection pages are under the 300-char block budget.
+Card text (all `[data-card]` elements) is under the 220-char budget.

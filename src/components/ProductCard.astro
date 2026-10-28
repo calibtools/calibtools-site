@@ -18,8 +18,8 @@ interface Props {
   placeholder?: string;
   /** Small tag shown instead of price (e.g. "In development"). */
   tag?: string;
-  /** Up to 3 spec chips: { label, value }. */
-  chips?: Array<{ label: string; value: string }>;
+  /** Up to 3 value-only chip strings, rendered as "val · val · val". */
+  chips?: string[];
   /** Star rating average (hidden when reviewCount is 0). */
   rating?: number;
   /** Review count (hidden when 0). */
@@ -53,11 +53,7 @@ const displaySummary = summary || sub || '';
     {reviewCount > 0 && <Rating average={rating} count={reviewCount} size={12} />}
     {displaySummary && <span class="text-sm text-ink-muted line-clamp-2">{displaySummary}</span>}
     {chips && chips.length > 0 && (
-      <div class="flex flex-wrap gap-1">
-        {chips.map((c) => (
-          <span class="rounded bg-ground-alt px-1.5 py-0.5 text-[11px] font-mono text-ink-muted">{c.label}: {c.value}</span>
-        ))}
-      </div>
+      <span class="text-[12px] font-mono text-ink-muted">{chips.join(' · ')}</span>
     )}
     {tag ? (
       <span class="text-xs font-semibold uppercase tracking-wide text-ink-soft">{tag}</span>

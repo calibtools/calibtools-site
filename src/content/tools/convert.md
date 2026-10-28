@@ -15,7 +15,9 @@ faq:
 
 ## What it does
 
-The format converter takes a calibration target config in any supported format — OpenCV JSON, Kalibr YAML, ROS 2 YAML or HALCON .descr — and converts it to any other. It auto-detects the input format, parses the pattern type, grid dimensions, square and marker sizes, dictionary and start ID, then serialises the result in the target format.
+The format converter takes a calibration target config in any supported format — OpenCV JSON, Kalibr YAML, ROS 2 YAML or HALCON .descr — and converts it to any other.
+
+It auto-detects the input format, parses the pattern type, grid dimensions, square and marker sizes, dictionary and start ID, then serialises the result in the target format.
 
 ## How to use it
 

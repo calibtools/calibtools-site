@@ -99,8 +99,15 @@ const bannedScanFiles = [
 });
 
 // ---------------------------------------------------------------------------
-// Prose length check (warn-only)
+// Prose length check (build-breaking, with allow-list)
 // ---------------------------------------------------------------------------
+
+// Allow-list: file:line entries that are permitted to exceed THRESHOLD.
+// Form-control groups and known placeholders only.
+const PROSE_ALLOW = new Set([
+  // /about/ placeholder paragraph — to be replaced with real copy (2026-10-29)
+  'src/pages/about.astro:28',
+]);
 
 const offenders = [];
 
@@ -150,13 +157,21 @@ for (const file of proseFiles) {
   }
 }
 
-if (offenders.length > 0) {
-  console.warn(`[check-prose] ${offenders.length} paragraph(s) exceed ${THRESHOLD} characters:`);
-  for (const o of offenders) {
-    console.warn(`  ${o.file}:${o.line} (${o.chars} chars) ${o.snippet}…`);
+const blocked = offenders.filter((o) => !PROSE_ALLOW.has(`${o.file}:${o.line}`));
+const allowed = offenders.filter((o) => PROSE_ALLOW.has(`${o.file}:${o.line}`));
+
+if (allowed.length > 0) {
+  console.log(`[check-prose] ${allowed.length} allowed paragraph(s) exceed ${THRESHOLD} chars (in allow-list).`);
+}
+
+if (blocked.length > 0) {
+  console.error(`[check-prose] ${blocked.length} paragraph(s) exceed ${THRESHOLD} characters:`);
+  for (const o of blocked) {
+    console.error(`  ${o.file}:${o.line} (${o.chars} chars) ${o.snippet}…`);
   }
+  process.exit(1);
 } else {
-  console.log(`[check-prose] OK — no paragraphs exceed ${THRESHOLD} characters.`);
+  console.log(`[check-prose] OK — no paragraphs exceed ${THRESHOLD} characters (outside allow-list).`);
 }
 
 // ---------------------------------------------------------------------------
