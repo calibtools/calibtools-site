@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calib.Tools Navigation Tree Test</title>
+<style>
+  :root { --brand: #E60012; --ink: #1a1a1a; --ink-soft: #666; --ground: #fafafa; --line: #e5e5e5; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--ground); color: var(--ink); line-height: 1.5; }
+  .container { max-width: 720px; margin: 0 auto; padding: 24px 16px; }
+  h1 { font-size: 20px; margin-bottom: 8px; }
+  h2 { font-size: 16px; margin-bottom: 6px; }
+  .subtitle { color: var(--ink-soft); font-size: 14px; margin-bottom: 24px; }
+  .task-card { background: white; border: 1px solid var(--line); border-radius: 8px; padding: 20px; margin-bottom: 16px; }
+  .task-number { font-size: 12px; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; }
+  .task-text { font-size: 16px; font-weight: 600; margin-bottom: 16px; }
+  .nav-tree { border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+  .nav-group { border-bottom: 1px solid var(--line); }
+  .nav-group:last-child { border-bottom: none; }
+  .nav-group-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; cursor: pointer; font-weight: 600; font-size: 14px; background: white; user-select: none; }
+  .nav-group-header:hover { background: #f5f5f5; }
+  .nav-group-header .arrow { transition: transform 0.2s; font-size: 12px; color: var(--ink-soft); }
+  .nav-group-header.open .arrow { transform: rotate(90deg); }
+  .nav-group-items { display: none; padding: 0 16px 10px 32px; background: white; }
+  .nav-group-items.open { display: block; }
+  .nav-item { padding: 6px 0; font-size: 14px; cursor: pointer; color: var(--ink); border-radius: 4px; }
+  .nav-item:hover { color: var(--brand); }
+  .nav-item.direct-link { padding: 10px 16px; font-weight: 600; font-size: 14px; cursor: pointer; background: white; }
+  .nav-item.direct-link:hover { background: #f5f5f5; color: var(--brand); }
+  .nav-cta { padding: 10px 16px; background: white; }
+  .cta-btn { display: inline-block; padding: 8px 16px; font-size: 14px; font-weight: 600; border-radius: 6px; cursor: pointer; border: none; }
+  .cta-primary { background: var(--brand); color: white; }
+  .cta-secondary { background: white; color: var(--ink); border: 1.5px solid var(--ink); margin-left: 8px; }
+  .mega-col { margin-bottom: 8px; }
+  .mega-col-header { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-soft); margin-bottom: 4px; padding-top: 4px; }
+  .progress { display: flex; gap: 6px; margin-bottom: 16px; }
+  .progress-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--line); }
+  .progress-dot.done { background: #22c55e; }
+  .progress-dot.current { background: var(--brand); }
+  #results-panel { display: none; background: white; border: 1px solid var(--line); border-radius: 8px; padding: 20px; margin-top: 24px; }
+  #results-panel h2 { margin-bottom: 12px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 16px; }
+  th, td { padding: 6px 8px; text-align: left; border-bottom: 1px solid var(--line); }
+  th { font-weight: 600; }
+  .export-btn { background: var(--ink); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600; }
+  .export-btn:hover { background: #333; }
+  #intro-panel { background: white; border: 1px solid var(--line); border-radius: 8px; padding: 24px; margin-bottom: 24px; }
+  #intro-panel p { margin-bottom: 12px; font-size: 14px; }
+  .start-btn { background: var(--brand); color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: 600; }
+  .start-btn:hover { opacity: 0.9; }
+  .desc { font-size: 12px; color: var(--ink-soft); }
+  .not-live { opacity: 0.5; font-style: italic; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Calib.Tools Tree Test</h1>
+  <p class="subtitle">Navigation findability study</p>
+
+  <div id="intro-panel">
+    <p><strong>Instructions:</strong> You will see 10 tasks, one at a time. For each task, click the navigation item where you would first look to complete the task. You can open groups and click sub-items. Your clicks are recorded.</p>
+    <p>There are no wrong answers. We are testing the navigation, not you.</p>
+    <p><strong>Time:</strong> About 5-10 minutes.</p>
+    <label style="display:block;margin-bottom:12px;">
+      <span style="font-size:14px;font-weight:600;">Your name or initials:</span><br>
+      <input type="text" id="participant-name" style="margin-top:4px;padding:8px 12px;border:1px solid var(--line);border-radius:6px;font-size:14px;width:200px;">
+    </label>
+    <button class="start-btn" onclick="startTest()">Start test</button>
+  </div>
+
+  <div id="test-panel" style="display:none;">
+    <div class="progress" id="progress"></div>
+
+    <div class="task-card" id="task-card">
+      <div class="task-number" id="task-number">Task 1 of 10</div>
+      <div class="task-text" id="task-text"></div>
+    </div>
+
+    <div class="nav-tree" id="nav-tree"></div>
+  </div>
+
+  <div id="results-panel">
+    <h2>Results</h2>
+    <table id="results-table">
+      <thead><tr><th>#</th><th>Task</th><th>First click</th><th>Full path</th><th>Correct?</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <p style="font-size:14px;margin-bottom:16px;">
+      <strong>First-click accuracy:</strong> <span id="first-click-score"></span> |
+      <strong>Task success:</strong> <span id="task-success-score"></span>
+    </p>
+    <button class="export-btn" onclick="exportJSON()">Export JSON</button>
+  </div>
+</div>
+
+<script>
+const TASKS = [
+  { id: 1, text: "Find a calibration board that works with Kalibr", targets: ["/tools/generator/aprilgrid/", "/targets/", "/targets/charuco-composite/", "/targets/checkerboard-composite/"], firstClicks: ["targets-group", "pattern-generator", "shop-targets"] },
+  { id: 2, text: "See who pays import duties on a target shipment", targets: ["/shipping/"], firstClicks: ["support-group"] },
+  { id: 3, text: "Download the OpenCV YAML for a ChArUco board you designed", targets: ["/tools/generator/charuco/", "/tools/generator/"], firstClicks: ["pattern-generator"] },
+  { id: 4, text: "Verify the inspection report for serial 000311", targets: ["/verify/"], firstClicks: ["support-group"] },
+  { id: 5, text: "Ask for a quote on a 1200 mm custom board", targets: ["/quote/"], firstClicks: ["request-quote"] },
+  { id: 6, text: "Compare composite vs ceramic material for your application", targets: ["/guides/composite-ceramic-or-glass/"], firstClicks: ["guides-link"] },
+  { id: 7, text: "Check what the detector sees in your calibration photo", targets: ["/tools/check/"], firstClicks: ["tools-group"] },
+  { id: 8, text: "Buy a ChArUco board on a ceramic substrate", targets: ["/targets/charuco-ceramic/", "/targets/collection/ceramic-glass/"], firstClicks: ["targets-group", "shop-targets"] },
+  { id: 9, text: "Find out what the return policy is", targets: ["/returns/"], firstClicks: ["support-group"] },
+  { id: 10, text: "Convert your OpenCV calibration to HALCON format", targets: ["/tools/convert/"], firstClicks: ["tools-group"] },
+];
+
+const NAV_TREE = [
+  { id: "targets-group", label: "Targets", type: "group", children: [
+    { id: "col-pattern", label: "By pattern", type: "column-header" },
+    { id: "charuco-boards", label: "ChArUco boards", path: "/targets/charuco-composite/" },
+    { id: "checkerboard-targets", label: "Checkerboard targets", path: "/targets/checkerboard-composite/" },
+    { id: "aprilgrid-boards", label: "AprilGrid boards", path: null, notLive: true },
+    { id: "circle-grid", label: "Circle grid targets", path: null, notLive: true },
+    { id: "halcon-plates", label: "HALCON calibration plates", path: null, notLive: true },
+    { id: "col-material", label: "By material", type: "column-header" },
+    { id: "composite-boards", label: "Composite boards", path: "/targets/collection/composite-boards/" },
+    { id: "ceramic-glass", label: "Ceramic & glass targets", path: "/targets/collection/ceramic-glass/" },
+    { id: "charuco-ceramic", label: "ChArUco ceramic", path: "/targets/charuco-ceramic/" },
+    { id: "lidar-iq", label: "LiDAR & image quality", path: "/targets/collection/lidar-image-quality/" },
+    { id: "col-services", label: "Services & accessories", type: "column-header" },
+    { id: "certificate", label: "ILAC calibration certificate", path: "/targets/certificate-ilac/" },
+    { id: "mounting", label: "Mounting fixture", path: "/targets/mounting-fixture/" },
+    { id: "mounts-acc", label: "Mounts & accessories", path: "/targets/collection/mounts-accessories/" },
+    { id: "all-targets", label: "All targets", path: "/targets/" },
+  ]},
+  { id: "pattern-generator", label: "Pattern generator", type: "direct", path: "/tools/generator/" },
+  { id: "tools-group", label: "Tools", type: "group", children: [
+    { id: "fov", label: "FOV & resolution calculator", path: "/tools/fov/", desc: "Sensor, lens and working distance in -- field of view, mm/px and target size out." },
+    { id: "wizard", label: "Target selection wizard", path: "/tools/wizard/", desc: "Five questions, one recommendation." },
+    { id: "convert", label: "Format converter", path: "/tools/convert/", desc: "OpenCV, ROS, Kalibr, HALCON, COLMAP intrinsics." },
+    { id: "check", label: "Detection check", path: "/tools/check/", desc: "Upload a photo and see what the detector finds." },
+    { id: "quality", label: "Calibration quality analyzer", path: "/tools/quality/", desc: "Coverage heatmap, reprojection error, parameter correlation." },
+    { id: "capture", label: "Capture assistant", path: "/tools/capture/", desc: "Guided calibration image capture with 15 poses." },
+    { id: "all-tools", label: "All tools", path: "/tools/" },
+  ]},
+  { id: "guides-link", label: "Guides", type: "direct", path: "/guides/" },
+  { id: "support-group", label: "Support", type: "group", children: [
+    { id: "faq", label: "FAQ", path: "/faq/" },
+    { id: "shipping", label: "Shipping, duties & taxes", path: "/shipping/" },
+    { id: "returns", label: "Returns", path: "/returns/" },
+    { id: "downloads", label: "Files & downloads", path: "/files/" },
+    { id: "verify", label: "Verify a report", path: "/verify/" },
+    { id: "about", label: "About", path: "/about/" },
+    { id: "contact", label: "Contact", path: "/contact/" },
+  ]},
+  { id: "shop-targets", label: "Shop targets", type: "cta-primary", path: "/targets/" },
+  { id: "request-quote", label: "Request a quote", type: "cta-secondary", path: "/quote/" },
+];
+
+let shuffledTasks = [];
+let currentTaskIndex = 0;
+let results = [];
+let clickPath = [];
+let firstClick = null;
+let participant = "";
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function startTest() {
+  participant = document.getElementById("participant-name").value.trim() || "anonymous";
+  shuffledTasks = shuffle(TASKS);
+  currentTaskIndex = 0;
+  results = [];
+  document.getElementById("intro-panel").style.display = "none";
+  document.getElementById("test-panel").style.display = "block";
+  renderProgress();
+  renderTask();
+  renderTree();
+}
+
+function renderProgress() {
+  const el = document.getElementById("progress");
+  el.innerHTML = "";
+  for (let i = 0; i < shuffledTasks.length; i++) {
+    const dot = document.createElement("div");
+    dot.className = "progress-dot" + (i < currentTaskIndex ? " done" : i === currentTaskIndex ? " current" : "");
+    el.appendChild(dot);
+  }
+}
+
+function renderTask() {
+  const task = shuffledTasks[currentTaskIndex];
+  document.getElementById("task-number").textContent = `Task ${currentTaskIndex + 1} of ${shuffledTasks.length}`;
+  document.getElementById("task-text").textContent = task.text;
+  clickPath = [];
+  firstClick = null;
+  // Collapse all groups
+  document.querySelectorAll(".nav-group-header").forEach(h => h.classList.remove("open"));
+  document.querySelectorAll(".nav-group-items").forEach(i => i.classList.remove("open"));
+  document.querySelectorAll(".nav-group-items").forEach(i => i.style.display = "none");
+}
+
+function renderTree() {
+  const container = document.getElementById("nav-tree");
+  container.innerHTML = "";
+  NAV_TREE.forEach(item => {
+    if (item.type === "group") {
+      const group = document.createElement("div");
+      group.className = "nav-group";
+      const header = document.createElement("div");
+      header.className = "nav-group-header";
+      header.innerHTML = `<span>${item.label}</span><span class="arrow">&#9654;</span>`;
+      header.addEventListener("click", () => {
+        recordClick(item.id, item.label);
+        header.classList.toggle("open");
+        const items = header.nextElementSibling;
+        const isOpen = items.classList.toggle("open");
+        items.style.display = isOpen ? "block" : "none";
+      });
+      group.appendChild(header);
+      const items = document.createElement("div");
+      items.className = "nav-group-items";
+      item.children.forEach(child => {
+        if (child.type === "column-header") {
+          const ch = document.createElement("div");
+          ch.className = "mega-col-header";
+          ch.textContent = child.label;
+          items.appendChild(ch);
+        } else {
+          const ci = document.createElement("div");
+          ci.className = "nav-item" + (child.notLive ? " not-live" : "");
+          ci.innerHTML = child.label + (child.desc ? `<div class="desc">${child.desc}</div>` : "") + (child.notLive ? " (coming soon)" : "");
+          ci.addEventListener("click", (e) => {
+            e.stopPropagation();
+            recordClick(child.id, child.label, child.path);
+            if (child.path) finishTask(child.path);
+          });
+          items.appendChild(ci);
+        }
+      });
+      group.appendChild(items);
+      container.appendChild(group);
+    } else if (item.type === "direct") {
+      const di = document.createElement("div");
+      di.className = "nav-item direct-link";
+      di.textContent = item.label;
+      di.addEventListener("click", () => {
+        recordClick(item.id, item.label, item.path);
+        finishTask(item.path);
+      });
+      container.appendChild(di);
+    } else if (item.type === "cta-primary" || item.type === "cta-secondary") {
+      const cta = document.createElement("div");
+      cta.className = "nav-cta";
+      const btn = document.createElement("button");
+      btn.className = "cta-btn " + (item.type === "cta-primary" ? "cta-primary" : "cta-secondary");
+      btn.textContent = item.label;
+      btn.addEventListener("click", () => {
+        recordClick(item.id, item.label, item.path);
+        finishTask(item.path);
+      });
+      cta.appendChild(btn);
+      container.appendChild(cta);
+    }
+  });
+}
+
+function recordClick(id, label, path) {
+  if (!firstClick) firstClick = { id, label, path };
+  clickPath.push({ id, label, path, ts: Date.now() });
+}
+
+function finishTask(selectedPath) {
+  const task = shuffledTasks[currentTaskIndex];
+  const isCorrect = task.targets.includes(selectedPath);
+  const firstClickCorrect = task.firstClicks.includes(firstClick.id);
+  results.push({
+    taskId: task.id,
+    taskText: task.text,
+    firstClick: { ...firstClick },
+    firstClickCorrect,
+    clickPath: [...clickPath],
+    selectedPath,
+    correct: isCorrect,
+  });
+  currentTaskIndex++;
+  if (currentTaskIndex < shuffledTasks.length) {
+    renderProgress();
+    renderTask();
+  } else {
+    showResults();
+  }
+}
+
+function showResults() {
+  document.getElementById("test-panel").style.display = "none";
+  const panel = document.getElementById("results-panel");
+  panel.style.display = "block";
+  const tbody = panel.querySelector("tbody");
+  tbody.innerHTML = "";
+  let fcCorrect = 0, taskCorrect = 0;
+  results.forEach(r => {
+    if (r.firstClickCorrect) fcCorrect++;
+    if (r.correct) taskCorrect++;
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${r.taskId}</td><td>${r.taskText}</td><td>${r.firstClick.label}</td><td>${r.clickPath.map(c => c.label).join(" → ")}</td><td>${r.correct ? "Yes" : "No"}</td>`;
+    tbody.appendChild(tr);
+  });
+  document.getElementById("first-click-score").textContent = `${Math.round(fcCorrect / results.length * 100)}%`;
+  document.getElementById("task-success-score").textContent = `${Math.round(taskCorrect / results.length * 100)}%`;
+}
+
+function exportJSON() {
+  const data = {
+    participant,
+    date: new Date().toISOString(),
+    taskOrder: shuffledTasks.map(t => t.id),
+    results,
+    summary: {
+      firstClickAccuracy: results.filter(r => r.firstClickCorrect).length / results.length,
+      taskSuccess: results.filter(r => r.correct).length / results.length,
+    }
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `tree-test-${participant}-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+</script>
+</body>
+</html>
