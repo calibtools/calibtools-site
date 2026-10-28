@@ -153,7 +153,7 @@ const featuredReviews = allReviews
           <span class="font-mono text-[12px] uppercase tracking-[0.18em] text-brand-text md:text-[13px]">Free tools &middot; runs in your browser</span>
           <h2 class="h-display m-0 text-[28px] md:text-[36px]">Free tools. Serious targets.</h2>
         </div>
-        <a href="/tools/" class="inline-flex items-center gap-1 text-[15px] font-semibold">See all tools <ArrowRight size={20} stroke-width={1.6} class="text-brand" aria-hidden="true" /></a>
+        <a href="/tools/" class="inline-flex items-center gap-1 text-[15px] font-semibold text-brand-on-dark">See all tools <ArrowRight size={20} stroke-width={1.6} class="text-brand-on-dark" aria-hidden="true" /></a>
       </div>
       <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
         <ToolCard href={featuredTools[0].href} title={featuredTools[0].title} cta={featuredTools[0].live ? featuredTools[0].cta : `${featuredTools[0].cta} (coming soon)`} body={featuredTools[0].body}>
@@ -276,7 +276,7 @@ const featuredReviews = allReviews
           ))}
         </div>
 
-        <a href="/targets/" class="text-[15px] font-medium text-brand-dark">
+        <a href="/targets/" class="text-[15px] font-medium text-brand-on-dark">
           Read all reviews on the product pages
         </a>
       </div>
@@ -292,7 +292,7 @@ const featuredReviews = allReviews
         <div class="flex flex-col border-t border-line">
           {guides.map((g) => (
             <a href={`/guides/${g.slug}/`} class="flex justify-between gap-4 border-b border-line py-4 text-ink no-underline hover:text-ink">
-              <span class="font-semibold">{g.data.title}</span><ArrowRight size={20} stroke-width={1.6} class="text-brand-dark" aria-hidden="true" />
+              <span class="font-semibold">{g.data.title}</span><ArrowRight size={20} stroke-width={1.6} class="text-brand-on-dark" aria-hidden="true" />
             </a>
           ))}
         </div>

@@ -40,7 +40,7 @@ const { href, title, sub, from, image, localImage, placeholder = 'PRODUCT', tag 
     {tag ? (
       <span class="text-xs font-semibold uppercase tracking-wide text-ink-soft">{tag}</span>
     ) : from ? (
-      <span class="text-sm font-semibold text-brand-dark">from {from}</span>
+      <span class="text-sm font-semibold text-brand-dark [html[data-theme=dark]_&]:text-brand-on-dark">from {from}</span>
     ) : null}
   </div>
 </a>

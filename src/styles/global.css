@@ -18,6 +18,7 @@
   --color-brand: 230 0 18;
   --color-brand-text: 230 0 18;
   --color-brand-dark: 179 0 14;
+  --color-brand-on-dark: 255 77 77;
   --color-brand-tint: #FBE9EA;
 }
 
@@ -33,6 +34,7 @@
   --color-brand: 230 0 18;
   --color-brand-text: 255 59 71;
   --color-brand-dark: 179 0 14;
+  --color-brand-on-dark: 255 77 77;
   --color-brand-tint: rgba(230, 0, 18, 0.16);
 }
 

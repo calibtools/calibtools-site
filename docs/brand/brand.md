@@ -37,11 +37,18 @@ CTA buttons, and small highlights. It is never used as a background fill, full-w
 or large typographic element. On the home page only the two CTA buttons may use red as a background.
 Source: `06-colours/colours.json` in the brand kit.
 
-### Dark-theme red text token
+### Colour token usage by surface
 
-For text set against the dark ground (`#0A0A0A`), use `#FF3B47` instead of `#E60012` to meet 4.5:1 contrast.
-This is **not** in the brand kit — it is a site-derived token for WCAG compliance. The kit red stays for anything
-≥ 18 px and for decorative accents that are not essential text.
+| Token | Hex | Use |
+|---|---|---|
+| `brand` (`--color-brand`) | #E60012 | CTA button fills; large headings (≥ 24 px, or ≥ 19 px bold); decorative accents; icon tints on any surface |
+| `brand-dark` (`--color-brand-dark`) | #B3000E | Light surfaces only: table headers, hover states on light bg, prose links. **Never on a dark background.** |
+| `brand-on-dark` (`--color-brand-on-dark`) | #FF4D4D | Dark surfaces (`#0A0A0A`, `#111111`, `#1A1A1A`): normal-size red text (< 24 px / < 19 px bold). WCAG ratios: 6.05 on #0A0A0A, 5.77 on #111111, 5.32 on #1A1A1A — all ≥ 4.5:1. |
+| `brand-text` (`--color-brand-text`) | #E60012 light / #FF3B47 dark | Eyebrow labels; theme-aware — resolves to `brand` on light, a lighter variant on dark. |
+
+**Rule:** On dark surfaces, red text at normal size uses `text-brand-on-dark`. `#E60012` (`text-brand`) is
+reserved for large headings (≥ 24 px, or ≥ 19 px bold) and for button fills where contrast is white-on-red.
+`#B3000E` (`text-brand-dark`) is for light surfaces only.
 
 ## Favicons and app icons
 
