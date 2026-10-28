@@ -11,7 +11,7 @@ import { getCollection, getEntry } from 'astro:content';
 import { getProductImages } from '@/lib/product-images';
 import { getImageMetadata } from '@/lib/productImageImports';
 import { Tag, Truck, FileCheck, Files, RotateCcw, Grid2x2 as Grid2X2, ScanLine, ListChecks, Package, Ruler, CircleDot, Plug, ArrowRight, Mail } from 'lucide-astro';
-import { getAllPublishedReviews, HOW_REVIEWS_WORK_SHORT } from '@/lib/reviews';
+import { getAllPublishedReviews, HOW_REVIEWS_WORK } from '@/lib/reviews';
 import { TAGLINE, IN_DEVELOPMENT, RETURNS_LINE } from '@/lib/claims';
 import Stars from '@/components/Stars';
 import heroTight from '@/assets/products/brand/dark/hero-boards-tight.webp';
@@ -247,7 +247,7 @@ const featuredReviews = allReviews
             <span class="font-mono text-[12px] uppercase tracking-[0.18em] text-brand-text md:text-[13px]">From the bench</span>
             <h2 class="h-display m-0 text-[28px] md:text-[36px]">What engineers measured.</h2>
           </div>
-          <p class="m-0 max-w-[460px] text-sm text-ink-muted">{HOW_REVIEWS_WORK_SHORT}</p>
+          <p class="m-0 max-w-[460px] text-sm text-ink-muted">{HOW_REVIEWS_WORK}</p>
         </div>
 
         <div class="flex gap-5 overflow-x-auto pb-2 scrollbar-none md:grid md:grid-cols-3 md:overflow-visible md:pb-0">

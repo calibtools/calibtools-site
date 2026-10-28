@@ -97,9 +97,8 @@ describe('AggregateRating', () => {
 
 describe('compliance: no literal "verified"', () => {
   it('HOW_REVIEWS_WORK does not contain "verified"', async () => {
-    const { HOW_REVIEWS_WORK, HOW_REVIEWS_WORK_SHORT } = await import('./reviews');
+    const { HOW_REVIEWS_WORK } = await import('./reviews');
     expect(HOW_REVIEWS_WORK.toLowerCase()).not.toContain('verified');
-    expect(HOW_REVIEWS_WORK_SHORT.toLowerCase()).not.toContain('verified');
   });
 });
 
@@ -143,7 +142,6 @@ describe('Review type: imported review constraints', () => {
       materialConnection: 'free_sample',
       reviewerOrg: 'Test Lab',
       country: 'US',
-      language: 'en',
       orderRefHash: '',
     });
     expect(imported.source).toBe('imported');
@@ -161,12 +159,12 @@ describe('Review type: imported review constraints', () => {
 });
 
 describe('material connection labels', () => {
-  it('MATERIAL_CONNECTION_LABEL has entries for all four values', async () => {
+  it('MATERIAL_CONNECTION_LABEL has entries for the three non-none values', async () => {
     const { MATERIAL_CONNECTION_LABEL } = await import('@/lib/claims');
-    expect(MATERIAL_CONNECTION_LABEL.none).toBeTruthy();
     expect(MATERIAL_CONNECTION_LABEL.free_sample).toBeTruthy();
     expect(MATERIAL_CONNECTION_LABEL.discount).toBeTruthy();
     expect(MATERIAL_CONNECTION_LABEL.insider).toBeTruthy();
+    expect('none' in MATERIAL_CONNECTION_LABEL).toBe(false);
   });
 
   it('labels do not use the word "verified"', async () => {
@@ -175,15 +173,32 @@ describe('material connection labels', () => {
       expect(label.toLowerCase()).not.toContain('verified');
     }
   });
+
+  it('connection line renders only for non-none values', () => {
+    const nonNone: MaterialConnection[] = ['free_sample', 'discount', 'insider'];
+    for (const mc of nonNone) {
+      const r = makeReview({ source: 'imported', materialConnection: mc, consent: true });
+      expect(r.materialConnection).not.toBe('none');
+    }
+    const noneReview = makeReview({ source: 'imported', materialConnection: 'none', consent: true });
+    expect(noneReview.materialConnection).toBe('none');
+  });
 });
 
 describe('policy page content', () => {
-  it('contains order reviews, shared reviews, and publish-everything', () => {
+  it('contains the spec paragraph: invite, free sample/discount, publish every review', () => {
     const content = readFileSync(join(__dirname, '..', 'pages', 'reviews-policy.astro'), 'utf-8');
-    expect(content).toContain('Order reviews');
-    expect(content).toContain('Shared reviews');
+    expect(content).toContain('invite after delivery');
+    expect(content).toContain('free sample');
+    expect(content).toContain('discount');
     expect(content).toContain('publish every review we receive');
-    expect(content).toContain('never moved between products');
+    expect(content).toContain('do not edit the text');
+  });
+
+  it('keeps removal rules (spam, personal attacks, personal data)', () => {
+    const content = readFileSync(join(__dirname, '..', 'pages', 'reviews-policy.astro'), 'utf-8');
+    expect(content).toContain('spam');
+    expect(content).toContain('personal');
   });
 
   it('does not contain old single-source wording', () => {

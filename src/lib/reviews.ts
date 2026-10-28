@@ -49,8 +49,6 @@ export interface Review {
   reviewerOrg?: string;
   /** ISO-2 country code (optional, imported only). */
   country?: string;
-  /** Language code (optional, imported only). */
-  language?: string;
 }
 
 export interface InviteToken {
@@ -191,6 +189,4 @@ async function getAllReviews(): Promise<Review[]> {
 // Constants
 // ---------------------------------------------------------------------------
 
-export const HOW_REVIEWS_WORK = 'Order reviews are invited by e-mail after delivery and tied to an order. Shared reviews come from people who bought elsewhere or evaluated samples, published with their written permission; any free sample, discount or company connection is stated on the card. We publish every review we receive, positive or negative. We never offer anything in return for a favourable review and we do not edit review text. Reviews are never moved between products. We remove only spam or personal data, and say so where we do.';
-
-export const HOW_REVIEWS_WORK_SHORT = 'Order reviews are invited after delivery; shared reviews are published with written permission. All reviews are published, negative ones included. No paid reviews.';
+export const HOW_REVIEWS_WORK = 'Reviews come from customers we invite after delivery and from engineers who bought or tested our targets elsewhere and agreed to be quoted. If a reviewer received a free sample or a discount, or works with us, we say so under the review. We publish every review we receive and do not edit the text.';
