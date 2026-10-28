@@ -1,0 +1,11 @@
+{
+  "product": {
+    "title": "Mounting Fixture",
+    "handle": "mounting-fixture",
+    "fetched": "2026-10-29",
+    "source": "https://calib.io/products/mounting-fixture.json"
+  },
+  "variants": [
+    { "id": 39711155454019, "title": "Default Title", "price": "240.00", "available": true, "sku": "MNTFIX01" }
+  ]
+}

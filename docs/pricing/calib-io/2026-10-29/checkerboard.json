@@ -1,0 +1,23 @@
+{
+  "product": {
+    "title": "Checkerboard Targets",
+    "handle": "checkerboard",
+    "fetched": "2026-10-29",
+    "source": "https://calib.io/products/checkerboard.json"
+  },
+  "variants": [
+    { "id": 8112181542959, "title": "Aluminium/LDPE / 200x150 / Fine", "price": "103.00", "available": true, "sku": "CHT200150F" },
+    { "id": 8112181608495, "title": "Aluminium/LDPE / 200x150 / Coarse", "price": "103.00", "available": true, "sku": "CHT200150C" },
+    { "id": 8112181444655, "title": "Aluminium/LDPE / 300x200 / Fine", "price": "108.00", "available": true, "sku": "CHT300200F" },
+    { "id": 8112181510191, "title": "Aluminium/LDPE / 300x200 / Coarse", "price": "108.00", "available": true, "sku": "CHT300200C" },
+    { "id": 8112181346351, "title": "Aluminium/LDPE / 400x300 / Fine", "price": "127.00", "available": true, "sku": "CHT400300F" },
+    { "id": 8112181379119, "title": "Aluminium/LDPE / 400x300 / Coarse", "price": "127.00", "available": true, "sku": "CHT400300C" },
+    { "id": 8112024125487, "title": "Aluminium/LDPE / 600x400 / Fine", "price": "176.00", "available": true, "sku": "CHT600400F" },
+    { "id": 8112181280815, "title": "Aluminium/LDPE / 600x400 / Coarse", "price": "176.00", "available": true, "sku": "CHT600400C" },
+    { "id": 9104447176751, "title": "Aluminium/LDPE / 800x600 / Fine", "price": "263.00", "available": true, "sku": "CHT800600F" },
+    { "id": 9104463429679, "title": "Aluminium/LDPE / 800x600 / Coarse", "price": "263.00", "available": true, "sku": "CHT800600C" },
+    { "id": 39812672913475, "title": "Ceramic / 75x50 / Fine", "price": "430.00", "available": true, "sku": "CHT075050F" },
+    { "id": 39812673044547, "title": "Ceramic / 100x75 / Fine", "price": "670.00", "available": true, "sku": "CHT100075F" },
+    { "id": 39812673175619, "title": "Ceramic / 150x100 / Fine", "price": "905.00", "available": true, "sku": "CHT150100F" }
+  ]
+}
