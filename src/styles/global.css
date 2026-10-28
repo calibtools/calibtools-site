@@ -110,10 +110,8 @@
     letter-spacing: 0.02em;
   }
 
-  /* Sizes — height, font-size, horizontal padding */
-  .btn-sm { @apply btn h-8 text-[13px] px-4; }
+  /* Size — single height on the 4 px grid */
   .btn-md { @apply btn h-10 text-[14px] px-5; }
-  .btn-lg { @apply btn h-12 text-[15px] px-7; }
 
   /* Variants — colour only, no sizing */
   .btn-primary { @apply bg-brand text-white hover:bg-brand-dark hover:text-white; }
