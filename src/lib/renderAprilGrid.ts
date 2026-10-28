@@ -61,7 +61,7 @@ export function renderAprilGridSvg(s: PatternSpec, ox: number, oy: number): stri
         const cell = tagSize / totalCells;
 
         // Decode tag bits and draw white cells
-        const bits = decodeAprilBits(family.codes[tagId], d);
+        const bits = decodeAprilBits(family.codes[tagId], d, family.bit_x, family.bit_y);
         for (let bi = 0; bi < d; bi++) {
           for (let bj = 0; bj < d; bj++) {
             if (bits[bi][bj] === 1) {

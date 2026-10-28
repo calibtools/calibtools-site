@@ -18,6 +18,10 @@ export interface AprilTagFamily {
   minHamming: number;
   count: number;
   codes: string[];
+  /** Bit-to-cell column mapping (from apriltag C source / OpenCV). */
+  bit_x?: number[];
+  /** Bit-to-cell row mapping (from apriltag C source / OpenCV). */
+  bit_y?: number[];
 }
 
 // Static imports for ArUco dictionaries
@@ -93,18 +97,34 @@ export function aprilFamilyNames(): string[] {
 
 /**
  * Decode an AprilTag code (hex uint64) into a d x d bit grid.
- * Bit 0 is the LSB, laid out row-major from top-left.
+ *
+ * AprilTag families use a non-row-major spiral bit layout defined by
+ * per-family bit_x/bit_y arrays from the apriltag C source.  If the
+ * family provides these arrays, they are used; otherwise falls back to
+ * row-major (only valid for families whose layout happens to be row-major,
+ * which in practice is none of the standard families).
  */
-export function decodeAprilBits(hex: string, d: number): number[][] {
+export function decodeAprilBits(hex: string, d: number, bit_x?: number[], bit_y?: number[]): number[][] {
   const code = BigInt('0x' + hex);
-  const grid: number[][] = [];
-  for (let r = 0; r < d; r++) {
-    const row: number[] = [];
-    for (let c = 0; c < d; c++) {
-      const bitIdx = BigInt(r * d + c);
-      row.push(Number((code >> bitIdx) & 1n));
+  const grid: number[][] = Array.from({ length: d }, () => Array(d).fill(0));
+
+  if (bit_x && bit_y) {
+    const nbits = bit_x.length;
+    for (let b = 0; b < nbits; b++) {
+      const x = bit_x[b];
+      const y = bit_y[b];
+      if (x >= 0 && x < d && y >= 0 && y < d) {
+        grid[y][x] = Number((code >> BigInt(b)) & 1n);
+      }
     }
-    grid.push(row);
+  } else {
+    // Fallback: row-major (incorrect for standard families, kept for compat)
+    const nbits = d * d;
+    for (let b = 0; b < nbits; b++) {
+      const r = Math.floor(b / d);
+      const c = b % d;
+      grid[r][c] = Number((code >> BigInt(b)) & 1n);
+    }
   }
   return grid;
 }
