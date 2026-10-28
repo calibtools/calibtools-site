@@ -267,7 +267,7 @@ function chaCOrderingTable(): string {
     ['Corners', 'n'], ['Markers', 'n'], ['Weight<br>(kg)', 'n'],
   ];
   const dicts = '<span class="mono">DICT_6X6_250</span>,<br><span class="mono">DICT_6X6_1000</span>';
-  type Row = [number, number, number, number, string, string, string, string];
+  type Row = [number, number, number, number, number, number, string, string];
   const rawRows: Row[] = [
     [7, 10, 110, 85,  10,   7.5,  dicts, '0.10'],
     [7, 11, 150, 100, 12.5, 9.5,  dicts, '0.17'],
