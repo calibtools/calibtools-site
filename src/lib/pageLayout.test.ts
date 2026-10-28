@@ -58,30 +58,41 @@ describe('layout constants', () => {
     expect(patternQuietZone(25)).toBe(25);
   });
 
-  it('wordmark is 20 mm wide on A4', () => {
-    expect(wordmarkWidth(a4W, a4H)).toBe(20);
+  it('wordmark sized by ISO 3098 cap height 3.5 mm on A4', () => {
+    // 3.5 × 7174.4 / 710 ≈ 35.4 mm
+    const wmW = wordmarkWidth(a4W, a4H);
+    expect(wmW).toBeCloseTo(35.4, 0);
     // Landscape — uses shorter dim, same result
-    expect(wordmarkWidth(a4H, a4W)).toBe(20);
+    expect(wordmarkWidth(a4H, a4W)).toBe(wmW);
   });
 
-  it('wordmark never below 20 mm', () => {
-    expect(wordmarkWidth(100, 150)).toBeGreaterThanOrEqual(20);
+  it('wordmark scaled to 5 mm cap height on A3+', () => {
+    const [a3W, a3H] = PAPERS.A3;
+    // 5 × 7174.4 / 710 ≈ 50.5 mm
+    expect(wordmarkWidth(a3W, a3H)).toBeCloseTo(50.5, 0);
   });
 
-  it('wordmark height from aspect ratio (compact)', () => {
-    const wmH = 20 / WM_ASPECT;
-    // 20 / 9.313 ≈ 2.15 mm
-    expect(wmH).toBeCloseTo(2.15, 1);
+  it('wordmark cap height from aspect ratio', () => {
+    const wmW = wordmarkWidth(a4W, a4H);
+    const wmH = wmW / WM_ASPECT;
+    // viewBox height maps to ~3.80 mm, cap height = 3.5 mm
+    expect(wmH).toBeCloseTo(3.80, 1);
   });
 
-  it('clear space = wmH / 2.3', () => {
-    const wmH = 20 / WM_ASPECT;
+  it('clear space = cap height (§04)', () => {
+    const wmW = wordmarkWidth(a4W, a4H);
+    const wmH = wmW / WM_ASPECT;
     const cs = wordmarkClearSpace(wmH);
-    expect(cs).toBeCloseTo(wmH / 2.3, 2);
+    // Cap height = wmH × 710 / 770.4 ≈ 3.5 mm
+    expect(cs).toBeCloseTo(3.5, 1);
   });
 
-  it('brandBlockHeight governed by 3 text lines (compact wordmark is short)', () => {
-    const wmW = 20;
+  it('brand text = ISO 3098 2.5 mm tier', () => {
+    expect(BRAND_TEXT_SIZE_MM).toBe(2.5);
+  });
+
+  it('brandBlockHeight governed by 3 text lines at 2.5 mm', () => {
+    const wmW = wordmarkWidth(a4W, a4H);
     const wmH = wmW / WM_ASPECT;
     const cs = wordmarkClearSpace(wmH);
     const wordmarkBlock = wmH + cs;
@@ -223,10 +234,10 @@ describe('computeGridReduction', () => {
 // ---------------------------------------------------------------------------
 
 describe('computeLayout — brand block geometry', () => {
-  it('wordmark is 20 mm wide on A4', () => {
+  it('wordmark sized by ISO 3098 cap height on A4', () => {
     const s = spec({ rows: 5, cols: 5, square: 20 });
     const layout = computeLayout(s, a4W, a4H, 'portrait');
-    expect(layout.brand.wmW).toBe(20);
+    expect(layout.brand.wmW).toBeCloseTo(35.4, 0);
   });
 
   it('wordmark at bottom-left inside margin', () => {

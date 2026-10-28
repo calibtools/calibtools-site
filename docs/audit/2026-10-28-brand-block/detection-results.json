@@ -1,0 +1,35 @@
+[
+  {
+    "name": "charuco-6x10-20-a4-landscape",
+    "description": "ChArUco 6×10 @ 20 mm, A4 landscape",
+    "detected": 45,
+    "expected": 45,
+    "cornersOutside": 0,
+    "cornersInBrand": 0,
+    "cornersInAxes": 0,
+    "pass": true,
+    "pngFile": "docs/audit/2026-10-28-brand-block/charuco-6x10-20-a4-landscape-1.png"
+  },
+  {
+    "name": "charuco-7x12-25-tiled-sheet1",
+    "description": "ChArUco 7×12 @ 25 mm, tiled sheet 1",
+    "detected": 0,
+    "expected": 0,
+    "cornersOutside": 0,
+    "cornersInBrand": 0,
+    "cornersInAxes": 0,
+    "pass": true,
+    "pngFile": "docs/audit/2026-10-28-brand-block/charuco-7x12-25-tiled-sheet1-1.png"
+  },
+  {
+    "name": "checkerboard-5x7-15-a4-portrait",
+    "description": "Checkerboard 5×7 @ 15 mm, A4 portrait (brand block proportionally largest)",
+    "detected": 24,
+    "expected": 24,
+    "cornersOutside": 0,
+    "cornersInBrand": 0,
+    "cornersInAxes": 0,
+    "pass": true,
+    "pngFile": "docs/audit/2026-10-28-brand-block/checkerboard-5x7-15-a4-portrait-1.png"
+  }
+]

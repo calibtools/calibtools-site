@@ -18,6 +18,7 @@ import {
   WORDMARK_DOT_RECT,
   WORDMARK_VB,
 } from './exportBrand';
+import { getArUcoDict, decodeMarkerBits } from './dicts/dicts';
 import type { PageLayout } from './pageLayout';
 
 /** Conversion factor: millimetres → PDF points. */
@@ -104,25 +105,40 @@ export async function exportPdf({ spec, pw: rawPw, ph: rawPh, fontBytes, layout 
         const [px, py] = pt(x, y + spec.square);
         page.drawRectangle({ x: px, y: py, width: spec.square * MM, height: spec.square * MM, color: rgb(0, 0, 0) });
       } else if (isMarkerType) {
-        // Marker placeholder — same pseudo-random pattern as SVG
+        // Real ArUco dictionary bits — matches SVG renderer (renderCharucoSvg)
         const m = spec.marker;
         const mx = x + (spec.square - m) / 2;
         const my = y + (spec.square - m) / 2;
-        const n = 8;
-        const cell = m / n;
-        const id = spec.startId + Math.floor((r * spec.cols + c) / 2);
+        const dict = getArUcoDict(spec.dict);
+
+        // Compute marker index: count white squares before this one (row-major)
+        let markerIdx = 0;
+        for (let rr = 0; rr < spec.rows; rr++) {
+          for (let cc = 0; cc < spec.cols; cc++) {
+            if (rr === r && cc === c) break;
+            if ((rr + cc) % 2 !== 0) markerIdx++;
+          }
+          if (rr === r) break;
+        }
+        const markerId = spec.startId + markerIdx;
 
         // Black marker background
         const [pmx, pmy] = pt(mx, my + m);
         page.drawRectangle({ x: pmx, y: pmy, width: m * MM, height: m * MM, color: rgb(0, 0, 0) });
 
-        // White bits
-        for (let i = 1; i < n - 1; i++) {
-          for (let j = 1; j < n - 1; j++) {
-            const bit = ((id * 31 + i * 7 + j * 13) % 5) < 2;
-            if (!bit) {
-              const [bx, by] = pt(mx + j * cell, my + i * cell + cell);
-              page.drawRectangle({ x: bx, y: by, width: cell * MM, height: cell * MM, color: rgb(1, 1, 1) });
+        if (dict && markerId < dict.count) {
+          const bits = decodeMarkerBits(dict.bits[markerId], dict.markerSize);
+          const n = dict.markerSize;
+          const border = 1;
+          const totalCells = n + 2 * border;
+          const cell = m / totalCells;
+          // White cells from bit grid (1 = white)
+          for (let bi = 0; bi < n; bi++) {
+            for (let bj = 0; bj < n; bj++) {
+              if (bits[bi][bj] === 1) {
+                const [bx, by] = pt(mx + (bj + border) * cell, my + (bi + border) * cell + cell);
+                page.drawRectangle({ x: bx, y: by, width: cell * MM, height: cell * MM, color: rgb(1, 1, 1) });
+              }
             }
           }
         }
@@ -472,17 +488,30 @@ export async function exportTiledPdf({ spec, tiling, fontBytes }: TiledPdfOption
               const [bmx, bmy] = pt(mdx, mdy + (mcy1 - mcy0));
               page.drawRectangle({ x: bmx, y: bmy, width: (mcx1 - mcx0) * MM, height: (mcy1 - mcy0) * MM, color: rgb(0, 0, 0) });
 
-              // White bits (simplified — only full markers)
+              // Real ArUco dictionary bits — only for fully visible markers
               if (mcx0 <= mx && mcy0 <= my && mcx1 >= mx + m && mcy1 >= my + m) {
-                const n = 8;
-                const cell = m / n;
-                const id = spec.startId + Math.floor((r * spec.cols + c) / 2);
-                for (let i = 1; i < n - 1; i++) {
-                  for (let j = 1; j < n - 1; j++) {
-                    const bit = ((id * 31 + i * 7 + j * 13) % 5) < 2;
-                    if (!bit) {
-                      const [wx, wy] = pt(pageOx + (mx + j * cell - winX0), pageOy + (my + i * cell + cell - winY0));
-                      page.drawRectangle({ x: wx, y: wy, width: cell * MM, height: cell * MM, color: rgb(1, 1, 1) });
+                const dict = getArUcoDict(spec.dict);
+                let markerIdx = 0;
+                for (let rr = 0; rr < spec.rows; rr++) {
+                  for (let cc = 0; cc < spec.cols; cc++) {
+                    if (rr === r && cc === c) break;
+                    if ((rr + cc) % 2 !== 0) markerIdx++;
+                  }
+                  if (rr === r) break;
+                }
+                const markerId = spec.startId + markerIdx;
+                if (dict && markerId < dict.count) {
+                  const bits = decodeMarkerBits(dict.bits[markerId], dict.markerSize);
+                  const n = dict.markerSize;
+                  const border = 1;
+                  const totalCells = n + 2 * border;
+                  const cell = m / totalCells;
+                  for (let bi = 0; bi < n; bi++) {
+                    for (let bj = 0; bj < n; bj++) {
+                      if (bits[bi][bj] === 1) {
+                        const [wx, wy] = pt(pageOx + (mx + (bj + border) * cell - winX0), pageOy + (my + (bi + border) * cell + cell - winY0));
+                        page.drawRectangle({ x: wx, y: wy, width: cell * MM, height: cell * MM, color: rgb(1, 1, 1) });
+                      }
                     }
                   }
                 }
