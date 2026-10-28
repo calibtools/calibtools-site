@@ -1,0 +1,102 @@
+Handle,Title,Body (HTML),Vendor,Product Category,Type,Tags,Published,Option1 Name,Option1 Value,Option1 Linked To,Option2 Name,Option2 Value,Option2 Linked To,Option3 Name,Option3 Value,Option3 Linked To,Variant SKU,Variant Grams,Variant Inventory Tracker,Variant Inventory Qty,Variant Inventory Policy,Variant Fulfillment Service,Variant Price,Variant Compare At Price,Variant Requires Shipping,Variant Taxable,Unit Price Total Measure,Unit Price Total Measure Unit,Unit Price Base Measure,Unit Price Base Measure Unit,Variant Barcodes,Image Src,Image Position,Image Alt Text,Gift Card,SEO Title,SEO Description,Mounting (product.metafields.specs.mounting),Operating range (product.metafields.specs.operating_range),Substrate (product.metafields.specs.substrate),Thermal expansion (product.metafields.specs.thermal_expansion),Feature tolerance (product.metafields.specs.tolerance),Variant Image,Variant Weight Unit,Variant Tax Code,Cost per item,Status,Variant Packed Length,Variant Packed Width,Variant Packed Height,Variant Packed Dimension Unit
+certificate-ilac,Calibration certificate (ILAC-recognised),"<p>Accredited third-party dimensional calibration of your target in an ISO/IEC 17025 laboratory, traceable to national standards and recognised under the ILAC MRA. Measured feature positions and uncertainty are reported. Adds 1–3 weeks to delivery.</p>",Calib.Tools,,Service,"certificate, mounts-accessories, service",true,Title,Default Title,,,,,,,,SVC-CERT-ILAC,0.0,,0,continue,manual,307.00,,false,true,,,,,,,,,false,ILAC Calibration Certificate for Targets | Calib.Tools,"Accredited ISO 17025 calibration certificate for your calibration target, traceable and ILAC-recognised.",,,,,,,g,,,active,,,,
+mounting-fixture,"Mounting fixture, ¼″ thread",<p>Aluminium clamp fixture with ¼″-20 thread for tripods and stands. Fits boards up to 6 mm thick.</p>,Calib.Tools,,Accessory,"fixture, mounts-accessories",true,Title,Default Title,,,,,,,,ACC-FIX-14,150.0,shopify,5,continue,manual,181.00,,true,true,,,,,,,,,false,Calibration Target Mounting Fixture | Calib.Tools,Aluminium clamp with ¼″ thread for mounting calibration boards on tripods and stands.,,,,,,,g,,,active,,,,
+charuco-ceramic,ChArUco calibration target — ceramic,"<p>White alumina ceramic with matte blue chrome pattern, lithographed in a cleanroom. Feature accuracy ±2 µm. Thermal expansion ~7.2 µm/(°C·m). For front-lit, small-FOV and metrology-grade calibration.</p><p>Inspection report included; ILAC-recognised calibration certificate available as an add-on.</p><table>
+<tr>
+<td>Substrate</td>
+<td>Alumina ceramic, 3 mm</td>
+</tr>
+<tr>
+<td>Feature accuracy</td>
+<td>±2 µm</td>
+</tr>
+<tr>
+<td>Thermal expansion</td>
+<td>~7.2 µm/(°C·m)</td>
+</tr>
+<tr>
+<td>Operating range</td>
+<td>−50 °C to +200 °C</td>
+</tr>
+<tr>
+<td>Finish</td>
+<td>Matte, front-lit</td>
+</tr>
+</table>",Calib.Tools,,Calibration target,"ceramic, ceramic-glass, charuco, metrology",true,Size,110×85,,Dictionary,DICT_6X6_250,,,,,CHA-C-11085-6X6,120.0,shopify,5,continue,manual,887.00,,true,true,,,,,,,,,false,Ceramic ChArUco Calibration Target ±2 µm | Calib.Tools,"Lithographed ceramic ChArUco target, ±2 µm feature accuracy, matte front-lit finish. Certificate option. Ships from Germany.",,,,,,,g,,,active,,,,
+charuco-ceramic,,,,,,,,,110×85,,,DICT_5X5_100,,,,,CHA-C-11085-5X5,120.0,shopify,5,continue,manual,887.00,,true,true,,,,,,,,,,,,,,,,,,g,,,,,,,
+charuco-ceramic,,,,,,,,,185×110,,,DICT_6X6_250,,,,,CHA-C-185110-6X6,260.0,shopify,5,continue,manual,1454.00,,true,true,,,,,,,,,,,,,,,,,,g,,,,,,,
+charuco-ceramic,,,,,,,,,185×110,,,DICT_5X5_100,,,,,CHA-C-185110-5X5,260.0,shopify,5,continue,manual,1454.00,,true,true,,,,,,,,,,,,,,,,,,g,,,,,,,
+charuco-ceramic,,,,,,,,,230×140,,,DICT_6X6_250,,,,,CHA-C-230140-6X6,400.0,shopify,5,continue,manual,1946.00,,true,true,,,,,,,,,,,,,,,,,,g,,,,,,,
+charuco-ceramic,,,,,,,,,230×140,,,DICT_5X5_100,,,,,CHA-C-230140-5X5,400.0,shopify,5,continue,manual,1946.00,,true,true,,,,,,,,,,,,,,,,,,g,,,,,,,
+charuco-composite,ChArUco calibration target — composite,"<p>ChArUco pattern (checkerboard with embedded ArUco markers) on aluminium/LDPE composite, 6 mm. UV-printed matte finish. Feature tolerance 0.3 mm + 0.2 mm/m. Operating range −50 °C to +80 °C, outdoor use up to 3 years.</p><p>Each board ships with an inspection report, datasheet, DXF outline and pattern files for OpenCV, Kalibr and HALCON.</p><table>
+<tr>
+<td>Substrate</td>
+<td>Aluminium / LDPE composite, 6 mm</td>
+</tr>
+<tr>
+<td>Feature tolerance</td>
+<td>0.3 mm + 0.2 mm/m</td>
+</tr>
+<tr>
+<td>Thermal expansion</td>
+<td>~24 µm/(°C·m)</td>
+</tr>
+<tr>
+<td>Operating range</td>
+<td>−50 °C to +80 °C</td>
+</tr>
+<tr>
+<td>Mounting</td>
+<td>4 × M4 inserts, ¼″ fixture optional</td>
+</tr>
+</table>",Calib.Tools,,Calibration target,"charuco, composite-boards, multi-camera, opencv, stereo",true,Size,200×150,,Dictionary,DICT_6X6_250,,,,,CHA-200150-6X6,250.0,shopify,5,continue,manual,151.00,,true,true,,,,,,,,,false,"ChArUco Calibration Board, Composite | Calib.Tools","Rigid ChArUco board for OpenCV stereo and multi-camera calibration. 200–800 mm, four dictionaries, inspection report included, ships from Germany.",,,,,,,g,,,active,,,,
+charuco-composite,,,,,,,,,200×150,,,DICT_5X5_100,,,,,CHA-200150-5X5,250.0,shopify,5,continue,manual,151.00,,true,true,,,,,,,,,,,,,,,,,,g,,,,,,,
+charuco-composite,,,,,,,,,200×150,,,DICT_4X4_50,,,,,CHA-200150-4X4,250.0,shopify,5,continue,manual,151.00,,true,true,,,,,,,,,,,,,,,,,,g,,,,,,,
+charuco-composite,,,,,,,,,200×150,,,AprilTag 36h11,,,,,CHA-200150-AT36,250.0,shopify,5,continue,manual,151.00,,true,true,,,,,,,,,,,,,,,,,,g,,,,,,,
+charuco-composite,,,,,,,,,300×200,,,DICT_6X6_250,,,,,CHA-300200-6X6,450.0,shopify,5,continue,manual,157.00,,true,true,,,,,,,,,,,,,,,,,,g,,,,,,,
+charuco-composite,,,,,,,,,300×200,,,DICT_5X5_100,,,,,CHA-300200-5X5,450.0,shopify,5,continue,manual,157.00,,true,true,,,,,,,,,,,,,,,,,,g,,,,,,,
+charuco-composite,,,,,,,,,300×200,,,DICT_4X4_50,,,,,CHA-300200-4X4,450.0,shopify,5,continue,manual,157.00,,true,true,,,,,,,,,,,,,,,,,,g,,,,,,,
+charuco-composite,,,,,,,,,300×200,,,AprilTag 36h11,,,,,CHA-300200-AT36,450.0,shopify,5,continue,manual,157.00,,true,true,,,,,,,,,,,,,,,,,,g,,,,,,,
+charuco-composite,,,,,,,,,400×300,,,DICT_6X6_250,,,,,CHA-400300-6X6,850.0,shopify,5,continue,manual,174.00,,true,true,,,,,,,,,,,,,,,,,,g,,,,,,,
+charuco-composite,,,,,,,,,400×300,,,DICT_5X5_100,,,,,CHA-400300-5X5,850.0,shopify,5,continue,manual,174.00,,true,true,,,,,,,,,,,,,,,,,,g,,,,,,,
+charuco-composite,,,,,,,,,400×300,,,DICT_4X4_50,,,,,CHA-400300-4X4,850.0,shopify,5,continue,manual,174.00,,true,true,,,,,,,,,,,,,,,,,,g,,,,,,,
+charuco-composite,,,,,,,,,400×300,,,AprilTag 36h11,,,,,CHA-400300-AT36,850.0,shopify,5,continue,manual,174.00,,true,true,,,,,,,,,,,,,,,,,,g,,,,,,,
+charuco-composite,,,,,,,,,600×400,,,DICT_6X6_250,,,,,CHA-600400-6X6,1700.0,shopify,5,continue,manual,264.00,,true,true,,,,,,,,,,,,,,,,,,g,,,,,,,
+charuco-composite,,,,,,,,,600×400,,,DICT_5X5_100,,,,,CHA-600400-5X5,1700.0,shopify,5,continue,manual,264.00,,true,true,,,,,,,,,,,,,,,,,,g,,,,,,,
+charuco-composite,,,,,,,,,600×400,,,DICT_4X4_50,,,,,CHA-600400-4X4,1700.0,shopify,5,continue,manual,264.00,,true,true,,,,,,,,,,,,,,,,,,g,,,,,,,
+charuco-composite,,,,,,,,,600×400,,,AprilTag 36h11,,,,,CHA-600400-AT36,1700.0,shopify,5,continue,manual,264.00,,true,true,,,,,,,,,,,,,,,,,,g,,,,,,,
+charuco-composite,,,,,,,,,800×600,,,DICT_6X6_250,,,,,CHA-800600-6X6,3300.0,shopify,5,continue,manual,357.00,,true,true,,,,,,,,,,,,,,,,,,g,,,,,,,
+charuco-composite,,,,,,,,,800×600,,,DICT_5X5_100,,,,,CHA-800600-5X5,3300.0,shopify,5,continue,manual,357.00,,true,true,,,,,,,,,,,,,,,,,,g,,,,,,,
+charuco-composite,,,,,,,,,800×600,,,DICT_4X4_50,,,,,CHA-800600-4X4,3300.0,shopify,5,continue,manual,357.00,,true,true,,,,,,,,,,,,,,,,,,g,,,,,,,
+charuco-composite,,,,,,,,,800×600,,,AprilTag 36h11,,,,,CHA-800600-AT36,3300.0,shopify,5,continue,manual,357.00,,true,true,,,,,,,,,,,,,,,,,,g,,,,,,,
+checkerboard-composite,Checkerboard calibration target — composite,"<p>Aluminium/LDPE composite, 6 mm. UV-printed matte pattern. Feature tolerance 0.3 mm + 0.2 mm/m. Operating range −50 °C to +80 °C, outdoor use up to 3 years.</p><p>Each board ships with an inspection report, datasheet, DXF outline and pattern files for OpenCV, Kalibr and HALCON.</p><table>
+<tr>
+<td>Substrate</td>
+<td>Aluminium / LDPE composite, 6 mm</td>
+</tr>
+<tr>
+<td>Feature tolerance</td>
+<td>0.3 mm + 0.2 mm/m</td>
+</tr>
+<tr>
+<td>Thermal expansion</td>
+<td>~24 µm/(°C·m)</td>
+</tr>
+<tr>
+<td>Operating range</td>
+<td>−50 °C to +80 °C</td>
+</tr>
+<tr>
+<td>Mounting</td>
+<td>4 × M4 inserts, ¼″ fixture optional</td>
+</tr>
+</table>",Calib.Tools,,Calibration target,"checkerboard, composite-boards, halcon, matlab, opencv",true,Size,200×150,,Pattern,Fine,,,,,CHT-200150-F,250.0,shopify,5,continue,manual,134.00,,true,true,,,,,,,,,false,"Checkerboard Calibration Target, Composite Board | Calib.Tools","Rigid aluminium composite checkerboard for OpenCV, HALCON and MATLAB camera calibration. 200–800 mm, inspection report included, ships from Germany.",,,,,,,g,,,active,,,,
+checkerboard-composite,,,,,,,,,200×150,,,Coarse,,,,,CHT-200150-C,250.0,shopify,5,continue,manual,134.00,,true,true,,,,,,,,,,,,,,,,,,g,,,,,,,
+checkerboard-composite,,,,,,,,,300×200,,,Fine,,,,,CHT-300200-F,450.0,shopify,5,continue,manual,141.00,,true,true,,,,,,,,,,,,,,,,,,g,,,,,,,
+checkerboard-composite,,,,,,,,,300×200,,,Coarse,,,,,CHT-300200-C,450.0,shopify,5,continue,manual,141.00,,true,true,,,,,,,,,,,,,,,,,,g,,,,,,,
+checkerboard-composite,,,,,,,,,400×300,,,Fine,,,,,CHT-400300-F,850.0,shopify,5,continue,manual,164.00,,true,true,,,,,,,,,,,,,,,,,,g,,,,,,,
+checkerboard-composite,,,,,,,,,400×300,,,Coarse,,,,,CHT-400300-C,850.0,shopify,5,continue,manual,164.00,,true,true,,,,,,,,,,,,,,,,,,g,,,,,,,
+checkerboard-composite,,,,,,,,,600×400,,,Fine,,,,,CHT-600400-F,1700.0,shopify,5,continue,manual,231.00,,true,true,,,,,,,,,,,,,,,,,,g,,,,,,,
+checkerboard-composite,,,,,,,,,600×400,,,Coarse,,,,,CHT-600400-C,1700.0,shopify,5,continue,manual,231.00,,true,true,,,,,,,,,,,,,,,,,,g,,,,,,,
+checkerboard-composite,,,,,,,,,800×600,,,Fine,,,,,CHT-800600-F,3300.0,shopify,5,continue,manual,343.00,,true,true,,,,,,,,,,,,,,,,,,g,,,,,,,
+checkerboard-composite,,,,,,,,,800×600,,,Coarse,,,,,CHT-800600-C,3300.0,shopify,5,continue,manual,343.00,,true,true,,,,,,,,,,,,,,,,,,g,,,,,,,
