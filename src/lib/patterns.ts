@@ -31,7 +31,7 @@ export interface PatternSpec {
   legacyLayout?: boolean;    // OpenCV ≤ 4.5 legacy ChArUco marker order
 
   // AprilGrid options (Step 3)
-  aprilFamily?: string;      // tag family: '16h5' | '25h9' | '36h11' | '41h12' | '52h13'
+  aprilFamily?: string;      // tag family: '16h5' | '25h9' | '36h11'
   borderBits?: number;       // 1 (AprilTag 3) or 2
   tagSpacing?: number;       // ratio of spacing/tagSize (e.g. 0.3)
   showTagIds?: boolean;      // display ID labels under each tag

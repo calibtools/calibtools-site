@@ -237,8 +237,6 @@ export default function Generator({ initialSpec }: GeneratorProps = {}) {
                 <option value="16h5">16h5 (30 tags)</option>
                 <option value="25h9">25h9 (35 tags)</option>
                 <option value="36h11">36h11 (587 tags)</option>
-                <option value="41h12">41h12 (2115 tags)</option>
-                <option value="52h13">52h13 (48714 tags)</option>
               </select>
             </label>
             <div className="grid grid-cols-2 gap-3">
@@ -299,8 +297,6 @@ export default function Generator({ initialSpec }: GeneratorProps = {}) {
                 <option value="16h5">16h5 (30 tags)</option>
                 <option value="25h9">25h9 (35 tags)</option>
                 <option value="36h11">36h11 (587 tags)</option>
-                <option value="41h12">41h12 (2115 tags)</option>
-                <option value="52h13">52h13 (48714 tags)</option>
               </select>
             </label>
             {spec.aprilFamily && (
