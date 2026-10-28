@@ -15,7 +15,9 @@ faq:
 
 ## What it does
 
-The detection check loads OpenCV.js in your browser and runs the appropriate corner or marker detector on a photo of your calibration board. It draws an overlay of detected corners (green when all expected corners are found, yellow when partial), reports the number of corners or markers found versus expected, and gives a pass/fail status.
+The detection check loads OpenCV.js in your browser and runs the appropriate corner or marker detector on a photo of your calibration board. It draws an overlay of detected corners — green when all expected corners are found, yellow when partial.
+
+The tool reports the number of corners or markers found versus expected and gives a pass/fail status.
 
 ## How to use it
 

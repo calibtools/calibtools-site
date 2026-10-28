@@ -46,6 +46,8 @@ const products = defineCollection({
   schema: z.object({
     summary: z.string().max(90),
     decideSpecs: z.tuple([z.string(), z.string(), z.string()]),
+    /** Short value-only chip strings for card display (e.g. "±0.3 mm", "6 mm"). */
+    chips: z.tuple([z.string(), z.string(), z.string()]).optional(),
     story: z.string().optional(),
     inTheBox: z.array(z.string()).optional(),
     compat: z.array(z.object({ tool: z.string(), note: z.string() })).optional(),

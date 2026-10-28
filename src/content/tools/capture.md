@@ -31,7 +31,9 @@ Captured images are saved as PNG files for use with OpenCV, ROS, Kalibr or any c
 
 ## Worked example
 
-Mount a ChArUco board on a flat surface. Start the camera, capture "Center" at roughly 500 mm distance, then follow the 14 remaining poses: close-up, far, four corners, four tilts, and three combined positions. Load the 15 images into `cv2.calibrateCamera` with the matching board config from the pattern generator.
+Mount a ChArUco board on a flat surface. Start the camera, capture "Center" at roughly 500 mm distance, then follow the 14 remaining poses: close-up, far, four corners, four tilts, and three combined positions.
+
+Load the 15 images into `cv2.calibrateCamera` with the matching board config from the pattern generator.
 
 ## Related guides
 

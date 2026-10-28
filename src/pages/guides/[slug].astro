@@ -23,13 +23,13 @@ const linkedProducts = d.products
   .filter(Boolean);
 
 // Review + content data for related product cards
-const guideCardData = new Map<string, { rating: number; count: number; summary?: string }>();
+const guideCardData = new Map<string, { rating: number; count: number; summary?: string; chips?: string[] }>();
 for (const p of linkedProducts) {
   if (!p) continue;
   const reviews = await getReviewsForProduct(p.handle);
   const s = summarize(reviews.filter(r => r.status === 'published'));
   const pc = await getEntry('products', p.handle);
-  guideCardData.set(p.handle, { rating: s.average, count: s.count, summary: pc?.data.summary });
+  guideCardData.set(p.handle, { rating: s.average, count: s.count, summary: pc?.data.summary, chips: pc?.data.chips });
 }
 
 // Sample-file links
@@ -181,6 +181,7 @@ const jsonLdItems = [articleLd, breadcrumbLd, ...(faqLd ? [faqLd] : [])];
                   placeholder={p.title.toUpperCase()}
                   rating={cd?.rating}
                   reviewCount={cd?.count}
+                  chips={cd?.chips}
                 />
               );
             })())}

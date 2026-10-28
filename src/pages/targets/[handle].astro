@@ -327,13 +327,13 @@ const collectionTitle = collectionHandle ? collectionHandle.replace(/-/g, ' ').r
 
 // Pairs-with card data
 import { getEntry } from 'astro:content';
-const pairsWithCardData = new Map<string, { rating: number; count: number; summary?: string }>();
+const pairsWithCardData = new Map<string, { rating: number; count: number; summary?: string; chips?: string[] }>();
 for (const p of pairsWith) {
   if (!p) continue;
   const reviews = await getReviewsForProduct(p.handle);
   const s = summarize(reviews.filter(r => r.status === 'published'));
   const pc = await getEntry('products', p.handle);
-  pairsWithCardData.set(p.handle, { rating: s.average, count: s.count, summary: pc?.data.summary });
+  pairsWithCardData.set(p.handle, { rating: s.average, count: s.count, summary: pc?.data.summary, chips: pc?.data.chips });
 }
 
 // FAQ
@@ -738,6 +738,7 @@ const orderingRows = (productData?.orderingRows ?? []).map((row) => {
               placeholder={p.title.toUpperCase()}
               rating={cd?.rating}
               reviewCount={cd?.count}
+              chips={cd?.chips}
             />
           );
         })())}

@@ -76,6 +76,13 @@ for (const p of collection.products) {
   }
 }
 
+// Product content summaries (from content collection)
+const productSummaries = new Map<string, string>();
+for (const p of collection.products) {
+  const pc = await getEntry('products', p.handle);
+  if (pc?.data.summary) productSummaries.set(p.handle, pc.data.summary);
+}
+
 // Generate preview thumbnails for products
 function productPreview(p: typeof collection.products[0]) {
   const localMeta = localHeroMap.get(p.handle);
@@ -306,7 +313,7 @@ const breadcrumbLd = {
                     ))}
                   </ul>
                 )}
-                <p class="m-0 text-[15px] text-ink-muted leading-relaxed">{p.description}</p>
+                <p class="m-0 text-[15px] text-ink-muted leading-relaxed">{productSummaries.get(p.handle) || p.description}</p>
               </div>
             </div>
 
