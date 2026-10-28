@@ -58,33 +58,33 @@ describe('layout constants', () => {
     expect(patternQuietZone(25)).toBe(25);
   });
 
-  it('wordmark sized by ISO 3098 cap height 3.5 mm on A4', () => {
-    // 3.5 × 7174.4 / 710 ≈ 35.4 mm
+  it('wordmark sized by ISO 3098 cap height 2.5 mm on A4', () => {
+    // 2.5 × 7174.4 / 710 ≈ 25.3 mm
     const wmW = wordmarkWidth(a4W, a4H);
-    expect(wmW).toBeCloseTo(35.4, 0);
+    expect(wmW).toBeCloseTo(25.3, 0);
     // Landscape — uses shorter dim, same result
     expect(wordmarkWidth(a4H, a4W)).toBe(wmW);
   });
 
-  it('wordmark scaled to 5 mm cap height on A3+', () => {
+  it('wordmark scaled to 3.5 mm cap height on A3+', () => {
     const [a3W, a3H] = PAPERS.A3;
-    // 5 × 7174.4 / 710 ≈ 50.5 mm
-    expect(wordmarkWidth(a3W, a3H)).toBeCloseTo(50.5, 0);
+    // 3.5 × 7174.4 / 710 ≈ 35.4 mm
+    expect(wordmarkWidth(a3W, a3H)).toBeCloseTo(35.4, 0);
   });
 
   it('wordmark cap height from aspect ratio', () => {
     const wmW = wordmarkWidth(a4W, a4H);
     const wmH = wmW / WM_ASPECT;
-    // viewBox height maps to ~3.80 mm, cap height = 3.5 mm
-    expect(wmH).toBeCloseTo(3.80, 1);
+    // viewBox height maps to ~2.72 mm, cap height = 2.5 mm
+    expect(wmH).toBeCloseTo(2.72, 1);
   });
 
   it('clear space = cap height (§04)', () => {
     const wmW = wordmarkWidth(a4W, a4H);
     const wmH = wmW / WM_ASPECT;
     const cs = wordmarkClearSpace(wmH);
-    // Cap height = wmH × 710 / 770.4 ≈ 3.5 mm
-    expect(cs).toBeCloseTo(3.5, 1);
+    // Cap height = wmH × 710 / 770.4 ≈ 2.5 mm
+    expect(cs).toBeCloseTo(2.5, 1);
   });
 
   it('brand text = ISO 3098 2.5 mm tier', () => {
@@ -237,7 +237,7 @@ describe('computeLayout — brand block geometry', () => {
   it('wordmark sized by ISO 3098 cap height on A4', () => {
     const s = spec({ rows: 5, cols: 5, square: 20 });
     const layout = computeLayout(s, a4W, a4H, 'portrait');
-    expect(layout.brand.wmW).toBeCloseTo(35.4, 0);
+    expect(layout.brand.wmW).toBeCloseTo(25.3, 0);
   });
 
   it('wordmark at bottom-left inside margin', () => {
