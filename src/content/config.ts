@@ -41,4 +41,15 @@ const collections_ = defineCollection({
   }),
 });
 
-export const collections = { guides, tools, collections: collections_ };
+const products = defineCollection({
+  type: 'content',
+  schema: z.object({
+    summary: z.string().max(90),
+    decideSpecs: z.tuple([z.string(), z.string(), z.string()]),
+    story: z.string().optional(),
+    inTheBox: z.array(z.string()).optional(),
+    compat: z.array(z.object({ tool: z.string(), note: z.string() })).optional(),
+  }),
+});
+
+export const collections = { guides, tools, collections: collections_, products };
