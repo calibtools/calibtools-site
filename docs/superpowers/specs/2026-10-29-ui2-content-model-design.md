@@ -73,16 +73,17 @@ File: `docs/content/content-model.md`
 | Slot | Source field | Char budget | Reveal | Order |
 |---|---|---|---|---|
 | H1 (product title) | Shopify product.title | - | visible | 1 |
-| Summary | `src/content/products/<handle>.md` frontmatter `summary` | <= 90 | visible | 2 |
-| Decide-specs strip | 3 chips from `decideSpecs` keys in product content, values from `productData.specGroups` | - | visible | 3 |
-| Price / variants | Shopify Storefront API | - | visible | 4 |
-| Specifications (full table) | `productData.specGroups` (datasheet-derived) | - | visible | 5 |
-| In the box | `productData.deliverables` + product content override | - | disclosure | 6 |
-| Files & formats | `productData.deliverables` files list + configFiles | - | disclosure | 7 |
-| Mounting & care | `productData.specGroups.Physical` mounting + Environment cleaning | - | disclosure | 8 |
-| Compatibility | hardcoded compatibility table (existing) | - | disclosure | 9 |
-| Reviews | ReviewsSection island | - | visible (summary) | 10 |
-| Related / pairs with | Shopify product relationships | - | visible | 11 |
+| Star rating | `summarize(getReviewsForProduct)` — Rating component | - | visible (0 reviews: hidden) | 2 |
+| Summary | `src/content/products/<handle>.md` frontmatter `summary` | <= 90 | visible | 3 |
+| Decide-specs strip | 3 chips from `decideSpecs` keys in product content, values from `productData.specGroups` | - | visible | 4 |
+| Price / variants | Shopify Storefront API | - | visible | 5 |
+| Specifications (full table) | `productData.specGroups` (datasheet-derived) | - | visible | 6 |
+| In the box | `productData.deliverables` + product content override | - | disclosure | 7 |
+| Files & formats | `productData.deliverables` files list + configFiles | - | disclosure | 8 |
+| Mounting & care | `productData.specGroups.Physical` mounting + Environment cleaning | - | disclosure | 9 |
+| Compatibility | hardcoded compatibility table (existing) | - | disclosure | 10 |
+| Reviews | ReviewsSection island | - | visible (summary) | 11 |
+| Related / pairs with | Shopify product relationships | - | visible | 12 |
 
 #### Collection page
 
@@ -127,6 +128,7 @@ All cards (product cards on /targets/, collection rows, related cards in guides)
 |---|---|---|
 | Image | Shopify CDN or local optimized | - |
 | Title | product/collection title | - |
+| Star rating | `summarize(getReviewsForProduct)` — Rating component; hidden when 0 | - |
 | Summary | product content `summary` or Shopify `description` | <= 90 |
 | 3 chips | product content `decideSpecs` keys -> values from specGroups | - |
 | Price | Shopify `priceFrom` | - |
@@ -213,7 +215,62 @@ Callers updated: `targets/index.astro`, `targets/[handle].astro` (pairs with), `
 
 Implementation: Since Astro renders markdown to HTML via `<Content />`, the split happens in `ToolContent.astro` by receiving the rendered HTML and using string splitting on `<h2` boundaries. Alternatively, render the markdown programmatically and split the AST — but string split on `<h2` is simpler and sufficient since tool content is fully controlled.
 
-### 3e. Reviews box condensation
+### 3e. Story-only description definition
+
+"Story-only description" = the Shopify `descriptionHtml` with every spec sentence removed. Spec sentences are those covering: material, tolerance, temperature, outdoor lifetime, in-the-box contents, mounting. What remains is what the product **is**, who it is **for**, and **why** — <= 2 short paragraphs. This is what `story` in `src/content/products/<handle>.md` contains, and what the Shopify CSV export preserves.
+
+### 3f. Star ratings on cards and product page
+
+New `src/components/Rating.astro` component:
+
+- Five stars (SVG or icon), brand red (`text-brand`) for filled portion, `text-line` for empty
+- Numeric average to 1 decimal place
+- Review count
+- Accessible label: `aria-label="Rated {avg} out of 5 from {count} reviews"`
+- **Renders nothing when count is 0** — no "no reviews yet" text, no empty stars, no element at all
+
+Usage:
+1. **Product card** (`ProductCard.astro`): rendered under the title, above summary. Card receives `rating` and `reviewCount` props; when `reviewCount` is 0, nothing renders.
+2. **Product page** (`[handle].astro`): rendered under H1, linking to `#reviews`. Already partially exists as the review summary link (lines 356-362) — refactor to use the shared `<Rating>` component. When count is 0, the link and stars are not rendered.
+
+Rating data is computed at build time from `getReviewsForProduct(handle)` + `summarize()` — the same source `ReviewsSection` uses. No new data fetch needed; the product page already computes `reviewSummary`.
+
+For cards on `/targets/`, `index.astro`, `guides/[slug].astro`: the caller must pass rating data. This means the listing pages need to load reviews per product at build time via `getReviewsForProduct` + `summarize`.
+
+### 3g. Product JSON-LD aggregateRating and review objects
+
+The product page JSON-LD (`productLd`) changes:
+
+1. **aggregateRating** (already partially implemented at lines 245-253): keep as-is, but ensure it is **only present when `reviewCount >= 1`**. Currently guarded by `reviewSummary.count > 0` — correct.
+
+2. **Add up to 5 review objects:** When `reviewCount >= 1`, add `review` array to `productLd` with up to 5 published reviews:
+   ```json
+   {
+     "@type": "Review",
+     "author": { "@type": "Person", "name": "<initials>" },
+     "datePublished": "<ISO date>",
+     "reviewBody": "<body text>",
+     "reviewRating": {
+       "@type": "Rating",
+       "ratingValue": <stars>,
+       "bestRating": 5
+     }
+   }
+   ```
+   Select the 5 most recent published reviews. When count is 0, neither `aggregateRating` nor `review` appears in the JSON-LD.
+
+3. **check-seo validation:** Add to `scripts/check-seo.mjs`:
+   - When `aggregateRating` is present in product page JSON-LD: validate shape has `ratingValue` (number string), `reviewCount` (number), `bestRating` "5"
+   - When product page has 0 reviews: validate `aggregateRating` and `review` are both absent
+   - Fail on shape mismatch
+
+4. **Vitest:** New test (in `src/lib/reviews.test.ts` or adjacent):
+   - `summarize([])` returns count 0, average 0
+   - `summarize([{stars:5}, {stars:4}, {stars:3}])` returns average 4.0 (not 4.00), count 3
+   - Rounding: `summarize([{stars:5},{stars:5},{stars:4}])` returns average "4.7" when formatted to 1 decimal
+   - Zero case: confirm no aggregateRating object generated when count is 0
+
+### 3h. Reviews box condensation
 
 In `src/islands/ReviewsSection.tsx`:
 - Replace the full HOW_REVIEWS_WORK paragraph with a one-sentence version
@@ -303,8 +360,10 @@ No changes to `scripts/check-seo.mjs`.
 | `src/pages/index.astro` | Pass chips to ProductCard, update HOW_REVIEWS_WORK usage |
 | `src/pages/guides/[slug].astro` | Pass chips to ProductCard |
 | `src/components/ToolContent.astro` | Split body into visible intro + disclosure sections |
+| `src/components/Rating.astro` | New: shared star rating component |
 | `src/islands/ReviewsSection.tsx` | Condense how-reviews-work to one sentence |
-| `src/lib/reviews.ts` | Keep HOW_REVIEWS_WORK, inline short version in ReviewsSection |
+| `src/lib/reviews.ts` | Keep HOW_REVIEWS_WORK, inline short version in ReviewsSection; vitest for summarize rounding/zero |
+| `scripts/check-seo.mjs` | Add aggregateRating shape validation + absence check |
 | `scripts/measure-text-blocks.mjs` | New |
 | `scripts/check-content.mjs` | New |
 | `scripts/check-prose.mjs` | Update thresholds, add card check |
