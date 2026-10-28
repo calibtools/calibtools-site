@@ -7,7 +7,7 @@ ECB EUR/USD reference rate: **1.1133** (2026-10-28)
 - **Composite**: target = calib.io anchor × 1.175, precise-rounded (avoid last digits 0/5/9),
   bounded [anchor × 1.15, anchor × 1.20].
 - **Ceramic 110×85 + 150×100**: same ×1.175 rule from calib.io ceramic anchors.
-- **Ceramic 185×110 + 230×140**: power-law extrapolation €/cm² = 45.26 × area^-0.3676
+- **Ceramic 185×110 + 230×140**: power-law extrapolation €/cm² = 44.67 × area^-0.3650
   fitted through the two anchored ceramic points.
 - **Fixture CT-ACC-A-FIX-14**: owner-set €163 (band €140–180); different construction from calib.io MNTFIX01.
 - **Certificate CT-SVC-X-CERT-ILAC**: owner-set $307 from Calibvision CNAS ≈$260 anchor; EUR derived.
@@ -27,10 +27,10 @@ ECB EUR/USD reference rate: **1.1133** (2026-10-28)
 | CT-CHA-P-400300 | 400×300 | €134 | calib.io CCT400300 Alu/LDPE | $139 | €157 | $174 | +17.2% | 0.1308 | — |
 | CT-CHA-P-600400 | 600×400 | €203 | calib.io CCT600400 Alu/LDPE | $199 | €238 | $264 | +17.2% | 0.0992 | — |
 | CT-CHA-P-800600 | 800×600 | €273 | calib.io CCT800600 Alu/LDPE | $269 | €321 | $357 | +17.6% | 0.0669 | — |
-| CT-CHA-C-110085 | 110×85 | €680 | calib.io CCT100075F ceramic 100×75 | $189 | €798 | $888 | +17.4% | 8.5348 | Anchor one size smaller (calib.io 100×75 → our 110×85) |
+| CT-CHA-C-110085 | 110×85 | €680 | calib.io CCT100075F ceramic 100×75 | $189 | €797 | $887 | +17.2% | 8.5241 | Owner override €797/$887 (avoid repeated-digit look of 798/888) |
 | CT-CHA-C-150100 | 150×100 | €915 | calib.io CCT150100F ceramic 150×100 | — | €1076 | $1198 | +17.6% | 7.1733 | Like-for-like; not yet in Shopify ⚠ not in Shopify |
-| CT-CHA-C-185110 | 185×110 | — | Power-law extrapolation from 110×85 + 150×100 | $239 | €1304 | $1452 | — | 6.4079 | Extrapolated: €/cm² = 45.26 × area^-0.3676 |
-| CT-CHA-C-230140 | 230×140 | — | Power-law extrapolation from 110×85 + 150×100 | $299 | €1744 | $1942 | — | 5.4161 | Extrapolated: €/cm² = 45.26 × area^-0.3676 |
+| CT-CHA-C-185110 | 185×110 | — | Power-law extrapolation from 110×85 + 150×100 | $239 | €1306 | $1454 | — | 6.4177 | Extrapolated: €/cm² = 44.67 × area^-0.3650 |
+| CT-CHA-C-230140 | 230×140 | — | Power-law extrapolation from 110×85 + 150×100 | $299 | €1748 | $1946 | — | 5.4286 | Extrapolated: €/cm² = 44.67 × area^-0.3650 |
 | CT-ACC-A-FIX-14 | — | — | Owner override (band €140–180) | $39 | €163 | $181 | — | — | Owner-set €163; different construction from calib.io MNTFIX01 @ €240 |
 | CT-SVC-X-CERT-ILAC | — | — | Calibvision CNAS cert ≈$260/PN → owner $307 | $149 | €276 | $307 | — | — | Owner-set $307; EUR derived via ECB rate |
 

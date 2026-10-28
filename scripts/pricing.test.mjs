@@ -90,7 +90,7 @@ describe('fitPowerLaw', () => {
     const { a, b } = CERAMIC_FIT;
     const p1 = a * Math.pow(93.5, b) * 93.5;
     const p2 = a * Math.pow(150, b) * 150;
-    expect(Math.round(p1)).toBe(798);
+    expect(Math.round(p1)).toBe(797);
     expect(Math.round(p2)).toBe(1076);
   });
 
@@ -145,7 +145,7 @@ describe('checkMonotonicity', () => {
 
   it('passes for ceramic family with extrapolated sizes', () => {
     const { a, b } = CERAMIC_FIT;
-    const sizes = [[110, 85, 798], [150, 100, 1076]];
+    const sizes = [[110, 85, 797], [150, 100, 1076]];
     for (const [w, h] of [[185, 110], [230, 140]]) {
       const areaCm2 = (w * h) / 100;
       sizes.push([w, h, extrapolateCeramic(areaCm2, a, b)]);
