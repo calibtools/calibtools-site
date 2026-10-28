@@ -23,42 +23,61 @@ export const PAPERS: Record<string, [number, number]> = {
 // tests, and check-exports.
 // ---------------------------------------------------------------------------
 
-/** Printer non-printable edge (mm). */
+/**
+ * Printer non-printable edge (mm).
+ * Derived from hardware specs: Epson ET-2800 inkjet 3 mm, Brother HL-L2350DW
+ * laser 4.23–6.35 mm.  8 mm covers both with margin to spare.
+ */
 export const PAGE_MARGIN = 8;
 
 /**
  * Quiet zone around the pattern (mm).
  * No brand element, axis, text or crop mark inside it.
- * Value = max(one square size of the current pattern, 10 mm).
+ * OpenCV requirement: ArUco needs ≥ 1 marker cell, findChessboardCornersSB
+ * needs ~1 square width, AprilTag needs 1 cell.  All three are satisfied by
+ * 1 × squareSize.  The 10 mm floor is a print-safety margin, not a detector
+ * requirement (see docs/audit/2026-10-28-brand-block.md §1c).
  */
 export function patternQuietZone(squareSize: number): number {
   return Math.max(squareSize, 10);
 }
 
-/** Compact wordmark width on A4/Letter (mm). Guidelines §04: compact print minimum 20 mm. */
-const WM_WIDTH_A4 = 20;
+// ---------------------------------------------------------------------------
+// ISO 3098 lettering tiers — wordmark sizing
+// ---------------------------------------------------------------------------
 
-/** Minimum wordmark width (mm). */
-const WM_WIDTH_MIN = 20;
+/**
+ * Cap height H in SVG design units, measured from glyph path bounding boxes
+ * (flat capitals I, L, T: y = 0 → y = −710).
+ */
+const CAP_HEIGHT_SVG = 710;
 
-/** Wordmark aspect ratio (width / height) from the kit. */
-const WM_ASPECT = WORDMARK_VB.width / WORDMARK_VB.height; // 7796.4 / 1857.4 ≈ 4.197
+/** ISO 3098 tier: wordmark cap height on A4 / Letter / Tabloid (mm). */
+const WM_CAP_A4 = 3.5;
+
+/** ISO 3098 tier: wordmark cap height on A3+ (mm). */
+const WM_CAP_A3 = 5;
+
+/** Short-side threshold for A3+ papers (mm). */
+const A3_SHORT_SIDE = 297;
+
+/** Wordmark aspect ratio (width / height) from the viewBox. */
+const WM_ASPECT = WORDMARK_VB.width / WORDMARK_VB.height;
 
 /**
  * Clear space around the wordmark (mm).
- * Brand guidelines §03: brackets sit 0.65 H above and below the letters,
- * where H = cap height = wordmark height / 2.3.
- * Kept free on all four sides of the wordmark.
+ * Brand guidelines §04: keep a clear space of H (cap height) on all sides,
+ * measured from the brackets or outermost letter.
  */
 export function wordmarkClearSpace(wmH: number): number {
-  return wmH / 2.3;
+  return wmH * CAP_HEIGHT_SVG / WORDMARK_VB.height;
 }
 
-/** Brand text: 7 pt in mm (7 × 25.4 / 72). */
-export const BRAND_TEXT_SIZE_MM = 7 * 25.4 / 72; // ≈ 2.47
+/** Brand text: ISO 3098 2.5 mm tier (parameter / provenance / print note). */
+export const BRAND_TEXT_SIZE_MM = 2.5;
 
 /** Line spacing for brand text lines (mm between baselines). */
-export const BRAND_LINE_SPACING = BRAND_TEXT_SIZE_MM * 1.3; // 7 pt × 1.3 ≈ 3.21 mm
+export const BRAND_LINE_SPACING = BRAND_TEXT_SIZE_MM * 1.3; // 2.5 × 1.3 = 3.25 mm
 
 /**
  * Compute brand block height.
@@ -215,12 +234,13 @@ export function orientPaper(
 
 /**
  * Compute wordmark width for a given page size.
- * 28 mm on A4/Letter, proportionally scaled for other sizes, minimum 25 mm.
+ * ISO 3098: cap height 3.5 mm on A4/Letter/Tabloid, 5 mm on A3+.
+ * Width derived from cap height × (viewBox.width / CAP_HEIGHT_SVG).
  */
 export function wordmarkWidth(pw: number, ph: number): number {
-  const refDim = Math.min(pw, ph);
-  const scale = refDim / 210;
-  return Math.max(WM_WIDTH_MIN, Math.round(WM_WIDTH_A4 * scale * 10) / 10);
+  const shortSide = Math.min(pw, ph);
+  const capH = shortSide >= A3_SHORT_SIDE ? WM_CAP_A3 : WM_CAP_A4;
+  return Math.round(capH * WORDMARK_VB.width / CAP_HEIGHT_SVG * 10) / 10;
 }
 
 // ---------------------------------------------------------------------------
