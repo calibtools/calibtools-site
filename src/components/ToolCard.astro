@@ -7,5 +7,5 @@ const { href, title, body, cta } = Astro.props;
   <slot name="icon" />
   <h3 class="m-0 text-xl font-bold">{title}</h3>
   <p class="m-0 text-[15px] leading-relaxed text-ink-muted">{body}</p>
-  <a href={href} class="mt-auto inline-flex items-center gap-1 text-[15px] font-semibold">{cta} <ArrowRight size={16} stroke-width={1.6} aria-hidden="true" /></a>
+  <a href={href} class="mt-auto inline-flex items-center gap-1 text-[15px] font-semibold [html[data-theme=dark]_&]:text-brand-on-dark">{cta} <ArrowRight size={16} stroke-width={1.6} aria-hidden="true" /></a>
 </div>

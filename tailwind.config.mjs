@@ -8,6 +8,7 @@ export default {
           DEFAULT: 'rgb(var(--color-brand) / <alpha-value>)',
           text: 'rgb(var(--color-brand-text) / <alpha-value>)',
           dark: 'rgb(var(--color-brand-dark) / <alpha-value>)',
+          'on-dark': 'rgb(var(--color-brand-on-dark) / <alpha-value>)',
           tint: 'var(--color-brand-tint)',
         },
         ink: {
