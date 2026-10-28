@@ -1,11 +1,15 @@
 ---
 import { Picture } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
+import Rating from './Rating.astro';
 
 interface Props {
   href: string;
   title: string;
-  sub: string;
+  /** Short summary (<= 90 chars). Falls back to sub if not provided. */
+  summary?: string;
+  /** @deprecated Use summary instead. Kept for backward compat. */
+  sub?: string;
   from: string;
   /** Remote image URL (Shopify CDN). */
   image?: string;
@@ -14,10 +18,20 @@ interface Props {
   placeholder?: string;
   /** Small tag shown instead of price (e.g. "In development"). */
   tag?: string;
+  /** Up to 3 spec chips: { label, value }. */
+  chips?: Array<{ label: string; value: string }>;
+  /** Star rating average (hidden when reviewCount is 0). */
+  rating?: number;
+  /** Review count (hidden when 0). */
+  reviewCount?: number;
 }
-const { href, title, sub, from, image, localImage, placeholder = 'PRODUCT', tag } = Astro.props;
+const {
+  href, title, summary, sub, from, image, localImage,
+  placeholder = 'PRODUCT', tag, chips, rating = 0, reviewCount = 0,
+} = Astro.props;
+const displaySummary = summary || sub || '';
 ---
-<a href={href} class="card flex flex-col overflow-hidden text-ink no-underline hover:text-ink hover:border-ink/40">
+<a href={href} data-card class="card flex flex-col overflow-hidden text-ink no-underline hover:text-ink hover:border-ink/40">
   <div class="aspect-[4/3] bg-ground-panel flex items-center justify-center overflow-hidden font-mono text-xs text-ink-soft">
     {localImage ? (
       <Picture
@@ -36,7 +50,15 @@ const { href, title, sub, from, image, localImage, placeholder = 'PRODUCT', tag 
   </div>
   <div class="flex flex-col gap-1.5 p-5">
     <strong class="text-[17px]">{title}</strong>
-    <span class="text-sm text-ink-muted">{sub}</span>
+    {reviewCount > 0 && <Rating average={rating} count={reviewCount} size={12} />}
+    {displaySummary && <span class="text-sm text-ink-muted line-clamp-2">{displaySummary}</span>}
+    {chips && chips.length > 0 && (
+      <div class="flex flex-wrap gap-1">
+        {chips.map((c) => (
+          <span class="rounded bg-ground-alt px-1.5 py-0.5 text-[11px] font-mono text-ink-muted">{c.label}: {c.value}</span>
+        ))}
+      </div>
+    )}
     {tag ? (
       <span class="text-xs font-semibold uppercase tracking-wide text-ink-soft">{tag}</span>
     ) : from ? (

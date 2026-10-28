@@ -47,6 +47,10 @@ const SVG_ALLOW = [
   'src/docs/build/ct-sv-cert-ilac.ts',
   // FAQ accordion chevron — inline SVG needed for group-open:rotate-180 in Astro
   'src/pages/faq.astro',
+  // Star rating uses inline SVG with dynamic fill for each star
+  'src/components/Rating.astro',
+  // Tool page disclosure script builds plus-icon SVG via innerHTML
+  'src/components/ToolContent.astro',
 ];
 
 /**

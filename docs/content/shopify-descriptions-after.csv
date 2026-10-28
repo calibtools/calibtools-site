@@ -1,0 +1,4 @@
+Handle,Body (HTML)
+charuco-composite,"<p>ChArUco combines a checkerboard with ArUco markers in the white squares. Markers identify each corner, so the board works even when partially outside the frame &mdash; exactly where lens distortion is strongest.</p><p>Native in OpenCV, supported by MATLAB and most multi-camera toolchains.</p>"
+charuco-ceramic,"<p>Lithographed chrome pattern on white alumina ceramic. Feature accuracy two orders of magnitude better than printed boards, thermally stable, chemically inert.</p><p>For metrology-grade camera calibration, high-magnification optics, and setups where the target must not be the error budget.</p>"
+checkerboard-composite,"<p>The classic pattern: highest corner localisation accuracy of any planar target when the whole board is in view. Supported by every calibration toolchain.</p><p>Choose Fine for more corners per image or Coarse for low-resolution and long-distance setups.</p>"

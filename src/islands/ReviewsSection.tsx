@@ -3,7 +3,6 @@ import { Star, Flag, ThumbsUp, ArrowDown } from '@/lib/icons';
 import Stars from '@/components/Stars';
 import {
   summarize, sortReviews,
-  HOW_REVIEWS_WORK,
   type Review, type ReviewSummary,
 } from '@/lib/reviews';
 import { MATERIAL_CONNECTION_LABEL } from '@/lib/claims';
@@ -44,7 +43,7 @@ export default function ReviewsSection({ reviews, handle }: Props) {
 
       {/* How reviews work box */}
       <p className="m-0 rounded border border-line bg-ground-alt px-3 py-2.5 text-[13px] leading-relaxed text-ink-muted">
-        <strong className="text-ink">How reviews work:</strong> {HOW_REVIEWS_WORK}{' '}
+        <strong className="text-ink">How reviews work:</strong> We publish every review unedited and disclose material connections.{' '}
         <a href="/reviews-policy/" className="text-brand-dark hover:text-brand">Full policy</a>
       </p>
 

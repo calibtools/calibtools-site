@@ -1,7 +1,8 @@
 ---
 import { Plus } from 'lucide-astro';
 /**
- * Renders tool SEO content below the island: prose body + FAQ as <details>.
+ * Renders tool SEO content below the island.
+ * First section visible (intro <= 240 chars); remaining sections in disclosures.
  */
 interface FaqItem { q: string; a: string }
 interface Props {
@@ -11,7 +12,7 @@ interface Props {
 const { Content, faq } = Astro.props;
 ---
 <section class="container-x pb-16">
-  <div class="prose-calib mx-auto max-w-[800px] flex flex-col gap-5">
+  <div class="prose-calib mx-auto max-w-[800px]" id="tool-content">
     <Content />
   </div>
   {faq.length > 0 && (
@@ -31,3 +32,38 @@ const { Content, faq } = Astro.props;
     </div>
   )}
 </section>
+
+<script>
+  // Split tool content: first section visible, rest in disclosures
+  const container = document.getElementById('tool-content');
+  if (container) {
+    const h2s = container.querySelectorAll('h2');
+    if (h2s.length > 0) {
+      for (const h2 of h2s) {
+        const details = document.createElement('details');
+        details.className = 'group border-t border-line';
+        const summary = document.createElement('summary');
+        summary.className = 'flex cursor-pointer list-none items-center justify-between gap-4 py-4 text-[17px] font-semibold [&::-webkit-details-marker]:hidden';
+        summary.innerHTML = `${h2.textContent}<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" class="shrink-0 text-ink-soft transition-transform group-open:rotate-45" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
+
+        const content = document.createElement('div');
+        content.className = 'pb-4';
+
+        // Collect siblings between this h2 and next h2
+        let sibling = h2.nextElementSibling;
+        const siblings: Element[] = [];
+        while (sibling && sibling.tagName !== 'H2') {
+          siblings.push(sibling);
+          sibling = sibling.nextElementSibling;
+        }
+
+        h2.replaceWith(details);
+        details.appendChild(summary);
+        details.appendChild(content);
+        for (const s of siblings) {
+          content.appendChild(s);
+        }
+      }
+    }
+  }
+</script>
