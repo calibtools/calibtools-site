@@ -16,8 +16,6 @@ interface Props {
   /** Local optimised image (from import.meta.glob). */
   localImage?: ImageMetadata;
   placeholder?: string;
-  /** Small tag shown instead of price (e.g. "In development"). */
-  tag?: string;
   /** Up to 3 value-only chip strings, rendered as "val · val · val". */
   chips?: string[];
   /** Star rating average (hidden when reviewCount is 0). */
@@ -27,7 +25,7 @@ interface Props {
 }
 const {
   href, title, summary, sub, from, image, localImage,
-  placeholder = 'PRODUCT', tag, chips, rating = 0, reviewCount = 0,
+  placeholder = 'PRODUCT', chips, rating = 0, reviewCount = 0,
 } = Astro.props;
 const displaySummary = summary || sub || '';
 ---
@@ -55,9 +53,7 @@ const displaySummary = summary || sub || '';
     {chips && chips.length > 0 && (
       <span class="text-[12px] font-mono text-ink-muted">{chips.join(' · ')}</span>
     )}
-    {tag ? (
-      <span class="text-xs font-semibold uppercase tracking-wide text-ink-soft">{tag}</span>
-    ) : from ? (
+    {from ? (
       <span class="text-sm font-semibold text-brand-dark [html[data-theme=dark]_&]:text-brand-on-dark">from {from}</span>
     ) : null}
   </div>

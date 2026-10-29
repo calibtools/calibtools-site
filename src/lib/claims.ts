@@ -49,9 +49,6 @@ export const INSPECTION_CLAIM_SHORT = 'Measured before it ships';
 /** Primary tagline — used for the home H1, <title> suffix, OG fallback. */
 export const TAGLINE = 'Know your target to the micron';
 
-/** Label shown on collection cards when no products are purchasable yet. */
-export const IN_DEVELOPMENT = 'In development';
-
 /** Returns headline — used on index.astro and returns.astro. */
 export const RETURNS_LINE = 'Not flat, not accurate, not what you ordered\u2009\u2014\u2009send it back.';
 

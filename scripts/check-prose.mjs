@@ -44,6 +44,9 @@ const BANNED_PATTERNS = [
   /±0\.5[\u2013-]2/,
   /±1[\u2013-]2/,
   /0\.5[\u2013-]2\s*µm/,
+  /\bcoming\s+soon\b/i,
+  /\bin\s+development\b/i,
+  /\(soon\)/i,
 ];
 
 /** Phrases that are allowed even when they contain a banned word. */

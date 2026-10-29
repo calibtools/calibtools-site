@@ -7,7 +7,6 @@ import { getProductImages } from '@/lib/product-images';
 import { getImageMetadata } from '@/lib/productImageImports';
 import { breadcrumbLd } from '@/lib/seo';
 import { getEntry } from 'astro:content';
-import { IN_DEVELOPMENT } from '@/lib/claims';
 import { getReviewsForProduct, summarize } from '@/lib/reviews';
 const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: 'Calibration targets' }]);
 
@@ -68,7 +67,6 @@ for (const p of products) {
             title={displayTitle}
             sub={displayDesc}
             from={hasPurchasable ? (firstProduct?.priceFrom ?? '') : ''}
-            tag={!hasPurchasable ? IN_DEVELOPMENT : undefined}
             localImage={localHero}
             image={!localHero ? (c.image ?? firstProduct?.image) : undefined}
             placeholder={displayTitle.toUpperCase()}

@@ -13,7 +13,7 @@ const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: 'Free tools' }]);
     </div>
     <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
       {tools.map((t) => (
-        <ToolCard href={t.href} title={t.title} body={t.body} cta={t.live ? t.cta : `${t.cta} (coming soon)`} />
+        <ToolCard href={t.href} title={t.title} body={t.body} cta={t.cta} />
       ))}
     </div>
   </section>
