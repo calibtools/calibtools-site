@@ -386,8 +386,18 @@ const PRODUCT_TAGS = {
   'halcon-composite': 'composite, halcon, mvtec',
 };
 
+/** Quote a CSV field: wrap in double-quotes if it contains comma, quote, or newline (RFC 4180). */
+function csvField(value) {
+  const s = String(value ?? '');
+  if (s.includes(',') || s.includes('"') || s.includes('\n')) {
+    return '"' + s.replace(/"/g, '""') + '"';
+  }
+  return s;
+}
+
 function shopifyProductImportCsv(rows) {
-  const lines = ['Handle,Title,Body (HTML),Vendor,Type,Tags,Option1 Name,Option1 Value,Variant SKU,Variant Price,Variant Inventory Policy,Published'];
+  const HEADER = ['Handle','Title','Body (HTML)','Vendor','Type','Tags','Option1 Name','Option1 Value','Variant SKU','Variant Price','Variant Inventory Policy','Published'];
+  const lines = [HEADER.join(',')];
   const seen = new Set();
   for (const r of rows) {
     if (r.proposedUsd == null) continue;
@@ -401,9 +411,64 @@ function shopifyProductImportCsv(rows) {
     const type = isFirst ? 'Calibration target' : '';
     const tags = isFirst ? (PRODUCT_TAGS[r.handle] || '') : '';
     const size = r.widthMm ? `${r.widthMm} \u00d7 ${r.heightMm}` : '';
-    lines.push(`${r.handle},${title},"${body}",${vendor},${type},${tags},Size,${size},${r.sku},${r.proposedUsd}.00,continue,TRUE`);
+    const fields = [r.handle, title, csvField(body), vendor, type, csvField(tags), 'Size', size, r.sku, `${r.proposedUsd}.00`, 'continue', 'TRUE'];
+    lines.push(fields.join(','));
   }
   return lines.join('\n') + '\n';
+}
+
+/** Validate that every data row has the same field count as the header and Variant Price is well-formed. */
+function validateCsv(csv, label) {
+  const lines = csv.trimEnd().split('\n');
+  if (lines.length < 2) throw new Error(`${label}: CSV has no data rows`);
+
+  // Parse a CSV line respecting quoted fields
+  function parseRow(line) {
+    const fields = [];
+    let i = 0;
+    while (i <= line.length) {
+      if (i === line.length) { fields.push(''); break; }
+      if (line[i] === '"') {
+        let val = '';
+        i++; // skip opening quote
+        while (i < line.length) {
+          if (line[i] === '"') {
+            if (i + 1 < line.length && line[i + 1] === '"') { val += '"'; i += 2; }
+            else { i++; break; }
+          } else { val += line[i]; i++; }
+        }
+        fields.push(val);
+        if (i < line.length && line[i] === ',') i++; // skip comma
+      } else {
+        const next = line.indexOf(',', i);
+        if (next === -1) { fields.push(line.slice(i)); break; }
+        fields.push(line.slice(i, next));
+        i = next + 1;
+      }
+    }
+    return fields;
+  }
+
+  const headerFields = parseRow(lines[0]);
+  const headerCount = headerFields.length;
+  const priceIdx = headerFields.indexOf('Variant Price');
+
+  const errors = [];
+  for (let i = 1; i < lines.length; i++) {
+    const fields = parseRow(lines[i]);
+    if (fields.length !== headerCount) {
+      errors.push(`Row ${i + 1}: expected ${headerCount} fields, got ${fields.length}`);
+    }
+    if (priceIdx !== -1) {
+      const price = fields[priceIdx];
+      if (!/^\d+\.\d\d$/.test(price)) {
+        errors.push(`Row ${i + 1}: Variant Price "${price}" does not match /^\\d+\\.\\d\\d$/`);
+      }
+    }
+  }
+  if (errors.length > 0) {
+    throw new Error(`${label} validation failed:\n  ${errors.join('\n  ')}`);
+  }
 }
 
 // ── Main ────────────────────────────────────────────────────────────────
@@ -419,7 +484,10 @@ const ladder = generateLadder();
 
 writeFileSync(join(docsDir, '2026-10-29-price-ladder.md'), ladderMarkdown(ladder));
 writeFileSync(join(docsDir, 'shopify-price-import-2026-10-29.csv'), shopifyCsv(ladder.rows));
-writeFileSync(join(docsDir, 'add-products-2026-10-29.csv'), shopifyProductImportCsv(ladder.rows));
+
+const addProductsCsv = shopifyProductImportCsv(ladder.rows);
+validateCsv(addProductsCsv, 'add-products-2026-10-29.csv');
+writeFileSync(join(docsDir, 'add-products-2026-10-29.csv'), addProductsCsv);
 
 console.log(ladderMarkdown(ladder));
 
