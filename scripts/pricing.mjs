@@ -136,6 +136,31 @@ const SHOPIFY_VARIANTS = {
   'CHA-C-185110': { shopifySkus: ['CHA-C-185110-6X6', 'CHA-C-185110-5X5'], oldUsd: 239 },
   'CHA-C-230140': { shopifySkus: ['CHA-C-230140-6X6', 'CHA-C-230140-5X5'], oldUsd: 299 },
 
+  // AprilGrid composite — not yet in Shopify
+  'APR-P-200150': { shopifySkus: [], oldUsd: null },
+  'APR-P-300200': { shopifySkus: [], oldUsd: null },
+  'APR-P-400300': { shopifySkus: [], oldUsd: null },
+  'APR-P-600400': { shopifySkus: [], oldUsd: null },
+  'APR-P-800600': { shopifySkus: [], oldUsd: null },
+  // Circle grid composite (symmetric) — not yet in Shopify
+  'CIR-P-200150': { shopifySkus: [], oldUsd: null },
+  'CIR-P-300200': { shopifySkus: [], oldUsd: null },
+  'CIR-P-400300': { shopifySkus: [], oldUsd: null },
+  'CIR-P-600400': { shopifySkus: [], oldUsd: null },
+  'CIR-P-800600': { shopifySkus: [], oldUsd: null },
+  // Asymmetric circle grid composite — not yet in Shopify
+  'ACR-P-200150': { shopifySkus: [], oldUsd: null },
+  'ACR-P-300200': { shopifySkus: [], oldUsd: null },
+  'ACR-P-400300': { shopifySkus: [], oldUsd: null },
+  'ACR-P-600400': { shopifySkus: [], oldUsd: null },
+  'ACR-P-800600': { shopifySkus: [], oldUsd: null },
+  // HALCON composite — not yet in Shopify
+  'HAL-P-200150': { shopifySkus: [], oldUsd: null },
+  'HAL-P-300200': { shopifySkus: [], oldUsd: null },
+  'HAL-P-400300': { shopifySkus: [], oldUsd: null },
+  'HAL-P-600400': { shopifySkus: [], oldUsd: null },
+  'HAL-P-800600': { shopifySkus: [], oldUsd: null },
+
   // Accessories / services — 1 variant each
   'ACC-FIX-14':   { shopifySkus: ['ACC-FIX-14'], oldUsd: 39 },
   'SVC-CERT-ILAC': { shopifySkus: ['SVC-CERT-ILAC'], oldUsd: 149 },
@@ -157,6 +182,35 @@ const CATALOGUE = [
   { sku: 'CT-CHA-P-400300', sizeKey: 'CHA-P-400300', handle: 'charuco-composite', family: 'CHA-P', widthMm: 400, heightMm: 300, anchorEur: 134, anchorSource: 'calib.io CCT400300 Alu/LDPE', note: '' },
   { sku: 'CT-CHA-P-600400', sizeKey: 'CHA-P-600400', handle: 'charuco-composite', family: 'CHA-P', widthMm: 600, heightMm: 400, anchorEur: 203, anchorSource: 'calib.io CCT600400 Alu/LDPE', note: '' },
   { sku: 'CT-CHA-P-800600', sizeKey: 'CHA-P-800600', handle: 'charuco-composite', family: 'CHA-P', widthMm: 800, heightMm: 600, anchorEur: 273, anchorSource: 'calib.io CCT800600 Alu/LDPE', note: '' },
+
+  // AprilGrid composite — anchor: calib.io kalibr-targets (only 3 sizes available)
+  // 200×150 and 300×200 use checkerboard anchors (same substrate + printing)
+  { sku: 'CT-APR-P-200150', sizeKey: 'APR-P-200150', handle: 'aprilgrid-composite', family: 'APR-P', widthMm: 200, heightMm: 150, anchorEur: 103, anchorSource: 'calib.io CHT200150 (proxy — no kalibr-targets 200×150)', note: '' },
+  { sku: 'CT-APR-P-300200', sizeKey: 'APR-P-300200', handle: 'aprilgrid-composite', family: 'APR-P', widthMm: 300, heightMm: 200, anchorEur: 108, anchorSource: 'calib.io CHT300200 (proxy — no kalibr-targets 300×200)', note: '' },
+  { sku: 'CT-APR-P-400300', sizeKey: 'APR-P-400300', handle: 'aprilgrid-composite', family: 'APR-P', widthMm: 400, heightMm: 300, anchorEur: 176, anchorSource: 'calib.io KLB400300', note: '' },
+  { sku: 'CT-APR-P-600400', sizeKey: 'APR-P-600400', handle: 'aprilgrid-composite', family: 'APR-P', widthMm: 600, heightMm: 400, anchorEur: 234, anchorSource: 'calib.io KLB600400', note: '' },
+  { sku: 'CT-APR-P-800600', sizeKey: 'APR-P-800600', handle: 'aprilgrid-composite', family: 'APR-P', widthMm: 800, heightMm: 600, anchorEur: 315, anchorSource: 'calib.io KLB800600', note: '' },
+
+  // Circle grid composite (symmetric) — anchor: calib.io circles
+  { sku: 'CT-CIR-P-200150', sizeKey: 'CIR-P-200150', handle: 'circlegrid-composite', family: 'CIR-P', widthMm: 200, heightMm: 150, anchorEur: 103, anchorSource: 'calib.io CT200150', note: '' },
+  { sku: 'CT-CIR-P-300200', sizeKey: 'CIR-P-300200', handle: 'circlegrid-composite', family: 'CIR-P', widthMm: 300, heightMm: 200, anchorEur: 108, anchorSource: 'calib.io CT300200', note: '' },
+  { sku: 'CT-CIR-P-400300', sizeKey: 'CIR-P-400300', handle: 'circlegrid-composite', family: 'CIR-P', widthMm: 400, heightMm: 300, anchorEur: 127, anchorSource: 'calib.io CT400300', note: '' },
+  { sku: 'CT-CIR-P-600400', sizeKey: 'CIR-P-600400', handle: 'circlegrid-composite', family: 'CIR-P', widthMm: 600, heightMm: 400, anchorEur: 176, anchorSource: 'calib.io CT600400', note: '' },
+  { sku: 'CT-CIR-P-800600', sizeKey: 'CIR-P-800600', handle: 'circlegrid-composite', family: 'CIR-P', widthMm: 800, heightMm: 600, anchorEur: 263, anchorSource: 'calib.io CT800600', note: '' },
+
+  // Asymmetric circle grid composite — anchor: calib.io asymmetric-circles
+  { sku: 'CT-ACR-P-200150', sizeKey: 'ACR-P-200150', handle: 'circlegrid-composite', family: 'ACR-P', widthMm: 200, heightMm: 150, anchorEur: 103, anchorSource: 'calib.io ACT200150', note: '' },
+  { sku: 'CT-ACR-P-300200', sizeKey: 'ACR-P-300200', handle: 'circlegrid-composite', family: 'ACR-P', widthMm: 300, heightMm: 200, anchorEur: 108, anchorSource: 'calib.io ACT300200', note: '' },
+  { sku: 'CT-ACR-P-400300', sizeKey: 'ACR-P-400300', handle: 'circlegrid-composite', family: 'ACR-P', widthMm: 400, heightMm: 300, anchorEur: 121, anchorSource: 'calib.io ACT400300', note: '' },
+  { sku: 'CT-ACR-P-600400', sizeKey: 'ACR-P-600400', handle: 'circlegrid-composite', family: 'ACR-P', widthMm: 600, heightMm: 400, anchorEur: 176, anchorSource: 'calib.io ACT600400', note: '' },
+  { sku: 'CT-ACR-P-800600', sizeKey: 'ACR-P-800600', handle: 'circlegrid-composite', family: 'ACR-P', widthMm: 800, heightMm: 600, anchorEur: 263, anchorSource: 'calib.io ACT800600', note: '' },
+
+  // HALCON composite — anchor: calib.io halcon-targets
+  { sku: 'CT-HAL-P-200150', sizeKey: 'HAL-P-200150', handle: 'halcon-composite', family: 'HAL-P', widthMm: 200, heightMm: 150, anchorEur: 127, anchorSource: 'calib.io HAL200150F', note: '' },
+  { sku: 'CT-HAL-P-300200', sizeKey: 'HAL-P-300200', handle: 'halcon-composite', family: 'HAL-P', widthMm: 300, heightMm: 200, anchorEur: 133, anchorSource: 'calib.io HAL300200F', note: '' },
+  { sku: 'CT-HAL-P-400300', sizeKey: 'HAL-P-400300', handle: 'halcon-composite', family: 'HAL-P', widthMm: 400, heightMm: 300, anchorEur: 142, anchorSource: 'calib.io HAL400300F', note: '' },
+  { sku: 'CT-HAL-P-600400', sizeKey: 'HAL-P-600400', handle: 'halcon-composite', family: 'HAL-P', widthMm: 600, heightMm: 400, anchorEur: 208, anchorSource: 'calib.io HAL600400F', note: '' },
+  { sku: 'CT-HAL-P-800600', sizeKey: 'HAL-P-800600', handle: 'halcon-composite', family: 'HAL-P', widthMm: 800, heightMm: 600, anchorEur: 283, anchorSource: 'calib.io HAL800600F', note: '' },
 
   // ChArUco ceramic — owner decision A: calib.io anchor, power-law extrapolation
   { sku: 'CT-CHA-C-110085', sizeKey: 'CHA-C-110085', handle: 'charuco-ceramic', family: 'CHA-C', widthMm: 110, heightMm: 85, anchorEur: 680, anchorSource: 'calib.io CCT100075F ceramic 100×75', note: 'Owner override €797/$887 (avoid repeated-digit look of 798/888)', ownerEur: 797, ownerUsd: 887 },
@@ -239,7 +293,7 @@ function generateLadder() {
 
 function ladderMarkdown({ rows, monotonicity }) {
   const lines = [
-    '# Price ladder — 2026-10-29 (rev b)',
+    '# Price ladder — 2026-10-29 (rev c)',
     '',
     `ECB EUR/USD reference rate: **${ECB_EURUSD}** (2026-10-28)`,
     '',
@@ -315,6 +369,43 @@ function shopifyCsv(rows) {
   return lines.join('\n') + '\n';
 }
 
+// ── Product titles/stories/tags for new products ──────────────────────
+const PRODUCT_TITLES = {
+  'aprilgrid-composite': 'AprilGrid calibration target',
+  'circlegrid-composite': 'Circle grid calibration target',
+  'halcon-composite': 'HALCON calibration plate',
+};
+const PRODUCT_STORIES = {
+  'aprilgrid-composite': '<p>AprilGrid composite board for Kalibr camera-IMU calibration. AprilTag 36h11 markers on rigid aluminium composite.</p>',
+  'circlegrid-composite': '<p>Symmetric and asymmetric circle grid targets on rigid aluminium composite. For OpenCV and HALCON workflows.</p>',
+  'halcon-composite': '<p>HALCON calibration plate with MVTec mark layout on rigid aluminium composite. Ships with .descr description file.</p>',
+};
+const PRODUCT_TAGS = {
+  'aprilgrid-composite': 'composite, aprilgrid, kalibr',
+  'circlegrid-composite': 'composite, circles, opencv, halcon',
+  'halcon-composite': 'composite, halcon, mvtec',
+};
+
+function shopifyProductImportCsv(rows) {
+  const lines = ['Handle,Title,Body (HTML),Vendor,Type,Tags,Option1 Name,Option1 Value,Variant SKU,Variant Price,Variant Inventory Policy,Published'];
+  const seen = new Set();
+  for (const r of rows) {
+    if (r.proposedUsd == null) continue;
+    // Only include new products (skip existing ones already in Shopify)
+    if (!PRODUCT_TITLES[r.handle]) continue;
+    const isFirst = !seen.has(r.handle);
+    seen.add(r.handle);
+    const title = isFirst ? PRODUCT_TITLES[r.handle] : '';
+    const body = isFirst ? PRODUCT_STORIES[r.handle] : '';
+    const vendor = isFirst ? 'Calib.Tools' : '';
+    const type = isFirst ? 'Calibration target' : '';
+    const tags = isFirst ? (PRODUCT_TAGS[r.handle] || '') : '';
+    const size = r.widthMm ? `${r.widthMm} \u00d7 ${r.heightMm}` : '';
+    lines.push(`${r.handle},${title},"${body}",${vendor},${type},${tags},Size,${size},${r.sku},${r.proposedUsd}.00,continue,TRUE`);
+  }
+  return lines.join('\n') + '\n';
+}
+
 // ── Main ────────────────────────────────────────────────────────────────
 
 import { writeFileSync } from 'node:fs';
@@ -328,6 +419,7 @@ const ladder = generateLadder();
 
 writeFileSync(join(docsDir, '2026-10-29-price-ladder.md'), ladderMarkdown(ladder));
 writeFileSync(join(docsDir, 'shopify-price-import-2026-10-29.csv'), shopifyCsv(ladder.rows));
+writeFileSync(join(docsDir, 'add-products-2026-10-29.csv'), shopifyProductImportCsv(ladder.rows));
 
 console.log(ladderMarkdown(ladder));
 

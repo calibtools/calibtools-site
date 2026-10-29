@@ -1,5 +1,5 @@
 /**
- * Canonical fallback prices — sourced from docs/pricing/2026-10-29-price-ladder.md (rev b).
+ * Canonical fallback prices — sourced from docs/pricing/2026-10-29-price-ladder.md (rev c).
  *
  * These are used ONLY when the Storefront API is unreachable (e.g. missing credentials
  * in CI or dev). The live site always reads prices from Shopify at build time.
@@ -14,7 +14,7 @@ export interface FallbackPrice {
   eur: number;
 }
 
-/** Price ladder — 2026-10-29 rev b. */
+/** Price ladder — 2026-10-29 rev c. */
 export const PRICE_LADDER: FallbackPrice[] = [
   // Checkerboard composite
   { sku: 'CT-CHT-P-200150', eur: 121 },
@@ -32,7 +32,7 @@ export const PRICE_LADDER: FallbackPrice[] = [
   { sku: 'CT-APR-P-200150', eur: 121 },
   { sku: 'CT-APR-P-300200', eur: 127 },
   { sku: 'CT-APR-P-400300', eur: 207 },
-  { sku: 'CT-APR-P-600400', eur: 276 },
+  { sku: 'CT-APR-P-600400', eur: 274 },
   { sku: 'CT-APR-P-800600', eur: 371 },
   // Circle grid composite (symmetric)
   { sku: 'CT-CIR-P-200150', eur: 121 },
@@ -51,7 +51,7 @@ export const PRICE_LADDER: FallbackPrice[] = [
   { sku: 'CT-HAL-P-300200', eur: 156 },
   { sku: 'CT-HAL-P-400300', eur: 167 },
   { sku: 'CT-HAL-P-600400', eur: 244 },
-  { sku: 'CT-HAL-P-800600', eur: 332 },
+  { sku: 'CT-HAL-P-800600', eur: 333 },
   // ChArUco ceramic
   { sku: 'CT-CHA-C-110085', eur: 797 },
   { sku: 'CT-CHA-C-150100', eur: 1076 },
