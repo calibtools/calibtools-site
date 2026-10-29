@@ -12,7 +12,7 @@ import { getProductImages } from '@/lib/product-images';
 import { getImageMetadata } from '@/lib/productImageImports';
 import { Tag, Truck, FileCheck, Files, RotateCcw, Grid2x2 as Grid2X2, ScanLine, ListChecks, Package, Ruler, CircleDot, Plug, ArrowRight, Mail } from 'lucide-astro';
 import { getAllPublishedReviews } from '@/lib/reviews';
-import { TAGLINE, IN_DEVELOPMENT, RETURNS_LINE } from '@/lib/claims';
+import { TAGLINE, RETURNS_LINE } from '@/lib/claims';
 import Stars from '@/components/Stars';
 import heroTight from '@/assets/products/brand/dark/hero-boards-tight.webp';
 import heroTightMobile from '@/assets/products/brand/dark/hero-boards-tight-mobile.webp';
@@ -156,13 +156,13 @@ const featuredReviews = allReviews
         <a href="/tools/" class="inline-flex items-center gap-1 text-[15px] font-semibold text-brand-on-dark">See all tools <ArrowRight size={20} stroke-width={1.6} class="text-brand-on-dark" aria-hidden="true" /></a>
       </div>
       <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
-        <ToolCard href={featuredTools[0].href} title={featuredTools[0].title} cta={featuredTools[0].live ? featuredTools[0].cta : `${featuredTools[0].cta} (coming soon)`} body={featuredTools[0].body}>
+        <ToolCard href={featuredTools[0].href} title={featuredTools[0].title} cta={featuredTools[0].cta} body={featuredTools[0].body}>
           <Grid2X2 slot="icon" size={20} stroke-width={1.6} class="text-brand" aria-hidden="true" />
         </ToolCard>
-        <ToolCard href={featuredTools[1].href} title={featuredTools[1].title} cta={featuredTools[1].live ? featuredTools[1].cta : `${featuredTools[1].cta} (coming soon)`} body={featuredTools[1].body}>
+        <ToolCard href={featuredTools[1].href} title={featuredTools[1].title} cta={featuredTools[1].cta} body={featuredTools[1].body}>
           <ScanLine slot="icon" size={20} stroke-width={1.6} class="text-brand" aria-hidden="true" />
         </ToolCard>
-        <ToolCard href={featuredTools[2].href} title={featuredTools[2].title} cta={featuredTools[2].live ? featuredTools[2].cta : `${featuredTools[2].cta} (coming soon)`} body={featuredTools[2].body}>
+        <ToolCard href={featuredTools[2].href} title={featuredTools[2].title} cta={featuredTools[2].cta} body={featuredTools[2].body}>
           <ListChecks slot="icon" size={20} stroke-width={1.6} class="text-brand" aria-hidden="true" />
         </ToolCard>
       </div>
@@ -190,7 +190,6 @@ const featuredReviews = allReviews
             title={displayTitle}
             sub={displayDesc}
             from={hasPurchasable ? (firstProduct?.priceFrom ?? '') : ''}
-            tag={!hasPurchasable ? IN_DEVELOPMENT : undefined}
             localImage={localHero}
             image={!localHero ? (c.image ?? firstProduct?.image) : undefined}
             placeholder={displayTitle.toUpperCase()}

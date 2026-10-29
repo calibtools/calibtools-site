@@ -11,7 +11,7 @@ const shortLabels: Record<string, string> = {
 <div class="container-x flex flex-wrap gap-2 pt-5 text-sm font-semibold">
   {tools.map((t) => (
     <a href={t.href} aria-label={t.title} class={`rounded-full px-3.5 py-2 no-underline ${current === t.key ? 'bg-ink text-white hover:text-white' : 'bg-ground-panel text-ink hover:text-ink'}`}>
-      {shortLabels[t.key] ?? t.title}{!t.live && <span class="ml-1 text-xs text-ink-muted">(soon)</span>}
+      {shortLabels[t.key] ?? t.title}
     </a>
   ))}
 </div>
