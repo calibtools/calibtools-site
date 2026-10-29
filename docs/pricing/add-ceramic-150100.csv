@@ -1,3 +1,30 @@
-Handle,Title,Body (HTML),Vendor,Product Category,Type,Tags,Published,Option1 Name,Option1 Value,Option2 Name,Option2 Value,Variant SKU,Variant Grams,Variant Inventory Tracker,Variant Inventory Qty,Variant Inventory Policy,Variant Fulfillment Service,Variant Price,Variant Compare At Price,Variant Requires Shipping,Variant Taxable,Image Src,Image Position,Image Alt Text,SEO Title,SEO Description,Status
-charuco-ceramic,,,,,,,,Size,150×100,Dictionary,DICT_6X6_250,CHA-C-150100-6X6,0,,0,deny,manual,1198,,TRUE,TRUE,,,,,,active
-charuco-ceramic,,,,,,,,Size,150×100,Dictionary,DICT_5X5_100,CHA-C-150100-5X5,0,,0,deny,manual,1198,,TRUE,TRUE,,,,,,active
+Handle,Title,Body (HTML),Vendor,Product Category,Type,Tags,Published,Option1 Name,Option1 Value,Option1 Linked To,Option2 Name,Option2 Value,Option2 Linked To,Option3 Name,Option3 Value,Option3 Linked To,Variant SKU,Variant Grams,Variant Inventory Tracker,Variant Inventory Qty,Variant Inventory Policy,Variant Fulfillment Service,Variant Price,Variant Compare At Price,Variant Requires Shipping,Variant Taxable,Unit Price Total Measure,Unit Price Total Measure Unit,Unit Price Base Measure,Unit Price Base Measure Unit,Variant Barcodes,Image Src,Image Position,Image Alt Text,Gift Card,SEO Title,SEO Description,Mounting (product.metafields.specs.mounting),Operating range (product.metafields.specs.operating_range),Substrate (product.metafields.specs.substrate),Thermal expansion (product.metafields.specs.thermal_expansion),Feature tolerance (product.metafields.specs.tolerance),Variant Image,Variant Weight Unit,Variant Tax Code,Cost per item,Status,Variant Packed Length,Variant Packed Width,Variant Packed Height,Variant Packed Dimension Unit
+charuco-ceramic,ChArUco calibration target — ceramic,"<p>White alumina ceramic with matte blue chrome pattern, lithographed in a cleanroom. Feature accuracy ±2 µm. Thermal expansion ~7.2 µm/(°C·m). For front-lit, small-FOV and metrology-grade calibration.</p><p>Inspection report included; ILAC-recognised calibration certificate available as an add-on.</p><table>
+<tr>
+<td>Substrate</td>
+<td>Alumina ceramic, 3 mm</td>
+</tr>
+<tr>
+<td>Feature accuracy</td>
+<td>±2 µm</td>
+</tr>
+<tr>
+<td>Thermal expansion</td>
+<td>~7.2 µm/(°C·m)</td>
+</tr>
+<tr>
+<td>Operating range</td>
+<td>−50 °C to +200 °C</td>
+</tr>
+<tr>
+<td>Finish</td>
+<td>Matte, front-lit</td>
+</tr>
+</table>",Calib.Tools,,Calibration target,"ceramic, ceramic-glass, charuco, metrology",true,Size,110×85,,Dictionary,DICT_6X6_250,,,,,CHA-C-11085-6X6,120.0,shopify,5,continue,manual,887.00,,true,true,,,,,,,,,false,Ceramic ChArUco Calibration Target ±2 µm | Calib.Tools,"Lithographed ceramic ChArUco target, ±2 µm feature accuracy, matte front-lit finish. Certificate option. Ships from Germany.",,,,,,,g,,,active,,,,
+charuco-ceramic,,,,,,,,,110×85,,,DICT_5X5_100,,,,,CHA-C-11085-5X5,120.0,shopify,5,continue,manual,887.00,,true,true,,,,,,,,,,,,,,,,,,g,,,,,,,
+charuco-ceramic,,,,,,,,,150×100,,,DICT_6X6_250,,,,,CHA-C-150100-6X6,120.0,shopify,5,continue,manual,1198.00,,true,true,,,,,,,,,,,,,,,,,,g,,,,,,,
+charuco-ceramic,,,,,,,,,150×100,,,DICT_5X5_100,,,,,CHA-C-150100-5X5,120.0,shopify,5,continue,manual,1198.00,,true,true,,,,,,,,,,,,,,,,,,g,,,,,,,
+charuco-ceramic,,,,,,,,,185×110,,,DICT_6X6_250,,,,,CHA-C-185110-6X6,260.0,shopify,5,continue,manual,1454.00,,true,true,,,,,,,,,,,,,,,,,,g,,,,,,,
+charuco-ceramic,,,,,,,,,185×110,,,DICT_5X5_100,,,,,CHA-C-185110-5X5,260.0,shopify,5,continue,manual,1454.00,,true,true,,,,,,,,,,,,,,,,,,g,,,,,,,
+charuco-ceramic,,,,,,,,,230×140,,,DICT_6X6_250,,,,,CHA-C-230140-6X6,400.0,shopify,5,continue,manual,1946.00,,true,true,,,,,,,,,,,,,,,,,,g,,,,,,,
+charuco-ceramic,,,,,,,,,230×140,,,DICT_5X5_100,,,,,CHA-C-230140-5X5,400.0,shopify,5,continue,manual,1946.00,,true,true,,,,,,,,,,,,,,,,,,g,,,,,,,
