@@ -1,0 +1,21 @@
+Handle,Title,Body (HTML),Vendor,Type,Tags,Option1 Name,Option1 Value,Variant SKU,Variant Price,Variant Inventory Policy,Published
+aprilgrid-composite,AprilGrid calibration target,"<p>AprilGrid composite board for Kalibr camera-IMU calibration. AprilTag 36h11 markers on rigid aluminium composite.</p>",Calib.Tools,Calibration target,composite, aprilgrid, kalibr,Size,200 × 150,CT-APR-P-200150,134.00,continue,TRUE
+aprilgrid-composite,,"",,,,Size,300 × 200,CT-APR-P-300200,141.00,continue,TRUE
+aprilgrid-composite,,"",,,,Size,400 × 300,CT-APR-P-400300,231.00,continue,TRUE
+aprilgrid-composite,,"",,,,Size,600 × 400,CT-APR-P-600400,306.00,continue,TRUE
+aprilgrid-composite,,"",,,,Size,800 × 600,CT-APR-P-800600,413.00,continue,TRUE
+circlegrid-composite,Circle grid calibration target,"<p>Symmetric and asymmetric circle grid targets on rigid aluminium composite. For OpenCV and HALCON workflows.</p>",Calib.Tools,Calibration target,composite, circles, opencv, halcon,Size,200 × 150,CT-CIR-P-200150,134.00,continue,TRUE
+circlegrid-composite,,"",,,,Size,300 × 200,CT-CIR-P-300200,141.00,continue,TRUE
+circlegrid-composite,,"",,,,Size,400 × 300,CT-CIR-P-400300,164.00,continue,TRUE
+circlegrid-composite,,"",,,,Size,600 × 400,CT-CIR-P-600400,231.00,continue,TRUE
+circlegrid-composite,,"",,,,Size,800 × 600,CT-CIR-P-800600,343.00,continue,TRUE
+circlegrid-composite,,"",,,,Size,200 × 150,CT-ACR-P-200150,134.00,continue,TRUE
+circlegrid-composite,,"",,,,Size,300 × 200,CT-ACR-P-300200,141.00,continue,TRUE
+circlegrid-composite,,"",,,,Size,400 × 300,CT-ACR-P-400300,158.00,continue,TRUE
+circlegrid-composite,,"",,,,Size,600 × 400,CT-ACR-P-600400,231.00,continue,TRUE
+circlegrid-composite,,"",,,,Size,800 × 600,CT-ACR-P-800600,343.00,continue,TRUE
+halcon-composite,HALCON calibration plate,"<p>HALCON calibration plate with MVTec mark layout on rigid aluminium composite. Ships with .descr description file.</p>",Calib.Tools,Calibration target,composite, halcon, mvtec,Size,200 × 150,CT-HAL-P-200150,164.00,continue,TRUE
+halcon-composite,,"",,,,Size,300 × 200,CT-HAL-P-300200,174.00,continue,TRUE
+halcon-composite,,"",,,,Size,400 × 300,CT-HAL-P-400300,186.00,continue,TRUE
+halcon-composite,,"",,,,Size,600 × 400,CT-HAL-P-600400,272.00,continue,TRUE
+halcon-composite,,"",,,,Size,800 × 600,CT-HAL-P-800600,371.00,continue,TRUE
