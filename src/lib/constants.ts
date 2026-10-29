@@ -15,8 +15,14 @@ export const COMPLIANCE = {
 export const PRODUCT_TO_COLLECTION: Record<string, string> = {
   'checkerboard-composite': 'composite-boards',
   'charuco-composite': 'composite-boards',
+  'aprilgrid-composite': 'composite-boards',
+  'circlegrid-composite': 'composite-boards',
+  'halcon-composite': 'composite-boards',
   'checkerboard-ceramic': 'ceramic-glass',
   'charuco-ceramic': 'ceramic-glass',
+  'reflectance-panel': 'lidar-image-quality',
+  'resolution-chart': 'lidar-image-quality',
+  'ir-board': 'lidar-image-quality',
   'mounting-fixture': 'mounts-accessories',
   'certificate-ilac': 'mounts-accessories',
 };

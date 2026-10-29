@@ -533,11 +533,36 @@ const FALLBACK_PRODUCTS: Product[] = [
   fb('certificate-ilac', 'ILAC calibration certificate',
     'ILAC-recognised dimensional calibration certificate.',
     [], '/targets/certificate-ilac/'),
+  fb('aprilgrid-composite', 'AprilGrid calibration target',
+    'Aluminium composite, AprilTag 36h11, for Kalibr camera–IMU calibration.',
+    [
+      { name: 'Size', values: ['200 × 150', '300 × 200', '400 × 300', '600 × 400', '800 × 600'] },
+    ], '/targets/aprilgrid-composite/'),
+  fb('circlegrid-composite', 'Circle grid calibration target',
+    'Aluminium composite, symmetric or asymmetric circle grid.',
+    [
+      { name: 'Size', values: ['200 × 150', '300 × 200', '400 × 300', '600 × 400', '800 × 600'] },
+      { name: 'Layout', values: ['Symmetric', 'Asymmetric'] },
+    ], '/targets/circlegrid-composite/'),
+  fb('halcon-composite', 'HALCON calibration plate',
+    'Aluminium composite, MVTec HALCON mark layout.',
+    [
+      { name: 'Size', values: ['200 × 150', '300 × 200', '400 × 300', '600 × 400', '800 × 600'] },
+    ], '/targets/halcon-composite/'),
+  fb('reflectance-panel', 'Reflectance panel',
+    'Calibrated Lambertian reflectance panel for LiDAR intensity calibration.',
+    [], '/targets/reflectance-panel/'),
+  fb('resolution-chart', 'ISO 12233 resolution chart',
+    'Resolution test chart for imaging system evaluation.',
+    [], '/targets/resolution-chart/'),
+  fb('ir-board', 'IR-compatible calibration board',
+    'Calibration board for thermal and NIR camera systems.',
+    [], '/targets/ir-board/'),
 ];
 
 const FALLBACK_COLLECTIONS: Collection[] = [
   { handle: 'composite-boards', title: 'Composite boards', description: '200–1200 mm, rigid, matte, outdoor-safe.', products: FALLBACK_PRODUCTS.filter((p) => p.handle.includes('composite')) },
   { handle: 'ceramic-glass', title: 'Ceramic & glass', description: 'Lithographed, ±2 µm, certificate option.', products: FALLBACK_PRODUCTS.filter((p) => p.handle.includes('ceramic')) },
-  { handle: 'lidar-image-quality', title: 'LiDAR & image quality', description: 'Reflectance panels, ISO 12233 charts, IR boards.', products: [] },
+  { handle: 'lidar-image-quality', title: 'LiDAR & image quality', description: 'Reflectance panels, ISO 12233 charts, IR boards.', products: FALLBACK_PRODUCTS.filter((p) => ['reflectance-panel', 'resolution-chart', 'ir-board'].includes(p.handle)) },
   { handle: 'mounts-accessories', title: 'Mounts & accessories', description: 'Fixtures, stands, robot flange, hard cases.', products: FALLBACK_PRODUCTS.filter((p) => p.handle === 'mounting-fixture' || p.handle === 'certificate-ilac') },
 ];
