@@ -349,7 +349,7 @@ const orderingRows = (productData?.orderingRows ?? []).map((row) => {
 <Base
   title={product.title}
   section="targets"
-  description={product.description.length > 160 ? product.description.slice(0, 157) + '...' : product.description}
+  description={displaySummary.length > 160 ? displaySummary.slice(0, 157) + '...' : displaySummary}
   jsonLd={[breadcrumbLd, productLd]}
   ogImage={ogImage}
   preloadImages={hasLocalImages ? [{

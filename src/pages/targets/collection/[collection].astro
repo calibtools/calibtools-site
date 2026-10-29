@@ -31,6 +31,7 @@ if (entry) {
   collection.title = entry.data.title;
   collection.description = entry.data.description;
 }
+const seoDescription = entry?.data.description ?? collection.description;
 const allProducts = await getProducts();
 
 // Render markdown body and parse into sections
@@ -150,7 +151,7 @@ const breadcrumbLd = {
   ],
 };
 ---
-<Base title={collection.title} section="targets" description={collection.description.length > 160 ? collection.description.slice(0, 157) + '...' : collection.description} jsonLd={[breadcrumbLd]} noindex={collection.products.length === 0}>
+<Base title={collection.title} section="targets" description={seoDescription.length > 160 ? seoDescription.slice(0, 157) + '...' : seoDescription} jsonLd={[breadcrumbLd]} noindex={collection.products.length === 0}>
   {/* --- Family page header --- */}
   <section class="container-x py-8 md:py-12">
     {/* Breadcrumb */}
