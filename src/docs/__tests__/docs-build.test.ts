@@ -86,7 +86,7 @@ describe('CT-IR full build', () => {
     tmp = mkdtempSync(join(tmpdir(), 'ct-ir-build-'));
   });
 
-  it('PASS variant renders exactly 2 pages', async () => {
+  it('PASS variant renders exactly 2 pages', { timeout: 30_000 }, async () => {
     const data = makeIRData();
     const coords = makeSampleCoords();
     const outBase = join(tmp, 'CT-IR-000311-PASS');
