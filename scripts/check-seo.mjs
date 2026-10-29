@@ -153,6 +153,16 @@ for (const file of htmlFiles) {
     if (desc && descLen > 160) errors.push({ file: rel, rule: 'desc-long', detail: `${descLen} chars (max 160)` });
   }
 
+  // Spec-dump markers in meta description
+  const SPEC_DUMP_MARKERS = ['Feature tolerance', 'Operating range'];
+  if (desc) {
+    for (const marker of SPEC_DUMP_MARKERS) {
+      if (desc.includes(marker)) {
+        errors.push({ file: rel, rule: 'desc-spec-dump', detail: `Meta description contains spec-dump marker "${marker}"` });
+      }
+    }
+  }
+
   // H1 (strip inline SVGs before counting to avoid false matches)
   const htmlNoSvg = html.replace(/<svg[\s\S]*?<\/svg>/gi, '');
   const h1s = extractTag(htmlNoSvg, 'h1');
