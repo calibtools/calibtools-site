@@ -8,12 +8,6 @@ interface Props { section?: string; theme?: 'dark' | 'light' }
 const { section, theme = 'light' } = Astro.props;
 const dark = theme === 'dark';
 
-/** Separate live items from coming-soon items for the "Coming:" line. */
-function splitLive(items: { label: string; href: string; live?: boolean }[]) {
-  const live = items.filter(i => i.live !== false);
-  const coming = items.filter(i => i.live === false);
-  return { live, coming };
-}
 ---
 
 <nav
@@ -71,29 +65,21 @@ function splitLive(items: { label: string; href: string; live?: boolean }[]) {
                 >
                   <div class="rounded-lg border border-line bg-ground shadow-lg">
                   <div class="grid grid-cols-3 gap-0 p-[var(--nav-space-5)]" data-mega-grid>
-                    {group.columns.map((col) => {
-                      const { live: liveItems, coming } = splitLive(col.items);
-                      return (
-                        <div data-mega-col>
-                          <div class="font-mono text-[length:var(--nav-text-xs)] font-medium uppercase tracking-[0.06em] text-ink-soft mb-[var(--nav-space-2)] whitespace-nowrap">{col.heading}</div>
-                          <div class="flex flex-col gap-px">
-                            {liveItems.map((item) => (
-                              <a
-                                href={item.href}
-                                class="block rounded px-[var(--nav-space-2)] py-[6px] text-[length:var(--nav-text-base)] whitespace-nowrap no-underline transition-colors text-ink hover:bg-brand-tint hover:text-brand"
-                              >
-                                {item.label}
-                              </a>
-                            ))}
-                            {coming.length > 0 && (
-                              <div class="max-w-full px-[var(--nav-space-2)] py-[6px] text-[length:var(--nav-text-sm)] leading-[1.5] text-ink-soft/50" data-coming-line>
-                                Coming: {coming.map(c => c.label).join(', ')}
-                              </div>
-                            )}
-                          </div>
+                    {group.columns.map((col) => (
+                      <div data-mega-col>
+                        <div class="font-mono text-[length:var(--nav-text-xs)] font-medium uppercase tracking-[0.06em] text-ink-soft mb-[var(--nav-space-2)] whitespace-nowrap">{col.heading}</div>
+                        <div class="flex flex-col gap-px">
+                          {col.items.map((item) => (
+                            <a
+                              href={item.href}
+                              class="block rounded px-[var(--nav-space-2)] py-[6px] text-[length:var(--nav-text-base)] whitespace-nowrap no-underline transition-colors text-ink hover:bg-brand-tint hover:text-brand"
+                            >
+                              {item.label}
+                            </a>
+                          ))}
                         </div>
-                      );
-                    })}
+                      </div>
+                    ))}
                   </div>
                   </div>
                 </div>
@@ -211,14 +197,10 @@ function splitLive(items: { label: string; href: string; live?: boolean }[]) {
           );
         }
         const allItems = group.columns
-          ? group.columns.flatMap((col) => {
-              const { live: liveItems, coming } = splitLive(col.items);
-              return [
-                { label: col.heading, isHeading: true, href: '', live: true, items: [] as any[] },
-                ...liveItems.map((i) => ({ ...i, isHeading: false })),
-                ...(coming.length > 0 ? [{ label: 'Coming: ' + coming.map(c => c.label).join(', '), isHeading: false, href: '', live: false, isComing: true }] : []),
-              ];
-            })
+          ? group.columns.flatMap((col) => [
+              { label: col.heading, isHeading: true, href: '' },
+              ...col.items.map((i) => ({ ...i, isHeading: false })),
+            ])
           : (group.items || []).map((i, idx) => ({ ...i, isHeading: false, isFirst: idx === 0 && group.key === 'tools' }));
         return (
           <details class="group">
@@ -231,11 +213,6 @@ function splitLive(items: { label: string; href: string; live?: boolean }[]) {
                 if (item.isHeading) {
                   return (
                     <div class="font-mono text-[length:var(--nav-text-sm)] font-bold uppercase tracking-[0.10em] text-ink mt-[var(--nav-space-3)] mb-[var(--nav-space-1)] px-[var(--nav-space-3)]">{item.label}</div>
-                  );
-                }
-                if ('isComing' in item && item.isComing) {
-                  return (
-                    <div class="min-h-[44px] flex items-center px-[var(--nav-space-3)] text-[length:var(--nav-text-sm)] text-ink-soft/50">{item.label}</div>
                   );
                 }
                 const isPromoted = 'isFirst' in item && item.isFirst;

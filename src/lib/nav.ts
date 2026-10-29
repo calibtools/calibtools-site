@@ -41,11 +41,11 @@ export const targetsMega: MegaMenuColumn[] = [
   {
     heading: 'By pattern',
     items: [
-      { label: 'ChArUco boards', href: '/targets/charuco-composite/' },
       { label: 'Checkerboard targets', href: '/targets/checkerboard-composite/' },
-      { label: 'AprilGrid boards', href: '#', live: false },
-      { label: 'Circle grid targets', href: '#', live: false },
-      { label: 'HALCON calibration plates', href: '#', live: false },
+      { label: 'ChArUco boards', href: '/targets/charuco-composite/' },
+      { label: 'AprilGrid boards', href: '/targets/aprilgrid-composite/' },
+      { label: 'Circle grid targets', href: '/targets/circlegrid-composite/' },
+      { label: 'HALCON calibration plates', href: '/targets/halcon-composite/' },
     ],
   },
   {
