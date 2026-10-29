@@ -56,8 +56,21 @@ Shopify variant SKUs differ from datasheet SKUs:
 | CT-ACC-A-FIX-14 | ACC-FIX-14 | 1 |
 | CT-SVC-X-CERT-ILAC | SVC-CERT-ILAC | 1 |
 
-**Not yet in Shopify**: CT-CHA-C-150100 (150×100 ceramic). Create the variants
-before importing prices for that size.
+CT-CHA-C-150100 (150×100 ceramic) was added to Shopify on 2026-10-29
+via `add-ceramic-150100.csv`.
+
+## Shopify product-import rule (learned 2026-10-29)
+
+When importing a CSV for an **existing** handle with "Overwrite matching handles":
+- The **first row** for that handle **must** carry the Title (and Body, Vendor, etc.).
+- The CSV **must** include **all existing variants** for that handle.
+
+Shopify replaces the entire variant set on overwrite. A CSV with only new or changed
+variants will **delete** every variant not listed. A CSV without a Title row for the
+handle is rejected outright.
+
+`scripts/pricing.mjs` enforces this: any CSV it writes for an existing handle must
+source full rows from the latest products export and fail if the handle has no Title row.
 
 ## Regeneration
 

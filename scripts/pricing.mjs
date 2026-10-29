@@ -132,34 +132,34 @@ const SHOPIFY_VARIANTS = {
 
   // ChArUco ceramic — 2 variants per size (6X6/5X5)
   'CHA-C-110085': { shopifySkus: ['CHA-C-11085-6X6', 'CHA-C-11085-5X5'], oldUsd: 189 },
-  'CHA-C-150100': { shopifySkus: [], oldUsd: null }, // NOT IN STORE
+  'CHA-C-150100': { shopifySkus: ['CHA-C-150100-6X6', 'CHA-C-150100-5X5'], oldUsd: null },
   'CHA-C-185110': { shopifySkus: ['CHA-C-185110-6X6', 'CHA-C-185110-5X5'], oldUsd: 239 },
   'CHA-C-230140': { shopifySkus: ['CHA-C-230140-6X6', 'CHA-C-230140-5X5'], oldUsd: 299 },
 
-  // AprilGrid composite — not yet in Shopify
-  'APR-P-200150': { shopifySkus: [], oldUsd: null },
-  'APR-P-300200': { shopifySkus: [], oldUsd: null },
-  'APR-P-400300': { shopifySkus: [], oldUsd: null },
-  'APR-P-600400': { shopifySkus: [], oldUsd: null },
-  'APR-P-800600': { shopifySkus: [], oldUsd: null },
-  // Circle grid composite (symmetric) — not yet in Shopify
-  'CIR-P-200150': { shopifySkus: [], oldUsd: null },
-  'CIR-P-300200': { shopifySkus: [], oldUsd: null },
-  'CIR-P-400300': { shopifySkus: [], oldUsd: null },
-  'CIR-P-600400': { shopifySkus: [], oldUsd: null },
-  'CIR-P-800600': { shopifySkus: [], oldUsd: null },
-  // Asymmetric circle grid composite — not yet in Shopify
-  'ACR-P-200150': { shopifySkus: [], oldUsd: null },
-  'ACR-P-300200': { shopifySkus: [], oldUsd: null },
-  'ACR-P-400300': { shopifySkus: [], oldUsd: null },
-  'ACR-P-600400': { shopifySkus: [], oldUsd: null },
-  'ACR-P-800600': { shopifySkus: [], oldUsd: null },
-  // HALCON composite — not yet in Shopify
-  'HAL-P-200150': { shopifySkus: [], oldUsd: null },
-  'HAL-P-300200': { shopifySkus: [], oldUsd: null },
-  'HAL-P-400300': { shopifySkus: [], oldUsd: null },
-  'HAL-P-600400': { shopifySkus: [], oldUsd: null },
-  'HAL-P-800600': { shopifySkus: [], oldUsd: null },
+  // AprilGrid composite — 1 variant per size (SKU = catalogue SKU)
+  'APR-P-200150': { shopifySkus: ['CT-APR-P-200150'], oldUsd: null },
+  'APR-P-300200': { shopifySkus: ['CT-APR-P-300200'], oldUsd: null },
+  'APR-P-400300': { shopifySkus: ['CT-APR-P-400300'], oldUsd: null },
+  'APR-P-600400': { shopifySkus: ['CT-APR-P-600400'], oldUsd: null },
+  'APR-P-800600': { shopifySkus: ['CT-APR-P-800600'], oldUsd: null },
+  // Circle grid composite (symmetric) — 1 variant per size
+  'CIR-P-200150': { shopifySkus: ['CT-CIR-P-200150'], oldUsd: null },
+  'CIR-P-300200': { shopifySkus: ['CT-CIR-P-300200'], oldUsd: null },
+  'CIR-P-400300': { shopifySkus: ['CT-CIR-P-400300'], oldUsd: null },
+  'CIR-P-600400': { shopifySkus: ['CT-CIR-P-600400'], oldUsd: null },
+  'CIR-P-800600': { shopifySkus: ['CT-CIR-P-800600'], oldUsd: null },
+  // Asymmetric circle grid composite — 1 variant per size
+  'ACR-P-200150': { shopifySkus: ['CT-ACR-P-200150'], oldUsd: null },
+  'ACR-P-300200': { shopifySkus: ['CT-ACR-P-300200'], oldUsd: null },
+  'ACR-P-400300': { shopifySkus: ['CT-ACR-P-400300'], oldUsd: null },
+  'ACR-P-600400': { shopifySkus: ['CT-ACR-P-600400'], oldUsd: null },
+  'ACR-P-800600': { shopifySkus: ['CT-ACR-P-800600'], oldUsd: null },
+  // HALCON composite — 1 variant per size
+  'HAL-P-200150': { shopifySkus: ['CT-HAL-P-200150'], oldUsd: null },
+  'HAL-P-300200': { shopifySkus: ['CT-HAL-P-300200'], oldUsd: null },
+  'HAL-P-400300': { shopifySkus: ['CT-HAL-P-400300'], oldUsd: null },
+  'HAL-P-600400': { shopifySkus: ['CT-HAL-P-600400'], oldUsd: null },
+  'HAL-P-800600': { shopifySkus: ['CT-HAL-P-800600'], oldUsd: null },
 
   // Accessories / services — 1 variant each
   'ACC-FIX-14':   { shopifySkus: ['ACC-FIX-14'], oldUsd: 39 },
@@ -395,8 +395,11 @@ function csvField(value) {
   return s;
 }
 
+/** Map family prefix to Layout option value for circlegrid-composite (Option2). */
+const CIRCLEGRID_LAYOUT = { 'CIR-P': 'Symmetric', 'ACR-P': 'Asymmetric' };
+
 function shopifyProductImportCsv(rows) {
-  const HEADER = ['Handle','Title','Body (HTML)','Vendor','Type','Tags','Option1 Name','Option1 Value','Variant SKU','Variant Price','Variant Inventory Policy','Published'];
+  const HEADER = ['Handle','Title','Body (HTML)','Vendor','Type','Tags','Option1 Name','Option1 Value','Option2 Name','Option2 Value','Variant SKU','Variant Price','Variant Inventory Policy','Published'];
   const lines = [HEADER.join(',')];
   const seen = new Set();
   for (const r of rows) {
@@ -411,10 +414,86 @@ function shopifyProductImportCsv(rows) {
     const type = isFirst ? 'Calibration target' : '';
     const tags = isFirst ? (PRODUCT_TAGS[r.handle] || '') : '';
     const size = r.widthMm ? `${r.widthMm} \u00d7 ${r.heightMm}` : '';
-    const fields = [r.handle, title, csvField(body), vendor, type, csvField(tags), 'Size', size, r.sku, `${r.proposedUsd}.00`, 'continue', 'TRUE'];
+    const layout = CIRCLEGRID_LAYOUT[r.family] || '';
+    const opt2Name = layout ? 'Layout' : '';
+    const fields = [r.handle, title, csvField(body), vendor, type, csvField(tags), 'Size', size, opt2Name, layout, r.sku, `${r.proposedUsd}.00`, 'continue', 'TRUE'];
     lines.push(fields.join(','));
   }
   return lines.join('\n') + '\n';
+}
+
+/**
+ * Guard: every handle in a product-import CSV must have a Title on its first row.
+ * Shopify's "overwrite matching handles" replaces the full variant set; a CSV
+ * without a Title row for a handle is rejected or destructive.
+ */
+function validateHandleTitles(csv, label) {
+  const lines = csv.trimEnd().split('\n');
+  if (lines.length < 2) return;
+
+  // Find Handle and Title column indices from header
+  const header = lines[0].split(',');
+  const handleIdx = header.indexOf('Handle');
+  const titleIdx = header.indexOf('Title');
+  if (handleIdx === -1 || titleIdx === -1) return;
+
+  const firstRowForHandle = new Map();
+  for (let i = 1; i < lines.length; i++) {
+    // Simple split is fine here — Handle and Title never contain commas
+    const fields = lines[i].split(',');
+    const handle = fields[handleIdx];
+    if (!handle) continue;
+    if (!firstRowForHandle.has(handle)) {
+      firstRowForHandle.set(handle, { line: i + 1, title: fields[titleIdx] || '' });
+    }
+  }
+
+  const errors = [];
+  for (const [handle, info] of firstRowForHandle) {
+    if (!info.title.trim()) {
+      errors.push(`Handle "${handle}" first appears at row ${info.line} without a Title — Shopify will reject or destroy variants`);
+    }
+  }
+  if (errors.length > 0) {
+    throw new Error(`${label} handle-title check failed:\n  ${errors.join('\n  ')}`);
+  }
+}
+
+/**
+ * Guard: option-value tuples must be unique within each handle.
+ * Shopify silently merges or rejects rows with duplicate option combos.
+ */
+function validateOptionUniqueness(csv, label) {
+  const lines = csv.trimEnd().split('\n');
+  if (lines.length < 2) return;
+
+  const header = lines[0].split(',');
+  const handleIdx = header.indexOf('Handle');
+  // Collect all Option columns (Option1 Value, Option2 Value, ...)
+  const optValIdxs = [];
+  for (let c = 0; c < header.length; c++) {
+    if (/^Option\d+ Value$/.test(header[c])) optValIdxs.push(c);
+  }
+  if (handleIdx === -1 || optValIdxs.length === 0) return;
+
+  const tuplesByHandle = new Map();
+  const errors = [];
+  for (let i = 1; i < lines.length; i++) {
+    const fields = lines[i].split(',');
+    const handle = fields[handleIdx];
+    if (!handle) continue;
+    const tuple = optValIdxs.map(c => fields[c] || '').join(' | ');
+    if (!tuplesByHandle.has(handle)) tuplesByHandle.set(handle, new Map());
+    const seen = tuplesByHandle.get(handle);
+    if (seen.has(tuple)) {
+      errors.push(`Handle "${handle}" row ${i + 1}: duplicate option tuple (${tuple}) — first at row ${seen.get(tuple)}`);
+    } else {
+      seen.set(tuple, i + 1);
+    }
+  }
+  if (errors.length > 0) {
+    throw new Error(`${label} option-uniqueness check failed:\n  ${errors.join('\n  ')}`);
+  }
 }
 
 /** Validate that every data row has the same field count as the header and Variant Price is well-formed. */
@@ -487,6 +566,8 @@ writeFileSync(join(docsDir, 'shopify-price-import-2026-10-29.csv'), shopifyCsv(l
 
 const addProductsCsv = shopifyProductImportCsv(ladder.rows);
 validateCsv(addProductsCsv, 'add-products-2026-10-29.csv');
+validateHandleTitles(addProductsCsv, 'add-products-2026-10-29.csv');
+validateOptionUniqueness(addProductsCsv, 'add-products-2026-10-29.csv');
 writeFileSync(join(docsDir, 'add-products-2026-10-29.csv'), addProductsCsv);
 
 console.log(ladderMarkdown(ladder));
