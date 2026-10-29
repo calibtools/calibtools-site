@@ -201,7 +201,11 @@ export async function getProducts(first = 50): Promise<Product[]> {
         products(first: $first) { nodes { ...ProductFields } }
       }
     `, { first });
-    return data.products.nodes.map(mapProduct);
+    const apiProducts = data.products.nodes.map(mapProduct);
+    // Merge fallback products for handles not yet in Shopify
+    const apiHandles = new Set(apiProducts.map((p: Product) => p.handle));
+    const missing = FALLBACK_PRODUCTS.filter((p) => !apiHandles.has(p.handle));
+    return [...apiProducts, ...missing];
   } catch {
     console.warn('\n⚠️  USING FALLBACK DATA — Storefront API query failed. No variants, cart will be disabled.\n');
     return FALLBACK_PRODUCTS;
@@ -220,7 +224,8 @@ export async function getProductByHandle(handle: string): Promise<Product | null
         product(handle: $handle) { ...ProductFields }
       }
     `, { handle });
-    return data.product ? mapProduct(data.product) : null;
+    // Fall back to local data if product not in Shopify yet
+    return data.product ? mapProduct(data.product) : (FALLBACK_PRODUCTS.find((p) => p.handle === handle) ?? null);
   } catch {
     console.warn(`\n⚠️  USING FALLBACK DATA — Storefront API query failed for "${handle}". No variants, cart will be disabled.\n`);
     return FALLBACK_PRODUCTS.find((p) => p.handle === handle) ?? null;
@@ -267,12 +272,17 @@ export async function getCollectionProducts(handle: string): Promise<Collection 
         }
       }
     `, { handle });
-    if (!data.collection) return null;
+    if (!data.collection) return FALLBACK_COLLECTIONS.find((c) => c.handle === handle) ?? null;
     const c = data.collection;
+    const apiProducts = c.products.nodes.map(mapProduct);
+    // Merge fallback products for handles not yet in Shopify
+    const apiHandles = new Set(apiProducts.map((p: Product) => p.handle));
+    const fallback = FALLBACK_COLLECTIONS.find((fc) => fc.handle === handle);
+    const missing = fallback ? fallback.products.filter((p) => !apiHandles.has(p.handle)) : [];
     return {
       handle: c.handle, title: c.title, description: c.description,
       image: c.image?.url,
-      products: c.products.nodes.map(mapProduct),
+      products: [...apiProducts, ...missing],
     };
   } catch {
     return FALLBACK_COLLECTIONS.find((c) => c.handle === handle) ?? null;

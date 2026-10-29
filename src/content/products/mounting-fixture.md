@@ -1,5 +1,5 @@
 ---
-summary: "Quarter-inch fixture clamp for any calibration board"
+summary: "Quarter-inch fixture clamp for mounting any calibration board on a tripod"
 decideSpecs:
   - "Material"
   - "Weight"

@@ -1,5 +1,5 @@
 ---
-summary: "Lithographed ceramic ChArUco target for metrology-grade calibration"
+summary: "Lithographed ceramic ChArUco target for metrology-grade camera calibration"
 decideSpecs:
   - "Feature position accuracy"
   - "Substrate"

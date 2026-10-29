@@ -1,5 +1,5 @@
 ---
-summary: "Symmetric and asymmetric circle grid targets for OpenCV and HALCON"
+summary: "Symmetric and asymmetric circle grid calibration targets for OpenCV and HALCON"
 decideSpecs:
   - "Feature position tolerance"
   - "Substrate"

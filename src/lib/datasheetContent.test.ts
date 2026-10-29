@@ -22,8 +22,8 @@ function collectMdFiles(dir: string, files: string[] = []): string[] {
 const mdFiles = collectMdFiles(DOCS_DIR);
 
 describe('datasheet content conversion', () => {
-  it('has exactly 11 source files converted', () => {
-    expect(mdFiles).toHaveLength(11);
+  it('has exactly 14 source files converted', () => {
+    expect(mdFiles).toHaveLength(14);
   });
 
   it('every file has valid front matter', () => {

@@ -1,5 +1,5 @@
 ---
-summary: "ISO 12233 resolution chart for imaging system evaluation"
+summary: "ISO 12233 resolution test chart for imaging system MTF and SFR evaluation"
 decideSpecs:
   - "Standard"
   - "Chart type"
