@@ -1,5 +1,5 @@
 ---
-summary: "HALCON calibration plate for MVTec HALCON camera calibration"
+summary: "HALCON calibration plate with MVTec mark layout for industrial machine vision"
 decideSpecs:
   - "Feature position tolerance"
   - "Substrate"

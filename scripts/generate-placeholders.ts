@@ -218,6 +218,12 @@ const productHandles = [
   { handle: 'charuco-ceramic', title: 'ChArUco ceramic target' },
   { handle: 'mounting-fixture', title: 'Mounting fixture' },
   { handle: 'certificate-ilac', title: 'Calibration certificate' },
+  { handle: 'aprilgrid-composite', title: 'AprilGrid calibration target' },
+  { handle: 'circlegrid-composite', title: 'Circle grid calibration target' },
+  { handle: 'halcon-composite', title: 'HALCON calibration plate' },
+  { handle: 'reflectance-panel', title: 'Reflectance panel' },
+  { handle: 'resolution-chart', title: 'ISO 12233 resolution chart' },
+  { handle: 'ir-board', title: 'IR calibration board' },
 ];
 
 for (const { handle, title } of productHandles) {

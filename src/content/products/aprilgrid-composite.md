@@ -1,5 +1,5 @@
 ---
-summary: "AprilGrid composite board for Kalibr camera–IMU calibration"
+summary: "AprilGrid composite board for Kalibr camera–IMU and multi-sensor calibration"
 decideSpecs:
   - "Feature position tolerance"
   - "Substrate"

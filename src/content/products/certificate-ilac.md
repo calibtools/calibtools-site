@@ -1,5 +1,5 @@
 ---
-summary: "Accredited calibration certificate from an ISO/IEC 17025 laboratory"
+summary: "Accredited dimensional calibration certificate from an ISO/IEC 17025 laboratory"
 decideSpecs:
   - "Lead time"
   - "Options"

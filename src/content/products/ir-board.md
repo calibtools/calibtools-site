@@ -1,5 +1,5 @@
 ---
-summary: "IR-compatible calibration board for thermal and NIR camera systems"
+summary: "IR-compatible calibration board for thermal and near-infrared camera systems"
 decideSpecs:
   - "Wavelength range"
   - "Substrate"

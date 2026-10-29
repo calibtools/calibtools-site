@@ -248,7 +248,7 @@ const productLd: Record<string, any> = {
   name: product.title, description: product.description,
   url: `${siteUrl}${product.url}`,
   brand: { '@type': 'Brand', name: 'Calib.Tools' },
-  image: hasLocalImages ? galleryImages.map((img) => `${siteUrl}${img.src}`) : product.images.length > 0 ? product.images.map((img) => img.url) : undefined,
+  image: hasLocalImages ? galleryImages.map((img) => `${siteUrl}${img.src}`) : product.images.length > 0 ? product.images.map((img) => img.url) : `${siteUrl}/og/${handle}.png`,
 };
 if (product.variants.length > 0) {
   productLd.hasVariant = product.variants.map((v) => ({
