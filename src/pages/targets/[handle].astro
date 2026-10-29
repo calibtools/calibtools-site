@@ -51,6 +51,10 @@ const fixturePrice = fixtureProduct?.variants[0]?.price;
 
 // descriptionHtml no longer rendered — story from product content replaces it
 
+// Quote-only products: no price, "Request a quote" CTA
+const QUOTE_HANDLES = new Set(['reflectance-panel', 'resolution-chart', 'ir-board']);
+const quoteOnly = QUOTE_HANDLES.has(handle!);
+
 // Lead-time eyebrow
 const anyAvailable = product.variants.some((v) => v.availableForSale);
 const eyebrow = m.lead_time
@@ -419,15 +423,22 @@ const orderingRows = (productData?.orderingRows ?? []).map((row) => {
       )}
 
       {/* VariantPicker (price, selectors, add-ons, qty, cart, assurances) */}
-      <VariantPicker
-        client:load
-        product={product}
-        certVariantId={certVariantId}
-        fixtureVariantId={fixtureVariantId}
-        certPrice={certPrice}
-        fixturePrice={fixturePrice}
-        boardSetImage={boardSetImageData}
-      />
+      {quoteOnly ? (
+        <div class="flex flex-col gap-4 rounded-xl border border-line bg-ground-alt p-6">
+          <p class="m-0 text-sm text-ink-muted">Specifications shown are target values. Contact us for pricing and lead times.</p>
+          <a href="/quote/" class="btn-md btn-primary text-center no-underline">Request a quote</a>
+        </div>
+      ) : (
+        <VariantPicker
+          client:load
+          product={product}
+          certVariantId={certVariantId}
+          fixtureVariantId={fixtureVariantId}
+          certPrice={certPrice}
+          fixturePrice={fixturePrice}
+          boardSetImage={boardSetImageData}
+        />
+      )}
     </div>
   </section>
 
@@ -753,7 +764,9 @@ const orderingRows = (productData?.orderingRows ?? []).map((row) => {
     </section>
   )}
 
-  <MobileBottomCluster slot="mobile-cluster" client:load mode="add-to-cart" defaultPrice={product.priceFrom} />
+  {!quoteOnly && (
+    <MobileBottomCluster slot="mobile-cluster" client:load mode="add-to-cart" defaultPrice={product.priceFrom} />
+  )}
 </Base>
 
 <script>
