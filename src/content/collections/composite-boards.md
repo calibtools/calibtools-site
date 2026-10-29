@@ -25,7 +25,7 @@ Composite calibration boards are the everyday workhorse for camera calibration. 
 
 UV flatbed printing delivers crisp edges at ±0.3 mm feature accuracy — more than sufficient for most machine-vision and robotics applications. Each board ships with a dimensional inspection report so you can verify accuracy out of the box.
 
-Available as Checkerboard and ChArUco patterns in sizes from 200 × 150 mm to 800 × 600 mm, with larger custom sizes on request.
+Available as Checkerboard, ChArUco, AprilGrid, circle grid, and HALCON patterns in sizes from 200 × 150 mm to 800 × 600 mm, with larger custom sizes on request.
 
 ## Specifications
 

@@ -18,15 +18,15 @@ founderQuote: "I started Calib.Tools because I kept wasting afternoons printing 
 
 LiDAR and image quality targets are designed for sensor characterisation and quality assurance beyond standard camera calibration. This collection includes reflectance panels for LiDAR intensity calibration, ISO 12233 resolution charts, and IR-compatible calibration boards.
 
-Products in this category are coming soon. Contact us to discuss your requirements.
+All products in this collection are quote-only. Contact us to discuss your requirements and lead times.
 
 ## Specifications
 
-Specifications vary by product type. See individual product groups below.
+Specifications vary by product type. See individual product pages for target specifications.
 
 ## Files
 
-Datasheets and measurement reports will be provided with each product.
+Datasheets and measurement reports are provided with each product.
 
 ## Cleaning & care
 
@@ -34,5 +34,5 @@ Care instructions vary by product. Refer to the product datasheet.
 
 ## FAQ
 
-**When will LiDAR targets be available?**
-Reflectance panels and image-quality charts are in development. Sign up for the newsletter to be notified when they ship.
+**How do I order LiDAR targets?**
+Use the "Request a quote" button on any product page, or email hello@calib.tools with your requirements. We reply within one business day.
