@@ -28,6 +28,30 @@ export const PRICE_LADDER: FallbackPrice[] = [
   { sku: 'CT-CHA-P-400300', eur: 157 },
   { sku: 'CT-CHA-P-600400', eur: 238 },
   { sku: 'CT-CHA-P-800600', eur: 321 },
+  // AprilGrid composite
+  { sku: 'CT-APR-P-200150', eur: 121 },
+  { sku: 'CT-APR-P-300200', eur: 127 },
+  { sku: 'CT-APR-P-400300', eur: 207 },
+  { sku: 'CT-APR-P-600400', eur: 276 },
+  { sku: 'CT-APR-P-800600', eur: 371 },
+  // Circle grid composite (symmetric)
+  { sku: 'CT-CIR-P-200150', eur: 121 },
+  { sku: 'CT-CIR-P-300200', eur: 127 },
+  { sku: 'CT-CIR-P-400300', eur: 148 },
+  { sku: 'CT-CIR-P-600400', eur: 207 },
+  { sku: 'CT-CIR-P-800600', eur: 308 },
+  // Asymmetric circle grid composite
+  { sku: 'CT-ACR-P-200150', eur: 121 },
+  { sku: 'CT-ACR-P-300200', eur: 127 },
+  { sku: 'CT-ACR-P-400300', eur: 142 },
+  { sku: 'CT-ACR-P-600400', eur: 207 },
+  { sku: 'CT-ACR-P-800600', eur: 308 },
+  // HALCON composite
+  { sku: 'CT-HAL-P-200150', eur: 148 },
+  { sku: 'CT-HAL-P-300200', eur: 156 },
+  { sku: 'CT-HAL-P-400300', eur: 167 },
+  { sku: 'CT-HAL-P-600400', eur: 244 },
+  { sku: 'CT-HAL-P-800600', eur: 332 },
   // ChArUco ceramic
   { sku: 'CT-CHA-C-110085', eur: 797 },
   { sku: 'CT-CHA-C-150100', eur: 1076 },
@@ -45,6 +69,9 @@ export function fallbackMinEur(handle: string): number {
     'checkerboard-composite': 'CT-CHT-P-',
     'charuco-composite': 'CT-CHA-P-',
     'charuco-ceramic': 'CT-CHA-C-',
+    'aprilgrid-composite': 'CT-APR-P-',
+    'circlegrid-composite': 'CT-CIR-P-',
+    'halcon-composite': 'CT-HAL-P-',
     'mounting-fixture': 'CT-ACC-A-',
     'certificate-ilac': 'CT-SVC-X-',
   };
