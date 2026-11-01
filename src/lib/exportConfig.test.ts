@@ -1,9 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import { kalibrYaml, ros2Yaml, halconDescr, opencvJson } from './exportConfig';
 import type { PatternSpec } from './patterns';
+import { markerForSquare } from './boardSizes';
 
 const checker: PatternSpec = {
-  type: 'Checkerboard', rows: 7, cols: 10, square: 25, marker: 18,
+  type: 'Checkerboard', rows: 7, cols: 10, square: 25, marker: markerForSquare(25),
   dict: 'DICT_6X6_250', paper: 'A4', startId: 0, scaleBar: true,
 };
 

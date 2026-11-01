@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ArrowLeftRight } from '@/lib/icons';
 import { parse, serialize, detectFormat, FORMAT_LABELS, type Format, type CalibConfig } from '@/lib/convert';
+import { markerForSquare } from '@/lib/boardSizes';
 
 const FORMATS: Format[] = ['opencv-json', 'kalibr-yaml', 'ros2-yaml', 'halcon-descr'];
 
@@ -9,7 +10,7 @@ const EXAMPLE = JSON.stringify({
   rows: 7,
   cols: 10,
   square_mm: 25,
-  marker_mm: 18,
+  marker_mm: markerForSquare(25),
   dictionary: 'DICT_6X6_250',
   start_id: 0,
   generator: 'Calib.Tools',

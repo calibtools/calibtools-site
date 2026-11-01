@@ -22,6 +22,7 @@ import {
 } from '../ctdoc';
 import { board_svg, axes, dim_h, dim_v } from '../ctpattern';
 import { LEAD_TIME } from '../../lib/claims';
+import { CERAMIC_SIZES, COMPOSITE_SIZES } from '../../lib/boardSizes';
 
 // ── Front-matter parser ──────────────────────────────────────────────
 
@@ -232,11 +233,12 @@ function mono(text: string): string {
 // ── CHA-C specific builders (faithful to build_ds.py) ────────────────
 
 function chaCProductRendering(): string {
+  const mk185 = CERAMIC_SIZES.find((s) => s.square === 14)!.marker;
   const label =
-    'CALIB.TOOLS   CT-CHA-C-185110-6X6   ChArUco 7\u00d712 \u00b7 14/10.5 mm \u00b7 DICT_6X6_250 \u00b7 IDs 0\u201341   SN [per unit] \u00b7 Rev A';
+    `CALIB.TOOLS   CT-CHA-C-185110-6X6   ChArUco 7\u00d712 \u00b7 14/${mk185} mm \u00b7 DICT_6X6_250 \u00b7 IDs 0\u201341   SN [per unit] \u00b7 Rev A`;
   const board = board_svg({
     W: 185, H: 110, rows: 7, cols: 12, sq: 14,
-    marker: 10.5, mx: 8.5, my: 6,
+    marker: mk185, mx: 8.5, my: 6,
     dict_name: 'DICT_6X6_250', start_id: 0,
     label, label_w: 168, axes_spec: [4.5, 4.5, 6.5, 0.6],
     mode: 'print', width_mm: 125,
@@ -267,23 +269,28 @@ function chaCOrderingTable(): string {
     ['Corners', 'n'], ['Markers', 'n'], ['Weight<br>(kg)', 'n'],
   ];
   const dicts = '<span class="mono">DICT_6X6_250</span>,<br><span class="mono">DICT_6X6_1000</span>';
-  type Row = [number, number, number, number, number, number, string, string];
+  // Marker sizes come from boardSizes.ts; rows/cols/weight are board-specific.
+  const ceramicBySquare = new Map(CERAMIC_SIZES.map((s) => [s.square, s.marker]));
+  type Row = [number, number, number, number, number, string, string];
   const rawRows: Row[] = [
-    [7, 10, 110, 85,  10,   7.5,  dicts, '0.10'],
-    [7, 11, 150, 100, 12.5, 9.5,  dicts, '0.17'],
-    [7, 12, 185, 110, 14,   10.5, dicts, '0.22'],
-    [8, 14, 230, 140, 15,   11,   dicts, '0.35'],
+    [7, 10, 110, 85,  10,   dicts, '0.10'],
+    [7, 11, 150, 100, 12.5, dicts, '0.17'],
+    [7, 12, 185, 110, 14,   dicts, '0.22'],
+    [8, 14, 230, 140, 15,   dicts, '0.35'],
   ];
-  const rows = rawRows.map(([r, c, w, h, sq, mk, dict, wt]) => [
-    `CT-CHA-C-${w}${h < 100 ? '0' + h : h}-6X6`,
-    `${w} \u00d7 ${h}`,
-    `${r} \u00d7 ${c}`,
-    `${sq} / ${mk}`,
-    dict,
-    String(charucoCornerCount(r, c)),
-    String(charucoMarkerCount(r, c)),
-    wt,
-  ]);
+  const rows = rawRows.map(([r, c, w, h, sq, dict, wt]) => {
+    const mk = ceramicBySquare.get(sq) ?? sq * 0.75;
+    return [
+      `CT-CHA-C-${w}${h < 100 ? '0' + h : h}-6X6`,
+      `${w} \u00d7 ${h}`,
+      `${r} \u00d7 ${c}`,
+      `${sq} / ${mk}`,
+      dict,
+      String(charucoCornerCount(r, c)),
+      String(charucoMarkerCount(r, c)),
+      wt,
+    ];
+  });
   return table(cols, rows, 'dense rawhead', undefined, ['23%', '11%', '9%', '12%', '19%', '8%', '8%', '10%']);
 }
 
@@ -307,14 +314,15 @@ function chaCKeySpecs(): string {
 }
 
 function chaCGeometryReference(): string {
+  const mk185 = CERAMIC_SIZES.find((s) => s.square === 14)!.marker;
   const board = board_svg({
     W: 185, H: 110, rows: 7, cols: 12, sq: 14,
-    marker: 10.5, mx: 8.5, my: 6,
+    marker: mk185, mx: 8.5, my: 6,
     dict_name: 'DICT_6X6_250', start_id: 0, axes_spec: null,
     mode: 'map', width_mm: 62, origin: true,
   });
   const details = kv([
-    ['Reference pattern', '<span class="mono">7 \u00d7 12</span> squares \u00b7 <span class="mono">14 / 10.5 mm</span>.'],
+    ['Reference pattern', `<span class="mono">7 \u00d7 12</span> squares \u00b7 <span class="mono">14 / ${mk185} mm</span>.`],
     ['Marker IDs', '<span class="mono">0\u201341</span>, row-major through white squares.'],
     ['Coordinate frame', 'Origin at the top-left outer pattern corner; X right, Y down.'],
     ['Version control', 'Odd-row board: no legacy-pattern issue with OpenCV <span class="mono">\u2265 4.6</span> or older versions.'],
@@ -511,7 +519,7 @@ function buildChaC(ds: DSParsed, watermark?: string): Doc {
     + chaCProductRendering()
     + section(1, 'Ordering', 'PRINT VERSION \u00b7 prices online')
     + chaCOrderingTable()
-    + p('All variants: white margin \u00b7 marker side 0.7\u20130.75 \u00d7 square side \u00b7 alumina ceramic, 3 mm.', 'small')
+    + p('All variants: white margin \u00b7 alumina ceramic, 3 mm. See ordering table for per-size marker dimensions.', 'small')
     + p('<span class="mono">Prices:</span> calib.tools/targets', 'small muted')
     + section(2, 'Key specifications')
     + chaCKeySpecs();

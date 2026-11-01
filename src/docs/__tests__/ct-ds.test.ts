@@ -3,6 +3,10 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { parseFrontMatter, _parseDatasheet, charucoCornerCount, charucoMarkerCount } from '../build/ct-ds';
 import { Doc } from '../ctdoc';
+import { COMPOSITE_SIZES, CERAMIC_SIZES } from '../../lib/boardSizes';
+import { markerForSquare } from '../../lib/boardSizes';
+import { kalibrYaml, ros2Yaml, halconDescr, opencvJson } from '../../lib/exportConfig';
+import type { PatternSpec } from '../../lib/patterns';
 
 // ── Load test data ──
 
@@ -235,5 +239,78 @@ describe('charucoCornerCount / charucoMarkerCount', () => {
   it('known values: 7×11 → 60 corners, 38 markers (not 39)', () => {
     expect(charucoCornerCount(7, 11)).toBe(60);
     expect(charucoMarkerCount(7, 11)).toBe(38);
+  });
+});
+
+// ── Marker-size consistency: boardSizes.ts is the single source of truth ──
+
+describe('marker-size consistency with boardSizes.ts', () => {
+  it('CT-DS-CHA-P.md ordering table marker sizes match COMPOSITE_SIZES', () => {
+    const ds = _parseDatasheet(CHA_P_MD);
+    expect(ds.ordering).not.toBeNull();
+    for (const row of ds.ordering!.rows) {
+      // "Square / marker" column, e.g. "25 / 18 mm"
+      const geomCol = row[3];
+      const match = geomCol.match(/([\d.]+)\s*\/\s*([\d.]+)/);
+      expect(match, `cannot parse square/marker from "${geomCol}"`).not.toBeNull();
+      const sq = Number(match![1]);
+      const mk = Number(match![2]);
+      const expected = COMPOSITE_SIZES.find((s) => s.square === sq);
+      expect(expected, `no COMPOSITE_SIZES entry for square=${sq}`).toBeDefined();
+      expect(mk).toBe(expected!.marker);
+    }
+  });
+
+  it('CT-DS-CHA-C.md ordering table marker sizes match CERAMIC_SIZES', () => {
+    const ds = _parseDatasheet(CHA_C_MD);
+    expect(ds.ordering).not.toBeNull();
+    for (const row of ds.ordering!.rows) {
+      const geomCol = row[3];
+      const match = geomCol.match(/([\d.]+)\s*\/\s*([\d.]+)/);
+      expect(match, `cannot parse square/marker from "${geomCol}"`).not.toBeNull();
+      const sq = Number(match![1]);
+      const mk = Number(match![2]);
+      const expected = CERAMIC_SIZES.find((s) => s.square === sq);
+      expect(expected, `no CERAMIC_SIZES entry for square=${sq}`).toBeDefined();
+      expect(mk).toBe(expected!.marker);
+    }
+  });
+
+  it('exported config files use markerForSquare for every board size', () => {
+    for (const bs of [...COMPOSITE_SIZES, ...CERAMIC_SIZES]) {
+      const spec: PatternSpec = {
+        type: 'ChArUco', rows: 7, cols: 10,
+        square: bs.square, marker: bs.marker,
+        dict: 'DICT_6X6_250', paper: 'A4', startId: 0, scaleBar: true,
+      };
+      // .opencv.json
+      const json = JSON.parse(opencvJson(spec));
+      expect(json.marker_mm).toBe(bs.marker);
+      // .kalibr.yaml — ChArUco is written as checkerboard, no marker_size line
+      // .ros2.yaml
+      const ros2 = ros2Yaml(spec);
+      expect(ros2).toContain(`marker_size: ${(bs.marker / 1000).toFixed(6)}`);
+      // markerForSquare roundtrip
+      expect(markerForSquare(bs.square)).toBe(bs.marker);
+    }
+  });
+
+  it('CT-DS-CHA-P.md does not quote a ratio range that excludes any composite size', () => {
+    const ratioMatch = CHA_P_MD.match(/(\d+\.\d+)[–-](\d+\.\d+)/);
+    if (ratioMatch) {
+      const lo = Number(ratioMatch[1]);
+      const hi = Number(ratioMatch[2]);
+      for (const bs of COMPOSITE_SIZES) {
+        const ratio = Math.round(bs.ratio * 100) / 100;
+        expect(ratio).toBeGreaterThanOrEqual(lo);
+        expect(ratio).toBeLessThanOrEqual(hi);
+      }
+    }
+  });
+
+  it('CT-DS-CHA-C.md does not quote a composite-only marker ratio range', () => {
+    // Ceramic 150×100 has ratio 0.76, outside the composite range 0.72–0.75.
+    // CHA-C.md must not include a "0.72–0.75" range statement.
+    expect(CHA_C_MD).not.toMatch(/0\.72[–-]0\.75/);
   });
 });

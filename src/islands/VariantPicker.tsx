@@ -7,6 +7,7 @@ import {
 } from '@/lib/shopify';
 import { computeSetBoards } from '@/lib/exportSet';
 import { LEAD_TIME } from '@/lib/claims';
+import { markerForSquare } from '@/lib/boardSizes';
 
 interface BoardSetImage {
   src: string;
@@ -104,7 +105,7 @@ export default function VariantPicker({ product, fixtureVariantId, fixturePrice,
       type: 'ChArUco' as const,
       rows, cols,
       square: parseFloat(product.metafields.square_size_mm ?? '25'),
-      marker: parseFloat(product.metafields.marker_size_mm ?? '18'),
+      marker: parseFloat(product.metafields.marker_size_mm ?? String(markerForSquare(parseFloat(product.metafields.square_size_mm ?? '25')))),
       dict: product.metafields.dictionary ?? 'DICT_6X6_250',
       paper: 'A4', startId: 0, scaleBar: true,
     };

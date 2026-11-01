@@ -10,6 +10,7 @@ import { patternSummary } from '@/lib/brand';
 import { computeSetBoards, buildSetManifest, setBoardFilename } from '@/lib/exportSet';
 import { PAPERS, computeLayout, fitNotice, reductionNotice, smallestFittingPaper, type Orientation } from '@/lib/pageLayout';
 import { LEAD_TIME } from '@/lib/claims';
+import { markerForSquare } from '@/lib/boardSizes';
 
 /**
  * Pattern generator.
@@ -50,7 +51,7 @@ function mmToIn(mm: number): string {
 const PRODUCT_SIZES: [number, number][] = [[200,200],[300,200],[300,300],[400,300],[400,400],[500,300],[500,400]];
 
 export default function Generator({ initialSpec }: GeneratorProps = {}) {
-  const defaultSpec: PatternSpec = { type: 'ChArUco', rows: 7, cols: 10, square: 25, marker: 18, dict: 'DICT_6X6_250', paper: 'A4', startId: 0, scaleBar: true };
+  const defaultSpec: PatternSpec = { type: 'ChArUco', rows: 7, cols: 10, square: 25, marker: markerForSquare(25), dict: 'DICT_6X6_250', paper: 'A4', startId: 0, scaleBar: true };
   const [spec, setSpec] = useState<PatternSpec>({ ...defaultSpec, ...initialSpec });
   const [busy, setBusy] = useState<'pdf' | 'png' | null>(null);
   const [boardCount, setBoardCount] = useState(1);
