@@ -246,11 +246,18 @@ const breadcrumbLd = {
   ],
 };
 // Compute variesBy from product options
-const variesBy = product.options.map((o) => {
-  const key = o.name.toLowerCase();
-  if (key === 'size') return 'https://schema.org/size';
-  return `https://schema.org/${key}`;
-});
+// size → schema.org/size; pattern-changing options → schema.org/pattern; others omitted
+const PATTERN_OPTIONS = new Set(['dictionary', 'layout', 'pattern']);
+const variesBy = [...new Set(
+  product.options
+    .map((o) => {
+      const key = o.name.toLowerCase();
+      if (key === 'size') return 'https://schema.org/size';
+      if (PATTERN_OPTIONS.has(key)) return 'https://schema.org/pattern';
+      return null;
+    })
+    .filter((v): v is string => v !== null),
+)];
 
 // Price valid until — 1 year from build date
 const priceValidUntil = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);

@@ -238,6 +238,23 @@ for (const file of htmlFiles) {
           }
         }
       }
+      // variesBy must only use known schema.org properties
+      if (ld['@type'] === 'ProductGroup' && ld.variesBy) {
+        const VALID_VARIES = new Set([
+          'https://schema.org/size',
+          'https://schema.org/color',
+          'https://schema.org/material',
+          'https://schema.org/pattern',
+          'https://schema.org/suggestedAge',
+          'https://schema.org/suggestedGender',
+        ]);
+        const vals = Array.isArray(ld.variesBy) ? ld.variesBy : [ld.variesBy];
+        for (const v of vals) {
+          if (!VALID_VARIES.has(v)) {
+            errors.push({ file: rel, rule: 'jsonld-varies-by', detail: `variesBy "${v}" is not a recognised schema.org property` });
+          }
+        }
+      }
     }
 
     // Article required fields
