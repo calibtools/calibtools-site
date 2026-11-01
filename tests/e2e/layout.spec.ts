@@ -45,6 +45,29 @@ async function noHorizontalOverflow(page: Page) {
 
 async function smallInteractiveElements(page: Page, minSize: number) {
   return page.evaluate((min) => {
+    /** Check if an element is inside a hidden/inert ancestor */
+    function isEffectivelyHidden(el: Element): boolean {
+      let cur: Element | null = el;
+      while (cur) {
+        if (cur.hasAttribute('inert')) return true;
+        if (cur.getAttribute('aria-hidden') === 'true') return true;
+        const s = window.getComputedStyle(cur);
+        if (s.visibility === 'hidden' || s.display === 'none') return true;
+        cur = cur.parentElement;
+      }
+      return false;
+    }
+    /** Check if an element is visually hidden (sr-only, clip, 1×1) */
+    function isVisuallyHidden(el: Element): boolean {
+      const s = window.getComputedStyle(el);
+      if (s.position === 'absolute' && s.overflow === 'hidden' &&
+          (s.clip !== 'auto' || s.clipPath === 'inset(50%)') &&
+          (parseInt(s.width) <= 1 || parseInt(s.height) <= 1)) return true;
+      const r = el.getBoundingClientRect();
+      if (r.width <= 1 && r.height <= 1) return true;
+      return false;
+    }
+
     const INTERACTIVE = 'a, button, input, select, textarea, summary, [role="button"], [role="tab"], [tabindex]';
     const els = Array.from(document.querySelectorAll(INTERACTIVE));
     const small: { tag: string; text: string; w: number; h: number }[] = [];
@@ -60,11 +83,22 @@ async function smallInteractiveElements(page: Page, minSize: number) {
       // Exempt off-screen drawers and lightbox
       if (el.closest('[data-cart-drawer]') || el.closest('[class*="CartDrawer"]')) continue;
       if (el.closest('.lightbox-dialog')) continue;
-      // Exempt elements outside the viewport (off-screen drawers)
-      if (rect.right < 0 || rect.left > window.innerWidth || rect.bottom < 0 || rect.top > window.innerHeight * 3) continue;
-      // Exempt hidden elements
+      // Exempt elements horizontally off-screen
+      if (rect.right < 0 || rect.left > window.innerWidth) continue;
+      // Exempt elements inside inert, aria-hidden, visibility:hidden, or display:none ancestors
+      if (isEffectivelyHidden(el)) continue;
+      // Exempt hidden elements (self)
       const style = window.getComputedStyle(el);
       if (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') continue;
+      // Exempt visually hidden elements (sr-only, clip, 1×1)
+      if (isVisuallyHidden(el)) continue;
+      // Exempt checkbox/radio inputs when their enclosing label is checked by the label-row rule
+      if (el.tagName === 'INPUT') {
+        const inp = el as HTMLInputElement;
+        if (inp.type === 'checkbox' || inp.type === 'radio') {
+          if (inp.closest('label')) continue;
+        }
+      }
       if (rect.width < min || rect.height < min) {
         small.push({
           tag: `${el.tagName.toLowerCase()}${el.className ? '.' + String(el.className).split(' ')[0] : ''}`,
@@ -130,9 +164,16 @@ async function tapTargets44(page: Page) {
       // Exempt hidden
       const style = window.getComputedStyle(el);
       if (style.display === 'none' || style.visibility === 'hidden') continue;
+      // Exempt visually hidden (sr-only, clip, 1×1)
+      if (style.position === 'absolute' && style.overflow === 'hidden' &&
+          (style.clip !== 'auto' || style.clipPath === 'inset(50%)') &&
+          (parseInt(style.width) <= 1 || parseInt(style.height) <= 1)) continue;
+      if (rect.width <= 1 && rect.height <= 1) continue;
       // Exempt inline links inside paragraphs
       if (el.tagName === 'A' && el.parentElement?.tagName === 'P') continue;
       if (el.closest('[data-cart-drawer]') || el.closest('.lightbox-dialog')) continue;
+      // Exempt elements horizontally off-screen
+      if (rect.right < 0 || rect.left > window.innerWidth) continue;
       if (Math.round(rect.height) < 44) {
         small.push({
           tag: el.tagName.toLowerCase(),
@@ -152,26 +193,44 @@ async function fixedElementOverlap(page: Page) {
     // Wait a tick for any scroll-based show/hide
     return new Promise<{ overlapping: string[] }>((resolve) => {
       setTimeout(() => {
+        // Find the sticky top nav (first sticky element at top:0) to exempt it
+        const stickyTopNav = (() => {
+          const all = Array.from(document.querySelectorAll('*'));
+          for (const el of all) {
+            const s = window.getComputedStyle(el);
+            if (s.position === 'sticky' && (s.top === '0px' || s.top === '0')) return el;
+          }
+          return null;
+        })();
+
         const fixed = Array.from(document.querySelectorAll('*')).filter((el) => {
           const s = window.getComputedStyle(el);
           if (s.position !== 'fixed' && s.position !== 'sticky') return false;
           if (s.display === 'none' || s.visibility === 'hidden') return false;
-          // Exempt the header nav (sticky by design)
+          // Exempt the sticky top nav (same as old header exemption)
+          if (el === stickyTopNav || (stickyTopNav && stickyTopNav.contains(el))) return false;
           if (el.tagName === 'HEADER' || el.closest('header')) return false;
           return true;
         });
-        // Only check elements visible in the current viewport (last screenful)
+
+        // Check ALL focusable elements in the last screenful (footer included)
         const vh = window.innerHeight;
-        const focusable = Array.from(document.querySelectorAll('main a, main button, main input, main select, main textarea, main [tabindex]'))
+        const focusable = Array.from(document.querySelectorAll('a, button, input, select, textarea, [tabindex]'))
           .filter((el) => {
             const r = el.getBoundingClientRect();
-            return r.height > 0 && r.width > 0 && r.top < vh && r.bottom > 0;
+            if (r.height <= 0 || r.width <= 0) return false;
+            if (r.top >= vh || r.bottom <= 0) return false;
+            // Exclude elements inside the sticky top nav
+            if (stickyTopNav && stickyTopNav.contains(el)) return false;
+            return true;
           });
+
         const overlapping: string[] = [];
         for (const f of fixed) {
           const fr = f.getBoundingClientRect();
           if (fr.width === 0 || fr.height === 0) continue;
           for (const t of focusable) {
+            // Exclude descendants of the fixed element itself
             if (f.contains(t) || t.contains(f)) continue;
             const tr = t.getBoundingClientRect();
             if (tr.width === 0 || tr.height === 0) continue;
@@ -311,13 +370,29 @@ test('floating ATC hidden while in-page ATC visible @ 375', async ({ page }) => 
   await page.goto('/targets/charuco-composite/', { waitUntil: 'networkidle' });
   // Wait for React hydration and IntersectionObserver to fire
   await page.waitForTimeout(500);
-  // The buy-box should be visible at load (not scrolled)
+
+  // Locate the floating bottom cluster (the fixed container with the ATC button)
+  const cluster = page.locator('.fixed.bottom-3.z-30').first();
+  if (await cluster.count() === 0) return; // no cluster on this page
+
+  // While in-page buy-box is in view, the cluster must be hidden
   const buyBox = page.locator('[data-buy-box]').first();
   if (await buyBox.count() > 0 && await buyBox.isVisible()) {
-    // The floating cluster should be hidden (opacity-0)
-    const cluster = page.locator('.fixed.opacity-0, .fixed[class*="pointer-events-none"]').first();
-    const visibleCluster = page.locator('.fixed.opacity-100 button:has-text("Add to cart")').first();
-    const isHidden = (await cluster.count() > 0) || (await visibleCluster.count() === 0);
-    expect(isHidden, 'Floating ATC should be hidden when buy-box is in view').toBe(true);
+    const hidden = await cluster.evaluate((el) => {
+      const s = window.getComputedStyle(el);
+      return s.opacity === '0' || s.visibility === 'hidden' || s.pointerEvents === 'none';
+    });
+    expect(hidden, 'Floating ATC should be hidden when buy-box is in view').toBe(true);
   }
+
+  // After scrolling past the buy-box, the cluster must be visible
+  await buyBox.evaluate((el) => el.scrollIntoView({ block: 'start' }));
+  await page.evaluate(() => window.scrollBy(0, window.innerHeight + 200));
+  await page.waitForTimeout(300);
+
+  const visible = await cluster.evaluate((el) => {
+    const s = window.getComputedStyle(el);
+    return s.opacity !== '0' && s.visibility !== 'hidden' && s.pointerEvents !== 'none';
+  });
+  expect(visible, 'Floating ATC should be visible after scrolling past buy-box').toBe(true);
 });
