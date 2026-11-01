@@ -26,13 +26,14 @@ const WITHDRAWN = new Set(['certificate-ilac']);
 const ACCESSORIES = new Set(['mounting-fixture']);
 const QUOTE_ONLY = new Set(['ir-board', 'reflectance-panel', 'resolution-chart']);
 
-// --- Label map: metafield key → rendered label ---
-const KEY_TO_LABEL = {
-  material:          'Material',
-  thickness_mm:      'Thickness',
-  feature_tolerance: 'Feature tolerance',
-  lead_time:         'Lead time',
-  files_included:    'Files included',
+// --- Label map: metafield key → possible rendered labels ---
+// Datasheet-sourced spec tables may use different labels than the metafield key.
+const KEY_TO_LABELS = {
+  material:          ['Material', 'Substrate'],
+  thickness_mm:      ['Thickness'],
+  feature_tolerance: ['Feature tolerance', 'Feature position tolerance', 'Feature position accuracy'],
+  lead_time:         ['Lead time'],
+  files_included:    ['Files included', 'Files', 'Inspection report', 'In the box'],
 };
 
 const BOARD_REQUIRED = ['material', 'thickness_mm', 'feature_tolerance', 'lead_time', 'files_included'];
@@ -88,15 +89,16 @@ for (const entry of entries) {
     continue;
   }
 
-  // Check if the page has a spec table
-  const hasSpecTable = html.includes('>Specifications<');
+  // Check if the page has a spec table (section#specifications or heading text)
+  const hasSpecTable = html.includes('id="specifications"') || html.includes('>Specifications<');
   const requiredKeys = isAccessory ? ACCESSORY_REQUIRED : BOARD_REQUIRED;
 
   if (hasSpecTable) {
     for (const key of requiredKeys) {
-      const label = KEY_TO_LABEL[key];
-      if (!label) continue;
-      if (!html.includes(`>${label}<`)) {
+      const labels = KEY_TO_LABELS[key];
+      if (!labels) continue;
+      const found = labels.some((label) => html.includes(`>${label}<`) || html.includes(`">${label}<`));
+      if (!found) {
         missing.push(key);
       }
     }
