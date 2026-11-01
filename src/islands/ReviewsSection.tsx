@@ -191,17 +191,17 @@ function ReviewCard({ review }: { review: Review }) {
       {(review.tags.camera || review.tags.lensOrFov || review.tags.software) && (
         <div className="flex flex-wrap gap-1.5">
           {review.tags.camera && (
-            <span className="rounded border border-line bg-ground px-2 py-0.5 font-mono text-[11px] text-ink-muted">
+            <span className="rounded border border-line bg-ground px-2 py-0.5 font-mono text-[12px] text-ink-muted">
               {review.tags.camera}
             </span>
           )}
           {review.tags.lensOrFov && (
-            <span className="rounded border border-line bg-ground px-2 py-0.5 font-mono text-[11px] text-ink-muted">
+            <span className="rounded border border-line bg-ground px-2 py-0.5 font-mono text-[12px] text-ink-muted">
               {review.tags.lensOrFov}
             </span>
           )}
           {review.tags.software && (
-            <span className="rounded border border-line bg-ground px-2 py-0.5 font-mono text-[11px] text-ink-muted">
+            <span className="rounded border border-line bg-ground px-2 py-0.5 font-mono text-[12px] text-ink-muted">
               {review.tags.software}
             </span>
           )}

@@ -143,12 +143,12 @@ export default function PurchaseTable({ product, datasheetUrl: fallbackUrl }: Pr
                   <td className="py-3 px-3">
                     <span className="font-mono text-[13px]">{cols.dictOrPattern}</span>
                     {cols.idsLabel && (
-                      <span className="block text-[11px] text-ink-soft mt-0.5">
+                      <span className="block text-[12px] text-ink-soft mt-0.5">
                         {cols.idsLabel}
                         {isCharuco && (
                           <a
                             href={`${product.url}#board-set`}
-                            className="ml-1.5 text-brand text-[11px] no-underline hover:underline"
+                            className="ml-1.5 text-brand text-[12px] no-underline hover:underline"
                           >
                             set&hellip;
                           </a>
@@ -229,10 +229,10 @@ export default function PurchaseTable({ product, datasheetUrl: fallbackUrl }: Pr
                     <span className="font-mono text-[12px] text-ink-muted">{cols.dictOrPattern}</span>
                   )}
                   {cols.idsLabel && (
-                    <span className="text-[11px] text-ink-soft">
+                    <span className="text-[12px] text-ink-soft">
                       {cols.idsLabel}
                       {isCharuco && (
-                        <a href={`${product.url}#board-set`} className="ml-1.5 text-brand text-[11px] no-underline hover:underline">set&hellip;</a>
+                        <a href={`${product.url}#board-set`} className="ml-1.5 text-brand text-[12px] no-underline hover:underline">set&hellip;</a>
                       )}
                     </span>
                   )}
