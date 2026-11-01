@@ -76,6 +76,18 @@ type SpecGroup = { title: string; rows: SpecRow[] };
 let specGroups: SpecGroup[] = [];
 if (productData && productData.specGroups.length > 0) {
   specGroups = productData.specGroups;
+  // Inject "Files included" from metafield if the datasheet table lacks it
+  const allLabels = specGroups.flatMap(g => g.rows.map(r => r.label));
+  const hasFilesRow = allLabels.some(l => l === 'Files included' || l === 'Files');
+  if (!hasFilesRow && m.files_included) {
+    // Find or create a Deliverables group
+    let deliverables = specGroups.find(g => g.title === 'Deliverables');
+    if (!deliverables) {
+      deliverables = { title: 'Deliverables', rows: [] };
+      specGroups.push(deliverables);
+    }
+    deliverables.rows.push({ label: 'Files included', value: m.files_included });
+  }
 } else {
   // Fall back to metafield-based groups (existing logic)
   const SPEC_LABELS: Record<string, string> = {
