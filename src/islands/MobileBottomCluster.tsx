@@ -16,6 +16,7 @@ export default function MobileBottomCluster({ mode, defaultPrice }: Props) {
   const [available, setAvailable] = useState(true);
   const [busy, setBusy] = useState(false);
   const [count, setCount] = useState(0);
+  const [hidden, setHidden] = useState(mode === 'add-to-cart');
 
   // Sync cart count
   useEffect(() => {
@@ -35,6 +36,19 @@ export default function MobileBottomCluster({ mode, defaultPrice }: Props) {
       window.removeEventListener('storage', onStorage);
     };
   }, []);
+
+  // Hide floating ATC while the in-page ATC button is visible
+  useEffect(() => {
+    if (mode !== 'add-to-cart') return;
+    const buyBox = document.querySelector('[data-buy-box]');
+    if (!buyBox) { setHidden(false); return; }
+    const observer = new IntersectionObserver(
+      ([entry]) => setHidden(entry.isIntersecting),
+      { threshold: 0.1 },
+    );
+    observer.observe(buyBox);
+    return () => observer.disconnect();
+  }, [mode]);
 
   // Listen for variant-changed on product pages
   useEffect(() => {
@@ -82,7 +96,7 @@ export default function MobileBottomCluster({ mode, defaultPrice }: Props) {
   };
 
   return (
-    <div className="fixed bottom-3 right-3 z-30 flex flex-col items-end gap-2 md:hidden">
+    <div className={`fixed bottom-3 right-3 z-30 flex flex-col items-end gap-2 md:hidden transition-opacity ${hidden ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
       {/* Cart button */}
       <button
         type="button"
@@ -93,7 +107,7 @@ export default function MobileBottomCluster({ mode, defaultPrice }: Props) {
       >
         <ShoppingCart size={20} strokeWidth={1.6} color="white" aria-hidden="true" />
         {count > 0 && (
-          <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-brand px-1 text-[11px] font-bold text-white">
+          <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-brand px-1 text-[12px] font-bold text-white">
             {count}
           </span>
         )}

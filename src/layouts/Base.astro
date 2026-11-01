@@ -77,7 +77,7 @@ const jsonLdItems = [...providedLd, ...(autoBc ? [autoBc] : []), ORGANIZATION_LD
   </head>
   <body class="bg-ground text-ink font-sans antialiased">
     <Nav section={section} theme={theme} />
-    <main class="pb-[88px] md:pb-0">
+    <main class="pb-[calc(88px+env(safe-area-inset-bottom,0px))] md:pb-0">
       <slot />
     </main>
     <Footer />
