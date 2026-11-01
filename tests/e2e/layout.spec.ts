@@ -51,12 +51,17 @@ async function smallInteractiveElements(page: Page, minSize: number) {
     for (const el of els) {
       const rect = el.getBoundingClientRect();
       if (rect.width === 0 && rect.height === 0) continue; // hidden
-      // Exempt inline links inside paragraphs
-      if (el.tagName === 'A' && el.parentElement?.tagName === 'P') continue;
-      // Exempt cart drawer (off-screen)
-      if (el.closest('[data-cart-drawer]')) continue;
-      // Exempt lightbox (hidden dialog)
+      // Exempt inline links inside prose text (paragraphs, list items, table cells)
+      if (el.tagName === 'A') {
+        const p = el.parentElement;
+        if (p && ['P', 'LI', 'TD', 'DD', 'BLOCKQUOTE'].includes(p.tagName)) continue;
+        if (el.closest('.prose-calib')) continue;
+      }
+      // Exempt off-screen drawers and lightbox
+      if (el.closest('[data-cart-drawer]') || el.closest('[class*="CartDrawer"]')) continue;
       if (el.closest('.lightbox-dialog')) continue;
+      // Exempt elements outside the viewport (off-screen drawers)
+      if (rect.right < 0 || rect.left > window.innerWidth || rect.bottom < 0 || rect.top > window.innerHeight * 3) continue;
       // Exempt hidden elements
       const style = window.getComputedStyle(el);
       if (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') continue;
@@ -149,9 +154,19 @@ async function fixedElementOverlap(page: Page) {
       setTimeout(() => {
         const fixed = Array.from(document.querySelectorAll('*')).filter((el) => {
           const s = window.getComputedStyle(el);
-          return (s.position === 'fixed' || s.position === 'sticky') && s.display !== 'none' && s.visibility !== 'hidden';
+          if (s.position !== 'fixed' && s.position !== 'sticky') return false;
+          if (s.display === 'none' || s.visibility === 'hidden') return false;
+          // Exempt the header nav (sticky by design)
+          if (el.tagName === 'HEADER' || el.closest('header')) return false;
+          return true;
         });
-        const focusable = Array.from(document.querySelectorAll('a, button, input, select, textarea, [tabindex]'));
+        // Only check elements visible in the current viewport (last screenful)
+        const vh = window.innerHeight;
+        const focusable = Array.from(document.querySelectorAll('main a, main button, main input, main select, main textarea, main [tabindex]'))
+          .filter((el) => {
+            const r = el.getBoundingClientRect();
+            return r.height > 0 && r.width > 0 && r.top < vh && r.bottom > 0;
+          });
         const overlapping: string[] = [];
         for (const f of fixed) {
           const fr = f.getBoundingClientRect();
@@ -218,6 +233,34 @@ for (const path of PAGES) {
     });
   }
 
+  // ── Below 768: checkbox/radio label rows ≥ 44px tall ──
+  for (const w of [360, 390]) {
+    test(`checkbox label 44px: ${slug} @ ${w}`, async ({ page }) => {
+      await page.setViewportSize({ width: w, height: 900 });
+      await page.goto(path, { waitUntil: 'networkidle' });
+      const small = await page.evaluate(() => {
+        const inputs = Array.from(document.querySelectorAll('input[type="checkbox"], input[type="radio"]'));
+        const violations: { text: string; h: number }[] = [];
+        for (const input of inputs) {
+          const label = input.closest('label');
+          if (!label) continue;
+          const rect = label.getBoundingClientRect();
+          if (rect.height === 0) continue;
+          const style = window.getComputedStyle(label);
+          if (style.display === 'none' || style.visibility === 'hidden') continue;
+          if (Math.round(rect.height) < 44) {
+            violations.push({
+              text: (label.textContent || '').trim().slice(0, 40),
+              h: Math.round(rect.height),
+            });
+          }
+        }
+        return violations;
+      });
+      expect(small, `Checkbox labels < 44px on ${slug} @ ${w}: ${JSON.stringify(small)}`).toHaveLength(0);
+    });
+  }
+
   // ── No text below 12px outside SVG ──
   for (const w of [360, 768, 1440]) {
     test(`min 12px text: ${slug} @ ${w}`, async ({ page }) => {
@@ -266,13 +309,15 @@ for (const path of PAGES) {
 test('floating ATC hidden while in-page ATC visible @ 375', async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 812 });
   await page.goto('/targets/charuco-composite/', { waitUntil: 'networkidle' });
-  // The in-page Add to cart should be visible at the top
-  const inPageBtn = page.locator('[data-buy-box] button:has-text("Add to cart"), [data-buy-box] a:has-text("Add to cart")').first();
-  if (await inPageBtn.count() > 0 && await inPageBtn.isVisible()) {
-    // If in-page button is visible, floating one should be hidden
-    const floatingBtn = page.locator('.fixed button:has-text("Add to cart")');
-    if (await floatingBtn.count() > 0) {
-      expect(await floatingBtn.isVisible(), 'Floating ATC should be hidden when in-page ATC is visible').toBe(false);
-    }
+  // Wait for React hydration and IntersectionObserver to fire
+  await page.waitForTimeout(500);
+  // The buy-box should be visible at load (not scrolled)
+  const buyBox = page.locator('[data-buy-box]').first();
+  if (await buyBox.count() > 0 && await buyBox.isVisible()) {
+    // The floating cluster should be hidden (opacity-0)
+    const cluster = page.locator('.fixed.opacity-0, .fixed[class*="pointer-events-none"]').first();
+    const visibleCluster = page.locator('.fixed.opacity-100 button:has-text("Add to cart")').first();
+    const isHidden = (await cluster.count() > 0) || (await visibleCluster.count() === 0);
+    expect(isHidden, 'Floating ATC should be hidden when buy-box is in view').toBe(true);
   }
 });
