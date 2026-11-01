@@ -23,7 +23,7 @@ const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: 'Privacy policy' 
 
       <h2>Server-side page counters</h2>
       <p>We count page views on the server to understand which pages are visited. These counters store anonymous totals only: the page path and a referrer category (such as &ldquo;generator&rdquo; or &ldquo;guide&rdquo;).</p>
-      <p>No IP addresses, no User-Agent strings, no visitor identifiers, and no cross-page session data are stored. It is not possible to trace a count back to an individual.</p>
+      <p>Requests from known crawlers are skipped; the User-Agent header is read for that check and is not stored. No IP addresses, no visitor identifiers, and no cross-page session data are stored. It is not possible to trace a count back to an individual.</p>
 
       <h2>Hosting</h2>
       <p>The site is hosted on Cloudflare Pages. Cloudflare may process your IP address and browser metadata to deliver the pages. See <a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener">Cloudflare&rsquo;s privacy policy</a>.</p>
