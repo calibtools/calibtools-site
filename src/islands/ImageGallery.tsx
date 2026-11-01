@@ -448,7 +448,7 @@ export default function ImageGallery({
           />
         </div>
         {imgs.length > 1 && (
-          <div className="grid grid-cols-4 gap-3 md:grid-cols-8" role="tablist" aria-label="Gallery thumbnails">
+          <div className="grid grid-cols-5 gap-3 md:grid-cols-8" role="tablist" aria-label="Gallery thumbnails">
             {imgs.slice(0, 8).map((img, i) => (
               <button
                 key={img.url}
@@ -528,7 +528,7 @@ export default function ImageGallery({
 
       {/* Thumbnail strip */}
       {localImages.length > 1 && (
-        <div className="grid grid-cols-4 gap-3 md:grid-cols-8" role="tablist" aria-label="Gallery thumbnails">
+        <div className="grid grid-cols-5 gap-3 md:grid-cols-8" role="tablist" aria-label="Gallery thumbnails">
           {localImages.slice(0, 8).map((img, i) => (
             <button
               key={img.file}
