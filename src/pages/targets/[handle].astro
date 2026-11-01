@@ -392,13 +392,13 @@ const orderingRows = (productData?.orderingRows ?? []).map((row) => {
   }] : undefined}
 >
   {/* Breadcrumb */}
-  <nav class="container-x flex gap-2 overflow-x-auto whitespace-nowrap pt-5 text-sm text-ink-soft scrollbar-none" aria-label="Breadcrumb">
-    <a href="/" class="text-ink-soft no-underline shrink-0">Home</a><span>/</span>
-    <a href="/targets/" class="text-ink-soft no-underline shrink-0">Calibration targets</a><span>/</span>
+  <nav class="container-x flex flex-wrap gap-x-2 gap-y-1 pt-5 text-sm text-ink-soft" aria-label="Breadcrumb">
+    <a href="/" class="text-ink-soft no-underline shrink-0 min-h-[44px] md:min-h-0 flex items-center">Home</a><span class="flex items-center">/</span>
+    <a href="/targets/" class="text-ink-soft no-underline shrink-0 min-h-[44px] md:min-h-0 flex items-center">Calibration targets</a><span class="flex items-center">/</span>
     {collectionHandle && (
-      <><a href={`/targets/collection/${collectionHandle}/`} class="text-ink-soft no-underline shrink-0">{collectionTitle}</a><span>/</span></>
+      <><a href={`/targets/collection/${collectionHandle}/`} class="text-ink-soft no-underline shrink-0 min-h-[44px] md:min-h-0 flex items-center">{collectionTitle}</a><span class="flex items-center">/</span></>
     )}
-    <span class="text-ink shrink-0">{product.title}</span>
+    <span class="text-ink shrink-0 min-h-[44px] md:min-h-0 flex items-center">{product.title}</span>
   </nav>
 
   {/* ── Buy box ── */}
@@ -429,7 +429,7 @@ const orderingRows = (productData?.orderingRows ?? []).map((row) => {
       {reviewSummary.count > 0 ? (
         <Rating average={reviewSummary.average} count={reviewSummary.count} href="#reviews" size={14} />
       ) : (
-        <a href="#reviews" class="inline-flex items-center gap-2 text-sm text-ink-muted no-underline hover:text-ink">
+        <a href="#reviews" class="inline-flex items-center gap-2 text-sm text-ink-muted no-underline hover:text-ink min-h-[24px]">
           <Stars client:load rating={0} size={14} />
           <span>No reviews yet · <span class="text-brand-dark">how reviews work ↓</span></span>
         </a>

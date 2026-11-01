@@ -156,10 +156,10 @@ const breadcrumbLd = {
   {/* --- Family page header --- */}
   <section class="container-x py-8 md:py-12">
     {/* Breadcrumb */}
-    <nav class="flex gap-2 overflow-x-auto whitespace-nowrap text-sm text-ink-soft pb-4 scrollbar-none" aria-label="Breadcrumb">
-      <a href="/" class="text-ink-soft no-underline shrink-0">Home</a><span>/</span>
-      <a href="/targets/" class="text-ink-soft no-underline shrink-0">Calibration targets</a><span>/</span>
-      <span class="text-ink shrink-0">{collection.title}</span>
+    <nav class="flex flex-wrap gap-x-2 gap-y-1 text-sm text-ink-soft pb-4" aria-label="Breadcrumb">
+      <a href="/" class="text-ink-soft no-underline shrink-0 min-h-[44px] md:min-h-0 flex items-center">Home</a><span class="flex items-center">/</span>
+      <a href="/targets/" class="text-ink-soft no-underline shrink-0 min-h-[44px] md:min-h-0 flex items-center">Calibration targets</a><span class="flex items-center">/</span>
+      <span class="text-ink shrink-0 min-h-[44px] md:min-h-0 flex items-center">{collection.title}</span>
     </nav>
 
     <div class="flex flex-col gap-8 lg:flex-row lg:gap-12">
@@ -201,7 +201,7 @@ const breadcrumbLd = {
                   ) : preview.type === 'svg' ? (
                     <div class="h-full w-full flex items-center justify-center p-1" set:html={preview.svg} />
                   ) : (
-                    <span class="font-mono text-[10px] text-ink-soft">{p.title.slice(0, 12)}</span>
+                    <span class="font-mono text-[12px] text-ink-soft">{p.title.slice(0, 12)}</span>
                   )}
                 </a>
               );
@@ -227,7 +227,7 @@ const breadcrumbLd = {
                   {p.image ? (
                     <img src={p.image} alt="" class="h-full w-full object-contain rounded" loading="lazy" />
                   ) : (
-                    <span class="font-mono text-[9px] text-ink-soft">{p.title.slice(0, 6)}</span>
+                    <span class="font-mono text-[12px] text-ink-soft">{p.title.slice(0, 6)}</span>
                   )}
                 </div>
                 <div class="flex flex-col gap-0.5 min-w-0">
