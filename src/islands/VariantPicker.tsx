@@ -385,7 +385,7 @@ export default function VariantPicker({ product, fixtureVariantId, fixturePrice,
       {confirmation && <p className="m-0 text-sm font-medium text-green-700">{confirmation}</p>}
       {error && <p className="m-0 text-sm text-brand">{error}</p>}
 
-      <a href="/quote/" className="text-sm text-ink-soft no-underline hover:text-ink">Need a quote or invoice/PO? <ArrowRight size={14} strokeWidth={1.6} aria-hidden="true" className="inline" /></a>
+      <a href="/quote/" className="text-sm text-ink-soft no-underline hover:text-ink min-h-[24px] inline-flex items-center gap-1">Need a quote or invoice/PO? <ArrowRight size={14} strokeWidth={1.6} aria-hidden="true" /></a>
 
       <div className="grid grid-cols-2 gap-3 pt-2 text-sm text-ink-muted">
         <span className="flex items-center gap-1.5"><Check size={18} strokeWidth={1.6} className="shrink-0 text-brand" aria-hidden="true" /> {LEAD_TIME}</span>

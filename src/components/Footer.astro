@@ -9,7 +9,7 @@ import { footerGroups } from '@/lib/nav';
         <span class="font-mono text-[length:var(--nav-text-sm)] font-bold uppercase tracking-[0.10em] text-ink mb-[var(--nav-space-4)]">{group.heading}</span>
         <div class="flex flex-col gap-[var(--nav-space-3)]">
           {group.items.map((item) => (
-            <a href={item.href} class="text-[length:var(--nav-text-base)] leading-[20px] text-ink-soft no-underline hover:text-ink">{item.label}</a>
+            <a href={item.href} class="text-[length:var(--nav-text-base)] leading-[20px] text-ink-soft no-underline hover:text-ink min-h-[44px] md:min-h-[24px] flex items-center">{item.label}</a>
           ))}
         </div>
       </div>

@@ -186,27 +186,27 @@ export default function Generator({ initialSpec }: GeneratorProps = {}) {
           </label>
           <label className="flex flex-col gap-2 text-[13px] font-semibold">Start ID<input className={field} type="number" min={0} value={spec.startId} onChange={(e) => set('startId', +e.target.value)} /></label>
         </div>
-        <label className="flex items-center gap-2.5 text-sm font-normal">
+        <label className="flex items-center gap-2.5 text-sm font-normal min-h-[44px] md:min-h-0">
           <input type="checkbox" className="h-[18px] w-[18px]"
             checked={autoSize}
             onChange={(e) => setAutoSize(e.target.checked)} />
           Auto board size
         </label>
-        <label className="flex items-center gap-2.5 text-sm font-normal"><input type="checkbox" className="h-[18px] w-[18px]" checked={spec.scaleBar} onChange={(e) => set('scaleBar', e.target.checked)} /> Add 100 mm scale bar and config QR</label>
-        <label className="flex items-center gap-2.5 text-sm font-normal">
+        <label className="flex items-center gap-2.5 text-sm font-normal min-h-[44px] md:min-h-0"><input type="checkbox" className="h-[18px] w-[18px]" checked={spec.scaleBar} onChange={(e) => set('scaleBar', e.target.checked)} /> Add 100 mm scale bar and config QR</label>
+        <label className="flex items-center gap-2.5 text-sm font-normal min-h-[44px] md:min-h-0">
           <input type="checkbox" className="h-[18px] w-[18px]"
             checked={compactInfo}
             onChange={(e) => setCompactInfo(e.target.checked)} />
           Compact info (hide parameter line)
         </label>
-        <label className="flex items-center gap-2.5 text-sm font-normal">
+        <label className="flex items-center gap-2.5 text-sm font-normal min-h-[44px] md:min-h-0">
           <input type="checkbox" className="h-[18px] w-[18px]"
             checked={spec.showAxes ?? true}
             onChange={(e) => set('showAxes', e.target.checked)} />
           Show coordinate axes
         </label>
         {(spec.showAxes ?? true) && (
-          <label className="flex items-center gap-2.5 text-sm font-normal">
+          <label className="flex items-center gap-2.5 text-sm font-normal min-h-[44px] md:min-h-0">
             <input type="checkbox" className="h-[18px] w-[18px]"
               checked={spec.monochromeAxes ?? false}
               onChange={(e) => set('monochromeAxes', e.target.checked)} />
@@ -214,7 +214,7 @@ export default function Generator({ initialSpec }: GeneratorProps = {}) {
           </label>
         )}
         {(spec.type === 'ChArUco' || spec.type === 'ArUco grid' || spec.type === 'AprilGrid (Kalibr)' || spec.type === 'Marker sheet') && (
-          <label className="flex items-center gap-2.5 text-sm font-normal">
+          <label className="flex items-center gap-2.5 text-sm font-normal min-h-[44px] md:min-h-0">
             <input type="checkbox" className="h-[18px] w-[18px]"
               checked={spec.showCornerBadge ?? true}
               onChange={(e) => set('showCornerBadge', e.target.checked)} />
@@ -222,7 +222,7 @@ export default function Generator({ initialSpec }: GeneratorProps = {}) {
           </label>
         )}
         {(spec.type === 'ChArUco' || spec.type === 'ArUco grid') && (
-          <label className="flex items-center gap-2.5 text-sm font-normal">
+          <label className="flex items-center gap-2.5 text-sm font-normal min-h-[44px] md:min-h-0">
             <input type="checkbox" className="h-[18px] w-[18px]"
               checked={spec.legacyLayout ?? false}
               onChange={(e) => set('legacyLayout', e.target.checked)} />
@@ -252,11 +252,11 @@ export default function Generator({ initialSpec }: GeneratorProps = {}) {
                 <input className={field} type="number" min={0.05} max={1} step={0.05}
                   value={spec.tagSpacing ?? 0.3}
                   onChange={(e) => set('tagSpacing', +e.target.value)} />
-                <span className="text-[11px] font-normal text-ink-muted">{((spec.tagSpacing ?? 0.3) * spec.square).toFixed(1)} mm</span>
+                <span className="text-[12px] font-normal text-ink-muted">{((spec.tagSpacing ?? 0.3) * spec.square).toFixed(1)} mm</span>
               </label>
             </div>
             <label className="flex flex-col gap-2 text-[13px] font-semibold">Specify tag IDs
-              <span className="text-[11px] font-normal text-ink-muted">Start ID, or comma/range list (e.g. 0-9,15,20-24)</span>
+              <span className="text-[12px] font-normal text-ink-muted">Start ID, or comma/range list (e.g. 0-9,15,20-24)</span>
               <input className={field} type="text" placeholder={String(spec.startId)}
                 value={spec.tagIdList ?? ''}
                 onChange={(e) => {
@@ -266,13 +266,13 @@ export default function Generator({ initialSpec }: GeneratorProps = {}) {
                 }} />
             </label>
             <div className="flex flex-col gap-2">
-              <label className="flex items-center gap-2.5 text-sm font-normal">
+              <label className="flex items-center gap-2.5 text-sm font-normal min-h-[44px] md:min-h-0">
                 <input type="checkbox" className="h-[18px] w-[18px]"
                   checked={spec.showTagIds ?? false}
                   onChange={(e) => set('showTagIds', e.target.checked)} />
                 Display tag IDs
               </label>
-              <label className="flex items-center gap-2.5 text-sm font-normal">
+              <label className="flex items-center gap-2.5 text-sm font-normal min-h-[44px] md:min-h-0">
                 <input type="checkbox" className="h-[18px] w-[18px]"
                   checked={spec.symmetricCorners ?? false}
                   onChange={(e) => set('symmetricCorners', e.target.checked)} />
@@ -310,7 +310,7 @@ export default function Generator({ initialSpec }: GeneratorProps = {}) {
               </label>
             )}
             <label className="flex flex-col gap-2 text-[13px] font-semibold">Specify tag IDs
-              <span className="text-[11px] font-normal text-ink-muted">Start ID, or comma/range list (e.g. 0-9,15,20-24)</span>
+              <span className="text-[12px] font-normal text-ink-muted">Start ID, or comma/range list (e.g. 0-9,15,20-24)</span>
               <input className={field} type="text" placeholder={String(spec.startId)}
                 value={spec.tagIdList ?? ''}
                 onChange={(e) => {
@@ -319,7 +319,7 @@ export default function Generator({ initialSpec }: GeneratorProps = {}) {
                   if (/^\d+$/.test(v)) set('startId', +v);
                 }} />
             </label>
-            <label className="flex items-center gap-2.5 text-sm font-normal">
+            <label className="flex items-center gap-2.5 text-sm font-normal min-h-[44px] md:min-h-0">
               <input type="checkbox" className="h-[18px] w-[18px]"
                 checked={spec.showTagIds ?? false}
                 onChange={(e) => set('showTagIds', e.target.checked)} />
@@ -350,13 +350,13 @@ export default function Generator({ initialSpec }: GeneratorProps = {}) {
 
         {spec.type === 'Checkerboard' && (
           <div className="flex flex-col gap-2">
-            <label className="flex items-center gap-2.5 text-sm font-normal">
+            <label className="flex items-center gap-2.5 text-sm font-normal min-h-[44px] md:min-h-0">
               <input type="checkbox" className="h-[18px] w-[18px]"
                 checked={spec.finderMarkers ?? false}
                 onChange={(e) => set('finderMarkers', e.target.checked)} />
               Finder markers (CALIB_CB_MARKER)
             </label>
-            <label className="flex items-center gap-2.5 text-sm font-normal">
+            <label className="flex items-center gap-2.5 text-sm font-normal min-h-[44px] md:min-h-0">
               <input type="checkbox" className="h-[18px] w-[18px]"
                 checked={spec.radonCheckers ?? false}
                 onChange={(e) => set('radonCheckers', e.target.checked)} />
@@ -381,7 +381,7 @@ export default function Generator({ initialSpec }: GeneratorProps = {}) {
         )}
 
         {(spec.type === 'Checkerboard' || spec.type.includes('circles') || spec.type.includes('dots')) && (
-          <label className="flex items-center gap-2.5 text-sm font-normal">
+          <label className="flex items-center gap-2.5 text-sm font-normal min-h-[44px] md:min-h-0">
             <input type="checkbox" className="h-[18px] w-[18px]"
               checked={spec.invert ?? false}
               onChange={(e) => set('invert', e.target.checked)} />

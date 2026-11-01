@@ -72,8 +72,8 @@ export default function CartPage() {
       <div className="flex flex-col items-center gap-4 py-16 text-center">
         <ShoppingCart size={48} strokeWidth={1.5} className="text-ink-soft" aria-hidden="true" />
         <h1 className="text-2xl font-bold">Your cart is empty</h1>
-        <a href="/targets/" className="text-sm font-semibold text-brand hover:text-brand-dark">
-          Browse targets <ArrowRight size={16} strokeWidth={1.6} aria-hidden="true" className="inline" />
+        <a href="/targets/" className="text-sm font-semibold text-brand hover:text-brand-dark min-h-[24px] inline-flex items-center gap-1">
+          Browse targets <ArrowRight size={16} strokeWidth={1.6} aria-hidden="true" />
         </a>
       </div>
     );
