@@ -8,7 +8,6 @@ sellingPoints:
 color: brand
 pairsWith:
   - mounting-fixture
-  - certificate-ilac
 specsTable:
   - { label: "Substrate", value: "Aluminium composite (PE core)" }
   - { label: "Thickness", value: "6 mm" }
@@ -58,4 +57,4 @@ Yes. The aluminium composite substrate and UV print are weather-resistant. For p
 Standard sizes go up to 800 × 600 mm. Custom sizes up to 1200 × 800 mm are available on request — contact us for a quote.
 
 **How does ±0.3 mm compare to ceramic targets?**
-Ceramic targets achieve ±2 µm (about 150× tighter). For most robotics and industrial vision tasks, ±0.3 mm is more than adequate. Choose ceramic when your application demands sub-pixel accuracy or traceable calibration.
+Ceramic targets have a ±2 µm target accuracy (about 150× tighter). For most robotics and industrial vision tasks, ±0.3 mm is more than adequate. Choose ceramic when your application demands sub-pixel accuracy.

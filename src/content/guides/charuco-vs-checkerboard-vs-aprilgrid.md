@@ -4,7 +4,7 @@ description: "Three patterns cover almost every calibration job. Which one depen
 date: 2026-10-22
 updated: 2026-10-22
 readingTime: "8 min"
-related: ["printed-target-costs-half-a-pixel", "composite-ceramic-or-glass"]
+related: []
 products: ["charuco-composite", "checkerboard-composite", "aprilgrid-composite", "circlegrid-composite"]
 sampleFiles: ["report"]
 ---
@@ -21,8 +21,6 @@ sampleFiles: ["report"]
 
 Lens distortion is strongest in the corners of the image, and that is exactly where a plain checkerboard can't be used — the detector needs every inner corner visible. Coded patterns let you push the board right to the edge, which is where the distortion model actually gets constrained.
 
-[BODY COPY — worked example with reprojection-error numbers from a real test.]
 
 ## Picking square and marker size
 
-[BODY COPY — rule of thumb for pixels per square, marker-to-square ratio, dictionary choice.]

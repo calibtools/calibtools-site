@@ -54,7 +54,7 @@ Inner corners = (rows − 1) × (cols − 1). Odd × even square counts are used
 
 ### Deliverables
 
-Inspection report CT-IR-<serial> · `.opencv.json`, `.kalibr.yaml`, `.ros2.yaml`, `.halcon.descr`, `.dxf` · CT-UM-GEN manual · Made to order · ships in 2–3 weeks · Options: ILAC-MRA certificate issued by an accredited third-party laboratory, available as SVC-X-CERT-ILAC, -L logo, ACC-A-CSE case.
+Inspection report CT-IR-<serial> · `.opencv.json`, `.kalibr.yaml`, `.ros2.yaml`, `.halcon.descr`, `.dxf` · CT-UM-GEN manual · Made to order · ships in 2–3 weeks · Options: -L logo, ACC-A-CSE case, custom NRE.
 
 ## Compliance and customs
 

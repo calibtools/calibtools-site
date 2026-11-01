@@ -383,7 +383,7 @@ function chaCDeliverablesBox(): string {
   const right = '<div>' + tag('Configuration & service') + kv([
     ['Marking on board', 'Label line with part / pattern / SN / Rev; printed X / Y arrows.'],
     ['Lead time', LEAD_TIME + '.'],
-    ['Options', 'Fixture \u00b7 <span class="mono">SVC-X-CERT-ILAC</span> \u00b7 custom NRE.'],
+    ['Options', 'Fixture \u00b7 custom NRE.'],
   ]) + '</div>';
   return `<div class="box"><div class="cols" style="grid-template-columns:1fr 1fr">${left}${right}</div></div>`;
 }

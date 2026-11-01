@@ -11,7 +11,7 @@ const DIST = resolve(import.meta.dirname, '..', 'dist');
 const errors = [];
 
 // Product pages to check
-const PRODUCT_DIRS = ['charuco-composite', 'charuco-ceramic', 'checkerboard-composite', 'mounting-fixture', 'certificate-ilac'];
+const PRODUCT_DIRS = ['charuco-composite', 'charuco-ceramic', 'checkerboard-composite', 'mounting-fixture'];
 
 function stripTags(html) {
   return html.replace(/<[^>]+>/g, '').replace(/&\w+;/g, ' ').replace(/\s+/g, ' ').trim();

@@ -3,14 +3,13 @@ if (process.env.SKIP_SPECS_CHECK === '1') { console.log('[check-specs] Skipped (
  * Postbuild check: verify required spec metafields are present in every
  * rendered product page in dist/targets/{handle}/index.html.
  *
- * Fails the build if required keys are missing from the spec table.
- * Warns if datasheet_url is missing (no link icon in the Downloads section).
+ * Product types:
+ * - Board products: require material, thickness_mm, feature_tolerance, lead_time, files_included
+ * - Accessory products (mounting-fixture): require material, lead_time
+ * - Quote-only products (ir-board, reflectance-panel, resolution-chart): require "Request a quote" CTA, no price
+ * - Withdrawn handles: skipped entirely
  *
  * Bypass: SKIP_SPECS_CHECK=1
- *
- * The spec table renders metafield keys as human-readable labels via the
- * SPEC_LABELS map in src/pages/targets/[handle].astro. This script checks
- * for those labels in the rendered HTML.
  */
 
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
@@ -21,8 +20,13 @@ if (process.env.SKIP_SPECS_CHECK === '1') {
   process.exit(0);
 }
 
+// --- Product type classification ---
+
+const WITHDRAWN = new Set(['certificate-ilac']);
+const ACCESSORIES = new Set(['mounting-fixture']);
+const QUOTE_ONLY = new Set(['ir-board', 'reflectance-panel', 'resolution-chart']);
+
 // --- Label map: metafield key → rendered label ---
-// Must match SPEC_LABELS in src/pages/targets/[handle].astro
 const KEY_TO_LABEL = {
   material:          'Material',
   thickness_mm:      'Thickness',
@@ -31,8 +35,8 @@ const KEY_TO_LABEL = {
   files_included:    'Files included',
 };
 
-const REQUIRED_KEYS = ['material', 'thickness_mm', 'feature_tolerance', 'lead_time', 'files_included'];
-const WARN_KEYS = ['datasheet_url']; // checked via Downloads section
+const BOARD_REQUIRED = ['material', 'thickness_mm', 'feature_tolerance', 'lead_time', 'files_included'];
+const ACCESSORY_REQUIRED = ['material', 'lead_time'];
 
 const DIST = resolve('dist/targets');
 
@@ -54,59 +58,72 @@ let hasErrors = false;
 const results = [];
 
 for (const entry of entries) {
-  const htmlPath = resolve(DIST, entry.name, 'index.html');
+  const handle = entry.name;
+
+  // Skip withdrawn handles
+  if (WITHDRAWN.has(handle)) {
+    results.push({ handle, type: 'withdrawn', missing: [], warnings: [], hasSpecTable: false });
+    continue;
+  }
+
+  const htmlPath = resolve(DIST, handle, 'index.html');
   if (!existsSync(htmlPath)) continue;
 
   const html = readFileSync(htmlPath, 'utf-8');
-  const handle = entry.name;
 
-  // Check if the page has a spec table (heading "Specifications")
-  const hasSpecTable = html.includes('>Specifications<');
+  // Determine product type
+  const isAccessory = ACCESSORIES.has(handle);
+  const isQuoteOnly = QUOTE_ONLY.has(handle);
 
   const missing = [];
   const warnings = [];
 
+  if (isQuoteOnly) {
+    // Quote-only: must show "Request a quote" and no price
+    if (!html.includes('Request a quote')) {
+      missing.push('quote-cta');
+    }
+    results.push({ handle, type: 'quote-only', missing, warnings, hasSpecTable: false });
+    if (missing.length > 0) hasErrors = true;
+    continue;
+  }
+
+  // Check if the page has a spec table
+  const hasSpecTable = html.includes('>Specifications<');
+  const requiredKeys = isAccessory ? ACCESSORY_REQUIRED : BOARD_REQUIRED;
+
   if (hasSpecTable) {
-    // Check required labels in spec table
-    for (const key of REQUIRED_KEYS) {
+    for (const key of requiredKeys) {
       const label = KEY_TO_LABEL[key];
-      if (!label) continue; // no label mapping = can't check
-      // Look for the label as a table cell: >Label<
+      if (!label) continue;
       if (!html.includes(`>${label}<`)) {
         missing.push(key);
       }
     }
   } else {
-    // No spec table at all — all required keys are missing
-    missing.push(...REQUIRED_KEYS);
+    missing.push(...requiredKeys);
   }
 
-  // Check for datasheet link (Downloads section with .pdf link)
-  for (const key of WARN_KEYS) {
-    if (key === 'datasheet_url') {
-      // The datasheet renders as a filename link containing "-datasheet"
-      if (!html.includes('-datasheet')) {
-        warnings.push(key);
-      }
-    }
+  // Check for datasheet link
+  if (!isAccessory && !html.includes('-datasheet')) {
+    warnings.push('datasheet_url');
   }
 
   if (missing.length > 0) hasErrors = true;
-
-  results.push({ handle, missing, warnings, hasSpecTable });
+  results.push({ handle, type: isAccessory ? 'accessory' : 'board', missing, warnings, hasSpecTable });
 }
 
 // --- Print table ---
 console.log('\n[check-specs] Product spec completeness:\n');
-console.log('  Handle                      Specs  Missing                                  Warnings');
-console.log('  ' + '─'.repeat(90));
+console.log('  Handle                      Type        Specs  Missing                                  Warnings');
+console.log('  ' + '─'.repeat(100));
 
 for (const r of results) {
-  const status = r.missing.length === 0 ? '✓' : '✗';
+  const status = r.type === 'withdrawn' ? '—' : r.missing.length === 0 ? '✓' : '✗';
   const missingStr = r.missing.length > 0 ? r.missing.join(', ') : '—';
   const warnStr = r.warnings.length > 0 ? r.warnings.join(', ') : '—';
   console.log(
-    `  ${r.handle.padEnd(30)} ${status.padEnd(7)} ${missingStr.padEnd(41)} ${warnStr}`,
+    `  ${r.handle.padEnd(30)} ${r.type.padEnd(12)} ${status.padEnd(7)} ${missingStr.padEnd(41)} ${warnStr}`,
   );
 }
 

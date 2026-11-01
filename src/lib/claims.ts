@@ -14,11 +14,10 @@ export const SHIPS_FROM = 'Ships from the factory';
 
 /** Inspection claim for product pages and datasheets. */
 export const INSPECTION_CLAIM =
-  'Measured before it ships \u2014 against a DAkkS-calibrated reference';
+  'Measured before it ships \u2014 against a golden-sample reference';
 
-/** Certificate add-on claim. */
-export const CERT_CLAIM =
-  'ILAC-MRA certificate from a CNAS-accredited laboratory (add-on)';
+/** Certificate add-on claim (withdrawn — lab selection pending). */
+export const CERT_CLAIM = '';
 
 /** Default Incoterm (to be confirmed). */
 export const INCOTERM = 'DAP' as const;

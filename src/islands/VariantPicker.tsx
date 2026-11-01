@@ -17,19 +17,15 @@ interface BoardSetImage {
 
 interface Props {
   product: Product;
-  /** Variant ID for the ILAC certificate add-on. */
-  certVariantId?: string;
   /** Variant ID for the mounting fixture add-on. */
   fixtureVariantId?: string;
-  /** Formatted price for the certificate add-on, e.g. "€149". */
-  certPrice?: string;
   /** Formatted price for the fixture add-on, e.g. "€39". */
   fixturePrice?: string;
   /** Pre-optimised board set image (brand/home-set.png). */
   boardSetImage?: BoardSetImage;
 }
 
-export default function VariantPicker({ product, certVariantId, fixtureVariantId, certPrice, fixturePrice, boardSetImage }: Props) {
+export default function VariantPicker({ product, fixtureVariantId, fixturePrice, boardSetImage }: Props) {
   // Init selections from URL query params or first variant's options
   const initSelections: Record<string, string> = {};
   if (product.variants.length > 0) {
@@ -57,7 +53,6 @@ export default function VariantPicker({ product, certVariantId, fixtureVariantId
 
   const [selections, setSelections] = useState(initSelections);
   const [quantity, setQuantity] = useState(1);
-  const [addCert, setAddCert] = useState(false);
   const [addFixture, setAddFixture] = useState(false);
   const [busy, setBusy] = useState<'add' | 'buy' | false>(false);
   const [error, setError] = useState('');
@@ -127,7 +122,6 @@ export default function VariantPicker({ product, certVariantId, fixtureVariantId
   const addToCart = async () => {
     if (!variant) throw new Error('No variant selected');
     const addons: string[] = [];
-    if (addCert && certVariantId) addons.push(certVariantId);
     if (addFixture && fixtureVariantId) addons.push(fixtureVariantId);
     const lines = buildCartLines(variant.id, quantity, addons);
 
@@ -329,21 +323,13 @@ export default function VariantPicker({ product, certVariantId, fixtureVariantId
       )}
 
       {/* Add-ons */}
-      {(certVariantId || fixtureVariantId) && (
+      {fixtureVariantId && (
         <fieldset className="flex flex-col gap-2.5 border-0 p-0">
           <legend className="text-[13px] font-semibold">Add-ons</legend>
-          {certVariantId && (
-            <label className="flex items-center gap-2.5 text-[15px]">
-              <input type="checkbox" className="h-[18px] w-[18px]" checked={addCert} onChange={(e) => setAddCert(e.target.checked)} />
-              ILAC-recognised calibration certificate {certPrice && <span className="text-ink-soft">+ {certPrice}</span>}
-            </label>
-          )}
-          {fixtureVariantId && (
-            <label className="flex items-center gap-2.5 text-[15px]">
-              <input type="checkbox" className="h-[18px] w-[18px]" checked={addFixture} onChange={(e) => setAddFixture(e.target.checked)} />
-              Mounting fixture, ¼″ thread {fixturePrice && <span className="text-ink-soft">+ {fixturePrice}</span>}
-            </label>
-          )}
+          <label className="flex items-center gap-2.5 text-[15px]">
+            <input type="checkbox" className="h-[18px] w-[18px]" checked={addFixture} onChange={(e) => setAddFixture(e.target.checked)} />
+            Mounting fixture, ¼″ thread {fixturePrice && <span className="text-ink-soft">+ {fixturePrice}</span>}
+          </label>
         </fieldset>
       )}
 

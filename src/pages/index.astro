@@ -49,13 +49,13 @@ for (const col of collections) {
   }
 }
 
-const isReady = (g: typeof allGuides[number]) => !g.body?.includes('[BODY COPY');
+const isReady = (g: typeof allGuides[number]) => !g.data.draft && !g.body?.includes('[BODY COPY');
 const guides = allGuides.filter(isReady).slice(0, 3);
 
 const why = [
   ['Transparent pricing', 'Every size and material priced on the page. No quote forms for standard parts.'],
   ['Lead time you can plan with', 'Made to order, ships in 2\u20133 weeks. Tracked express worldwide.'],
-  ['Inspection report included', 'Dimensional check on every board. ILAC-recognised calibration certificate as an add-on.'],
+  ['Inspection report included', 'Dimensional check on every board, with measured coordinates you can load into your calibration.'],
   ['Files you can use', 'Datasheet, CAD and pattern JSON for OpenCV, Kalibr and HALCON with every target.'],
   ['30-day returns', RETURNS_LINE],
 ];

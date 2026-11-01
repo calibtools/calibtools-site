@@ -6,6 +6,7 @@ updated: 2026-10-22
 readingTime: "7 min"
 products: ["charuco-composite", "charuco-ceramic"]
 sampleFiles: ["report", "datasheet"]
+draft: true
 ---
 
 [BODY COPY]

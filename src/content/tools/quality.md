@@ -31,4 +31,4 @@ After calibrating with 15 images of a ChArUco board, paste your OpenCV JSON resu
 
 ## Related guides
 
-- [A printed target costs half a pixel](/guides/printed-target-costs-half-a-pixel/) — why substrate quality affects reprojection error
+- [Composite board datasheet](/files/datasheets/CT-DS-CHA-P.pdf) — feature tolerance and flatness of the board

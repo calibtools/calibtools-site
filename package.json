@@ -9,7 +9,7 @@
     "docs:build": "tsx scripts/docs-build.mjs",
     "docs:check": "node scripts/docs-check.mjs",
     "build": "astro build",
-    "postbuild": "node scripts/sitemap-lastmod.mjs && node scripts/check-links.mjs && node scripts/check-specs.mjs && tsx scripts/check-exports.mjs && node scripts/check-seo.mjs",
+    "postbuild": "node scripts/sitemap-lastmod.mjs && node scripts/check-links.mjs && node scripts/check-specs.mjs && tsx scripts/check-exports.mjs && node scripts/check-seo.mjs && node scripts/check-placeholders.mjs",
     "preview": "astro preview",
     "check": "astro check",
     "test": "vitest run",
@@ -43,6 +43,7 @@
     "exceljs": "^4.4.0",
     "opentype.js": "^2.0.0",
     "pako": "^3.0.3",
+    "pdfjs-dist": "^6.4.299",
     "tsx": "^4.23.15",
     "typescript": "^5.8.0",
     "vitest": "^3.1.0"

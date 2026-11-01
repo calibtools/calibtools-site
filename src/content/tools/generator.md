@@ -47,4 +47,4 @@ A common stereo rig setup: select ChArUco, 7 × 10, 25 mm squares, 18 mm markers
 ## Related guides
 
 - [ChArUco vs checkerboard vs AprilGrid](/guides/charuco-vs-checkerboard-vs-aprilgrid/) — which pattern for which job
-- [A printed target costs half a pixel](/guides/printed-target-costs-half-a-pixel/) — why paper targets limit accuracy
+- [Composite board datasheet](/files/datasheets/CT-DS-CHA-P.pdf) — feature tolerance and flatness of the board

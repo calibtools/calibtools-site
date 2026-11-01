@@ -2,6 +2,7 @@
  * Selection wizard — recommends a calibration pattern based on user answers.
  * Pure logic, no DOM.
  */
+import { DEFAULT_MARKER_RATIO, markerForSquare } from './boardSizes';
 
 export type Application = 'robotics' | 'industrial' | 'automotive' | 'drone' | 'medical' | 'research' | 'other';
 export type AccuracyNeed = 'high' | 'medium' | 'low';
@@ -94,7 +95,7 @@ export function recommend(a: WizardAnswers): Recommendation {
   if (a.accuracy === 'high') {
     material = 'aluminum';
     if (square > 20) square = 20;
-    marker = Math.round(square * 0.7);
+    marker = markerForSquare(square);
     reasoning.push('High accuracy requires a rigid, dimensionally stable target. Aluminum composite recommended.');
   } else if (a.accuracy === 'medium') {
     material = 'acrylic';
@@ -119,13 +120,13 @@ export function recommend(a: WizardAnswers): Recommendation {
     const idealSquare = Math.round(coverage / cols / 2);
     if (idealSquare >= 5 && idealSquare <= 100) {
       square = idealSquare;
-      marker = Math.round(square * 0.72);
+      marker = markerForSquare(square);
       reasoning.push(`Based on your camera setup, ${square} mm squares give good pixel coverage at ${a.distance} mm.`);
     }
   }
 
   // Ensure marker < square
-  if (marker >= square) marker = Math.round(square * 0.72);
+  if (marker >= square) marker = markerForSquare(square);
 
   return { pattern, rows, cols, square, marker, dict, paper, material, reasoning };
 }

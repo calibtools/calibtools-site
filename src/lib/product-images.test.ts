@@ -37,11 +37,6 @@ describe('getProductImages', () => {
     ]);
   });
 
-  it('returns images for certificate-ilac (2 images)', () => {
-    const images = getProductImages('certificate-ilac');
-    expect(images.length).toBe(2);
-  });
-
   it('returns empty array for unknown handle (fallback to render pipeline)', () => {
     const images = getProductImages('nonexistent-product');
     expect(images).toEqual([]);

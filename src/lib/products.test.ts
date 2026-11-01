@@ -41,7 +41,7 @@ function flattenSpecValues(handle: string): Set<string> {
 }
 
 const PRODUCTS_DIR = resolve(import.meta.dirname, '../content/products');
-const HANDLES = ['charuco-composite', 'charuco-ceramic', 'checkerboard-composite', 'mounting-fixture', 'certificate-ilac'];
+const HANDLES = ['charuco-composite', 'charuco-ceramic', 'checkerboard-composite', 'mounting-fixture'];
 
 describe('product content: no spec value duplication', () => {
   for (const handle of HANDLES) {

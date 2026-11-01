@@ -1,11 +1,11 @@
 ---
 seoTitle: "Mounts, accessories and services"
-seoDescription: "Mounting fixtures and the optional accredited calibration certificate: what you add alongside a target to mount it squarely and document its accuracy."
+seoDescription: "Mounting fixtures and stands designed for Calib.Tools calibration targets. Position the board squarely, keep it stable, and get repeatable results."
 title: "Mounts & accessories"
 description: "Fixtures, stands, and services to complement your calibration targets."
 sellingPoints:
   - "Mounting fixtures and stands designed for repeatable target positioning"
-  - "ILAC-recognised calibration certificates and custom services"
+  - "Designed for repeatable, stable target positioning in any setup"
 color: grey
 pairsWith: []
 specsTable:
@@ -16,7 +16,7 @@ founderQuote: "I started Calib.Tools because I kept wasting afternoons printing 
 
 ## Overview
 
-Accessories and services that pair with Calib.Tools calibration targets. The mounting fixture provides a stable, repeatable hold for any board with a ¼″ mounting hole. The ILAC calibration certificate adds formal measurement traceability.
+Accessories that pair with Calib.Tools calibration targets. The mounting fixture provides a stable, repeatable hold for any board with a ¼″ mounting hole.
 
 ## Specifications
 

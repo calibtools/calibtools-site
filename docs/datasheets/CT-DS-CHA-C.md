@@ -28,7 +28,7 @@ Start ID 0, row-major, OpenCV ≥ 4.6 placement. Larger ceramic plates (up to 40
 
 | | |
 |---|---|
-| Feature position accuracy | ±2 µm (any feature to nominal, at 20 °C) |
+| Feature position accuracy | ±2 µm (target; any feature to nominal, at 20 °C; measurement method to be published) |
 | Edge definition | ≤ 1 µm |
 | Orthogonality | ±0.002° |
 
@@ -60,7 +60,7 @@ Start ID 0, row-major, OpenCV ≥ 4.6 placement. Larger ceramic plates (up to 40
 | Inspection report | CT-IR-<serial>: per-feature coordinates (CSV) + flatness + visual |
 | Files | `.opencv.json`, `.kalibr.yaml`, `.ros2.yaml`, `.halcon.descr`, `.dxf`, measured-coordinates CSV |
 | Lead time | Made to order — 10–15 business days to dispatch |
-| Options | ILAC-MRA certificate issued by an accredited third-party laboratory, available as SVC-X-CERT-ILAC (+1–3 weeks; per-feature uncertainty statement) |
+| Options | Fixture ACC-A-FIX-14 · custom NRE |
 
 ## Compliance and customs
 

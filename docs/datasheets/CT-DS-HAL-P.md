@@ -64,7 +64,7 @@ Pattern area is centred with a white quiet zone ≥ 1 mark pitch on all sides; t
 | Files | `.halcon.descr`, `.opencv.json`, `.dxf` |
 | Documents | this datasheet, CT-UM-GEN user manual |
 | Lead time | Made to order · ships in 2–3 weeks |
-| Options | ILAC-MRA certificate issued by an accredited third-party laboratory, available as SVC-X-CERT-ILAC (+1–3 weeks) · logo print (-L) · hard case (ACC-A-CSE) |
+| Options | Logo print (-L) · hard case (ACC-A-CSE) · custom NRE |
 
 ## Compliance and customs
 

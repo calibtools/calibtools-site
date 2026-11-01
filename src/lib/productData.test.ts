@@ -56,7 +56,7 @@ describe('getProductData', () => {
     expect(geom).toBeDefined();
     const accuracy = geom!.rows.find((r) => r.label === 'Feature position accuracy');
     expect(accuracy).toBeDefined();
-    expect(accuracy!.value).toContain('±2 µm');
+    expect(accuracy!.value).toContain('±2 µm (target;');
   });
 
   it('metafields override datasheet values', () => {

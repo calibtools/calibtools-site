@@ -2,19 +2,18 @@
 seoTitle: "Ceramic and glass targets"
 seoDescription: "Lithographed chrome on alumina ceramic or borosilicate glass, for calibration tasks where a printed board is the limiting factor. Certificate optional."
 title: "Ceramic & glass"
-description: "Lithographed on alumina or borosilicate glass, ±2 µm feature accuracy."
+description: "Lithographed on alumina or borosilicate glass, ±2 µm (target) feature accuracy."
 sellingPoints:
-  - "Lithographed blue chrome on alumina — ±2 µm measured against a DAkkS-calibrated reference"
-  - "ILAC-recognised calibration certificate available for traceable measurement uncertainty"
+  - "Lithographed blue chrome on alumina — ±2 µm target accuracy; measurement method to be published"
+  - "Inspection report with measured feature positions included with every target"
 color: slate-blue
 pairsWith:
   - mounting-fixture
-  - certificate-ilac
 specsTable:
   - { label: "Substrate", value: "96 % alumina ceramic" }
   - { label: "Thickness", value: "1.5 mm (ceramic), 3 mm (glass)" }
   - { label: "Print", value: "Blue chrome lithography" }
-  - { label: "Feature tolerance", value: "±2 µm" }
+  - { label: "Feature tolerance", value: "±2 µm (target)" }
   - { label: "Flatness", value: "< 10 µm over 100 mm" }
   - { label: "CTE", value: "6.5 ppm/°C (alumina)" }
   - { label: "Operating temperature", value: "-40 to +150 °C" }
@@ -23,7 +22,7 @@ founderQuote: "I started Calib.Tools because I kept wasting afternoons printing 
 
 ## Overview
 
-Ceramic and glass calibration targets deliver the highest feature accuracy we offer. Blue chrome lithography on 96 % alumina produces ±2 µm feature positions — measured against a DAkkS-calibrated reference, with an optional ILAC-MRA certificate from a CNAS-accredited laboratory.
+Ceramic and glass calibration targets deliver the highest feature accuracy we offer. Blue chrome lithography on 96 % alumina targets ±2 µm feature positions; measurement method to be published.
 
 Ideal for metrology, medical imaging, microscopy, and any application where sub-pixel calibration accuracy is critical.
 
@@ -38,7 +37,6 @@ Each ceramic target includes:
 - **Datasheet PDF** — dimensions, tolerances, material properties
 - **Dimensional inspection report** — measured feature positions from coordinate measurement
 - **Config files** — OpenCV JSON, Kalibr YAML, ROS 2 YAML, HALCON description
-- **ILAC calibration certificate** (optional add-on) — traceable measurement uncertainty
 
 ## Cleaning & care
 
@@ -52,5 +50,5 @@ Each ceramic target includes:
 **When do I need a ceramic target instead of composite?**
 When your application requires sub-pixel calibration accuracy, traceable measurement, or operation in extreme temperatures. Common use cases: metrology, medical imaging, semiconductor inspection.
 
-**Is the ILAC certificate included?**
-No — it is available as an add-on. The included inspection report confirms dimensional accuracy; the ILAC certificate adds formal traceability and measurement uncertainty.
+**Is a calibration certificate available?**
+Contact us about accredited calibration options. The included inspection report confirms dimensional accuracy for most applications.

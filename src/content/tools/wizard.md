@@ -37,4 +37,4 @@ A stereo rig for industrial inspection at medium accuracy, indoors, using OpenCV
 
 ## Related guides
 
-- [Composite, ceramic or glass?](/guides/composite-ceramic-or-glass/) — materials compared
+- [Ceramic datasheet](/files/datasheets/CT-DS-CHA-C.pdf) — feature tolerance and flatness for ceramic targets

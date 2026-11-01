@@ -43,7 +43,7 @@ test('No "Germany", "Munich", "München", "EU stock" in dist', async ({ page }) 
 // Ceramic accuracy consistency
 // ---------------------------------------------------------------------------
 
-test('Ceramic collection page shows ±2 µm, not ±1–2', async ({ page }) => {
+test('Ceramic collection page shows ±2 µm (target)', async ({ page }) => {
   await page.goto('/targets/collection/ceramic-glass/');
   const body = await page.locator('main').textContent();
   expect(body).toContain('±2 µm');

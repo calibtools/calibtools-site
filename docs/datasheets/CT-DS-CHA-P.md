@@ -34,7 +34,7 @@ Pattern area is centred with a white quiet zone ≥ 1 square on all sides; the e
 | Feature position tolerance | ±0.3 mm + 0.2 mm/m (any corner to nominal grid, at 20 °C) |
 | Square pitch, mean | ±0.05 mm |
 | Orthogonality | ±0.02° |
-| Marker-to-square ratio | 0.74 |
+| Marker-to-square ratio | 0.72–0.75 (see ordering table for per-size marker dimensions) |
 | Edge radius | R6 mm |
 
 ### Physical
@@ -66,7 +66,7 @@ Pattern area is centred with a white quiet zone ≥ 1 square on all sides; the e
 | Files | `.opencv.json`, `.kalibr.yaml` (checkerboard mode), `.ros2.yaml`, `.halcon.descr`, `.dxf` |
 | Documents | this datasheet, CT-UM-GEN user manual, CT-UM-CHA-P quick start |
 | Lead time | Made to order · ships in 2–3 weeks |
-| Options | ILAC-MRA certificate issued by an accredited third-party laboratory, available as SVC-X-CERT-ILAC (+1–3 weeks) · logo print (-L) · hard case (ACC-A-CSE) |
+| Options | Logo print (-L) · hard case (ACC-A-CSE) · custom NRE |
 
 ## Compliance and customs
 

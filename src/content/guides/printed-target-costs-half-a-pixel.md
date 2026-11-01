@@ -6,6 +6,7 @@ updated: 2026-10-22
 readingTime: "6 min"
 products: ["checkerboard-composite"]
 sampleFiles: ["report"]
+draft: true
 ---
 
 [BODY COPY]

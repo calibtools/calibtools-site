@@ -42,11 +42,8 @@ const productData = getProductData(handle!, m);
 
 // Find add-on variant IDs
 const allProducts = await getProducts();
-const certProduct = allProducts.find((p) => p.handle === 'certificate-ilac');
 const fixtureProduct = allProducts.find((p) => p.handle === 'mounting-fixture');
-const certVariantId = certProduct?.variants[0]?.id;
 const fixtureVariantId = fixtureProduct?.variants[0]?.id;
-const certPrice = certProduct?.variants[0]?.price;
 const fixturePrice = fixtureProduct?.variants[0]?.price;
 
 // descriptionHtml no longer rendered — story from product content replaces it
@@ -59,11 +56,9 @@ const quoteOnly = QUOTE_HANDLES.has(handle!);
 const anyAvailable = product.variants.some((v) => v.availableForSale);
 const eyebrow = m.lead_time
   ? m.lead_time
-  : handle === 'certificate-ilac'
-    ? 'Made to order'
-    : anyAvailable
-      ? LEAD_TIME
-      : 'Made to order';
+  : anyAvailable
+    ? LEAD_TIME
+    : 'Made to order';
 
 // Product content from collection
 const productContent = await getEntry('products', handle!);
@@ -171,7 +166,6 @@ const datasheetUrl = m.datasheet_url || findDatasheetUrl(handle!) || '';
 
 const downloadFiles = [
   ...(datasheetUrl ? [{ name: `${handle}-datasheet${m.datasheet_rev ? `-rev${m.datasheet_rev}` : ''}.pdf`, url: datasheetUrl, mime: 'application/pdf' }] : []),
-  { name: 'sample-inspection-report.pdf', url: '/downloads/sample-inspection-report.pdf', mime: 'application/pdf' },
   ...configFiles.map((f) => ({
     name: f.name,
     url: `data:${f.mime};charset=utf-8,${encodeURIComponent(f.content)}`,
@@ -354,8 +348,8 @@ if (isComposite || isCeramic) {
 const ogImage = hasLocalImages ? galleryImages[0].src : product.images[0]?.url ?? `/og/${handle}.png`;
 
 // Pairs with / Compare
-const isAccessory = handle === 'mounting-fixture' || handle === 'certificate-ilac';
-const pairsWith = isAccessory ? [] : [fixtureProduct, certProduct].filter(Boolean);
+const isAccessory = handle === 'mounting-fixture';
+const pairsWith = isAccessory ? [] : [fixtureProduct].filter(Boolean);
 let compareProduct: typeof product | null = null;
 if (handle?.includes('-composite')) compareProduct = allProducts.find((p) => p.handle === handle.replace('-composite', '-ceramic')) ?? null;
 else if (handle?.includes('-ceramic')) compareProduct = allProducts.find((p) => p.handle === handle.replace('-ceramic', '-composite')) ?? null;
@@ -466,9 +460,7 @@ const orderingRows = (productData?.orderingRows ?? []).map((row) => {
         <VariantPicker
           client:load
           product={product}
-          certVariantId={certVariantId}
           fixtureVariantId={fixtureVariantId}
-          certPrice={certPrice}
           fixturePrice={fixturePrice}
           boardSetImage={boardSetImageData}
         />
@@ -670,16 +662,10 @@ const orderingRows = (productData?.orderingRows ?? []).map((row) => {
         </summary>
         <div class="flex flex-col gap-4 pb-6 text-[15px] leading-relaxed text-ink-muted">
           <p class="m-0">
-            <strong class="text-ink">Factory inspection report (included)</strong> &mdash; every board measured by comparison against a golden sample calibrated by a DAkkS-accredited laboratory. Report PDF and coordinates CSV at <a href="/verify/">calib.tools/verify</a>.
-          </p>
-          <p class="m-0">
-            <strong class="text-ink">Accredited calibration certificate (optional)</strong> &mdash; issued by an ISO/IEC&nbsp;17025-accredited laboratory, [lab name, accreditation no.] (CNAS), recognised under the ILAC&nbsp;MRA, now operated by Global&nbsp;ACI. Separate service (SVC-X-CERT-ILAC), adds 1&ndash;3&nbsp;weeks.
+            <strong class="text-ink">Factory inspection report (included)</strong> &mdash; every board measured by comparison against a golden sample. Report PDF and coordinates CSV at <a href="/verify/">calib.tools/verify</a>.
           </p>
           <div class="flex flex-col gap-2 rounded border border-line bg-ground-alt p-4 text-[13px] text-ink-soft">
-            <p class="m-0"><strong>ISO/IEC 17025</strong> &mdash; international standard for testing and calibration laboratories. Accreditation proves competence and a quality system.</p>
-            <p class="m-0"><strong>ILAC MRA / Global ACI</strong> &mdash; mutual recognition among national accreditation bodies; accepted in 100+ economies. ILAC and IAF merged into Global&nbsp;ACI on 1&nbsp;Jan&nbsp;2026; existing ILAC marks remain valid.</p>
-            <p class="m-0"><strong>CNAS</strong> &mdash; China National Accreditation Service, an ILAC MRA signatory.</p>
-            <p class="m-0"><strong>Measurement uncertainty</strong> &mdash; quantified range within which the true value lies at 95&nbsp;% confidence. Only an accredited certificate provides this.</p>
+            <p class="m-0"><strong>Measurement uncertainty</strong> &mdash; a quantified range within which the true value lies at a stated confidence level. An uncertainty can be stated for any properly performed measurement, including in-house inspections.</p>
           </div>
         </div>
       </details>

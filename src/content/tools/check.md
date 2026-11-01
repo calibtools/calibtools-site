@@ -33,4 +33,4 @@ You printed a 7 × 10 ChArUco, DICT_6X6_250 on A3. Take a photo with your phone,
 
 ## Related guides
 
-- [A printed target costs half a pixel](/guides/printed-target-costs-half-a-pixel/) — detection failure often starts with print quality
+- [Composite board datasheet](/files/datasheets/CT-DS-CHA-P.pdf) — feature tolerance and flatness of the board

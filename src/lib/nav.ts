@@ -58,9 +58,8 @@ export const targetsMega: MegaMenuColumn[] = [
     ],
   },
   {
-    heading: 'Services & accessories',
+    heading: 'Accessories',
     items: [
-      { label: 'ILAC calibration certificate', href: '/targets/certificate-ilac/' },
       { label: 'Mounting fixture', href: '/targets/mounting-fixture/' },
       { label: 'Mounts & accessories', href: '/targets/collection/mounts-accessories/' },
       { label: 'All targets', href: '/targets/' },

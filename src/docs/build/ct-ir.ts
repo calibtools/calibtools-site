@@ -516,8 +516,7 @@ export async function buildIR(opts: {
   } else {
     stmt =
       `The item identified above meets the specifications of datasheet ${ds} at the time of inspection. ` +
-      'This is an inspection report issued by Calib.Tools; it is not an accredited calibration certificate. ' +
-      'An ILAC-MRA certificate issued by an accredited third-party laboratory is available as SVC-X-CERT-ILAC.';
+      'This is an inspection report issued by Calib.Tools; it is not an accredited calibration certificate.';
   }
 
   const tr = meas?.traceability;

@@ -420,7 +420,7 @@ export default function ImageGallery({
               dangerouslySetInnerHTML={{ __html: placeholderSvg }}
             />
           ) : (
-            <span className="font-mono text-xs text-ink-soft">[PRODUCT PHOTO]</span>
+            <span className="font-mono text-xs text-ink-soft">No image available</span>
           )}
         </div>
       </div>

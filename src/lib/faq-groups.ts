@@ -23,7 +23,7 @@ export const faqGroups: FaqGroup[] = [
     items: [
       {
         question: 'What tolerances can I expect?',
-        answer: 'Composite boards are printed to \u00B10.3\u00A0mm feature accuracy. Ceramic targets achieve \u00B12\u00A0\u00B5m, measured against a DAkkS-calibrated reference. Every target ships with a dimensional inspection report.',
+        answer: 'Composite boards are printed to \u00B10.3\u00A0mm feature accuracy. Ceramic targets have a \u00B12\u00A0\u00B5m target accuracy; measurement method to be published. Every target ships with a dimensional inspection report.',
       },
       {
         question: 'Is this compatible with OpenCV?',
@@ -45,11 +45,11 @@ export const faqGroups: FaqGroup[] = [
     items: [
       {
         question: 'Do I need a calibration certificate?',
-        answer: 'A certificate is not required for most applications. The included inspection report confirms dimensional accuracy. For regulated environments (medical, automotive, aerospace), the ILAC-MRA calibration certificate from a CNAS-accredited laboratory provides traceable measurement uncertainty.',
+        answer: 'A certificate is not required for most applications. The included inspection report confirms dimensional accuracy. For regulated environments (medical, automotive, aerospace), contact us about accredited calibration options.',
       },
       {
         question: 'What is included with each target?',
-        answer: 'Every target comes with the board, a dimensional inspection report, a datasheet PDF, and downloadable config files for OpenCV, Kalibr, ROS\u00A02 and HALCON. An ILAC-recognised calibration certificate is available as an add-on.',
+        answer: 'Every target comes with the board, a dimensional inspection report, a datasheet PDF, and downloadable config files for OpenCV, Kalibr, ROS\u00A02 and HALCON.',
       },
     ],
   },

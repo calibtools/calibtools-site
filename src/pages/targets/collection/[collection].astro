@@ -299,7 +299,7 @@ const breadcrumbLd = {
                 ) : preview.type === 'svg' ? (
                   <div class="h-full w-full flex items-center justify-center p-4" set:html={preview.svg} />
                 ) : (
-                  <span class="font-mono text-xs text-ink-soft">[{p.title}]</span>
+                  <span class="font-mono text-xs text-ink-soft">{p.title}</span>
                 )}
               </div>
 

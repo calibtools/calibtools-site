@@ -48,7 +48,6 @@ const HANDLE_TO_FAMILY_MATERIAL: Record<string, { family: string; material: stri
   'checkerboard-composite': { family: 'CHT', material: 'P' },
   'checkerboard-ceramic': { family: 'CHT', material: 'C' },
   'mounting-fixture': { family: 'ACC', material: 'A' },
-  'certificate-ilac': { family: 'SVC', material: 'X' },
 };
 
 /**

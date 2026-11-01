@@ -190,9 +190,10 @@ function mapProduct(n: any): Product {
 // --- Queries ---
 
 export async function getProducts(first = 50): Promise<Product[]> {
+  const isWithdrawn = (h: string) => WITHDRAWN_HANDLES.includes(h);
   if (!hasCredentials()) {
     console.warn('\n⚠️  USING FALLBACK DATA — no Storefront credentials. Variants will be empty, cart will be disabled.\n');
-    return FALLBACK_PRODUCTS;
+    return FALLBACK_PRODUCTS.filter((p) => !isWithdrawn(p.handle));
   }
   try {
     const data = await storefront(`
@@ -201,18 +202,19 @@ export async function getProducts(first = 50): Promise<Product[]> {
         products(first: $first) { nodes { ...ProductFields } }
       }
     `, { first });
-    const apiProducts = data.products.nodes.map(mapProduct);
+    const apiProducts = data.products.nodes.map(mapProduct).filter((p: Product) => !isWithdrawn(p.handle));
     // Merge fallback products for handles not yet in Shopify
     const apiHandles = new Set(apiProducts.map((p: Product) => p.handle));
-    const missing = FALLBACK_PRODUCTS.filter((p) => !apiHandles.has(p.handle));
+    const missing = FALLBACK_PRODUCTS.filter((p) => !apiHandles.has(p.handle) && !isWithdrawn(p.handle));
     return [...apiProducts, ...missing];
   } catch {
     console.warn('\n⚠️  USING FALLBACK DATA — Storefront API query failed. No variants, cart will be disabled.\n');
-    return FALLBACK_PRODUCTS;
+    return FALLBACK_PRODUCTS.filter((p) => !isWithdrawn(p.handle));
   }
 }
 
 export async function getProductByHandle(handle: string): Promise<Product | null> {
+  if (WITHDRAWN_HANDLES.includes(handle)) return null;
   if (!hasCredentials()) {
     console.warn('\n⚠️  USING FALLBACK DATA — no Storefront credentials. No variants, cart will be disabled.\n');
     return FALLBACK_PRODUCTS.find((p) => p.handle === handle) ?? null;
@@ -252,7 +254,7 @@ export async function getCollections(): Promise<Collection[]> {
       title: c.title,
       description: c.description,
       image: c.image?.url,
-      products: c.products.nodes.map(mapProduct),
+      products: c.products.nodes.map(mapProduct).filter((p: Product) => !WITHDRAWN_HANDLES.includes(p.handle)),
     }));
   } catch {
     return FALLBACK_COLLECTIONS;
@@ -274,11 +276,12 @@ export async function getCollectionProducts(handle: string): Promise<Collection 
     `, { handle });
     if (!data.collection) return FALLBACK_COLLECTIONS.find((c) => c.handle === handle) ?? null;
     const c = data.collection;
-    const apiProducts = c.products.nodes.map(mapProduct);
+    const isWithdrawn = (h: string) => WITHDRAWN_HANDLES.includes(h);
+    const apiProducts = c.products.nodes.map(mapProduct).filter((p: Product) => !isWithdrawn(p.handle));
     // Merge fallback products for handles not yet in Shopify
     const apiHandles = new Set(apiProducts.map((p: Product) => p.handle));
     const fallback = FALLBACK_COLLECTIONS.find((fc) => fc.handle === handle);
-    const missing = fallback ? fallback.products.filter((p) => !apiHandles.has(p.handle)) : [];
+    const missing = fallback ? fallback.products.filter((p) => !apiHandles.has(p.handle) && !isWithdrawn(p.handle)) : [];
     return {
       handle: c.handle, title: c.title, description: c.description,
       image: c.image?.url,
@@ -507,6 +510,11 @@ export function clearStoredCart(): void {
   try { localStorage.removeItem('calib-cart-id'); } catch { /* private browsing */ }
 }
 
+// --- Withdrawn handles ---
+
+/** Handles withdrawn from sale — excluded from product lists and page generation. */
+export const WITHDRAWN_HANDLES = ['certificate-ilac'];
+
 // --- Fallback data ---
 
 function fb(handle: string, title: string, desc: string, opts: Product['options'], url: string): Product {
@@ -532,7 +540,7 @@ const FALLBACK_PRODUCTS: Product[] = [
       { name: 'Dictionary', values: ['DICT_6X6_250', 'DICT_5X5_100', 'DICT_4X4_50', 'AprilTag 36h11'] },
     ], '/targets/charuco-composite/'),
   fb('charuco-ceramic', 'ChArUco ceramic target',
-    'Lithographed blue chrome on alumina, ±2 µm.',
+    'Lithographed blue chrome on alumina, ±2 µm (target).',
     [
       { name: 'Size', values: ['110 × 85', '150 × 100', '185 × 110', '230 × 140'] },
       { name: 'Dictionary', values: ['DICT_6X6_250', 'DICT_5X5_100'] },
@@ -572,7 +580,7 @@ const FALLBACK_PRODUCTS: Product[] = [
 
 const FALLBACK_COLLECTIONS: Collection[] = [
   { handle: 'composite-boards', title: 'Composite boards', description: '200–1200 mm, rigid, matte, outdoor-safe.', products: FALLBACK_PRODUCTS.filter((p) => p.handle.includes('composite')) },
-  { handle: 'ceramic-glass', title: 'Ceramic & glass', description: 'Lithographed, ±2 µm, certificate option.', products: FALLBACK_PRODUCTS.filter((p) => p.handle.includes('ceramic')) },
+  { handle: 'ceramic-glass', title: 'Ceramic & glass', description: 'Lithographed, ±2 µm (target).', products: FALLBACK_PRODUCTS.filter((p) => p.handle.includes('ceramic')) },
   { handle: 'lidar-image-quality', title: 'LiDAR & image quality', description: 'Reflectance panels, ISO 12233 charts, IR boards.', products: FALLBACK_PRODUCTS.filter((p) => ['reflectance-panel', 'resolution-chart', 'ir-board'].includes(p.handle)) },
-  { handle: 'mounts-accessories', title: 'Mounts & accessories', description: 'Fixtures, stands, robot flange, hard cases.', products: FALLBACK_PRODUCTS.filter((p) => p.handle === 'mounting-fixture' || p.handle === 'certificate-ilac') },
+  { handle: 'mounts-accessories', title: 'Mounts & accessories', description: 'Fixtures, stands, robot flange, hard cases.', products: FALLBACK_PRODUCTS.filter((p) => p.handle === 'mounting-fixture') },
 ];

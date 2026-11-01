@@ -8,7 +8,7 @@ faq:
   - q: "Does it convert camera intrinsics?"
     a: "No. This tool converts calibration target configuration files (pattern geometry and dimensions), not camera matrices or distortion coefficients."
   - q: "Can I batch-convert multiple files?"
-    a: "Not yet. Paste one config at a time. [CHECK] Batch mode may be added later."
+    a: "Not yet. Paste one config at a time. Batch mode may be added later."
   - q: "Is the output deterministic?"
     a: "Yes. The same input always produces the same output. The converter does not add timestamps or random values."
 ---
@@ -34,3 +34,4 @@ You have a Kalibr YAML from an existing camera–IMU calibration and need the sa
 ## Related guides
 
 - [ChArUco vs checkerboard vs AprilGrid](/guides/charuco-vs-checkerboard-vs-aprilgrid/) — choosing the right pattern before converting
+

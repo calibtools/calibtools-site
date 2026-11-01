@@ -24,7 +24,6 @@ export const PRODUCT_TO_COLLECTION: Record<string, string> = {
   'resolution-chart': 'lidar-image-quality',
   'ir-board': 'lidar-image-quality',
   'mounting-fixture': 'mounts-accessories',
-  'certificate-ilac': 'mounts-accessories',
 };
 
 /** Sibling collection nav items. */

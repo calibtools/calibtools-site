@@ -15,6 +15,8 @@ const guides = defineCollection({
     keyRule: z.string().optional(),
     products: z.array(z.string()).default([]),
     sampleFiles: z.array(z.enum(['report', 'datasheet', 'csv'])).default([]),
+    /** Hidden guides are noindexed and excluded from listings. */
+    draft: z.boolean().default(false),
   }),
 });
 
