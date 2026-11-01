@@ -50,7 +50,7 @@ export default function NewsletterForm() {
   };
 
   return (
-    <form className="card flex flex-col gap-4 self-start bg-ground-alt p-8" onSubmit={handleSubmit}>
+    <form className="card flex flex-col gap-4 self-start bg-ground-alt p-5 sm:p-8 max-w-full overflow-hidden" onSubmit={handleSubmit}>
       <strong className="text-xl">New tools and targets, monthly.</strong>
       <span className="text-[15px] text-ink-muted">No marketing fluff. One email a month, unsubscribe anytime.</span>
 
