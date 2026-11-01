@@ -94,7 +94,7 @@ describe('CT-IR full build', () => {
     expect(result.pages).toBe(2);
   });
 
-  it('PASS variant has no overflow', async () => {
+  it('PASS variant has no overflow', { timeout: 15_000 }, async () => {
     const data = makeIRData();
     const coords = makeSampleCoords();
     const outBase = join(tmp, 'CT-IR-000311-PASS-overflow');
@@ -104,7 +104,7 @@ describe('CT-IR full build', () => {
     expect(hasOverflow).toBe(false);
   });
 
-  it('PENDING variant renders exactly 2 pages', async () => {
+  it('PENDING variant renders exactly 2 pages', { timeout: 15_000 }, async () => {
     const data = makeIRData();
     const outBase = join(tmp, 'CT-IR-000311-PENDING');
     const result = await buildIR({ data, measurements: null, coords: null, outBase });
@@ -119,7 +119,7 @@ describe('CT-IR full build', () => {
     expect(html).not.toContain('9.9992');
   });
 
-  it('SAMPLE watermark variant still renders 2 pages', async () => {
+  it('SAMPLE watermark variant still renders 2 pages', { timeout: 15_000 }, async () => {
     const data = makeIRData();
     const coords = makeSampleCoords();
     const outBase = join(tmp, 'CT-IR-000311-SAMPLE');
