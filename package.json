@@ -12,7 +12,8 @@
     "postbuild": "node scripts/sitemap-lastmod.mjs && node scripts/check-links.mjs && node scripts/check-specs.mjs && tsx scripts/check-exports.mjs && node scripts/check-seo.mjs",
     "preview": "astro preview",
     "check": "astro check",
-    "test": "vitest run"
+    "test": "vitest run",
+    "page-views": "node scripts/page-views.mjs"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.12",
