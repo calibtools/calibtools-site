@@ -440,7 +440,7 @@ const orderingRows = (productData?.orderingRows ?? []).map((row) => {
 
       {/* Key-specs strip */}
       {keySpecs.length > 0 && (
-        <dl class="m-0 grid grid-cols-2 gap-px rounded border border-line bg-line md:grid-cols-4">
+        <dl class="m-0 grid grid-cols-1 gap-px rounded border border-line bg-line sm:grid-cols-2 md:grid-cols-4">
           {keySpecs.map((ks) => (
             <div class="flex flex-col gap-1 bg-ground p-3">
               <dt class="text-[12px] uppercase tracking-[0.08em] text-ink-muted">{ks.label}</dt>
