@@ -1,6 +1,6 @@
 ---
 title: Composite boards
-description: "200–1200 mm, rigid aluminium composite, UV-printed matte pattern, outdoor-safe."
+description: "Rigid aluminium composite, UV-printed matte pattern, outdoor-safe."
 sellingPoints:
   - "UV-printed on rigid aluminium composite — flat, lightweight, durable"
   - "Every board ships with an inspection report and config files for OpenCV, Kalibr, ROS 2 and HALCON"
