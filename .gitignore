@@ -13,3 +13,5 @@ test-output/
 src/assets/products/report.md
 docs/superpowers/
 .claude/settings.local.json
+test-results/
+playwright-report/
