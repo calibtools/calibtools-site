@@ -74,7 +74,7 @@ export default function CollectionTabs({ collectionHandle, specsTable, founderQu
           {founderQuote && (
             <p className="m-0 text-sm text-ink-muted italic leading-relaxed">&ldquo;{founderQuote}&rdquo;</p>
           )}
-          <a href="/quote/" className="mt-2 inline-flex items-center gap-1.5 text-sm font-semibold text-brand hover:text-brand-dark">
+          <a href="/quote/" className="mt-2 inline-flex items-center gap-1.5 text-sm font-semibold text-brand hover:text-brand-dark min-h-[44px] md:min-h-[24px]">
             Get a quote <ArrowRight size={14} strokeWidth={1.6} aria-hidden="true" className="inline" />
           </a>
         </div>
@@ -122,7 +122,7 @@ export default function CollectionTabs({ collectionHandle, specsTable, founderQu
                 key={tab}
                 type="button"
                 onClick={() => setActiveTab(tab)}
-                className={`shrink-0 px-5 py-3.5 text-sm font-medium border-b-2 transition-colors ${
+                className={`shrink-0 px-5 py-3.5 text-sm font-medium border-b-2 transition-colors min-h-[24px] ${
                   activeTab === tab
                     ? 'border-brand text-brand'
                     : 'border-transparent text-ink-muted hover:text-ink'

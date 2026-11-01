@@ -270,7 +270,7 @@ const breadcrumbLd = {
           {sib.handle === handle ? (
             <span class="font-semibold text-ink">{sib.label}</span>
           ) : (
-            <a href={`/targets/collection/${sib.handle}/`} class="text-ink-muted no-underline hover:text-brand">{sib.label}</a>
+            <a href={`/targets/collection/${sib.handle}/`} class="text-ink-muted no-underline hover:text-brand min-h-[44px] md:min-h-[24px] inline-flex items-center">{sib.label}</a>
           )}
         </>
       ))}

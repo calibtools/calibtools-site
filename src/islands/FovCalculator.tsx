@@ -136,7 +136,7 @@ export default function FovCalculator() {
 
         <div className="card flex flex-wrap items-center justify-between gap-3 bg-ground-alt px-5 py-4">
           <span className="text-[15px]"><strong>Need a calibration target?</strong> <span className="text-ink-muted">Print-exact patterns with 0.3 mm tolerance.</span></span>
-          <a href="/tools/generator/" className="rounded bg-ink px-4 py-2.5 text-sm font-semibold text-white no-underline hover:text-white">Generate pattern</a>
+          <a href="/tools/generator/" className="rounded bg-ink px-4 py-2.5 text-sm font-semibold text-white no-underline hover:text-white min-h-[44px] md:min-h-[24px] inline-flex items-center">Generate pattern</a>
         </div>
       </div>
     </section>

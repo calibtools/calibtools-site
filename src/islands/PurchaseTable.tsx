@@ -134,7 +134,7 @@ export default function PurchaseTable({ product, datasheetUrl: fallbackUrl }: Pr
                   <td className="py-3 px-3">
                     <a
                       href={`${product.url}?variant=${encodeURIComponent(v.id)}`}
-                      className="font-mono text-[13px] text-brand-dark hover:text-brand no-underline"
+                      className="font-mono text-[13px] text-brand-dark hover:text-brand no-underline min-h-[24px] inline-flex items-center"
                     >
                       {v.sku || v.title}
                     </a>
@@ -148,7 +148,7 @@ export default function PurchaseTable({ product, datasheetUrl: fallbackUrl }: Pr
                         {isCharuco && (
                           <a
                             href={`${product.url}#board-set`}
-                            className="ml-1.5 text-brand text-[12px] no-underline hover:underline"
+                            className="ml-1.5 text-brand text-[12px] no-underline hover:underline min-h-[24px] inline-flex items-center"
                           >
                             set&hellip;
                           </a>
@@ -159,7 +159,7 @@ export default function PurchaseTable({ product, datasheetUrl: fallbackUrl }: Pr
                   <td className="py-3 px-3 spec">{cols.squares}</td>
                   <td className="py-3 px-3">
                     {cols.docsUrl ? (
-                      <a href={cols.docsUrl} target="_blank" rel="noopener" className="text-ink-soft hover:text-brand" title="Datasheet PDF">
+                      <a href={cols.docsUrl} target="_blank" rel="noopener" className="text-ink-soft hover:text-brand min-h-[24px] inline-flex items-center" title="Datasheet PDF">
                         <FileText size={16} strokeWidth={1.6} aria-hidden="true" />
                       </a>
                     ) : (
@@ -220,7 +220,7 @@ export default function PurchaseTable({ product, datasheetUrl: fallbackUrl }: Pr
                 <div className="flex flex-col gap-0.5">
                   <a
                     href={`${product.url}?variant=${encodeURIComponent(v.id)}`}
-                    className="font-mono text-[13px] text-brand-dark hover:text-brand no-underline"
+                    className="font-mono text-[13px] text-brand-dark hover:text-brand no-underline min-h-[44px] inline-flex items-center"
                   >
                     {v.sku || v.title}
                   </a>
@@ -232,7 +232,7 @@ export default function PurchaseTable({ product, datasheetUrl: fallbackUrl }: Pr
                     <span className="text-[12px] text-ink-soft">
                       {cols.idsLabel}
                       {isCharuco && (
-                        <a href={`${product.url}#board-set`} className="ml-1.5 text-brand text-[12px] no-underline hover:underline">set&hellip;</a>
+                        <a href={`${product.url}#board-set`} className="ml-1.5 text-brand text-[12px] no-underline hover:underline min-h-[44px] inline-flex items-center">set&hellip;</a>
                       )}
                     </span>
                   )}
