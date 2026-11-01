@@ -1,4 +1,5 @@
 ---
+seoDescription: "HALCON calibration plate with MVTec mark layout, supplied with the matching .descr description file. Rigid aluminium composite, 200-800 mm."
 summary: "HALCON calibration plate with MVTec mark layout for industrial machine vision"
 decideSpecs:
   - "Feature position tolerance"

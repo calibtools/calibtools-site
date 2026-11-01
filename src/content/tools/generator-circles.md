@@ -1,6 +1,6 @@
 ---
-seoTitle: "Circle grid generator — symmetric PDF"
-seoDescription: "Generate symmetric and asymmetric circle grid calibration patterns. Print-exact PDF for OpenCV cv::findCirclesGrid. Free, runs in your browser."
+seoTitle: "Asymmetric circle grid generator — free PDF"
+seoDescription: "Generate symmetric and asymmetric circle grid patterns as print-exact PDF for OpenCV findCirclesGrid and HALCON. Set rows, spacing and layout. Free, in-browser."
 h1: "Circle grid pattern generator"
 faq:
   - q: "What is the difference between symmetric and asymmetric circles?"

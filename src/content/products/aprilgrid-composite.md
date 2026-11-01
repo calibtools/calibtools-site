@@ -1,4 +1,5 @@
 ---
+seoDescription: "AprilGrid board with AprilTag 36h11 markers for Kalibr camera-IMU calibration. Rigid aluminium composite, 200-800 mm, inspection report included."
 summary: "AprilGrid composite board for Kalibr camera–IMU and multi-sensor calibration"
 decideSpecs:
   - "Feature position tolerance"

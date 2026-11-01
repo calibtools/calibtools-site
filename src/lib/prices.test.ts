@@ -20,7 +20,6 @@ const ALLOW_LIST = new Set([
   'src/lib/prices.test.ts',
   'src/lib/shopify.ts',
   'src/lib/shopify.test.ts',
-  // VariantPicker has €150 shipping threshold (policy, not product price)
   'src/islands/VariantPicker.tsx',
 ]);
 

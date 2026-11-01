@@ -24,7 +24,7 @@ export function toolJsonLd(
     offers: {
       '@type': 'Offer',
       price: '0',
-      priceCurrency: 'EUR',
+      priceCurrency: 'USD',
     },
     creator: {
       '@type': 'Organization',

@@ -5,7 +5,7 @@ date: 2026-10-22
 updated: 2026-10-22
 readingTime: "8 min"
 related: ["printed-target-costs-half-a-pixel", "composite-ceramic-or-glass"]
-products: ["charuco-composite", "checkerboard-composite"]
+products: ["charuco-composite", "checkerboard-composite", "aprilgrid-composite", "circlegrid-composite"]
 sampleFiles: ["report"]
 ---
 
@@ -13,9 +13,9 @@ sampleFiles: ["report"]
 
 | Pattern | Best for | Avoid when |
 |---|---|---|
-| Checkerboard | Single camera, full board always in view, highest corner accuracy | Board gets cut off at the image edge; multi-camera rigs |
-| ChArUco | Stereo and multi-camera, wide lenses, partial views; OpenCV native | Very low resolution where markers can't be decoded |
-| AprilGrid | Camera–IMU calibration with Kalibr; robotics stacks built on AprilTag | Pure OpenCV pipelines (less tooling than ChArUco) |
+| [Checkerboard](/targets/checkerboard-composite/) | Single camera, full board always in view, highest corner accuracy | Board gets cut off at the image edge; multi-camera rigs |
+| [ChArUco](/targets/charuco-composite/) | Stereo and multi-camera, wide lenses, partial views; OpenCV native | Very low resolution where markers can't be decoded |
+| [AprilGrid](/targets/aprilgrid-composite/) | Camera–IMU calibration with Kalibr; robotics stacks built on AprilTag | Pure OpenCV pipelines (less tooling than ChArUco) |
 
 ## Why partial views matter more than you think
 

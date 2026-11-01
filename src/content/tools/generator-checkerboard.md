@@ -1,6 +1,6 @@
 ---
-seoTitle: "Checkerboard generator — free PDF"
-seoDescription: "Generate checkerboard calibration patterns as print-exact PDF. Standard pattern for OpenCV cv::findChessboardCorners. Free, runs in your browser."
+seoTitle: "Checkerboard generator — calibration PDF"
+seoDescription: "Generate a camera calibration checkerboard as a print-exact PDF. Set square size, rows and columns for OpenCV findChessboardCorners. Free, in your browser."
 h1: "Checkerboard pattern generator"
 faq:
   - q: "What are inner corners?"

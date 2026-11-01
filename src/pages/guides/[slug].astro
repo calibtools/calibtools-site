@@ -43,11 +43,13 @@ const showSampleFiles = d.sampleFiles.length > 0;
 const siteUrl = 'https://calib.tools';
 
 // JSON-LD: Article
+const ogImage = `/og/${entry.slug}.png`;
 const articleLd = {
   '@context': 'https://schema.org',
   '@type': 'Article',
   headline: d.title,
   description: d.description,
+  image: `${siteUrl}${ogImage}`,
   datePublished: d.date.toISOString(),
   dateModified: d.updated.toISOString(),
   author: { '@type': 'Organization', name: 'Calib.Tools', url: `${siteUrl}/about/` },
@@ -81,7 +83,7 @@ const faqLd = d.faq.length > 0
 
 const jsonLdItems = [articleLd, breadcrumbLd, ...(faqLd ? [faqLd] : [])];
 ---
-<Base title={d.title} description={d.description} section="guides" jsonLd={jsonLdItems}>
+<Base title={d.title} description={d.description} section="guides" jsonLd={jsonLdItems} ogType="article">
   <section class="container-x flex flex-wrap justify-center gap-14 py-12 md:py-16">
     <article class="prose-calib flex min-w-0 flex-1 basis-[560px] max-w-[720px] flex-col gap-5">
       {/* Breadcrumb */}

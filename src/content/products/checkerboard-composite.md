@@ -1,4 +1,5 @@
 ---
+seoDescription: "The classic pattern, with the highest corner accuracy of any planar target when the whole board is in view. Aluminium composite, 200-800 mm, fine or coarse."
 summary: "Classic checkerboard target — highest corner accuracy when fully in view"
 decideSpecs:
   - "Feature position tolerance"

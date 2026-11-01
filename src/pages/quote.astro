@@ -31,6 +31,9 @@ import Base from '@/layouts/Base.astro';
           <textarea id="q-message" name="message" rows={4} class="input" placeholder="Quantity, delivery address, special requirements..."></textarea>
         </div>
 
+        {/* Source page — sent with the form submission, not tracking */}
+        <input type="hidden" name="source_page" id="q-source" />
+
         {/* Honeypot */}
         <input type="text" name="website" tabindex={-1} autocomplete="off" class="absolute -left-[9999px] h-0 w-0 overflow-hidden" aria-hidden="true" />
 
@@ -39,4 +42,15 @@ import Base from '@/layouts/Base.astro';
       </form>
     </div>
   </div>
+  <script>
+    const src = document.getElementById('q-source') as HTMLInputElement | null;
+    if (src) {
+      try {
+        const ref = document.referrer ? new URL(document.referrer) : null;
+        if (ref && (ref.hostname === 'calib.tools' || ref.hostname === 'www.calib.tools')) {
+          src.value = ref.pathname;
+        }
+      } catch { /* invalid referrer — leave empty */ }
+    }
+  </script>
 </Base>

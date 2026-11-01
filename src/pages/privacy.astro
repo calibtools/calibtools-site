@@ -3,7 +3,7 @@ import Base from '@/layouts/Base.astro';
 import { breadcrumbLd } from '@/lib/seo';
 const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: 'Privacy policy' }]);
 ---
-<Base title="Privacy policy" description="Privacy policy for calib.tools. No analytics, no tracking, no cookies. Browser tools run entirely client-side." jsonLd={bcLd}>
+<Base title="Privacy policy" description="No tracking, no advertising cookies, no third-party scripts. Server-side page counters store anonymous totals only. Here is exactly what we store." jsonLd={bcLd}>
   <div class="container-x py-10 md:py-16">
     <div class="prose-calib mx-auto flex max-w-[720px] flex-col gap-5">
       <h1 class="h-display m-0 text-[32px] md:text-[40px]">Privacy policy</h1>
@@ -15,20 +15,27 @@ const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: 'Privacy policy' 
         Email: <a href="mailto:hello@calib.tools">hello@calib.tools</a>
       </p>
 
-      <h2>What we collect</h2>
-      <p>This website does not use analytics, tracking scripts or cookies. The browser tools run entirely in your browser — no images, calibration files or personal data are uploaded to our servers.</p>
+      <h2>What we do not do</h2>
+      <p>We do not track individual visitors. We do not set advertising or analytics cookies. No third-party scripts or external fonts are loaded on this site. Everything you enter into the browser tools stays in your browser and is never uploaded to our servers.</p>
+
+      <h2>What is stored in your browser</h2>
+      <p>The only thing this site stores on your device is a shopping cart identifier (<code>localStorage</code> key <code>calib-cart-id</code>). It is created only after you add an item to your cart, and it is used solely to keep your cart contents across page loads. No cookies are set.</p>
+
+      <h2>Server-side page counters</h2>
+      <p>We count page views on the server to understand which pages are visited. These counters store anonymous totals only: the page path and a referrer category (such as &ldquo;generator&rdquo; or &ldquo;guide&rdquo;).</p>
+      <p>No IP addresses, no User-Agent strings, no visitor identifiers, and no cross-page session data are stored. It is not possible to trace a count back to an individual.</p>
 
       <h2>Hosting</h2>
-      <p>The site is hosted on Cloudflare Pages. Cloudflare may process your IP address and browser metadata to deliver the pages. See <a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener">Cloudflare's privacy policy</a>.</p>
+      <p>The site is hosted on Cloudflare Pages. Cloudflare may process your IP address and browser metadata to deliver the pages. See <a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener">Cloudflare&rsquo;s privacy policy</a>.</p>
 
       <h2>Shop &amp; checkout</h2>
-      <p>When you place an order, checkout is handled by Shopify on <code>shop.calib.tools</code>. Shopify processes your name, address, email and payment details to fulfil the order. See <a href="https://www.shopify.com/legal/privacy" target="_blank" rel="noopener">Shopify's privacy policy</a>.</p>
+      <p>When you place an order, checkout is handled by Shopify on <code>shop.calib.tools</code>. Shopify processes your name, address, email and payment details to fulfil the order. See <a href="https://www.shopify.com/legal/privacy" target="_blank" rel="noopener">Shopify&rsquo;s privacy policy</a>.</p>
 
       <h2>Email</h2>
       <p>If you subscribe to the newsletter, your email address is stored by Shopify. You can unsubscribe at any time via the link in every email.</p>
 
       <h2>Fonts</h2>
-      <p>This site uses Geist Sans, Geist Mono and Geist Pixel by Vercel, SIL Open Font License 1.1, self-hosted. No external font services are loaded — all font files are served from our own domain.</p>
+      <p>This site uses Geist Sans, Geist Mono and Geist Pixel by Vercel, SIL Open Font License 1.1, self-hosted. No external font services are loaded &mdash; all font files are served from our own domain.</p>
 
       <h2>Your rights</h2>
       <p>Under the GDPR you have the right to access, rectify, erase or port your data, and to object to or restrict processing. Contact <a href="mailto:hello@calib.tools">hello@calib.tools</a>.</p>

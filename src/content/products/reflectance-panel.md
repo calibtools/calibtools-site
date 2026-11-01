@@ -1,4 +1,5 @@
 ---
+seoDescription: "Lambertian diffuse reflectance panel for LiDAR intensity calibration and range verification. Reflectance level, size and mounting set to your test setup."
 summary: "Calibrated Lambertian reflectance panel for LiDAR intensity calibration"
 decideSpecs:
   - "Reflectance"

@@ -14,6 +14,11 @@ const jsonLd = toolJsonLd(entry.data.h1, '/tools/generator/charuco/', entry.data
   <ToolTabs current="generator" />
   <div class="container-x py-7 md:pb-16">
     <Generator client:load initialSpec={{ type: 'ChArUco', dict: 'DICT_6X6_250' }} />
+    <p class="mt-6 text-[15px] text-ink-muted">
+      Printing your own pattern has <a href="/guides/printed-target-costs-half-a-pixel/" class="text-brand-dark font-medium">measurable accuracy limits</a>.
+      For sub-pixel reprojection error, the <a href="/targets/charuco-composite/" class="text-brand-dark font-medium">ChArUco aluminium composite board</a> or
+      <a href="/targets/charuco-ceramic/" class="text-brand-dark font-medium">ChArUco ceramic target</a> are UV-printed or lithographed to tighter tolerances than any office printer.
+    </p>
   </div>
   <ToolContent Content={Content} faq={entry.data.faq} />
 </Base>

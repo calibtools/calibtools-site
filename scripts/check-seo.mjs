@@ -72,10 +72,11 @@ function extractTag(html, tag, scope) {
 }
 
 function extractMeta(html, name) {
-  const regex = new RegExp(`<meta\\s[^>]*(?:name|property)=["']${name}["'][^>]*content=["']([^"']*)["']`, 'i');
+  // Match content in double quotes (Astro always uses double quotes)
+  const regex = new RegExp(`<meta\\s[^>]*(?:name|property)=["']${name}["'][^>]*content="([^"]*)"`, 'i');
   const m = regex.exec(html);
   if (m) return m[1];
-  const regex2 = new RegExp(`<meta\\s[^>]*content=["']([^"']*)["'][^>]*(?:name|property)=["']${name}["']`, 'i');
+  const regex2 = new RegExp(`<meta\\s[^>]*content="([^"]*)"[^>]*(?:name|property)=["']${name}["']`, 'i');
   const m2 = regex2.exec(html);
   return m2 ? m2[1] : null;
 }
@@ -142,14 +143,14 @@ for (const file of htmlFiles) {
   if (titles.length === 0) errors.push({ file: rel, rule: 'title-missing', detail: 'No <title> tag' });
   if (titles.length > 1) errors.push({ file: rel, rule: 'title-duplicate', detail: `${titles.length} <title> tags` });
   if (!isNoindex && titleLen > 0 && titleLen > 60) errors.push({ file: rel, rule: 'title-long', detail: `${titleLen} chars (max 60)` });
-  if (!isNoindex && titleLen > 0 && titleLen < 20) errors.push({ file: rel, rule: 'title-short', detail: `${titleLen} chars (min 20)` });
+  if (!isNoindex && titleLen > 0 && titleLen < 25) errors.push({ file: rel, rule: 'title-short', detail: `${titleLen} chars (min 25)` });
 
   // Description
   const desc = extractMeta(html, 'description');
   const descLen = desc?.length ?? 0;
   if (!isNoindex) {
     if (!desc) errors.push({ file: rel, rule: 'desc-missing', detail: 'No meta description' });
-    if (desc && descLen < 70) errors.push({ file: rel, rule: 'desc-short', detail: `${descLen} chars (min 70)` });
+    if (desc && descLen < 120) errors.push({ file: rel, rule: 'desc-short', detail: `${descLen} chars (min 120)` });
     if (desc && descLen > 160) errors.push({ file: rel, rule: 'desc-long', detail: `${descLen} chars (max 160)` });
   }
 
@@ -235,6 +236,38 @@ for (const file of htmlFiles) {
             if (!rv.author) errors.push({ file: rel, rule: 'jsonld-review-author', detail: 'review missing author' });
             if (!rv.reviewRating) errors.push({ file: rel, rule: 'jsonld-review-rating', detail: 'review missing reviewRating' });
           }
+        }
+      }
+    }
+
+    // Article required fields
+    if (ld['@type'] === 'Article') {
+      if (!ld.headline) errors.push({ file: rel, rule: 'jsonld-article-headline', detail: 'Article JSON-LD missing headline' });
+      if (!ld.datePublished) errors.push({ file: rel, rule: 'jsonld-article-date', detail: 'Article JSON-LD missing datePublished' });
+      if (!ld.author) errors.push({ file: rel, rule: 'jsonld-article-author', detail: 'Article JSON-LD missing author' });
+      if (!ld.image) errors.push({ file: rel, rule: 'jsonld-article-image', detail: 'Article JSON-LD missing image' });
+    }
+
+    // BreadcrumbList required fields
+    if (ld['@type'] === 'BreadcrumbList') {
+      if (!ld.itemListElement || !Array.isArray(ld.itemListElement) || ld.itemListElement.length === 0) {
+        errors.push({ file: rel, rule: 'jsonld-breadcrumb-items', detail: 'BreadcrumbList JSON-LD missing itemListElement' });
+      } else {
+        for (const item of ld.itemListElement) {
+          if (!item.name) errors.push({ file: rel, rule: 'jsonld-breadcrumb-name', detail: 'BreadcrumbList item missing name' });
+          if (typeof item.position === 'undefined') errors.push({ file: rel, rule: 'jsonld-breadcrumb-position', detail: 'BreadcrumbList item missing position' });
+        }
+      }
+    }
+
+    // FAQPage required fields
+    if (ld['@type'] === 'FAQPage') {
+      if (!ld.mainEntity || !Array.isArray(ld.mainEntity) || ld.mainEntity.length === 0) {
+        errors.push({ file: rel, rule: 'jsonld-faq-items', detail: 'FAQPage JSON-LD missing mainEntity' });
+      } else {
+        for (const q of ld.mainEntity) {
+          if (!q.name) errors.push({ file: rel, rule: 'jsonld-faq-question', detail: 'FAQPage Question missing name' });
+          if (!q.acceptedAnswer?.text) errors.push({ file: rel, rule: 'jsonld-faq-answer', detail: 'FAQPage Question missing acceptedAnswer text' });
         }
       }
     }

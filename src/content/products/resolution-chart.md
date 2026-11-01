@@ -1,4 +1,5 @@
 ---
+seoDescription: "ISO 12233 resolution test chart for MTF and SFR evaluation of imaging systems. Chart version, size and substrate set for your measurement distance."
 summary: "ISO 12233 resolution test chart for imaging system MTF and SFR evaluation"
 decideSpecs:
   - "Standard"

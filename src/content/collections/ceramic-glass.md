@@ -1,4 +1,6 @@
 ---
+seoTitle: "Ceramic and glass targets"
+seoDescription: "Lithographed chrome on alumina ceramic or borosilicate glass, for calibration tasks where a printed board is the limiting factor. Certificate optional."
 title: "Ceramic & glass"
 description: "Lithographed on alumina or borosilicate glass, ±2 µm feature accuracy."
 sellingPoints:

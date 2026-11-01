@@ -41,7 +41,7 @@ afterAll(() => {
 const validPage = [
   '<!doctype html><html><head>',
   '<title>Valid Page Title Here \u00b7 Calib.Tools</title>',
-  '<meta name="description" content="This is a valid description that is long enough to pass the minimum length check for SEO validation purposes." />',
+  '<meta name="description" content="This is a valid description that is long enough to pass the minimum length check for SEO validation purposes. Extra words here to reach one-twenty chars." />',
   '<link rel="canonical" href="https://calib.tools/" />',
   '<script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"Calib.Tools"}</script>',
   '</head><body><h1>Valid Page</h1></body></html>',

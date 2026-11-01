@@ -1,6 +1,6 @@
 ---
 title: "Multi-board marker IDs explained"
-description: "When running multiple calibration boards in one rig, each board needs distinct marker IDs. Here's how to compute them and configure OpenCV and Kalibr."
+description: "When running multiple calibration boards in one rig, each board needs distinct marker IDs. How to compute start IDs and configure OpenCV and Kalibr correctly."
 date: 2026-10-24
 updated: 2026-10-25
 readingTime: "3 min"

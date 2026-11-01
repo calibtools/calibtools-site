@@ -33,6 +33,8 @@ const collections_ = defineCollection({
   schema: z.object({
     title: z.string(),
     description: z.string(),
+    seoTitle: z.string().min(25).max(60).optional(),
+    seoDescription: z.string().min(120).max(160).optional(),
     sellingPoints: z.array(z.string()).length(2),
     color: z.enum(['brand', 'slate-blue', 'amber', 'grey']),
     pairsWith: z.array(z.string()).default([]),
@@ -45,6 +47,7 @@ const products = defineCollection({
   type: 'content',
   schema: z.object({
     summary: z.string().max(90),
+    seoDescription: z.string().min(120).max(160).optional(),
     decideSpecs: z.tuple([z.string(), z.string(), z.string()]),
     /** Short value-only chip strings for card display (e.g. "±0.3 mm", "6 mm"). */
     chips: z.tuple([z.string(), z.string(), z.string()]).optional(),

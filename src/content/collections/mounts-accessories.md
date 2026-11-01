@@ -1,4 +1,6 @@
 ---
+seoTitle: "Mounts, accessories and services"
+seoDescription: "Mounting fixtures and the optional accredited calibration certificate: what you add alongside a target to mount it squarely and document its accuracy."
 title: "Mounts & accessories"
 description: "Fixtures, stands, and services to complement your calibration targets."
 sellingPoints:

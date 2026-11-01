@@ -1,6 +1,6 @@
 ---
-seoTitle: "FOV calculator — field of view and GSD"
-seoDescription: "Calculate field of view, ground sample distance and target size for any camera and lens. Presets for common machine vision cameras. Free, in your browser."
+seoTitle: "Field of view calculator — FOV converter"
+seoDescription: "Calculate field of view from sensor size, focal length and working distance. Converts between FOV degrees, mm coverage and GSD. Free, in your browser."
 h1: "FOV & resolution calculator"
 faq:
   - q: "What is GSD?"
@@ -36,6 +36,12 @@ It also recommends a minimum working distance for a given target size and fill f
 ## Worked example
 
 2/3" sensor (IMX174, 1920 × 1200), 12 mm lens, 500 mm working distance: the FOV is approximately 365 × 275 mm with a GSD of 0.19 mm/px. A 250 × 175 mm board fills about 68 % of the horizontal frame — a reasonable fill for calibration.
+
+## Beyond visible light
+
+If you are calibrating thermal, near-infrared or LiDAR sensors, the standard patterns still apply for geometry — but the board material matters.
+
+See the [IR-compatible calibration board](/targets/ir-board/) for thermal cameras, [reflectance panels](/targets/reflectance-panel/) for LiDAR intensity, and [resolution charts](/targets/resolution-chart/) for MTF evaluation.
 
 ## Related guides
 

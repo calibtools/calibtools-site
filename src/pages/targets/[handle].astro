@@ -71,6 +71,8 @@ const productContent = await getEntry('products', handle!);
 // Summary from product content, fallback to positioning
 const positioning = productData?.positioning || product.description;
 const displaySummary = productContent?.data.summary || positioning;
+// SEO description: prefer content seoDescription, then truncated summary
+const metaDescription = productContent?.data.seoDescription || (displaySummary.length > 160 ? displaySummary.slice(0, 157) + '...' : displaySummary);
 
 // Spec groups: prefer datasheet, fall back to metafield-based groups
 type SpecRow = { label: string; value: string };
@@ -243,17 +245,42 @@ const breadcrumbLd = {
     { '@type': 'ListItem', position: 3, name: product.title },
   ],
 };
+// Compute variesBy from product options
+const variesBy = product.options.map((o) => {
+  const key = o.name.toLowerCase();
+  if (key === 'size') return 'https://schema.org/size';
+  return `https://schema.org/${key}`;
+});
+
+// Price valid until — 1 year from build date
+const priceValidUntil = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+
 const productLd: Record<string, any> = {
   '@context': 'https://schema.org', '@type': 'ProductGroup',
+  productGroupID: handle,
   name: product.title, description: product.description,
   url: `${siteUrl}${product.url}`,
   brand: { '@type': 'Brand', name: 'Calib.Tools' },
   image: hasLocalImages ? galleryImages.map((img) => `${siteUrl}${img.src}`) : product.images.length > 0 ? product.images.map((img) => img.url) : `${siteUrl}/og/${handle}.png`,
+  ...(variesBy.length > 0 && { variesBy }),
 };
 if (product.variants.length > 0) {
+  // Group-level AggregateOffer
+  const amounts = product.variants.map((v) => parseFloat(v.priceAmount)).filter((n) => !isNaN(n));
+  if (amounts.length > 0) {
+    productLd.offers = {
+      '@type': 'AggregateOffer',
+      lowPrice: Math.min(...amounts).toFixed(2),
+      highPrice: Math.max(...amounts).toFixed(2),
+      priceCurrency: product.variants[0].currencyCode,
+      offerCount: product.variants.length,
+      availability: product.variants.some((v) => v.availableForSale) ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+      url: `${siteUrl}${product.url}`,
+    };
+  }
   productLd.hasVariant = product.variants.map((v) => ({
     '@type': 'Product', name: `${product.title} — ${v.title}`, sku: v.sku || undefined,
-    offers: { '@type': 'Offer', price: v.priceAmount, priceCurrency: v.currencyCode, availability: v.availableForSale ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock', url: `${siteUrl}${product.url}?variant=${encodeURIComponent(v.id)}`, seller: { '@type': 'Organization', name: 'Calib.Tools' } },
+    offers: { '@type': 'Offer', price: v.priceAmount, priceCurrency: v.currencyCode, priceValidUntil, availability: v.availableForSale ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock', url: `${siteUrl}${product.url}`, seller: { '@type': 'Organization', name: 'Calib.Tools' } },
   }));
 } else {
   productLd.offers = { '@type': 'AggregateOffer', lowPrice: product.priceMinAmount, priceCurrency: product.priceMinCurrency, availability: 'https://schema.org/InStock', url: `${siteUrl}${product.url}` };
@@ -353,7 +380,7 @@ const orderingRows = (productData?.orderingRows ?? []).map((row) => {
 <Base
   title={product.title}
   section="targets"
-  description={displaySummary.length > 160 ? displaySummary.slice(0, 157) + '...' : displaySummary}
+  description={metaDescription}
   jsonLd={[breadcrumbLd, productLd]}
   ogImage={ogImage}
   preloadImages={hasLocalImages ? [{
@@ -714,7 +741,7 @@ const orderingRows = (productData?.orderingRows ?? []).map((row) => {
       {compareProduct && (
         <div class="card flex flex-col gap-2 bg-ground-alt p-5">
           <strong class="flex items-center gap-2 text-[15px]"><Columns2 size={20} stroke-width={1.6} class="text-brand" aria-hidden="true" />Compare with {compareProduct.title}</strong>
-          <span class="text-sm text-ink-muted">{handle?.includes('composite') ? 'Higher accuracy, smaller sizes.' : 'Larger sizes from \u20AC79, more affordable.'}</span>
+          <span class="text-sm text-ink-muted">{handle?.includes('composite') ? 'Higher accuracy, smaller sizes.' : `Larger sizes from ${compareProduct!.priceFrom}, more affordable.`}</span>
           <a href={compareProduct.url} class="text-sm font-semibold">View {compareProduct.title} <ArrowRight size={14} stroke-width={1.6} class="inline" aria-hidden="true" /></a>
         </div>
       )}

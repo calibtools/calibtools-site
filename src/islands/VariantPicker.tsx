@@ -236,7 +236,7 @@ export default function VariantPicker({ product, certVariantId, fixtureVariantId
         {variant && !variant.availableForSale && (
           <span className="text-sm text-brand">Out of stock</span>
         )}
-        <span className="text-sm text-ink-soft">excl. VAT · free EU shipping over €150</span>
+        <span className="text-sm text-ink-soft">excl. VAT · shipping calculated at checkout</span>
       </div>
 
       {/* Option selectors */}

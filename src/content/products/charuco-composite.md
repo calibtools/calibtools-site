@@ -1,4 +1,5 @@
 ---
+seoDescription: "ChArUco board for OpenCV stereo and multi-camera calibration: markers identify every corner, so the board still works partly outside the frame. 200-800 mm."
 summary: "ChArUco composite board for OpenCV stereo and multi-camera calibration"
 decideSpecs:
   - "Feature position tolerance"

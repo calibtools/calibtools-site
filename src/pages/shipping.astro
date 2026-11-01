@@ -3,7 +3,7 @@ import Base from '@/layouts/Base.astro';
 import { breadcrumbLd } from '@/lib/seo';
 const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: 'Shipping' }]);
 ---
-<Base title="Shipping" description="Shipping times, methods and rates for Calib.Tools calibration targets. Tracked express worldwide, made to order." jsonLd={bcLd}>
+<Base title="Shipping and duties" description="Tracked express worldwide on made-to-order targets. Lead times by product, how duties and import VAT are handled, and what the delivery terms mean." jsonLd={bcLd}>
   <div class="container-x py-10 md:py-16">
     <div class="prose-calib mx-auto flex max-w-[720px] flex-col gap-5">
       <h1 class="h-display m-0 text-[32px] md:text-[40px]">Shipping</h1>
@@ -23,7 +23,7 @@ const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: 'Shipping' }]);
       </table>
 
       <h2>Customs &amp; duties</h2>
-      <p>Prices are in EUR and exclude import VAT and duties. Shipments are sent DAP: the carrier collects import VAT (and duty, if any) from the recipient before delivery. Business customers can reclaim import VAT through their normal return. DDP for larger orders on request &mdash; <a href="mailto:hello@calib.tools">contact us</a>.</p>
+      <p>Prices are in USD and exclude import VAT and duties. Shipments are sent DAP: the carrier collects import VAT (and duty, if any) from the recipient before delivery. Business customers can reclaim import VAT through their normal return. DDP for larger orders on request &mdash; <a href="mailto:hello@calib.tools">contact us</a>.</p>
 
       <h2>Questions?</h2>
       <p>Email <a href="mailto:hello@calib.tools">hello@calib.tools</a> &mdash; we reply within one business day.</p>

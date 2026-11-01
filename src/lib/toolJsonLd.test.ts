@@ -22,7 +22,7 @@ describe('toolJsonLd', () => {
     expect(app.applicationCategory).toBe('DeveloperApplication');
     expect(app.operatingSystem).toBe('Web');
     expect(app.offers.price).toBe('0');
-    expect(app.offers.priceCurrency).toBe('EUR');
+    expect(app.offers.priceCurrency).toBe('USD');
     expect(app.url).toBe('https://calib.tools/tools/fov/');
   });
 

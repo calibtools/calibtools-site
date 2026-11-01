@@ -1,4 +1,5 @@
 ---
+seoDescription: "Reflectance panels, ISO 12233 resolution charts and IR-compatible boards for LiDAR, thermal and image-quality work. Configured to your test setup."
 title: "LiDAR & image quality"
 description: "Reflectance panels, ISO 12233 charts, IR-compatible boards for LiDAR and imaging systems."
 sellingPoints:
@@ -16,7 +17,9 @@ founderQuote: "I started Calib.Tools because I kept wasting afternoons printing 
 
 ## Overview
 
-LiDAR and image quality targets are designed for sensor characterisation and quality assurance beyond standard camera calibration. This collection includes reflectance panels for LiDAR intensity calibration, ISO 12233 resolution charts, and IR-compatible calibration boards.
+LiDAR and image quality targets are designed for sensor characterisation and quality assurance beyond standard camera calibration.
+
+This collection includes [reflectance panels](/targets/reflectance-panel/) for LiDAR intensity calibration, [ISO 12233 resolution charts](/targets/resolution-chart/) for MTF and SFR evaluation, and [IR-compatible calibration boards](/targets/ir-board/) for thermal and near-infrared camera systems.
 
 All products in this collection are quote-only. Contact us to discuss your requirements and lead times.
 

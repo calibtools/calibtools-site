@@ -81,7 +81,7 @@ export const faqGroups: FaqGroup[] = [
       },
       {
         question: 'Who pays import duties?',
-        answer: 'Prices are in EUR and exclude import VAT and duties. Shipments are sent DAP: the carrier collects import VAT (and duty, if any) from the recipient before delivery. Business customers can reclaim import VAT through their normal return.',
+        answer: 'Prices are in USD and exclude import VAT and duties. Shipments are sent DAP: the carrier collects import VAT (and duty, if any) from the recipient before delivery. Business customers can reclaim import VAT through their normal return.',
       },
     ],
   },

@@ -1,4 +1,5 @@
 ---
+seoDescription: "Lithographed chrome on alumina ceramic, for camera calibration where printed boards are not accurate enough. Matte front-lit finish, certificate optional."
 summary: "Lithographed ceramic ChArUco target for metrology-grade camera calibration"
 decideSpecs:
   - "Feature position accuracy"

@@ -1,4 +1,5 @@
 ---
+seoDescription: "Rigid aluminium composite with a UV-printed matte pattern, the standard choice for robotics and machine vision. 200-800 mm standard, to 1200 mm on request."
 title: Composite boards
 description: "Rigid aluminium composite, UV-printed matte pattern, outdoor-safe."
 sellingPoints:

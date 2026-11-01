@@ -14,6 +14,10 @@ const jsonLd = toolJsonLd(entry.data.h1, '/tools/generator/aprilgrid/', entry.da
   <ToolTabs current="generator" />
   <div class="container-x py-7 md:pb-16">
     <Generator client:load initialSpec={{ type: 'AprilGrid (Kalibr)', dict: 'DICT_APRILTAG_36h11' }} />
+    <p class="mt-6 text-[15px] text-ink-muted">
+      Printing your own pattern has <a href="/guides/printed-target-costs-half-a-pixel/" class="text-brand-dark font-medium">measurable accuracy limits</a>.
+      The <a href="/targets/aprilgrid-composite/" class="text-brand-dark font-medium">AprilGrid aluminium composite board</a> is UV-printed with controlled tolerances and ships with a dimensional inspection report and Kalibr YAML.
+    </p>
   </div>
   <ToolContent Content={Content} faq={entry.data.faq} />
 </Base>

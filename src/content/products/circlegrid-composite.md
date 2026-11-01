@@ -1,4 +1,5 @@
 ---
+seoDescription: "Symmetric and asymmetric circle grids for OpenCV findCirclesGrid and HALCON. Rigid aluminium composite, 200-800 mm, inspection report included."
 summary: "Symmetric and asymmetric circle grid calibration targets for OpenCV and HALCON"
 decideSpecs:
   - "Feature position tolerance"

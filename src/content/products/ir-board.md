@@ -1,4 +1,5 @@
 ---
+seoDescription: "Calibration board for thermal and near-infrared camera systems. Configured to your wavelength band, format and mounting: request a quote with your needs."
 summary: "IR-compatible calibration board for thermal and near-infrared camera systems"
 decideSpecs:
   - "Wavelength range"
