@@ -4,6 +4,21 @@
 @tailwind components;
 @tailwind utilities;
 
+/* --- Spacing scale (4 px base) --- */
+:root {
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --section-y: 48px;
+}
+@media (min-width: 768px)  { :root { --section-y: 64px; } }
+@media (min-width: 1280px) { :root { --section-y: 80px; } }
+
 /* --- Theme colour tokens (RGB triplets for Tailwind alpha support) --- */
 :root {
   --color-ground: 255 255 255;

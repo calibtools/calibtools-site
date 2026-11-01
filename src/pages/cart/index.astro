@@ -3,7 +3,7 @@ import Base from '@/layouts/Base.astro';
 import CartPage from '@/islands/CartPage';
 ---
 <Base title="Cart" section="targets" noindex>
-  <section class="container-x py-12">
+  <section class="container-x py-[var(--section-y)]">
     <CartPage client:load />
   </section>
 </Base>

@@ -84,11 +84,11 @@ const faqLd = d.faq.length > 0
 const jsonLdItems = [articleLd, breadcrumbLd, ...(faqLd ? [faqLd] : [])];
 ---
 <Base title={d.title} description={d.description} section="guides" jsonLd={jsonLdItems} ogType="article" noindex={d.draft}>
-  <section class="container-x flex flex-wrap justify-center gap-14 py-12 md:py-16">
+  <section class="container-x flex flex-wrap justify-center gap-14 py-[var(--section-y)]">
     <article class="prose-calib flex min-w-0 flex-1 basis-[560px] max-w-[720px] flex-col gap-5">
       {/* Breadcrumb */}
       <div class="flex gap-2 text-sm text-ink-soft">
-        <a href="/guides/" class="text-ink-soft no-underline">Guides</a><span>/</span><span>Article</span>
+        <a href="/guides/" class="text-ink-soft no-underline min-h-[44px] md:min-h-[24px] flex items-center">Guides</a><span class="flex items-center">/</span><span class="flex items-center">Article</span>
       </div>
 
       {/* Eyebrow */}
@@ -105,7 +105,7 @@ const jsonLdItems = [articleLd, breadcrumbLd, ...(faqLd ? [faqLd] : [])];
         <div class="flex gap-4 rounded border border-line bg-ground-alt p-5">
           <span class="block w-[3px] shrink-0 rounded bg-brand"></span>
           <div class="flex flex-col gap-1.5">
-            <span class="font-mono text-[11px] uppercase tracking-[0.16em] text-ink-soft">Short answer</span>
+            <span class="font-mono text-[12px] uppercase tracking-[0.16em] text-ink-soft">Short answer</span>
             <p class="m-0 text-[15px] leading-relaxed">{d.keyRule}</p>
           </div>
         </div>
@@ -203,13 +203,13 @@ const jsonLdItems = [articleLd, breadcrumbLd, ...(faqLd ? [faqLd] : [])];
       {headings.length > 0 && (
         <div class="flex flex-col gap-2.5">
           <span class="text-[13px] font-bold uppercase tracking-[0.06em] text-ink-soft">In this guide</span>
-          {headings.filter((h) => h.depth === 2).map((h) => <a href={`#${h.slug}`} class="text-[15px] text-ink no-underline">{h.text}</a>)}
+          {headings.filter((h) => h.depth === 2).map((h) => <a href={`#${h.slug}`} class="text-[15px] text-ink no-underline min-h-[24px] flex items-center">{h.text}</a>)}
         </div>
       )}
       {related.length > 0 && (
         <div class="flex flex-col gap-2.5 border-t border-line pt-5">
           <span class="text-[13px] font-bold uppercase tracking-[0.06em] text-ink-soft">Related</span>
-          {related.map((r) => r && <a href={`/guides/${r.slug}/`} class="text-[15px] text-ink no-underline">{r.data.title}</a>)}
+          {related.map((r) => r && <a href={`/guides/${r.slug}/`} class="text-[15px] text-ink no-underline min-h-[24px] flex items-center">{r.data.title}</a>)}
         </div>
       )}
       <div class="flex flex-col gap-2.5 rounded-lg bg-ink p-5 text-white">

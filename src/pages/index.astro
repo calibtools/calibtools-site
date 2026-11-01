@@ -147,13 +147,13 @@ const featuredReviews = allReviews
 
   {/* ── Free tools ── */}
   <section id="tools" class="border-y border-line bg-ground-alt">
-    <div class="container-x flex flex-col gap-9 py-12 md:py-[72px]">
+    <div class="container-x flex flex-col gap-9 py-[var(--section-y)]">
       <div class="flex flex-wrap items-end justify-between gap-4">
         <div class="flex flex-col gap-2.5">
           <span class="font-mono text-[12px] uppercase tracking-[0.18em] text-brand-text md:text-[13px]">Free tools &middot; runs in your browser</span>
           <h2 class="h-display m-0 text-[28px] md:text-[36px]">Free tools. Serious targets.</h2>
         </div>
-        <a href="/tools/" class="inline-flex items-center gap-1 text-[15px] font-semibold text-brand-on-dark">See all tools <ArrowRight size={20} stroke-width={1.6} class="text-brand-on-dark" aria-hidden="true" /></a>
+        <a href="/tools/" class="inline-flex items-center gap-1 text-[15px] font-semibold min-h-[24px] text-brand-on-dark">See all tools <ArrowRight size={20} stroke-width={1.6} class="text-brand-on-dark" aria-hidden="true" /></a>
       </div>
       <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
         <ToolCard href={featuredTools[0].href} title={featuredTools[0].title} cta={featuredTools[0].cta} body={featuredTools[0].body}>
@@ -170,7 +170,7 @@ const featuredReviews = allReviews
   </section>
 
   {/* ── Targets ── */}
-  <section id="products" class="container-x flex flex-col gap-9 py-12 md:py-[72px]">
+  <section id="products" class="container-x flex flex-col gap-9 py-[var(--section-y)]">
     <div class="flex flex-col gap-2.5">
       <span class="font-mono text-[12px] uppercase tracking-[0.18em] text-brand-text md:text-[13px]">Calibration targets</span>
       <h2 class="h-display m-0 text-[28px] md:text-[36px]">From checkerboard to certificate.</h2>
@@ -201,7 +201,7 @@ const featuredReviews = allReviews
 
   {/* ── Why us ── */}
   <section id="why" class="border-y border-[#262626] bg-[#0A0A0A]">
-    <div class="container-x flex flex-col gap-10 py-12 md:py-[72px]">
+    <div class="container-x flex flex-col gap-10 py-[var(--section-y)]">
       <h2 class="h-display m-0 max-w-[720px] text-[28px] md:text-[36px]">Built flat. Checked twice.</h2>
       <div class="grid grid-cols-1 gap-8 md:grid-cols-5">
         {why.map(([title, desc], i) => {
@@ -240,7 +240,7 @@ const featuredReviews = allReviews
   {/* ── From the bench (reviews) — only when >= 3 published reviews ── */}
   {showReviews && (
     <section id="reviews-home" class="border-t border-line">
-      <div class="container-x flex flex-col gap-8 py-12 md:py-[72px]">
+      <div class="container-x flex flex-col gap-8 py-[var(--section-y)]">
         <div class="flex flex-wrap items-end justify-between gap-4">
           <div class="flex flex-col gap-2.5">
             <span class="font-mono text-[12px] uppercase tracking-[0.18em] text-brand-text md:text-[13px]">From the bench</span>
@@ -265,9 +265,9 @@ const featuredReviews = allReviews
               <p class="m-0 line-clamp-3 text-[15px] leading-relaxed text-ink-muted">{r.body}</p>
               {(r.tags.camera || r.tags.lensOrFov || r.tags.software) && (
                 <div class="flex flex-wrap gap-1.5">
-                  {r.tags.camera && <span class="rounded border border-line bg-ground px-2 py-0.5 font-mono text-[11px] text-ink-muted">{r.tags.camera}</span>}
-                  {r.tags.lensOrFov && <span class="rounded border border-line bg-ground px-2 py-0.5 font-mono text-[11px] text-ink-muted">{r.tags.lensOrFov}</span>}
-                  {r.tags.software && <span class="rounded border border-line bg-ground px-2 py-0.5 font-mono text-[11px] text-ink-muted">{r.tags.software}</span>}
+                  {r.tags.camera && <span class="rounded border border-line bg-ground px-2 py-0.5 font-mono text-[12px] text-ink-muted">{r.tags.camera}</span>}
+                  {r.tags.lensOrFov && <span class="rounded border border-line bg-ground px-2 py-0.5 font-mono text-[12px] text-ink-muted">{r.tags.lensOrFov}</span>}
+                  {r.tags.software && <span class="rounded border border-line bg-ground px-2 py-0.5 font-mono text-[12px] text-ink-muted">{r.tags.software}</span>}
                 </div>
               )}
               <div class="flex items-center gap-2 pt-1 text-xs text-ink-muted">
@@ -286,7 +286,7 @@ const featuredReviews = allReviews
   )}
 
   {/* ── Learn + subscribe ── */}
-  <section id="learn" class="container-x flex flex-wrap gap-12 py-12 pb-[72px] md:py-[72px]">
+  <section id="learn" class="container-x flex flex-wrap gap-12 py-[var(--section-y)]">
     {guides.length > 0 && (
       <div class="flex min-w-0 flex-1 basis-[520px] flex-col gap-5">
         <span class="font-mono text-[12px] uppercase tracking-[0.18em] text-brand-text md:text-[13px]">Knowledge base</span>
