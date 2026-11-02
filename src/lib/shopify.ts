@@ -157,6 +157,14 @@ export function formatPrice(amount: string, currencyCode: string): string {
   return `${n.toFixed(2)} ${currencyCode}`;
 }
 
+/** Format a price for card display. Returns empty string for zero/quote-only products. */
+export function formatCardPrice(priceFrom: string): string {
+  // Strip currency symbol and whitespace, check if the numeric value is 0
+  const numeric = priceFrom.replace(/[^0-9.]/g, '');
+  if (!numeric || Number(numeric) === 0) return '';
+  return priceFrom;
+}
+
 function mapProduct(n: any): Product {
   const minPrice = n.priceRange.minVariantPrice;
   return {

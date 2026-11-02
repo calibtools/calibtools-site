@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { formatPrice, findVariant, buildCartLines, buildSetCartLine, highestEndId, sanitizeHtml, extractSpecsFromHtml, type Variant, type Cart } from './shopify';
+import { formatPrice, formatCardPrice, findVariant, buildCartLines, buildSetCartLine, highestEndId, sanitizeHtml, extractSpecsFromHtml, type Variant, type Cart } from './shopify';
 import { dictMarkerCount } from './dicts/dicts';
 
 describe('formatPrice', () => {
@@ -8,6 +8,15 @@ describe('formatPrice', () => {
   it('USD', () => expect(formatPrice('99.00', 'USD')).toBe('$99'));
   it('GBP', () => expect(formatPrice('79.99', 'GBP')).toBe('£79.99'));
   it('other currency', () => expect(formatPrice('100.00', 'JPY')).toBe('100.00 JPY'));
+});
+
+describe('formatCardPrice', () => {
+  it('returns price string for non-zero EUR', () => expect(formatCardPrice('€89')).toBe('€89'));
+  it('returns price string for non-zero USD', () => expect(formatCardPrice('$109.50')).toBe('$109.50'));
+  it('returns empty for €0', () => expect(formatCardPrice('€0')).toBe(''));
+  it('returns empty for $0', () => expect(formatCardPrice('$0')).toBe(''));
+  it('returns empty for €0.00', () => expect(formatCardPrice('€0.00')).toBe(''));
+  it('returns empty for empty string', () => expect(formatCardPrice('')).toBe(''));
 });
 
 describe('findVariant', () => {
