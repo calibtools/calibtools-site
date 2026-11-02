@@ -51,7 +51,7 @@ export const targetsMega: MegaMenuColumn[] = [
   {
     heading: 'By material',
     items: [
-      { label: 'Composite boards', href: '/targets/collection/composite-boards/' },
+      { label: 'Composite targets', href: '/targets/collection/composite-boards/' },
       { label: 'Ceramic & glass targets', href: '/targets/collection/ceramic-glass/' },
       { label: 'ChArUco ceramic', href: '/targets/charuco-ceramic/' },
       { label: 'LiDAR & image quality', href: '/targets/collection/lidar-image-quality/' },
@@ -60,8 +60,8 @@ export const targetsMega: MegaMenuColumn[] = [
   {
     heading: 'Accessories',
     items: [
-      { label: 'Mounting fixture', href: '/targets/mounting-fixture/' },
-      { label: 'Mounts & accessories', href: '/targets/collection/mounts-accessories/' },
+      { label: 'Target mounting fixture', href: '/targets/mounting-fixture/' },
+      { label: 'Mounts & Accessories', href: '/targets/collection/mounts-accessories/' },
       { label: 'All targets', href: '/targets/' },
     ],
   },
@@ -108,10 +108,10 @@ export const footerGroups: FooterGroup[] = [
     heading: 'Targets',
     items: [
       { label: 'All targets', href: '/targets/' },
-      { label: 'Composite boards', href: '/targets/collection/composite-boards/' },
-      { label: 'Ceramic & glass', href: '/targets/collection/ceramic-glass/' },
-      { label: 'LiDAR & image quality', href: '/targets/collection/lidar-image-quality/' },
-      { label: 'Mounts & accessories', href: '/targets/collection/mounts-accessories/' },
+      { label: 'Aluminium Composite Targets', href: '/targets/collection/composite-boards/' },
+      { label: 'Ceramic & Glass Targets', href: '/targets/collection/ceramic-glass/' },
+      { label: 'LiDAR & Image Quality Targets', href: '/targets/collection/lidar-image-quality/' },
+      { label: 'Mounts & Accessories', href: '/targets/collection/mounts-accessories/' },
     ],
   },
   {

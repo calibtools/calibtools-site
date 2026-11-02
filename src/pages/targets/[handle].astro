@@ -391,7 +391,7 @@ const orderingRows = (productData?.orderingRows ?? []).map((row) => {
 });
 ---
 <Base
-  title={product.title}
+  title={productContent?.data.seoTitle ?? product.title}
   section="targets"
   description={metaDescription}
   jsonLd={[breadcrumbLd, productLd]}

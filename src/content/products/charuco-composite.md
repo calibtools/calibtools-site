@@ -1,4 +1,5 @@
 ---
+seoTitle: "ChArUco Target, Aluminium Composite"
 seoDescription: "A ChArUco board you can push half out of frame and still detect: every corner carries a marker ID. Made for your OpenCV stereo and multi-camera rigs."
 summary: "See every corner, even at the frame edge — for your OpenCV stereo and multi-camera rigs"
 decideSpecs:

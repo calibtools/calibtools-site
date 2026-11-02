@@ -396,7 +396,7 @@ export default function VariantPicker({ product, fixtureVariantId, fixturePrice,
           <legend className="text-[13px] font-semibold">Add-ons</legend>
           <label className="flex items-center gap-2.5 text-[15px] min-h-[44px] md:min-h-0">
             <input type="checkbox" className="h-[18px] w-[18px]" checked={addFixture} onChange={(e) => setAddFixture(e.target.checked)} />
-            Mounting fixture, ¼″ thread {fixturePrice && <span className="text-ink-soft">+ {fixturePrice}</span>}
+            Target Mounting Fixture, ¼″-20 {fixturePrice && <span className="text-ink-soft">+ {fixturePrice}</span>}
           </label>
         </fieldset>
       )}

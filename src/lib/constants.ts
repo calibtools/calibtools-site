@@ -28,8 +28,8 @@ export const PRODUCT_TO_COLLECTION: Record<string, string> = {
 
 /** Sibling collection nav items. */
 export const COLLECTION_SIBLINGS = [
-  { handle: 'composite-boards', label: 'Composite' },
-  { handle: 'ceramic-glass', label: 'Ceramic & glass' },
+  { handle: 'composite-boards', label: 'Composite Targets' },
+  { handle: 'ceramic-glass', label: 'Ceramic & Glass' },
   { handle: 'lidar-image-quality', label: 'LiDAR & IQ' },
   { handle: 'mounts-accessories', label: 'Accessories' },
 ] as const;

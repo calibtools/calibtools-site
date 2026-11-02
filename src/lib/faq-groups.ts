@@ -23,7 +23,7 @@ export const faqGroups: FaqGroup[] = [
     items: [
       {
         question: 'What tolerances can I expect?',
-        answer: 'Composite boards are printed to \u00B10.3\u00A0mm feature accuracy. Ceramic targets have a \u00B12\u00A0\u00B5m target accuracy; measurement method to be published. Every target ships with a dimensional inspection report.',
+        answer: 'Our aluminium composite targets are printed to \u00B10.3\u00A0mm + 0.2\u00A0mm/m (at 20\u00A0\u00B0C). Our ceramic targets have a \u00B12\u00A0\u00B5m target; we will publish the measurement method with the first production boards. Every target is measured before it ships, and you get its inspection report.',
       },
       {
         question: 'Is this compatible with OpenCV?',

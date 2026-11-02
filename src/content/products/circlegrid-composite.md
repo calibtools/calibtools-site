@@ -1,4 +1,5 @@
 ---
+seoTitle: "Circle Grid Target, Aluminium Composite"
 seoDescription: "Symmetric or asymmetric circle grids for OpenCV findCirclesGrid and HALCON. Your dot centres stay accurate under defocus and low light. 200–800 mm."
 summary: "Circle grids for OpenCV and HALCON — robust when your images are soft or dim"
 decideSpecs:
