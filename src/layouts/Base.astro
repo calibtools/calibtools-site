@@ -82,7 +82,7 @@ const jsonLdItems = [...providedLd, ...(autoBc ? [autoBc] : []), ORGANIZATION_LD
     </main>
     <Footer />
     <!-- Reserved space so the floating bottom cluster never covers footer links -->
-    <div class="h-[calc(88px+env(safe-area-inset-bottom,0px))] md:h-0" aria-hidden="true"></div>
+    <div class="h-[calc(120px+env(safe-area-inset-bottom,0px))] md:h-0" aria-hidden="true"></div>
     <slot name="mobile-cluster">
       <MobileBottomCluster client:load mode="shop" />
     </slot>
