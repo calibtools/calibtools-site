@@ -160,7 +160,7 @@ describe('Doc HTML output for CHA-C', () => {
     // Minimal doc to verify page count matches CHA-C layout
     const d = new Doc(
       'CT-DS-CHA-C', 'A', '2026-10-24',
-      'Datasheet', 'ChArUco calibration target \u00b7 ceramic',
+      'Datasheet', 'ChArUco Calibration Target, Alumina Ceramic',
     );
     d.addPage('<p>Page 1</p>');
     d.addPage('<p>Page 2</p>');
@@ -174,7 +174,7 @@ describe('Doc HTML output for CHA-C', () => {
   it('includes the header ID in each page', () => {
     const d = new Doc(
       'CT-DS-CHA-C', 'A', '2026-10-24',
-      'Datasheet', 'ChArUco calibration target \u00b7 ceramic',
+      'Datasheet', 'ChArUco Calibration Target, Alumina Ceramic',
     );
     d.addPage('<p>content</p>');
     const html = d.html('A4');
@@ -185,7 +185,7 @@ describe('Doc HTML output for CHA-C', () => {
   it('includes CONTACT_LINE in footer', () => {
     const d = new Doc(
       'CT-DS-CHA-C', 'A', '2026-10-24',
-      'Datasheet', 'ChArUco calibration target \u00b7 ceramic',
+      'Datasheet', 'ChArUco Calibration Target, Alumina Ceramic',
     );
     d.addPage('<p>content</p>');
     const html = d.html('A4');

@@ -509,7 +509,7 @@ function buildChaC(ds: DSParsed, watermark?: string): Doc {
   const d = new Doc(
     'CT-DS-CHA-C', ds.meta.rev, ds.meta.date,
     'Datasheet',
-    'ChArUco calibration target \u00b7 ceramic',
+    ds.meta.title,
     undefined, undefined, watermark,
   );
 

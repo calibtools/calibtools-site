@@ -10,7 +10,7 @@ import { resolve, join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { buildIR, parsePartNumber, geometryTable, type IRData, type IRMeasurements, type Coord } from '../build/ct-ir';
 import { buildCSV } from '../build/ct-csv';
-import { _parseDatasheet, buildDS } from '../build/ct-ds';
+import { _parseDatasheet, buildDS, parseFrontMatter } from '../build/ct-ds';
 
 // ── Shared fixtures ──────────────────────────────────────────────────
 
@@ -172,6 +172,45 @@ describe('CT-DS build — no overflow', () => {
     const result = await buildDS({ code: 'CT-DS-CHA-P', outBase });
     expect(result.pages).toBe(3);
   });
+});
+
+// ── PDF page-1 title matches markdown ────────────────────────────────
+
+describe('CT-DS PDF title matches markdown source', () => {
+  const DS_CODES = [
+    'CT-DS-CHA-C',
+    'CT-DS-CHA-P',
+    'CT-DS-CHT-P',
+    'CT-DS-ACC-A-FIX-14',
+  ];
+
+  let tmp: string;
+
+  beforeAll(() => {
+    tmp = mkdtempSync(join(tmpdir(), 'ct-ds-title-'));
+  });
+
+  for (const code of DS_CODES) {
+    it(`${code} PDF page 1 contains the markdown title`, { timeout: 30_000 }, async () => {
+      const { execFileSync } = await import('node:child_process');
+      const outBase = join(tmp, code);
+      await buildDS({ code, outBase });
+
+      // Extract page-1 text with pdftotext
+      const pdfPath = `${outBase}.pdf`;
+      const text = execFileSync('pdftotext', ['-f', '1', '-l', '1', pdfPath, '-'], { encoding: 'utf-8' });
+      const normalised = text.replace(/\s+/g, ' ').trim();
+
+      // Read the expected title from the markdown source
+      const mdPath = resolve(process.cwd(), `docs/datasheets/${code}.md`);
+      const md = readFileSync(mdPath, 'utf-8');
+      const { meta } = parseFrontMatter(md);
+
+      // Title may wrap across lines in pdftotext output — normalise both
+      const expectedWords = meta.title.replace(/\s+/g, ' ').trim();
+      expect(normalised).toContain(expectedWords);
+    });
+  }
 });
 
 // ── CT-CSV integration ──────────────────────────────────────────────
