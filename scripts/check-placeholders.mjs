@@ -203,6 +203,18 @@ async function main() {
     }
   }
 
+  // ── Withdrawn files guard ──────────────────────────────────────────
+  const WITHDRAWN_FILES = [/CT-SV-CERT-ILAC/];
+  const allDistFiles = [...htmlFiles, ...textFiles, ...pdfFiles];
+  for (const file of allDistFiles) {
+    const rel = relative(DIST, file);
+    for (const pattern of WITHDRAWN_FILES) {
+      if (pattern.test(rel)) {
+        errors.push({ file: rel, detail: `Withdrawn file must not appear in dist: ${rel}` });
+      }
+    }
+  }
+
   // ── Print results ──────────────────────────────────────────────────
   if (errors.length > 0) {
     console.error(`\n[check-placeholders] ${errors.length} placeholder(s) found:\n`);

@@ -91,7 +91,6 @@ async function main() {
     'CT-DS-CHA-P',
     'CT-DS-CHT-P',
     'CT-DS-ACC-A-FIX-14',
-    'CT-SV-CERT-ILAC',
   ];
 
   const { buildDS } = await import('../src/docs/build/ct-ds.ts');

@@ -136,7 +136,6 @@ describe('CT-DS build — no overflow', () => {
     'CT-DS-CHA-P',
     'CT-DS-CHT-P',
     'CT-DS-ACC-A-FIX-14',
-    'CT-SV-CERT-ILAC',
   ];
 
   let tmp: string;
@@ -153,13 +152,6 @@ describe('CT-DS build — no overflow', () => {
       expect(result.overflow).toHaveLength(0);
     });
   }
-
-  it('CT-SV-CERT-ILAC renders exactly 2 pages', async () => {
-    const outBase = join(tmp, 'CT-SV-CERT-ILAC-count');
-    const result = await buildDS({ code: 'CT-SV-CERT-ILAC', outBase });
-    expect(result.pages).toBe(2);
-    expect(result.overflow).toHaveLength(0);
-  });
 
   it('CT-DS-CHA-C renders 4 pages', async () => {
     const outBase = join(tmp, 'CT-DS-CHA-C-count');
