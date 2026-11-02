@@ -96,7 +96,7 @@ export default function MobileBottomCluster({ mode, defaultPrice }: Props) {
   };
 
   return (
-    <div className={`fixed bottom-3 right-3 z-30 flex flex-col items-end gap-2 md:hidden transition-opacity ${hidden ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+    <div data-mobile-cluster className={`fixed bottom-3 right-3 z-30 flex flex-col items-end gap-2 md:hidden transition-opacity ${hidden ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
       {/* Cart button */}
       <button
         type="button"

@@ -81,11 +81,29 @@ const jsonLdItems = [...providedLd, ...(autoBc ? [autoBc] : []), ORGANIZATION_LD
       <slot />
     </main>
     <Footer />
-    <!-- Reserved space so the floating bottom cluster never covers footer links -->
-    <div class="h-[calc(120px+env(safe-area-inset-bottom,0px))] md:h-0" aria-hidden="true"></div>
     <slot name="mobile-cluster">
       <MobileBottomCluster client:load mode="shop" />
     </slot>
     <CartDrawer client:load />
+    <script is:inline>
+      // Hide the floating bottom cluster when the footer is in view.
+      // Uses a scroll listener (synchronous with scroll) rather than
+      // IntersectionObserver so the hidden state is set before any
+      // same-frame read of computed styles.
+      (function() {
+        var footer = document.querySelector('footer');
+        if (!footer) return;
+        function check() {
+          var fr = footer.getBoundingClientRect();
+          var hidden = fr.top < window.innerHeight;
+          document.querySelectorAll('[data-mobile-cluster]').forEach(function(el) {
+            el.style.opacity = hidden ? '0' : '';
+            el.style.pointerEvents = hidden ? 'none' : '';
+          });
+        }
+        window.addEventListener('scroll', check, { passive: true });
+        check();
+      })();
+    </script>
   </body>
 </html>

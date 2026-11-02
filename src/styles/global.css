@@ -113,7 +113,9 @@
 }
 
 @layer base {
-  html { scroll-behavior: smooth; }
+  /* scroll-behavior: smooth removed — it delays programmatic scrollTo()
+     which breaks IntersectionObserver-based visibility toggling.
+     Anchor smooth-scroll handled via JS where needed. */
   a { @apply text-brand-dark hover:text-brand; }
 }
 
