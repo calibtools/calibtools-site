@@ -9,7 +9,7 @@ import {
 import { computeSetBoards } from '@/lib/exportSet';
 import { dictMarkerCount } from '@/lib/dicts/dicts';
 import { LEAD_TIME } from '@/lib/claims';
-import { findCharucoSize, findAprilGridSize } from '@/lib/boardSizes';
+import { findCharucoSize, findAprilGridSize, markerCount } from '@/lib/boardSizes';
 
 interface BoardSetImage {
   src: string;
@@ -118,6 +118,21 @@ export default function VariantPicker({ product, fixtureVariantId, fixturePrice,
   const boardSizeError = isBoardProduct && selectedSize && !sizeInfo
     ? `Unknown size "${selectedSize}" — board set unavailable`
     : '';
+
+  // Number of markers the selected size needs (for dictionary validation)
+  const markersNeeded = useMemo(() => {
+    if (!sizeInfo) return 0;
+    return markerCount(sizeInfo.kind, sizeInfo.rows, sizeInfo.cols);
+  }, [sizeInfo]);
+
+  // Check if a dictionary option value has enough markers for the selected size
+  const isDictDisabled = (dictValue: string): string | null => {
+    if (!sizeInfo || markersNeeded === 0) return null;
+    const count = dictMarkerCount(dictValue);
+    if (count === null) return null; // unknown dict — allow it
+    if (count < markersNeeded) return `${dictValue} has ${count} markers; this size needs ${markersNeeded}`;
+    return null;
+  };
 
   // Compute boards from the selected variant's geometry
   const boards = useMemo(() => {
@@ -274,33 +289,45 @@ export default function VariantPicker({ product, fixtureVariantId, fixturePrice,
       </div>
 
       {/* Option selectors */}
-      {product.options.map((opt) => (
-        <fieldset key={opt.name} className="flex flex-col gap-2.5 border-0 p-0">
-          <legend className="text-[13px] font-semibold">{opt.name}</legend>
-          <div className="flex flex-wrap gap-2">
-            {opt.values.map((val) => (
-              <label
-                key={val}
-                className={`cursor-pointer rounded border px-3.5 py-2.5 text-sm ${
-                  selections[opt.name] === val
-                    ? 'border-2 border-brand font-semibold'
-                    : 'border-line font-medium'
-                }`}
-              >
-                <input
-                  type="radio"
-                  name={opt.name}
-                  value={val}
-                  checked={selections[opt.name] === val}
-                  onChange={() => handleSelect(opt.name, val)}
-                  className="sr-only"
-                />
-                {val}
-              </label>
-            ))}
-          </div>
-        </fieldset>
-      ))}
+      {product.options.map((opt) => {
+        const isDictOpt = opt.name === 'Dictionary';
+        return (
+          <fieldset key={opt.name} className="flex flex-col gap-2.5 border-0 p-0">
+            <legend className="text-[13px] font-semibold">{opt.name}</legend>
+            <div className="flex flex-wrap gap-2">
+              {opt.values.map((val) => {
+                const disabledHint = isDictOpt ? isDictDisabled(val) : null;
+                const isDisabled = !!disabledHint;
+                return (
+                  <label
+                    key={val}
+                    className={`rounded border px-3.5 py-2.5 text-sm ${
+                      isDisabled
+                        ? 'cursor-not-allowed border-line text-ink-muted opacity-50'
+                        : selections[opt.name] === val
+                          ? 'cursor-pointer border-2 border-brand font-semibold'
+                          : 'cursor-pointer border-line font-medium'
+                    }`}
+                    title={disabledHint ?? undefined}
+                    aria-disabled={isDisabled || undefined}
+                  >
+                    <input
+                      type="radio"
+                      name={opt.name}
+                      value={val}
+                      checked={selections[opt.name] === val}
+                      disabled={isDisabled}
+                      onChange={() => handleSelect(opt.name, val)}
+                      className="sr-only"
+                    />
+                    {val}
+                  </label>
+                );
+              })}
+            </div>
+          </fieldset>
+        );
+      })}
 
       {/* Board set */}
       {isBoardProduct && (
