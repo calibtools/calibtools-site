@@ -1,35 +1,53 @@
 {
-  "generated": "2026-11-02T05:39:56.974Z",
-  "inputHash": "2cedff11b81e2c515f0f63ec6fe4140eada0d83cde32a39ba22926c7d5107fdf",
+  "generated": "2026-11-02T05:41:39.389Z",
+  "inputHash": "56afe9ab8c39c13be7874489ce9d5cbd0ea761b15253901dc65d0d166a1f87d1",
   "files": [
     {
       "code": "CT-DS-CHA-C",
       "path": "public/files/datasheets/CT-DS-CHA-C.pdf",
-      "sha256": "002ff7bd9b8aa1947671fa06d3a86f09a74aee246c995ba3dbe7d26cba12ce48",
+      "sha256": "4396d8700074bc25ab4592f4cc95d41ff7d54bc70bc63ea0d1d5168ccf63d4ad",
       "pages": 4
     },
     {
       "code": "CT-DS-CHA-P",
       "path": "public/files/datasheets/CT-DS-CHA-P.pdf",
-      "sha256": "e2a05101f4040097ccc7bf00fd363fb0f1ee36f1d03fee9313ebd2029c191d76",
+      "sha256": "886b9e96113cee5f89a0be92e70c852b37bee7eb077ad2f2908853bea67d891d",
       "pages": 3
     },
     {
       "code": "CT-DS-CHT-P",
       "path": "public/files/datasheets/CT-DS-CHT-P.pdf",
-      "sha256": "984b92c8c4f5f071c123d1c25e05c83c6bf8b34ba6e0402e15227b4304a3897f",
+      "sha256": "a467c247ad69788de2aa958ba27475d4e85dff80912ea65195eb515433db82db",
+      "pages": 3
+    },
+    {
+      "code": "CT-DS-APR-P",
+      "path": "public/files/datasheets/CT-DS-APR-P.pdf",
+      "sha256": "e2b8e030fb865c7d73fe850511817979b46b28da3d9edca41f4bd673ceb17fe9",
+      "pages": 3
+    },
+    {
+      "code": "CT-DS-CIR-P",
+      "path": "public/files/datasheets/CT-DS-CIR-P.pdf",
+      "sha256": "8bdf14c0e13a040132091e2f992ebd400496513265fa86aacd1e7811b5321548",
+      "pages": 3
+    },
+    {
+      "code": "CT-DS-HAL-P",
+      "path": "public/files/datasheets/CT-DS-HAL-P.pdf",
+      "sha256": "c983b8e7aa5d4edab3ca4c8acc1901034447165bb535ff4e6229fc09b938f1a8",
       "pages": 3
     },
     {
       "code": "CT-DS-ACC-A-FIX-14",
       "path": "public/files/datasheets/CT-DS-ACC-A-FIX-14.pdf",
-      "sha256": "91b877a0662a0418474d4fe54f048aeb500e32240db8a7ffda5ccea749b09af1",
+      "sha256": "17709503d9cc950f68f3c459867f590c534d0c8789e1918c06af235e2b2b814b",
       "pages": 1
     },
     {
       "code": "CT-IR-000311",
       "path": "public/files/reports/CT-IR-000311.pdf",
-      "sha256": "53e4788a6d4b1e958c3d660a497316f5f3a20d8bf5a4328901c18de8a5dad962",
+      "sha256": "188a0cc329873ebd158e79ef383d97d3a78d761b53c396ee20107aa085ea906f",
       "pages": 2
     },
     {

@@ -90,6 +90,9 @@ async function main() {
     'CT-DS-CHA-C',
     'CT-DS-CHA-P',
     'CT-DS-CHT-P',
+    'CT-DS-APR-P',
+    'CT-DS-CIR-P',
+    'CT-DS-HAL-P',
     'CT-DS-ACC-A-FIX-14',
   ];
 
