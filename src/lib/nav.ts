@@ -143,7 +143,6 @@ export const footerGroups: FooterGroup[] = [
       { label: 'About', href: '/about/' },
       { label: 'Legal notice', href: '/imprint/' },
       { label: 'Privacy', href: '/privacy/' },
-      { label: 'Reviews policy', href: '/reviews-policy/' },
     ],
   },
 ];

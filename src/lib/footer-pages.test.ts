@@ -102,11 +102,13 @@ describe('privacy.astro copy', () => {
   it('has California clause', () => expect(src).toContain('California residents'));
 });
 
-describe('reviews-policy.astro copy', () => {
-  const src = read('src/pages/reviews-policy.astro');
-  it('has the approved h1', () => expect(src).toContain('>Reviews policy<'));
-  it('has who-can-review section', () => expect(src).toContain('Who can review'));
-  it('has our-replies section', () => expect(src).toContain('Our replies'));
+describe('reviews policy page removed', () => {
+  it('no source file links to /reviews-policy/', () => {
+    for (const f of ['src/lib/nav.ts', 'src/pages/index.astro', 'src/pages/privacy.astro', 'src/islands/ReviewsSection.tsx']) {
+      expect(read(f)).not.toContain('/reviews-policy/');
+    }
+  });
+  it('old URL redirects home', () => expect(read('public/_redirects')).toContain('/reviews-policy/ / 301'));
 });
 
 // ── Claims interpolation ────────────────────────────────────────────
