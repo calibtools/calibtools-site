@@ -6,8 +6,11 @@
 /** Footer copyright line (no location). */
 export const FOOTER_LINE = '\u00A9 2026 Calib.Tools';
 
+/** Production lead-time as a human phrase (for prose interpolation). */
+export const LEAD_TIME_WEEKS = '2\u20133 weeks';
+
 /** Lead-time / availability one-liner for product pages and datasheets. */
-export const LEAD_TIME = 'Made to order \u00B7 ships in 2\u20133 weeks';
+export const LEAD_TIME = `Made to order \u00B7 ships in ${LEAD_TIME_WEEKS}`;
 
 /** Short shipping origin label for the purchase table header. */
 export const SHIPS_FROM = 'Ships from the factory';
@@ -21,6 +24,29 @@ export const CERT_CLAIM = '';
 
 /** Default Incoterm (to be confirmed). */
 export const INCOTERM = 'DAP' as const;
+
+// ── Returns & shipping policy constants ─────────────────────────────
+
+/** Return window from delivery date (calendar days). */
+export const RETURN_WINDOW_DAYS = 30;
+
+/** Return-authorisation number validity (calendar days). */
+export const RA_VALID_DAYS = 14;
+
+/** Late-return restocking window (prose). */
+export const RESTOCKING_WINDOW = '31\u2013120 days';
+
+/** Minimum restocking fee for late returns. */
+export const RESTOCKING_FEE_MIN = '25\u00A0%';
+
+/** Defect warranty duration (prose). */
+export const DEFECT_WARRANTY = 'one year from invoice';
+
+/** Business days before refund is initiated after inspection. */
+export const REFUND_START_DAYS = 3;
+
+/** Number of countries / territories we ship to. */
+export const SHIP_COUNTRY_COUNT = 41;
 
 // ── Material specs ───────────────────────────────────────────────────
 

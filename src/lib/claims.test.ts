@@ -16,7 +16,7 @@ describe('RETURNS_LINE constant', () => {
   it('is used in returns.astro', () => {
     const src = readFileSync(resolve(ROOT, 'src/pages/returns.astro'), 'utf-8');
     expect(src).toContain('RETURNS_LINE');
-    expect(src).toContain("import { RETURNS_LINE } from '@/lib/claims'");
+    expect(src).toContain("RETURNS_LINE,");
   });
 
   it('neither page has the inline copy', () => {

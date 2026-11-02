@@ -1,32 +1,50 @@
 ---
 import Base from '@/layouts/Base.astro';
 import { breadcrumbLd } from '@/lib/seo';
+import { LEAD_TIME_WEEKS, CONTACT_EMAIL, SHIP_COUNTRY_COUNT } from '@/lib/claims';
 const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: 'Shipping' }]);
 ---
-<Base title="Shipping and duties" description="Tracked express worldwide on made-to-order targets. Lead times by product, how duties and import VAT are handled, and what the delivery terms mean." jsonLd={bcLd}>
+<Base title="Shipping, duties and taxes" description="Made-to-order lead times, tracked express transit by region, how shipping is priced, and who pays import VAT and duties on Calib.Tools calibration targets." jsonLd={bcLd}>
   <div class="container-x py-10 md:py-16">
     <div class="prose-calib mx-auto flex max-w-[720px] flex-col gap-5">
-      <h1 class="h-display m-0 text-[32px] md:text-[40px]">Shipping</h1>
+      <h1 class="h-display m-0 text-[32px] md:text-[40px]">Shipping, duties &amp; taxes</h1>
 
-      <h2>Processing time</h2>
-      <p>All targets are made to order. Production and dispatch from the factory takes 2&ndash;3 weeks. A tracking link is emailed as soon as your order ships.</p>
+      <p>Every target is made to order, measured, then sent by tracked express. Here&rsquo;s how long that takes and what to expect when it arrives.</p>
 
-      <h2>Delivery times &amp; methods</h2>
+      <h2>Production</h2>
+      <p>Standard targets take {LEAD_TIME_WEEKS} to produce, measure and dispatch. Custom sizes can add 1&ndash;2 weeks. You get a tracking link by email as soon as your parcel leaves.</p>
+
+      <h2>Transit</h2>
       <table>
-        <thead><tr><th>Destination</th><th>Transit</th><th>Method</th><th>Rates</th></tr></thead>
+        <thead><tr><th>Destination</th><th>Transit (business days)</th><th>Method</th></tr></thead>
         <tbody>
-          <tr><td>EU</td><td>3&ndash;6 days</td><td>Tracked express</td><td>Calculated at checkout</td></tr>
-          <tr><td>UK / Switzerland / Norway</td><td>3&ndash;6 days</td><td>Tracked express</td><td>Calculated at checkout</td></tr>
-          <tr><td>United States</td><td>3&ndash;5 days</td><td>Tracked express</td><td>Calculated at checkout</td></tr>
-          <tr><td>Rest of world</td><td>5&ndash;10 days</td><td>Tracked express</td><td>Calculated at checkout</td></tr>
+          <tr><td>United States</td><td>3&ndash;5</td><td>Tracked express</td></tr>
+          <tr><td>EU</td><td>3&ndash;6</td><td>Tracked express</td></tr>
+          <tr><td>UK, Switzerland, Norway</td><td>3&ndash;6</td><td>Tracked express</td></tr>
+          <tr><td>Rest of world</td><td>5&ndash;10</td><td>Tracked express</td></tr>
         </tbody>
       </table>
 
-      <h2>Customs &amp; duties</h2>
-      <p>Prices are in USD and exclude import VAT and duties. Shipments are sent DAP: the carrier collects import VAT (and duty, if any) from the recipient before delivery. Business customers can reclaim import VAT through their normal return. DDP for larger orders on request &mdash; <a href="mailto:hello@calib.tools">contact us</a>.</p>
+      <p>We ship to {SHIP_COUNTRY_COUNT} countries and territories. If yours is listed at checkout, we ship there.</p>
+
+      <h2>Shipping cost</h2>
+      <p>Checkout shows the carrier rate for your address and parcel size, so you pay what it actually costs to send. Boards of 600&nbsp;&times;&nbsp;400&nbsp;mm and larger go in bigger cartons and cost more to ship.</p>
+
+      <h2>Duties &amp; import VAT</h2>
+      <p>Prices exclude import VAT and duties. We ship DAP (Delivered at Place): the carrier pays them at customs and collects them from you before delivery, usually with a small clearance fee.</p>
+      <ul class="ml-5 flex flex-col gap-2 text-[15px] list-disc">
+        <li><strong>EU, UK, Switzerland, Norway:</strong> import VAT at your local rate, plus duty if any. Businesses can usually reclaim the VAT in their normal return.</li>
+        <li><strong>United States:</strong> duty applies to all imported parcels, whatever the value. The carrier collects it before delivery.</li>
+        <li><strong>Everywhere else:</strong> local rules apply. Your carrier will contact you if anything is due.</li>
+      </ul>
+
+      <p>Ordering several targets for a lab or a production line? We can quote DDP (duties paid) so nothing is due on arrival. Ask through the <a href="/quote/">quote form</a>.</p>
+
+      <h2>Damaged or lost parcels</h2>
+      <p>If the box arrives damaged, take photos before you unpack and email us within 30 days. We&rsquo;ll replace the target &mdash; see <a href="/returns/">Returns</a>. If tracking stops moving, tell us: we chase the carrier and replace or refund once the loss is confirmed.</p>
 
       <h2>Questions?</h2>
-      <p>Email <a href="mailto:hello@calib.tools">hello@calib.tools</a> &mdash; we reply within one business day.</p>
+      <p>Email <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>. We reply within one business day.</p>
     </div>
   </div>
 </Base>

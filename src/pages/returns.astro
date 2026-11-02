@@ -1,31 +1,62 @@
 ---
 import Base from '@/layouts/Base.astro';
 import { breadcrumbLd } from '@/lib/seo';
-import { RETURNS_LINE } from '@/lib/claims';
+import {
+  RETURNS_LINE,
+  CONTACT_EMAIL,
+  RETURN_WINDOW_DAYS,
+  RA_VALID_DAYS,
+  RESTOCKING_WINDOW,
+  RESTOCKING_FEE_MIN,
+  DEFECT_WARRANTY,
+  REFUND_START_DAYS,
+} from '@/lib/claims';
 const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: 'Returns' }]);
 ---
-<Base title="Returns and refunds" description="Thirty-day return window on standard targets, no questions asked. How to start a return, who pays shipping, and how made-to-order items are handled." jsonLd={bcLd}>
+<Base title="Returns and refunds" description="Return a standard target within 30 days of delivery. How to get a return number, how to pack it, restocking after 30 days and the one-year defect warranty." jsonLd={bcLd}>
   <div class="container-x py-10 md:py-16">
     <div class="prose-calib mx-auto flex max-w-[720px] flex-col gap-5">
       <h1 class="h-display m-0 text-[32px] md:text-[40px]">Returns &amp; refunds</h1>
 
-      <h2>30-day return window</h2>
-      <p>{RETURNS_LINE} Within 30 days of delivery for a full refund or replacement. No questions asked.</p>
+      <p>{RETURNS_LINE}</p>
 
-      <h2>How to return</h2>
-      <p>Email <a href="mailto:hello@calib.tools">hello@calib.tools</a> with your order number. We will send a prepaid return label (EU) or shipping instructions (rest of world).</p>
+      <p>We want every target to earn its place on your bench. If it doesn&rsquo;t, or you ordered the wrong one, here is how returns work.</p>
 
-      <h2>Condition</h2>
-      <p>Targets must be returned in their original packaging. Light handling marks from mounting are fine — we understand these are working tools.</p>
+      <h2>Within {RETURN_WINDOW_DAYS} days of delivery</h2>
+      <p>You can return any standard catalogue target within {RETURN_WINDOW_DAYS} days of delivery.</p>
+      <ol class="ml-5 flex flex-col gap-2 text-[15px] list-decimal">
+        <li>Email <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a> with your order number. We reply with a return authorisation (RA) number within one business day.</li>
+        <li>Pack the target in its original Calib.Tools box, foam and clean bag.</li>
+        <li>Write the RA number on the outside of the shipping carton and send it within {RA_VALID_DAYS} days. RA numbers expire after that.</li>
+      </ol>
 
-      <h2>Refund timeline</h2>
-      <p>Refunds are processed within 3 business days of receiving the return. The amount appears on your statement within 5–10 business days depending on your bank.</p>
+      <h2>If we got it wrong</h2>
+      <p>Wrong pattern, wrong size, out of spec or damaged in transit: tell us within {RETURN_WINDOW_DAYS} days of delivery. We cover return shipping, then send a replacement or refund you in full, original shipping included.</p>
 
-      <h2>Custom orders</h2>
-      <p>Custom-printed targets (non-standard patterns or sizes) cannot be returned unless they do not meet the agreed specification.</p>
+      <h2>If you changed your mind</h2>
+      <p>That&rsquo;s fine within {RETURN_WINDOW_DAYS} days. The target needs to come back unused and undamaged, in its original packaging. Return shipping is on you, and the original shipping charge isn&rsquo;t refunded.</p>
+
+      <h2>After {RETURN_WINDOW_DAYS} days</h2>
+      <ul class="ml-5 flex flex-col gap-2 text-[15px] list-disc">
+        <li><strong>{RESTOCKING_WINDOW}:</strong> unopened targets in their original packaging can still come back, less a restocking fee of at least {RESTOCKING_FEE_MIN}.</li>
+        <li><strong>Up to {DEFECT_WARRANTY}:</strong> if a target turns out to be defective, we repair or replace it, unless the product&rsquo;s own warranty says otherwise.</li>
+      </ul>
+      <p>Either way, email us for an RA number before you send anything.</p>
+
+      <h2>How to pack it</h2>
+      <p>Put the target back in its clean bag and seat it in the lower foam, pattern facing the top foam. Don&rsquo;t tape anything to the pattern face. Place the Calib.Tools box inside a separate shipping carton and write the RA number on that outer carton.</p>
+
+      <h2>What we check</h2>
+      <p>We inspect every return when it arrives. Scratches on the pattern, chipped ceramic edges, bent composite or other signs of use or misuse mean we can&rsquo;t accept a change-of-mind return. Defect claims are judged against the spec on the product page.</p>
+
+      <h2>Refunds</h2>
+      <p>Refunds go back to the card or account you paid with. We start the refund within {REFUND_START_DAYS} business days of the return passing inspection. Most banks show it within 5&ndash;10 business days.</p>
+
+      <h2>Custom and volume orders</h2>
+      <p>Custom targets &mdash; patterns, sizes or substrates made to your drawing &mdash; can&rsquo;t be cancelled or returned, unless they don&rsquo;t meet the agreed specification. Returning part of a volume order of standard targets? Email us first and we&rsquo;ll work it out case by case.</p>
 
       <h2>Questions?</h2>
-      <p>Email <a href="mailto:hello@calib.tools">hello@calib.tools</a>.</p>
+      <p>Email <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>. Someone who knows the products will answer within one business day.</p>
     </div>
   </div>
 </Base>
