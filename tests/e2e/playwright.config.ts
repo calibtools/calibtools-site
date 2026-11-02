@@ -12,9 +12,9 @@ export default defineConfig({
     { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
   ],
   webServer: {
-    command: 'SKIP_SPECS_CHECK=1 pnpm build && pnpm preview',
+    command: 'pnpm preview',
     port: 4321,
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: true,
     timeout: 120_000,
   },
 });
