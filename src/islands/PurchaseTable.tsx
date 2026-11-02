@@ -9,6 +9,7 @@ import { availabilityLabel } from '@/lib/collectionSpecs';
 import { SHIPS_FROM } from '@/lib/claims';
 import { idRange } from '@/lib/idRange';
 import type { PatternSpec } from '@/lib/patterns';
+import { findCharucoSize, findAprilGridSize } from '@/lib/boardSizes';
 
 interface Props {
   product: Product;
@@ -28,15 +29,26 @@ function variantColumns(variant: Variant, product: Product, fallbackDocsUrl?: st
   // Squares from metafield
   const squares = m.squares ?? '';
 
-  // ID range for ChArUco / AprilGrid
+  // ID range — derive from boardSizes using the variant's selected Size
   let idsLabel = '';
-  if (m.dictionary && m.squares && m.square_size_mm) {
-    const [rows, cols] = m.squares.split(/[x×]/).map((s: string) => Number(s.trim()));
-    if (rows > 0 && cols > 0) {
+  const isAprilGrid = product.handle.includes('aprilgrid');
+  if (size) {
+    const agSize = isAprilGrid ? findAprilGridSize(size) : null;
+    const chSize = !isAprilGrid ? findCharucoSize(size) : null;
+    if (agSize) {
       const spec: PatternSpec = {
-        type: 'ChArUco', rows, cols,
-        square: Number(m.square_size_mm), marker: Number(m.marker_size_mm ?? 0),
-        dict: m.dictionary, paper: 'A4', startId: Number(m.start_id ?? 0), scaleBar: false,
+        type: 'AprilGrid (Kalibr)', rows: agSize.rows, cols: agSize.cols,
+        square: agSize.tagSize, marker: agSize.tagSize,
+        dict: 'DICT_APRILTAG_36h11', paper: 'A4', startId: Number(m.start_id ?? 0), scaleBar: false,
+      };
+      const range = idRange(spec);
+      if (range) idsLabel = `IDs ${range.min}\u2013${range.max}`;
+    } else if (chSize) {
+      const dict = dictOrPattern || m.dictionary || '';
+      const spec: PatternSpec = {
+        type: 'ChArUco', rows: chSize.rows, cols: chSize.cols,
+        square: chSize.square, marker: chSize.marker,
+        dict, paper: 'A4', startId: Number(m.start_id ?? 0), scaleBar: false,
       };
       const range = idRange(spec);
       if (range) idsLabel = `IDs ${range.min}\u2013${range.max}`;
