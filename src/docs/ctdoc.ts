@@ -129,7 +129,7 @@ body { font-family: 'Geist'; font-size: 10pt; line-height: 1.45; color: ${G80}; 
 
 /* type */
 .eyebrow { font-family: 'Geist Mono'; font-size: 8pt; letter-spacing: .16em; text-transform: uppercase; color: ${G60}; margin: 3mm 0 1.2mm; }
-h1 { font-weight: 700; font-size: 21pt; line-height: 1.15; color: ${BLACK}; margin: 0 0 1.5mm; white-space: nowrap; letter-spacing: -.005em; }
+h1 { font-weight: 700; font-size: 21pt; line-height: 1.15; color: ${BLACK}; margin: 0 0 1.5mm; letter-spacing: -.005em; }
 .sub { font-size: 10pt; color: ${G60}; margin: 0 0 4mm; }
 h2.sec { font-weight: 600; font-size: 11pt; line-height: 1.25; color: ${BLACK}; margin: 3.6mm 0 1.6mm; padding-top: 1.3mm; border-top: 0.35mm solid ${BLACK};
           display: flex; align-items: baseline; gap: 2.6mm; break-after: avoid; }

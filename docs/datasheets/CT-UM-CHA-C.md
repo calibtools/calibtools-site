@@ -1,6 +1,6 @@
 ---
 code: CT-UM-CHA-C
-title: ChArUco ceramic target — Quick start
+title: ChArUco Calibration Target, Alumina Ceramic — Quick start
 type: manual
 rev: A
 date: 2026-10-24

@@ -1,6 +1,6 @@
 ---
 code: CT-DS-ACC-A-FIX-14
-title: Mounting fixture, ¼″-20
+title: Target Mounting Fixture, ¼″-20
 type: datasheet
 rev: A
 date: 2026-10-24

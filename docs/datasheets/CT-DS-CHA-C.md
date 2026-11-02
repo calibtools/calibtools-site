@@ -1,6 +1,6 @@
 ---
 code: CT-DS-CHA-C
-title: ChArUco calibration target, ceramic
+title: ChArUco Calibration Target, Alumina Ceramic
 type: datasheet
 rev: A
 date: 2026-10-24

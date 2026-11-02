@@ -1,6 +1,6 @@
 ---
 code: CT-DS-APR-P
-title: AprilGrid calibration target, composite
+title: AprilGrid Calibration Target, Aluminium Composite
 type: datasheet
 rev: A
 date: 2026-10-29

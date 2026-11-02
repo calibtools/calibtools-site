@@ -1,6 +1,6 @@
 ---
 code: CT-DS-CHT-P
-title: Checkerboard calibration target, composite
+title: Checkerboard Calibration Target, Aluminium Composite
 type: datasheet
 rev: A
 date: 2026-10-24

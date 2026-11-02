@@ -1,6 +1,6 @@
 ---
 code: CT-DS-CHA-P
-title: ChArUco calibration target, composite
+title: ChArUco Calibration Target, Aluminium Composite
 type: datasheet
 rev: A
 date: 2026-10-24

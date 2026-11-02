@@ -1,6 +1,6 @@
 ---
 code: CT-UM-CHT-P
-title: Checkerboard composite target — Quick start
+title: Checkerboard Calibration Target, Aluminium Composite — Quick start
 type: manual
 rev: A
 date: 2026-10-24

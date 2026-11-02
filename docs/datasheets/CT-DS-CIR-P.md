@@ -1,6 +1,6 @@
 ---
 code: CT-DS-CIR-P
-title: Circle grid calibration target, composite
+title: Circle Grid Calibration Target, Aluminium Composite
 type: datasheet
 rev: A
 date: 2026-10-29

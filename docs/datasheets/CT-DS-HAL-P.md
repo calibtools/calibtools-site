@@ -1,6 +1,6 @@
 ---
 code: CT-DS-HAL-P
-title: HALCON calibration plate, composite
+title: HALCON Calibration Plate, Aluminium Composite
 type: datasheet
 rev: A
 date: 2026-10-29

@@ -36,7 +36,7 @@ describe('parseFrontMatter', () => {
   it('correctly reads CT-DS-CHA-C.md front matter', () => {
     const { meta } = parseFrontMatter(CHA_C_MD);
     expect(meta.code).toBe('CT-DS-CHA-C');
-    expect(meta.title).toBe('ChArUco calibration target, ceramic');
+    expect(meta.title).toBe('ChArUco Calibration Target, Alumina Ceramic');
     expect(meta.type).toBe('datasheet');
     expect(meta.rev).toBe('A');
     expect(meta.family).toBe('CHA');

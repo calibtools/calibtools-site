@@ -1,6 +1,6 @@
 ---
 code: CT-UM-CHA-P
-title: ChArUco composite target — Quick start
+title: ChArUco Calibration Target, Aluminium Composite — Quick start
 type: manual
 rev: A
 date: 2026-10-24
