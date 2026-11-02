@@ -4,13 +4,13 @@ import { Plus, ArrowRight, User } from '@/lib/icons';
 interface Props {
   collectionHandle: string;
   specsTable: Array<{ label: string; value: string }>;
-  founderQuote?: string;
+  brandNote?: string;
 }
 
 const TAB_KEYS = ['Overview', 'Specifications', 'Files', 'Cleaning & care', 'FAQ'] as const;
 type TabKey = (typeof TAB_KEYS)[number];
 
-export default function CollectionTabs({ collectionHandle, specsTable, founderQuote }: Props) {
+export default function CollectionTabs({ collectionHandle, specsTable, brandNote }: Props) {
   const [activeTab, setActiveTab] = useState<TabKey>('Overview');
   const [sections, setSections] = useState<Record<string, string>>({});
   const [isMobile, setIsMobile] = useState(false);
@@ -71,8 +71,8 @@ export default function CollectionTabs({ collectionHandle, specsTable, founderQu
         <div className="flex flex-col gap-1.5">
           <strong className="text-[15px]">Calib.Tools</strong>
           <span className="text-sm text-ink-muted">Founder, Calib.Tools</span>
-          {founderQuote && (
-            <p className="m-0 text-sm text-ink-muted italic leading-relaxed">&ldquo;{founderQuote}&rdquo;</p>
+          {brandNote && (
+            <p className="m-0 text-sm text-ink-muted leading-relaxed">{brandNote}</p>
           )}
           <a href="/quote/" className="mt-2 inline-flex items-center gap-1.5 text-sm font-semibold text-brand hover:text-brand-dark min-h-[44px] md:min-h-[24px]">
             Get a quote <ArrowRight size={14} strokeWidth={1.6} aria-hidden="true" className="inline" />

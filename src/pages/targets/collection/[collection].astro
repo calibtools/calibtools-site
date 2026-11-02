@@ -40,7 +40,7 @@ let specsTable: Array<{ label: string; value: string }> = [];
 let sellingPoints: string[] = [];
 let pairsWith: string[] = [];
 let collectionColor: string = 'brand';
-let founderQuote: string | undefined;
+let brandNote: string | undefined;
 let ContentComponent: any = null;
 
 if (entry) {
@@ -48,7 +48,7 @@ if (entry) {
   sellingPoints = entry.data.sellingPoints;
   pairsWith = entry.data.pairsWith;
   collectionColor = entry.data.color;
-  founderQuote = entry.data.founderQuote;
+  brandNote = entry.data.brandNote;
   const rendered = await entry.render();
   ContentComponent = rendered.Content;
 }
@@ -256,7 +256,7 @@ const breadcrumbLd = {
       client:load
       collectionHandle={handle!}
       specsTable={specsTable}
-      founderQuote={founderQuote}
+      brandNote={brandNote}
     />
   )}
 

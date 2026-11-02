@@ -41,7 +41,7 @@ const collections_ = defineCollection({
     color: z.enum(['brand', 'slate-blue', 'amber', 'grey']),
     pairsWith: z.array(z.string()).default([]),
     specsTable: z.array(z.object({ label: z.string(), value: z.string() })).default([]),
-    founderQuote: z.string().optional(),
+    brandNote: z.string().optional(),
   }),
 });
 
