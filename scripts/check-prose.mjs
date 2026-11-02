@@ -47,6 +47,10 @@ const BANNED_PATTERNS = [
   /\bcoming\s+soon\b/i,
   /\bin\s+development\b/i,
   /\(soon\)/i,
+  /From\s+checkerboard\s+to\s+certificate/i,
+  /I\s+started\s+Calib\.Tools/i,
+  /\bpremium\b/i,
+  /\bbest-in-class\b/i,
 ];
 
 /** Phrases that are allowed even when they contain a banned word. */
