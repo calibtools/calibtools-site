@@ -3,7 +3,7 @@
  *
  * Every file that needs square/marker sizes or grid dimensions must import
  * from here.  Values come from the ordering tables in the datasheets
- * (CT-DS-CHA-P, CT-DS-CHA-C, CT-DS-APR-P) and are verified by unit tests
+ * (CT-DS-CHA-P, CT-DS-CHA-C, CT-DS-APR-P) and are checked by unit tests
  * that parse those tables directly.
  *
  * Integer-mm rounding causes the marker-to-square ratio to vary by size,
