@@ -121,7 +121,7 @@ const jsonLdItems = [articleLd, breadcrumbLd, ...(faqLd ? [faqLd] : [])];
           <div class="flex flex-col divide-y divide-line">
             {d.faq.map((item: { q: string; a: string }) => (
               <details class="group py-3">
-                <summary class="flex cursor-pointer list-none items-center justify-between gap-4 text-[15px] font-semibold [&::-webkit-details-marker]:hidden">
+                <summary class="flex cursor-pointer list-none items-center justify-between gap-4 min-h-[44px] md:min-h-[24px] text-[15px] font-semibold [&::-webkit-details-marker]:hidden">
                   {item.q}
                   <span class="shrink-0 text-ink-soft transition-transform group-open:rotate-45">+</span>
                 </summary>

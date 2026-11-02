@@ -405,12 +405,12 @@ const orderingRows = (productData?.orderingRows ?? []).map((row) => {
 >
   {/* Breadcrumb */}
   <nav class="container-x flex flex-wrap gap-x-2 gap-y-1 pt-5 text-sm text-ink-soft" aria-label="Breadcrumb">
-    <a href="/" class="text-ink-soft no-underline shrink-0 min-h-[44px] md:min-h-0 flex items-center">Home</a><span class="flex items-center">/</span>
-    <a href="/targets/" class="text-ink-soft no-underline shrink-0 min-h-[44px] md:min-h-0 flex items-center">Calibration targets</a><span class="flex items-center">/</span>
+    <a href="/" class="text-ink-soft no-underline shrink-0 min-h-[44px] md:min-h-[24px] flex items-center">Home</a><span class="flex items-center">/</span>
+    <a href="/targets/" class="text-ink-soft no-underline shrink-0 min-h-[44px] md:min-h-[24px] flex items-center">Calibration targets</a><span class="flex items-center">/</span>
     {collectionHandle && (
-      <><a href={`/targets/collection/${collectionHandle}/`} class="text-ink-soft no-underline shrink-0 min-h-[44px] md:min-h-0 flex items-center">{collectionTitle}</a><span class="flex items-center">/</span></>
+      <><a href={`/targets/collection/${collectionHandle}/`} class="text-ink-soft no-underline shrink-0 min-h-[44px] md:min-h-[24px] flex items-center">{collectionTitle}</a><span class="flex items-center">/</span></>
     )}
-    <span class="text-ink shrink-0 min-h-[44px] md:min-h-0 flex items-center">{product.title}</span>
+    <span class="text-ink shrink-0 min-h-[44px] md:min-h-[24px] flex items-center">{product.title}</span>
   </nav>
 
   {/* ── Buy box ── */}
@@ -739,7 +739,7 @@ const orderingRows = (productData?.orderingRows ?? []).map((row) => {
       <div class="card flex flex-col gap-2 bg-ground-alt p-5">
         <strong class="flex items-center gap-2 text-[15px]"><Wand2 size={20} stroke-width={1.6} class="text-brand" aria-hidden="true" />Not sure about the size?</strong>
         <span class="text-sm text-ink-muted">Run the free selection wizard with your camera and lens.</span>
-        <a href="/tools/wizard/" class="text-sm font-semibold">Open wizard <ArrowRight size={14} stroke-width={1.6} class="inline" aria-hidden="true" /></a>
+        <a href="/tools/wizard/" class="text-sm font-semibold min-h-[44px] md:min-h-[24px] inline-flex items-center">Open wizard <ArrowRight size={14} stroke-width={1.6} class="inline" aria-hidden="true" /></a>
       </div>
 
       {/* Compare material */}
@@ -747,7 +747,7 @@ const orderingRows = (productData?.orderingRows ?? []).map((row) => {
         <div class="card flex flex-col gap-2 bg-ground-alt p-5">
           <strong class="flex items-center gap-2 text-[15px]"><Columns2 size={20} stroke-width={1.6} class="text-brand" aria-hidden="true" />Compare with {compareProduct.title}</strong>
           <span class="text-sm text-ink-muted">{handle?.includes('composite') ? 'Higher accuracy, smaller sizes.' : `Larger sizes from ${compareProduct!.priceFrom}, more affordable.`}</span>
-          <a href={compareProduct.url} class="text-sm font-semibold">View {compareProduct.title} <ArrowRight size={14} stroke-width={1.6} class="inline" aria-hidden="true" /></a>
+          <a href={compareProduct.url} class="text-sm font-semibold min-h-[44px] md:min-h-[24px] inline-flex items-center">View {compareProduct.title} <ArrowRight size={14} stroke-width={1.6} class="inline" aria-hidden="true" /></a>
         </div>
       )}
 
@@ -755,7 +755,7 @@ const orderingRows = (productData?.orderingRows ?? []).map((row) => {
       <div class="card flex flex-col gap-2 bg-ground-alt p-5">
         <strong class="flex items-center gap-2 text-[15px]"><MessageSquare size={20} stroke-width={1.6} class="text-brand" aria-hidden="true" />Need a quote?</strong>
         <span class="text-sm text-ink-muted">Reply within one business day.</span>
-        <a href="/quote/" class="text-sm font-semibold">Request a quote <ArrowRight size={14} stroke-width={1.6} class="inline" aria-hidden="true" /></a>
+        <a href="/quote/" class="text-sm font-semibold min-h-[44px] md:min-h-[24px] inline-flex items-center">Request a quote <ArrowRight size={14} stroke-width={1.6} class="inline" aria-hidden="true" /></a>
       </div>
     </div>
   </section>
@@ -792,7 +792,7 @@ const orderingRows = (productData?.orderingRows ?? []).map((row) => {
   {/* Back to family */}
   {collectionHandle && (
     <section class="container-x pb-16">
-      <a href={`/targets/collection/${collectionHandle}/`} class="text-sm font-semibold no-underline"><ArrowUp size={14} stroke-width={1.6} class="inline" aria-hidden="true" /> All {collectionTitle.toLowerCase()}</a>
+      <a href={`/targets/collection/${collectionHandle}/`} class="text-sm font-semibold no-underline min-h-[44px] md:min-h-[24px] inline-flex items-center"><ArrowUp size={14} stroke-width={1.6} class="inline" aria-hidden="true" /> All {collectionTitle.toLowerCase()}</a>
     </section>
   )}
 

@@ -539,7 +539,7 @@ export default function Generator({ initialSpec }: GeneratorProps = {}) {
             <ul className="m-0 list-none space-y-1 pl-0 text-[13px]">
               <li>(a) <strong>Tile</strong> across {layout.tiling ? `${layout.tiling.cols} \u00D7 ${layout.tiling.rows} = ${layout.tiling.totalPages}` : ''} {spec.paper} sheets at 100 % scale with 10 mm overlap and crop marks.{' '}
                 {layout.tiling && (
-                  <button type="button" className="font-semibold underline" disabled={busy !== null} onClick={async () => {
+                  <button type="button" className="font-semibold underline min-h-[44px] md:min-h-[24px] inline-flex items-center" disabled={busy !== null} onClick={async () => {
                     setBusy('pdf');
                     try {
                       const bytes = await exportTiledPdf({ spec, tiling: layout.tiling! });
@@ -554,17 +554,17 @@ export default function Generator({ initialSpec }: GeneratorProps = {}) {
               </li>
               {layout.reducedSpec && (
                 <li>(b) <strong>Reduce grid</strong>: {reductionNotice(spec.rows, spec.cols, layout.reducedSpec.rows, layout.reducedSpec.cols, spec.square, layout.reducedSpec.orientation)}.{' '}
-                  <button type="button" className="font-semibold underline" onClick={() => { set('rows', layout.reducedSpec!.rows); set('cols', layout.reducedSpec!.cols); }}>Apply</button>
+                  <button type="button" className="font-semibold underline min-h-[44px] md:min-h-[24px] inline-flex items-center" onClick={() => { set('rows', layout.reducedSpec!.rows); set('cols', layout.reducedSpec!.cols); }}>Apply</button>
                 </li>
               )}
               {layout.upsizePaper && (
                 <li>(c) <strong>Switch to {layout.upsizePaper}</strong>.{' '}
-                  <button type="button" className="font-semibold underline" onClick={() => set('paper', layout.upsizePaper!)}>Switch</button>
+                  <button type="button" className="font-semibold underline min-h-[44px] md:min-h-[24px] inline-flex items-center" onClick={() => set('paper', layout.upsizePaper!)}>Switch</button>
                 </li>
               )}
             </ul>
             <p className="m-0 mt-2 text-[12px] text-ink-muted">Or use squares ≤ {maxSquare} mm.{' '}
-              <button type="button" className="font-semibold underline" onClick={() => set('square', maxSquare)}>Set {maxSquare} mm</button>
+              <button type="button" className="font-semibold underline min-h-[44px] md:min-h-[24px] inline-flex items-center" onClick={() => set('square', maxSquare)}>Set {maxSquare} mm</button>
             </p>
           </div>
         )}

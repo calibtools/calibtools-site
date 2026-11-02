@@ -21,7 +21,7 @@ const { Content, faq } = Astro.props;
       <div class="flex flex-col divide-y divide-line border-y border-line">
         {faq.map((item) => (
           <details class="group py-4">
-            <summary class="flex cursor-pointer list-none items-center justify-between gap-4 min-h-[44px] md:min-h-0 text-[15px] font-semibold [&::-webkit-details-marker]:hidden">
+            <summary class="flex cursor-pointer list-none items-center justify-between gap-4 min-h-[44px] md:min-h-[24px] text-[15px] font-semibold [&::-webkit-details-marker]:hidden">
               {item.q}
               <Plus size={18} stroke-width={1.6} class="shrink-0 text-ink-soft transition-transform group-open:rotate-45" aria-hidden="true" />
             </summary>
@@ -43,7 +43,7 @@ const { Content, faq } = Astro.props;
         const details = document.createElement('details');
         details.className = 'group border-t border-line';
         const summary = document.createElement('summary');
-        summary.className = 'flex cursor-pointer list-none items-center justify-between gap-4 py-4 min-h-[44px] md:min-h-0 text-[17px] font-semibold [&::-webkit-details-marker]:hidden';
+        summary.className = 'flex cursor-pointer list-none items-center justify-between gap-4 py-4 min-h-[44px] md:min-h-[24px] text-[17px] font-semibold [&::-webkit-details-marker]:hidden';
         summary.innerHTML = `${h2.textContent}<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" class="shrink-0 text-ink-soft transition-transform group-open:rotate-45" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
 
         const content = document.createElement('div');

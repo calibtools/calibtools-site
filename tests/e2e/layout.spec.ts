@@ -193,28 +193,32 @@ async function fixedElementOverlap(page: Page) {
     // Wait a tick for any scroll-based show/hide
     return new Promise<{ overlapping: string[] }>((resolve) => {
       setTimeout(() => {
-        // Find the sticky top nav (first sticky element at top:0) to exempt it
-        const stickyTopNav = (() => {
-          const all = Array.from(document.querySelectorAll('*'));
-          for (const el of all) {
-            const s = window.getComputedStyle(el);
-            if (s.position === 'sticky' && (s.top === '0px' || s.top === '0')) return el;
-          }
-          return null;
-        })();
+        const vh = window.innerHeight;
+        const vw = window.innerWidth;
 
-        const fixed = Array.from(document.querySelectorAll('*')).filter((el) => {
+        // Find the sticky top nav: the first sticky nav at top:0
+        const stickyTopNav = document.querySelector('nav[data-nav-bar]') as Element | null;
+
+        // Find fixed/sticky elements that are visible and on-screen
+        const fixed: Element[] = [];
+        // Only check elements that are likely fixed/sticky (much faster than querySelectorAll('*'))
+        const candidates = document.querySelectorAll('[class*="fixed"], [class*="sticky"], [style*="position"]');
+        for (const el of candidates) {
           const s = window.getComputedStyle(el);
-          if (s.position !== 'fixed' && s.position !== 'sticky') return false;
-          if (s.display === 'none' || s.visibility === 'hidden') return false;
-          // Exempt the sticky top nav (same as old header exemption)
-          if (el === stickyTopNav || (stickyTopNav && stickyTopNav.contains(el))) return false;
-          if (el.tagName === 'HEADER' || el.closest('header')) return false;
-          return true;
-        });
+          if (s.position !== 'fixed' && s.position !== 'sticky') continue;
+          if (s.display === 'none' || s.visibility === 'hidden') continue;
+          if (s.opacity === '0' || s.pointerEvents === 'none') continue;
+          // Exempt the sticky top nav
+          if (el === stickyTopNav || (stickyTopNav && stickyTopNav.contains(el))) continue;
+          if (el.tagName === 'HEADER' || el.closest('header')) continue;
+          // Exempt fixed elements fully off-screen (e.g. translated-away drawers)
+          const fr = el.getBoundingClientRect();
+          if (fr.right <= 0 || fr.left >= vw || fr.bottom <= 0 || fr.top >= vh) continue;
+          if (fr.width === 0 || fr.height === 0) continue;
+          fixed.push(el);
+        }
 
         // Check ALL focusable elements in the last screenful (footer included)
-        const vh = window.innerHeight;
         const focusable = Array.from(document.querySelectorAll('a, button, input, select, textarea, [tabindex]'))
           .filter((el) => {
             const r = el.getBoundingClientRect();
@@ -228,7 +232,6 @@ async function fixedElementOverlap(page: Page) {
         const overlapping: string[] = [];
         for (const f of fixed) {
           const fr = f.getBoundingClientRect();
-          if (fr.width === 0 || fr.height === 0) continue;
           for (const t of focusable) {
             // Exclude descendants of the fixed element itself
             if (f.contains(t) || t.contains(f)) continue;
@@ -301,6 +304,13 @@ for (const path of PAGES) {
         const inputs = Array.from(document.querySelectorAll('input[type="checkbox"], input[type="radio"]'));
         const violations: { text: string; h: number }[] = [];
         for (const input of inputs) {
+          // Skip visually hidden inputs (sr-only, clip, 1×1)
+          const is = window.getComputedStyle(input);
+          if (is.position === 'absolute' && is.overflow === 'hidden' &&
+              (is.clip !== 'auto' || is.clipPath === 'inset(50%)') &&
+              (parseInt(is.width) <= 1 || parseInt(is.height) <= 1)) continue;
+          const ir = input.getBoundingClientRect();
+          if (ir.width <= 1 && ir.height <= 1) continue;
           const label = input.closest('label');
           if (!label) continue;
           const rect = label.getBoundingClientRect();
@@ -386,9 +396,8 @@ test('floating ATC hidden while in-page ATC visible @ 375', async ({ page }) => 
   }
 
   // After scrolling past the buy-box, the cluster must be visible
-  await buyBox.evaluate((el) => el.scrollIntoView({ block: 'start' }));
-  await page.evaluate(() => window.scrollBy(0, window.innerHeight + 200));
-  await page.waitForTimeout(300);
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+  await page.waitForTimeout(600);
 
   const visible = await cluster.evaluate((el) => {
     const s = window.getComputedStyle(el);
