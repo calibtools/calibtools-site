@@ -9,7 +9,7 @@ import {
 import { computeSetBoards } from '@/lib/exportSet';
 import { dictMarkerCount } from '@/lib/dicts/dicts';
 import { LEAD_TIME } from '@/lib/claims';
-import { markerForSquare } from '@/lib/boardSizes';
+import { findCharucoSize, findAprilGridSize } from '@/lib/boardSizes';
 
 interface BoardSetImage {
   src: string;
@@ -95,24 +95,54 @@ export default function VariantPicker({ product, fixtureVariantId, fixturePrice,
   }, [product.options]);
 
   // Determine if this is a board-set-eligible product
-  const isBoardProduct = product.handle.includes('charuco') || product.handle.includes('aprilgrid') || product.handle.includes('aruco');
+  const isCharuco = product.handle.includes('charuco') || product.handle.includes('aruco');
+  const isAprilGrid = product.handle.includes('aprilgrid');
+  const isBoardProduct = isCharuco || isAprilGrid;
 
-  // Compute boards using product metafields for pattern params
+  // Selected size and dictionary from variant options
+  const selectedSize = selections['Size'] ?? '';
+  const selectedDict = selections['Dictionary'] ?? '';
+
+  // Look up grid geometry from boardSizes (not from product metafields)
+  const sizeInfo = useMemo(() => {
+    if (!isBoardProduct || !selectedSize) return null;
+    if (isAprilGrid) {
+      const ag = findAprilGridSize(selectedSize);
+      return ag ? { kind: 'aprilgrid' as const, ...ag } : null;
+    }
+    const ch = findCharucoSize(selectedSize);
+    return ch ? { kind: 'charuco' as const, ...ch } : null;
+  }, [isBoardProduct, isAprilGrid, selectedSize]);
+
+  // Board-set error when selected size is not in boardSizes
+  const boardSizeError = isBoardProduct && selectedSize && !sizeInfo
+    ? `Unknown size "${selectedSize}" — board set unavailable`
+    : '';
+
+  // Compute boards from the selected variant's geometry
   const boards = useMemo(() => {
-    if (!isBoardProduct || boardCount <= 1) return null;
-    const squares = product.metafields.squares ?? '10x7';
-    const cols = parseInt(squares.split('x')[0], 10) || 10;
-    const rows = parseInt(squares.split('x')[1], 10) || 7;
+    if (!sizeInfo || boardCount <= 1) return null;
+    if (sizeInfo.kind === 'aprilgrid') {
+      const spec = {
+        type: 'AprilGrid (Kalibr)' as const,
+        rows: sizeInfo.rows, cols: sizeInfo.cols,
+        square: sizeInfo.tagSize, marker: sizeInfo.tagSize,
+        dict: 'DICT_APRILTAG_36h11',
+        aprilFamily: '36h11',
+        tagSpacing: sizeInfo.gap / sizeInfo.tagSize,
+        paper: 'A4', startId: 0, scaleBar: true,
+      };
+      return computeSetBoards(spec, boardCount, boardStartIds.length >= boardCount ? boardStartIds : undefined);
+    }
     const spec = {
       type: 'ChArUco' as const,
-      rows, cols,
-      square: parseFloat(product.metafields.square_size_mm ?? '25'),
-      marker: parseFloat(product.metafields.marker_size_mm ?? String(markerForSquare(parseFloat(product.metafields.square_size_mm ?? '25')))),
-      dict: product.metafields.dictionary ?? 'DICT_6X6_250',
+      rows: sizeInfo.rows, cols: sizeInfo.cols,
+      square: sizeInfo.square, marker: sizeInfo.marker,
+      dict: selectedDict || 'DICT_6X6_250',
       paper: 'A4', startId: 0, scaleBar: true,
     };
     return computeSetBoards(spec, boardCount, boardStartIds.length >= boardCount ? boardStartIds : undefined);
-  }, [boardCount, boardStartIds, product.metafields, isBoardProduct]);
+  }, [boardCount, boardStartIds, sizeInfo, selectedDict]);
 
   // Clear confirmation timer on unmount
   useEffect(() => () => { if (confirmTimer.current) clearTimeout(confirmTimer.current); }, []);
@@ -160,9 +190,9 @@ export default function VariantPicker({ product, fixtureVariantId, fixturePrice,
     setError('');
     setConfirmation('');
     try {
-      if (boardCount >= 2 && boards && variant) {
+      if (boardCount >= 2 && boards && variant && sizeInfo) {
         // Multi-board set: one cart line with quantity = boardCount × userQuantity
-        const dict = product.metafields.dictionary ?? 'DICT_6X6_250';
+        const dict = isAprilGrid ? 'DICT_APRILTAG_36h11' : selectedDict;
         const maxMarkers = dictMarkerCount(dict);
 
         // Read existing cart to find continuation start ID
@@ -274,8 +304,9 @@ export default function VariantPicker({ product, fixtureVariantId, fixturePrice,
 
       {/* Board set */}
       {isBoardProduct && (
-        <fieldset className="flex flex-col gap-2.5 border-0 p-0">
+        <fieldset className="flex flex-col gap-2.5 border-0 p-0" disabled={!!boardSizeError}>
           <legend className="text-[13px] font-semibold">Board set</legend>
+          {boardSizeError && <p className="m-0 text-sm text-brand">{boardSizeError}</p>}
           <div className="flex flex-wrap gap-2">
             {[1, 2, 3, 4].map(n => (
               <label key={n} className={`cursor-pointer rounded border px-3.5 py-2.5 text-sm ${
