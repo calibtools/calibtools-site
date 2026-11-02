@@ -25,7 +25,7 @@ export function computeSetBoards(
   const boards: SetBoard[] = [];
 
   for (let k = 0; k < count; k++) {
-    const startId = overrideStartIds?.[k] ?? k * markersPerBoard;
+    const startId = overrideStartIds?.[k] ?? (baseSpec.startId + k * markersPerBoard);
     const spec = { ...baseSpec, startId };
     const boardRange = idRange(spec)!;
     boards.push({ index: k, startId, idRange: boardRange, spec });
