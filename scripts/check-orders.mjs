@@ -127,7 +127,7 @@ for (const order of orders) {
 
   for (const item of order.lineItems.nodes) {
     const props = (item.customAttributes ?? [])
-      .filter((a) => a.key === 'start_id' || a.key === 'id_range')
+      .filter((a) => ['start_id', 'id_range', 'id_ranges', 'boards'].includes(a.key))
       .map((a) => `${a.key}=${a.value}`)
       .join(', ');
 
@@ -140,10 +140,12 @@ for (const order of orders) {
 
 const withProps = orders.filter((o) =>
   o.lineItems.nodes.some((li) =>
-    (li.customAttributes ?? []).some((a) => a.key === 'start_id' || a.key === 'id_range'),
+    (li.customAttributes ?? []).some((a) =>
+      ['start_id', 'id_range', 'id_ranges', 'boards'].includes(a.key),
+    ),
   ),
 );
 
-console.log(`[check-orders] ${withProps.length}/${orders.length} orders have start_id or id_range properties.`);
+console.log(`[check-orders] ${withProps.length}/${orders.length} orders have board-set properties.`);
 console.log('\nPacking slip: properties appear automatically unless prefixed with _.');
 console.log('Customise at: Settings → Shipping and delivery → Packing slips → Edit template.\n');
