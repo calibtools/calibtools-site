@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { formatPrice, findVariant, buildCartLines, sanitizeHtml, extractSpecsFromHtml, type Variant } from './shopify';
+import { formatPrice, findVariant, buildCartLines, buildSetCartLine, highestEndId, sanitizeHtml, extractSpecsFromHtml, type Variant, type Cart } from './shopify';
+import { dictMarkerCount } from './dicts/dicts';
 
 describe('formatPrice', () => {
   it('EUR integer', () => expect(formatPrice('89.00', 'EUR')).toBe('€89'));
@@ -249,6 +250,81 @@ describe('cartLinesRemove', () => {
     const cart = await cartLinesRemove('gid://shopify/Cart/1', ['line-1']);
     expect(cart.totalQuantity).toBe(0);
     expect(cart.lines).toHaveLength(0);
+  });
+});
+
+describe('buildSetCartLine', () => {
+  it('N=2, Q=1 → qty 2 with correct attributes', () => {
+    const line = buildSetCartLine('v1', 2, 1, 0, ['0\u201334', '35\u201369']);
+    expect(line.merchandiseId).toBe('v1');
+    expect(line.quantity).toBe(2);
+    expect(line.attributes).toEqual([
+      { key: 'start_id', value: '0' },
+      { key: 'id_range', value: '0\u201369' },
+      { key: 'id_ranges', value: '0\u201334, 35\u201369' },
+      { key: 'boards', value: '2' },
+    ]);
+  });
+
+  it('N=4, Q=2 → qty 8', () => {
+    const line = buildSetCartLine('v1', 4, 2, 0, ['0\u201334', '35\u201369', '70\u2013104', '105\u2013139']);
+    expect(line.quantity).toBe(8);
+    expect(line.attributes!.find(a => a.key === 'boards')!.value).toBe('8');
+    expect(line.attributes!.find(a => a.key === 'id_range')!.value).toBe('0\u2013139');
+  });
+
+  it('N=1 Q=2 still works (edge case)', () => {
+    const line = buildSetCartLine('v1', 1, 2, 0, ['0\u201334']);
+    expect(line.quantity).toBe(2);
+    expect(line.attributes!.find(a => a.key === 'id_range')!.value).toBe('0\u201334');
+  });
+});
+
+describe('highestEndId', () => {
+  const mkCart = (lines: Cart['lines']): Cart => ({
+    id: 'c1', checkoutUrl: '', totalQuantity: 0,
+    cost: { subtotalAmount: { amount: '0', currencyCode: 'USD' } },
+    lines,
+  });
+  const mkLine = (vid: string, attrs: Array<{ key: string; value: string }>) => ({
+    id: 'l1', quantity: 1, attributes: attrs,
+    merchandise: { id: vid, title: '', sku: '', product: { title: '', handle: '' }, price: { amount: '0', currencyCode: 'USD' }, image: null },
+    cost: { totalAmount: { amount: '0', currencyCode: 'USD' } },
+  });
+
+  it('returns -1 for null cart', () => {
+    expect(highestEndId(null, 'v1')).toBe(-1);
+  });
+
+  it('returns -1 when no set lines for variant', () => {
+    expect(highestEndId(mkCart([mkLine('v1', [])]), 'v1')).toBe(-1);
+  });
+
+  it('finds highest end from id_range attribute', () => {
+    const cart = mkCart([
+      mkLine('v1', [{ key: 'id_range', value: '0\u201369' }]),
+      mkLine('v1', [{ key: 'id_range', value: '70\u2013139' }]),
+    ]);
+    expect(highestEndId(cart, 'v1')).toBe(139);
+  });
+
+  it('ignores lines for different variants', () => {
+    const cart = mkCart([mkLine('v2', [{ key: 'id_range', value: '0\u201369' }])]);
+    expect(highestEndId(cart, 'v1')).toBe(-1);
+  });
+});
+
+describe('dictMarkerCount overflow', () => {
+  it('DICT_6X6_250 has 250 markers', () => {
+    expect(dictMarkerCount('DICT_6X6_250')).toBe(250);
+  });
+
+  it('DICT_4X4_50 has 50 markers', () => {
+    expect(dictMarkerCount('DICT_4X4_50')).toBe(50);
+  });
+
+  it('unknown dict returns null', () => {
+    expect(dictMarkerCount('DICT_UNKNOWN')).toBeNull();
   });
 });
 
