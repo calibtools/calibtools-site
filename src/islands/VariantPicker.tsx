@@ -8,7 +8,7 @@ import {
 } from '@/lib/shopify';
 import { computeSetBoards } from '@/lib/exportSet';
 import { dictMarkerCount } from '@/lib/dicts/dicts';
-import { LEAD_TIME } from '@/lib/claims';
+import { LEAD_TIME, INSPECTION_CLAIM_SHORT } from '@/lib/claims';
 import { findCharucoSize, findAprilGridSize, markerCount } from '@/lib/boardSizes';
 
 interface BoardSetImage {
@@ -456,7 +456,7 @@ export default function VariantPicker({ product, fixtureVariantId, fixturePrice,
 
       <div className="grid grid-cols-2 gap-3 pt-2 text-sm text-ink-muted">
         <span className="flex items-center gap-1.5"><Check size={18} strokeWidth={1.6} className="shrink-0 text-brand" aria-hidden="true" /> {LEAD_TIME}</span>
-        <span className="flex items-center gap-1.5"><Check size={18} strokeWidth={1.6} className="shrink-0 text-brand" aria-hidden="true" /> Inspection report included</span>
+        <span className="flex items-center gap-1.5"><Check size={18} strokeWidth={1.6} className="shrink-0 text-brand" aria-hidden="true" /> {INSPECTION_CLAIM_SHORT}</span>
         <span className="flex items-center gap-1.5"><Check size={18} strokeWidth={1.6} className="shrink-0 text-brand" aria-hidden="true" /> 30-day returns</span>
         <span className="flex items-center gap-1.5"><Check size={18} strokeWidth={1.6} className="shrink-0 text-brand" aria-hidden="true" /> Volume pricing from 5 pcs</span>
       </div>

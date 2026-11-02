@@ -12,7 +12,7 @@ import { getProductImages } from '@/lib/product-images';
 import { getImageMetadata } from '@/lib/productImageImports';
 import { Tag, Truck, FileCheck, Files, RotateCcw, Grid2x2 as Grid2X2, ScanLine, ListChecks, Package, Ruler, CircleDot, Plug, ArrowRight, Mail } from 'lucide-astro';
 import { getAllPublishedReviews } from '@/lib/reviews';
-import { TAGLINE, RETURNS_LINE } from '@/lib/claims';
+import { TAGLINE, RETURNS_LINE, INSPECTION_CLAIM_SHORT } from '@/lib/claims';
 import Stars from '@/components/Stars';
 import heroTight from '@/assets/products/brand/dark/hero-boards-tight.webp';
 import heroTightMobile from '@/assets/products/brand/dark/hero-boards-tight-mobile.webp';
@@ -55,7 +55,7 @@ const guides = allGuides.filter(isReady).slice(0, 3);
 const why = [
   ['Transparent pricing', 'Every size and material priced on the page. No quote forms for standard parts.'],
   ['Lead time you can plan with', 'Made to order, ships in 2\u20133 weeks. Tracked express worldwide.'],
-  ['Inspection report included', 'Dimensional check on every board, with measured coordinates you can load into your calibration.'],
+  [INSPECTION_CLAIM_SHORT, 'Dimensional check on every board, with measured coordinates you can load into your calibration.'],
   ['Files you can use', 'Datasheet, CAD and pattern JSON for OpenCV, Kalibr and HALCON with every target.'],
   ['30-day returns', RETURNS_LINE],
 ];
