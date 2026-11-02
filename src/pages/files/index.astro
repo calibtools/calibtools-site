@@ -2,28 +2,17 @@
 import Base from '@/layouts/Base.astro';
 import { getAllDatasheets } from '@/lib/datasheetManifest';
 import { breadcrumbLd } from '@/lib/seo';
+import { CONTACT_EMAIL } from '@/lib/claims';
 const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: 'Downloads' }]);
-const pageDescription = "Download datasheets, user manuals and application notes for every Calib.Tools target: substrate specifications, tolerances, pattern files and revisions.";
 
 const entries = getAllDatasheets();
-
-/** Friendly product name from a datasheet code like CT-DS-CHA-P */
-const CODE_TO_NAME: Record<string, string> = {
-  'CT-DS-CHA-C': 'ChArUco ceramic board',
-  'CT-DS-CHA-P': 'ChArUco composite board',
-  'CT-DS-CHT-P': 'Checkerboard composite',
-  'CT-DS-APR-P': 'AprilGrid composite',
-  'CT-DS-CIR-P': 'Circle grid composite',
-  'CT-DS-HAL-P': 'HALCON calibration plate',
-  'CT-DS-ACC-A-FIX-14': 'Mounting fixture',
-};
 ---
-<Base title="Files and datasheets" description={pageDescription} jsonLd={bcLd}>
+<Base title="Files and datasheets" description="Datasheets for every Calib.Tools calibration target — substrate, tolerances, flatness, pattern layout and marker IDs — plus the free config file tools." jsonLd={bcLd}>
   <section class="container-x flex flex-col gap-9 py-12 md:py-16">
     <div class="flex flex-col gap-2.5">
       <span class="eyebrow">Downloads</span>
-      <h1 class="h-display m-0 text-[36px] md:text-[48px]">Files &amp; datasheets</h1>
-      <p class="m-0 max-w-[600px] text-base text-ink-muted">Product datasheets, user manual, inspection report template, and pattern file documentation. All documents are PDF, generated from source and versioned.</p>
+      <h1 class="h-display m-0 text-[36px] md:text-[48px]">Files &amp; downloads</h1>
+      <p class="m-0 max-w-[600px] text-base text-ink-muted">Datasheets for every target we sell. Each PDF is built from the same spec data as the product pages, so the numbers always match. The revision and date are on every page.</p>
     </div>
 
     {entries.length > 0 && (
@@ -43,7 +32,7 @@ const CODE_TO_NAME: Record<string, string> = {
               {entries.map((ds, i) => (
                 <tr class={`border-t border-line ${i % 2 === 1 ? 'bg-ground-alt' : ''}`}>
                   <td class="py-3 px-3 spec">{ds.code}</td>
-                  <td class="py-3 px-3">{CODE_TO_NAME[ds.code] ?? ds.code}</td>
+                  <td class="py-3 px-3">{ds.name}</td>
                   <td class="py-3 px-3 spec text-right">{ds.pages}</td>
                   <td class="py-3 px-3">
                     <a href={ds.url} class="font-semibold text-brand no-underline hover:text-brand-dark">Download PDF</a>
@@ -55,5 +44,19 @@ const CODE_TO_NAME: Record<string, string> = {
         </div>
       </div>
     )}
+
+    <div class="flex flex-col gap-5">
+      <h2 class="h-display m-0 text-[28px] md:text-[32px]">Config &amp; pattern files</h2>
+      <p class="m-0 max-w-[600px] text-base text-ink-muted">Calibration config files for OpenCV, Kalibr, ROS&nbsp;2 and HALCON come from our free tools, so they always match the board you pick:</p>
+      <ul class="ml-5 flex flex-col gap-2 text-[15px] list-disc">
+        <li><a href="/tools/generator/" class="text-brand font-semibold no-underline hover:text-brand-dark">Pattern generator</a> &mdash; print-exact PDF and SVG for any grid, with matching config files.</li>
+        <li><a href="/tools/convert/" class="text-brand font-semibold no-underline hover:text-brand-dark">Config converter</a> &mdash; turn one format into another (OpenCV &harr; Kalibr &harr; ROS&nbsp;2 &harr; HALCON).</li>
+      </ul>
+    </div>
+
+    <div class="flex flex-col gap-3">
+      <h2 class="h-display m-0 text-[28px] md:text-[32px]">Can&rsquo;t find something?</h2>
+      <p class="m-0 max-w-[600px] text-base text-ink-muted">Need a drawing, a DXF outline for your fixture, or an older revision? Email <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a> with the product code.</p>
+    </div>
   </section>
 </Base>

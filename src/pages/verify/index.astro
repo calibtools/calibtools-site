@@ -1,12 +1,13 @@
 ---
 import Base from '@/layouts/Base.astro';
+import { CONTACT_EMAIL } from '@/lib/claims';
 ---
-<Base title="Verify serial number" description="Look up an inspection report by serial number." noindex>
+<Base title="Look up a serial number" description="Look up the inspection record for a Calib.Tools target by its serial number." noindex>
   <section class="container-x flex flex-col items-center gap-6 py-16 md:py-24">
     <div class="flex flex-col items-center gap-2.5 text-center">
       <span class="eyebrow">Verify</span>
-      <h1 class="h-display m-0 text-[36px] md:text-[48px]">Serial number lookup</h1>
-      <p class="m-0 max-w-[480px] text-base text-ink-muted">Enter a serial number to view the inspection report for a Calib.Tools calibration target.</p>
+      <h1 class="h-display m-0 text-[36px] md:text-[48px]">Look up a serial number</h1>
+      <p class="m-0 max-w-[480px] text-base text-ink-muted">Targets that ship with an inspection record carry a serial number on the box label, e.g.&nbsp;SN&nbsp;000311. Enter it to see the part number, marker ID range, inspection date and report.</p>
     </div>
     <form id="verify-form" class="flex w-full max-w-[400px] gap-3">
       <input
@@ -19,6 +20,7 @@ import Base from '@/layouts/Base.astro';
       />
       <button type="submit" class="btn-md btn-primary">Look up</button>
     </form>
+    <p class="m-0 max-w-[480px] text-center text-sm text-ink-muted">No serial number on your label? Email <a href={`mailto:${CONTACT_EMAIL}`} class="text-brand">{CONTACT_EMAIL}</a> with your order number and we&rsquo;ll send you what we have on your target.</p>
   </section>
   <script>
     document.getElementById('verify-form')?.addEventListener('submit', (e) => {

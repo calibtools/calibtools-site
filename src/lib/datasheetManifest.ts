@@ -28,6 +28,8 @@ export interface DatasheetEntry {
   material: string;
   pages: number;
   url: string;
+  /** Product name from the datasheet markdown frontmatter (e.g. "ChArUco Calibration Target, Aluminium Composite"). */
+  name: string;
 }
 
 /** Raw manifest written by docs-build */
@@ -38,6 +40,21 @@ interface RawManifest {
 }
 
 let _cache: DatasheetEntry[] | null = null;
+
+/**
+ * Read the `title` field from a datasheet markdown file's frontmatter.
+ * Falls back to the code itself if the file or field is missing.
+ */
+function readDatasheetTitle(code: string): string {
+  const mdPath = resolve('docs/datasheets', `${code}.md`);
+  try {
+    const src = readFileSync(mdPath, 'utf-8');
+    const m = src.match(/^title:\s*(.+)$/m);
+    return m ? m[1].trim() : code;
+  } catch {
+    return code;
+  }
+}
 
 /**
  * Parse family + material from a datasheet code.
@@ -71,6 +88,7 @@ export function getDatasheetManifest(): DatasheetEntry[] {
           material: fm.material,
           pages: f.pages ?? 0,
           url: f.path.startsWith('public/') ? `/${f.path.slice('public/'.length)}` : `/${f.path}`,
+          name: readDatasheetTitle(f.code),
         };
       });
     return _cache;

@@ -1,6 +1,7 @@
 ---
 import Base from '@/layouts/Base.astro';
 import { ArrowLeft } from 'lucide-astro';
+import { CONTACT_EMAIL } from '@/lib/claims';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
@@ -34,8 +35,8 @@ const { sn } = Astro.params;
 const { record, found } = Astro.props;
 ---
 <Base
-  title={found ? `SN ${sn} — Inspection record` : `No record for serial ${sn}`}
-  description={found ? `Inspection record for serial number ${sn}.` : 'No record found for this serial number.'}
+  title={found ? `SN ${sn} — Inspection record` : `No record for SN ${sn}`}
+  description={found ? `Inspection record for serial number ${sn}.` : `No record found for serial number ${sn}.`}
   noindex
 >
   <section class="container-x flex flex-col items-center gap-6 py-16 md:py-24">
@@ -84,10 +85,12 @@ const { record, found } = Astro.props;
     ) : (
       <div class="flex flex-col items-center gap-4 text-center">
         <span class="eyebrow">Not found</span>
-        <h1 class="h-display m-0 text-[32px] md:text-[40px]">No record for this serial</h1>
+        <h1 class="h-display m-0 text-[32px] md:text-[40px]">No record for SN {sn}</h1>
         <p class="m-0 max-w-[480px] text-base text-ink-muted">
-          The serial number was not found in our register. If you believe this is an error,
-          contact <a href="mailto:hello@calib.tools" class="text-brand">hello@calib.tools</a> with your serial number.
+          Check the number on the box label &mdash; it&rsquo;s six digits after &ldquo;SN&rdquo;. Records go live when the target ships, so a brand-new order can take a day to appear.
+        </p>
+        <p class="m-0 max-w-[480px] text-base text-ink-muted">
+          Still nothing? Email <a href={`mailto:${CONTACT_EMAIL}`} class="text-brand">{CONTACT_EMAIL}</a> with your order number.
         </p>
         <a href="/verify/" class="btn-md btn-primary mt-2">Try another serial</a>
       </div>
