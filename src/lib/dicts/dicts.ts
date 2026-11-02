@@ -57,10 +57,21 @@ export function arucoDictNames(): string[] {
   return Object.keys(ARUCO_DICTS);
 }
 
-/** Return the total number of markers in a dictionary, or null if unknown. */
+/**
+ * Return the total number of markers in a dictionary, or null if unknown.
+ * Accepts ArUco dict names (e.g. DICT_6X6_250) and AprilTag dict names
+ * (e.g. DICT_APRILTAG_36h11 → looks up '36h11' family).
+ */
 export function dictMarkerCount(name: string): number | null {
   const d = ARUCO_DICTS[name];
-  return d ? d.count : null;
+  if (d) return d.count;
+  // Handle DICT_APRILTAG_<family> naming convention
+  const aprilMatch = name.match(/^DICT_APRILTAG_(\S+)$/i);
+  if (aprilMatch) {
+    const fam = APRILTAG_FAMILIES[aprilMatch[1]];
+    if (fam) return fam.count;
+  }
+  return null;
 }
 
 /**
