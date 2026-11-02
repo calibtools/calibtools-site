@@ -474,6 +474,52 @@ export function buildCartLines(
   return lines;
 }
 
+/**
+ * Build a single cart line for a board set.
+ * quantity = boardCount × userQuantity, with attributes encoding the full set.
+ */
+export function buildSetCartLine(
+  variantId: string,
+  boardCount: number,
+  userQuantity: number,
+  startId: number,
+  idRanges: string[],
+): CartLineInput {
+  const totalQty = boardCount * userQuantity;
+  const fullSpan = `${idRanges[0].split('\u2013')[0]}\u2013${idRanges[idRanges.length - 1].split('\u2013')[1]}`;
+  return {
+    merchandiseId: variantId,
+    quantity: totalQty,
+    attributes: [
+      { key: 'start_id', value: String(startId) },
+      { key: 'id_range', value: fullSpan },
+      { key: 'id_ranges', value: idRanges.join(', ') },
+      { key: 'boards', value: String(totalQty) },
+    ],
+  };
+}
+
+/**
+ * Find the highest end ID for a given variant across existing cart lines.
+ * Returns -1 if no set lines exist for this variant.
+ */
+export function highestEndId(cart: Cart | null, variantId: string): number {
+  if (!cart) return -1;
+  let max = -1;
+  for (const line of cart.lines) {
+    if (line.merchandise.id !== variantId) continue;
+    const rangeAttr = line.attributes.find(a => a.key === 'id_range');
+    if (!rangeAttr) continue;
+    // id_range is "min–max" (en-dash U+2013)
+    const parts = rangeAttr.value.split('\u2013');
+    if (parts.length === 2) {
+      const end = parseInt(parts[1], 10);
+      if (!isNaN(end) && end > max) max = end;
+    }
+  }
+  return max;
+}
+
 /** Sanitise descriptionHtml: strip script tags. */
 export function sanitizeHtml(html: string): string {
   return html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');

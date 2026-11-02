@@ -57,6 +57,12 @@ export function arucoDictNames(): string[] {
   return Object.keys(ARUCO_DICTS);
 }
 
+/** Return the total number of markers in a dictionary, or null if unknown. */
+export function dictMarkerCount(name: string): number | null {
+  const d = ARUCO_DICTS[name];
+  return d ? d.count : null;
+}
+
 /**
  * Decode hex-encoded marker bytes into a 2D bit grid (0/1).
  * Returns markerSize x markerSize array of 0|1.

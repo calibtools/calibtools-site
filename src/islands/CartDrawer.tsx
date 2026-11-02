@@ -213,6 +213,10 @@ function CartLine({
   const { merchandise } = line;
   const unitPrice = formatPrice(merchandise.price.amount, merchandise.price.currencyCode);
   const lineTotal = formatPrice(line.cost.totalAmount.amount, line.cost.totalAmount.currencyCode);
+  const boardsAttr = line.attributes.find(a => a.key === 'boards');
+  const idRangesAttr = line.attributes.find(a => a.key === 'id_ranges');
+  const idRangeAttr = line.attributes.find(a => a.key === 'id_range');
+  const isSet = !!boardsAttr;
 
   return (
     <li className="flex gap-4 py-4" data-testid="cart-line">
@@ -237,9 +241,10 @@ function CartLine({
         </a>
         <span className="text-xs text-ink-muted">
           {merchandise.title}
-          {line.attributes.find(a => a.key === 'id_range') && (
-            <> · IDs {line.attributes.find(a => a.key === 'id_range')!.value}</>
-          )}
+          {isSet
+            ? <> · Set of {boardsAttr.value} boards · IDs {idRangesAttr?.value ?? idRangeAttr?.value ?? ''}</>
+            : idRangeAttr && <> · IDs {idRangeAttr.value}</>
+          }
         </span>
         {merchandise.sku && (
           <span className="font-mono text-xs text-ink-soft">{merchandise.sku}</span>
@@ -247,28 +252,33 @@ function CartLine({
         <span className="spec text-sm text-ink-muted">{unitPrice} each</span>
 
         <div className="mt-1.5 flex items-center gap-3">
-          {/* Quantity stepper */}
-          <div className="flex items-center rounded border border-line">
-            <button
-              type="button"
-              aria-label="Decrease quantity"
-              disabled={busy}
-              onClick={() => onUpdateQty(line.quantity - 1)}
-              className="flex h-[44px] w-[44px] items-center justify-center text-lg font-semibold text-ink-muted hover:text-ink disabled:opacity-40"
-            >
-              <Minus size={16} strokeWidth={1.6} aria-hidden="true" />
-            </button>
-            <span className="w-8 text-center text-sm" data-testid="line-quantity">{line.quantity}</span>
-            <button
-              type="button"
-              aria-label="Increase quantity"
-              disabled={busy}
-              onClick={() => onUpdateQty(line.quantity + 1)}
-              className="flex h-[44px] w-[44px] items-center justify-center text-lg font-semibold text-ink-muted hover:text-ink disabled:opacity-40"
-            >
-              <Plus size={16} strokeWidth={1.6} aria-hidden="true" />
-            </button>
-          </div>
+          {isSet ? (
+            /* Set lines: no quantity stepper — only Remove */
+            <span className="text-sm text-ink-muted" data-testid="line-quantity">{line.quantity}×</span>
+          ) : (
+            /* Single-board lines: full quantity stepper */
+            <div className="flex items-center rounded border border-line">
+              <button
+                type="button"
+                aria-label="Decrease quantity"
+                disabled={busy}
+                onClick={() => onUpdateQty(line.quantity - 1)}
+                className="flex h-[44px] w-[44px] items-center justify-center text-lg font-semibold text-ink-muted hover:text-ink disabled:opacity-40"
+              >
+                <Minus size={16} strokeWidth={1.6} aria-hidden="true" />
+              </button>
+              <span className="w-8 text-center text-sm" data-testid="line-quantity">{line.quantity}</span>
+              <button
+                type="button"
+                aria-label="Increase quantity"
+                disabled={busy}
+                onClick={() => onUpdateQty(line.quantity + 1)}
+                className="flex h-[44px] w-[44px] items-center justify-center text-lg font-semibold text-ink-muted hover:text-ink disabled:opacity-40"
+              >
+                <Plus size={16} strokeWidth={1.6} aria-hidden="true" />
+              </button>
+            </div>
+          )}
 
           <button
             type="button"

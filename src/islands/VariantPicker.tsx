@@ -1,11 +1,13 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { Check, Minus, Plus, ArrowRight } from '@/lib/icons';
 import {
-  findVariant, buildCartLines, cartCreate, cartLinesAdd,
+  findVariant, buildCartLines, buildSetCartLine, highestEndId,
+  cartCreate, cartLinesAdd, cartQuery,
   getStoredCartId, setStoredCartId, dispatchCartUpdated,
   type Product,
 } from '@/lib/shopify';
 import { computeSetBoards } from '@/lib/exportSet';
+import { dictMarkerCount } from '@/lib/dicts/dicts';
 import { LEAD_TIME } from '@/lib/claims';
 import { markerForSquare } from '@/lib/boardSizes';
 
@@ -159,39 +161,46 @@ export default function VariantPicker({ product, fixtureVariantId, fixturePrice,
     setConfirmation('');
     try {
       if (boardCount >= 2 && boards && variant) {
-        // Multi-board: add each board as a separate line with attributes
-        const existingCartId = getStoredCartId();
-        if (!existingCartId) {
-          // Create cart with first board
-          const attrs = [
-            { key: 'start_id', value: String(boards[0].startId) },
-            { key: 'id_range', value: `${boards[0].idRange.min}\u2013${boards[0].idRange.max}` },
-          ];
-          const lines = buildCartLines(variant.id, quantity, [], attrs);
-          const result = await cartCreate(lines);
-          setStoredCartId(result.cartId);
+        // Multi-board set: one cart line with quantity = boardCount × userQuantity
+        const dict = product.metafields.dictionary ?? 'DICT_6X6_250';
+        const maxMarkers = dictMarkerCount(dict);
 
-          // Add remaining boards
-          for (let i = 1; i < boards.length; i++) {
-            const boardAttrs = [
-              { key: 'start_id', value: String(boards[i].startId) },
-              { key: 'id_range', value: `${boards[i].idRange.min}\u2013${boards[i].idRange.max}` },
-            ];
-            const boardLines = buildCartLines(variant.id, quantity, [], boardAttrs);
-            await cartLinesAdd(result.cartId, boardLines);
+        // Read existing cart to find continuation start ID
+        const existingCartId = getStoredCartId();
+        let cart = existingCartId ? await cartQuery(existingCartId) : null;
+        const prevEnd = highestEndId(cart, variant.id);
+        const contStart = prevEnd >= 0 ? prevEnd + 1 : 0;
+
+        // Compute boards from continuation start
+        const setBoards = computeSetBoards(
+          { ...boards[0].spec, startId: contStart },
+          boardCount,
+        );
+
+        // Check dictionary overflow
+        const lastId = setBoards[setBoards.length - 1].idRange.max;
+        if (maxMarkers !== null && lastId >= maxMarkers) {
+          setError(`ID ${lastId} exceeds ${dict} (${maxMarkers} markers). Use 5+ / custom start IDs or contact us.`);
+          setBusy(false);
+          return;
+        }
+
+        const idRanges = setBoards.map(b => `${b.idRange.min}\u2013${b.idRange.max}`);
+        const line = buildSetCartLine(variant.id, boardCount, quantity, contStart, idRanges);
+
+        if (existingCartId) {
+          try {
+            await cartLinesAdd(existingCartId, [line]);
+          } catch {
+            const result = await cartCreate([line]);
+            setStoredCartId(result.cartId);
           }
         } else {
-          for (const board of boards) {
-            const attrs = [
-              { key: 'start_id', value: String(board.startId) },
-              { key: 'id_range', value: `${board.idRange.min}\u2013${board.idRange.max}` },
-            ];
-            const boardLines = buildCartLines(variant.id, quantity, [], attrs);
-            await cartLinesAdd(existingCartId, boardLines);
-          }
+          const result = await cartCreate([line]);
+          setStoredCartId(result.cartId);
         }
         dispatchCartUpdated();
-        setConfirmation(`Added ${boards.length} boards to cart`);
+        setConfirmation(`Added set of ${boardCount} boards to cart`);
         if (confirmTimer.current) clearTimeout(confirmTimer.current);
         confirmTimer.current = setTimeout(() => setConfirmation(''), 3000);
         window.dispatchEvent(new Event('open-cart-drawer'));
