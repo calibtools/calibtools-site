@@ -39,7 +39,7 @@ const KEY_TO_LABELS = {
 const BOARD_REQUIRED = ['material', 'thickness_mm', 'feature_tolerance', 'lead_time', 'files_included'];
 const ACCESSORY_REQUIRED = ['material', 'lead_time'];
 
-const DIST = resolve('dist/targets');
+const DIST = resolve(process.env.CHECK_SPECS_DIST || 'dist/targets');
 
 if (!existsSync(DIST)) {
   console.error('[check-specs] dist/targets/ not found — run pnpm build first.');
