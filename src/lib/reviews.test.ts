@@ -188,11 +188,11 @@ describe('material connection labels', () => {
 describe('policy page content', () => {
   it('contains the spec paragraph: invite, free sample/discount, publish every review', () => {
     const content = readFileSync(join(__dirname, '..', 'pages', 'reviews-policy.astro'), 'utf-8');
-    expect(content).toContain('invite after delivery');
+    expect(content).toContain('private review link');
     expect(content).toContain('free sample');
     expect(content).toContain('discount');
-    expect(content).toContain('publish every review we receive');
-    expect(content).toContain('do not edit the text');
+    expect(content).toContain('Every review we receive');
+    expect(content).toContain('edit wording');
   });
 
   it('keeps removal rules (spam, personal attacks, personal data)', () => {

@@ -112,8 +112,6 @@ const bannedScanFiles = [
 // Allow-list: file:line entries that are permitted to exceed THRESHOLD.
 // Form-control groups and known placeholders only.
 const PROSE_ALLOW = new Set([
-  // /about/ placeholder paragraph — to be replaced with real copy (2026-10-29)
-  'src/pages/about.astro:28',
 ]);
 
 const offenders = [];
