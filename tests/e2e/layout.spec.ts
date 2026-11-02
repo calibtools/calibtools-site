@@ -22,7 +22,7 @@ const LANDSCAPE = { width: 844, height: 390 };
 
 const SCREENSHOT_WIDTHS = [360, 768, 1440];
 const SCREENSHOT_DIR = resolve(process.cwd(), 'docs/design/layout-audit-2026-11-01',
-  process.env.LAYOUT_PHASE === 'after' ? 'after' : 'before');
+  process.env.LAYOUT_PHASE === 'before' ? 'before' : 'after');
 
 // Elements that must be ≥ 44px tall below 768px
 const TAP_TARGET_44_SEL = [
