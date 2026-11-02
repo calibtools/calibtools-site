@@ -95,4 +95,23 @@ describe('check-specs files_included', () => {
     const r = run(dir);
     expect(r.code).toBe(0);
   });
+
+  it('FAILS when board page has no datasheet link', () => {
+    // Board page with all spec rows but no -datasheet href anywhere
+    const html = `<html><body>
+<section id="specifications"><table>
+<tr><td>Material</td><td>Composite</td></tr>
+<tr><td>Thickness</td><td>6 mm</td></tr>
+<tr><td>Feature tolerance</td><td>±10 µm</td></tr>
+<tr><td>Lead time</td><td>2 weeks</td></tr>
+<tr><td>Files included</td><td>DXF</td></tr>
+</table></section>
+</body></html>`;
+    const dir = setupFixture('no-datasheet', {
+      'test-board/index.html': html,
+    });
+    const r = run(dir);
+    expect(r.code).toBe(1);
+    expect(r.stdout + r.stderr).toContain('datasheet_url');
+  });
 });

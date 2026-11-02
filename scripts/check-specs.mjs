@@ -106,9 +106,9 @@ for (const entry of entries) {
     missing.push(...requiredKeys);
   }
 
-  // Check for datasheet link
+  // Check for datasheet link — required for all board pages
   if (!isAccessory && !html.includes('-datasheet')) {
-    warnings.push('datasheet_url');
+    missing.push('datasheet_url');
   }
 
   if (missing.length > 0) hasErrors = true;
