@@ -33,7 +33,7 @@ const KEY_TO_LABELS = {
   thickness_mm:      ['Thickness'],
   feature_tolerance: ['Feature tolerance', 'Feature position tolerance', 'Feature position accuracy'],
   lead_time:         ['Lead time'],
-  files_included:    ['Files included', 'Files', 'Inspection report', 'In the box'],
+  files_included:    ['Files included', 'Files'],
 };
 
 const BOARD_REQUIRED = ['material', 'thickness_mm', 'feature_tolerance', 'lead_time', 'files_included'];
