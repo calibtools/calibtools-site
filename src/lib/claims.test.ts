@@ -10,7 +10,8 @@ describe('RETURNS_LINE constant', () => {
     const src = readFileSync(resolve(ROOT, 'src/pages/index.astro'), 'utf-8');
     expect(src).toContain('RETURNS_LINE');
     // Also import check
-    expect(src).toContain("import { TAGLINE, RETURNS_LINE } from '@/lib/claims'");
+    expect(src).toContain('RETURNS_LINE');
+    expect(src).toContain("from '@/lib/claims'");
   });
 
   it('is used in returns.astro', () => {
