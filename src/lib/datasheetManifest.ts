@@ -1,52 +1,96 @@
 /**
- * Read the datasheet manifest (public/files/datasheets/index.json) at build time
+ * Read the docs-build manifest (public/files/manifest.json) at build time
  * and resolve datasheet URLs for products.
  *
- * Matching logic: the manifest has family+material codes (e.g. CHA+P).
- * Products are matched by checking their first variant's SKU prefix against
- * the family-material pair, or by a handle→code lookup table.
+ * The manifest is written by scripts/docs-build.mjs with shape:
+ *   { generated, inputHash, files: [{ code, path, sha256, pages? }] }
+ *
+ * Datasheet codes follow the pattern CT-DS-{FAMILY}-{MATERIAL}[-SUFFIX].
+ * Family + material are parsed from the code so the handle→code map only
+ * needs to know each product's family and material letter.
  */
 
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 
-export interface DatasheetEntry {
+/** Shape of each file entry in public/files/manifest.json */
+export interface ManifestFileEntry {
   code: string;
-  title: string;
-  type: string;
-  rev: string;
-  date: string;
-  status: string;
-  family: string | null;
-  material: string | null;
+  path: string;
   sha256: string;
-  bytes: number;
+  pages?: number;
 }
 
-let _manifest: DatasheetEntry[] | null = null;
+/** Resolved datasheet record exposed to pages */
+export interface DatasheetEntry {
+  code: string;
+  family: string;
+  material: string;
+  pages: number;
+  url: string;
+}
 
-/** Load the manifest once (cached for the build). */
+/** Raw manifest written by docs-build */
+interface RawManifest {
+  generated: string;
+  inputHash: string;
+  files: ManifestFileEntry[];
+}
+
+let _cache: DatasheetEntry[] | null = null;
+
+/**
+ * Parse family + material from a datasheet code.
+ * CT-DS-CHA-P        → { family: 'CHA', material: 'P' }
+ * CT-DS-ACC-A-FIX-14 → { family: 'ACC', material: 'A' }
+ */
+function parseFamilyMaterial(code: string): { family: string; material: string } | null {
+  // Strip the CT-DS- prefix, then take the first two segments
+  const m = code.match(/^CT-DS-([A-Z]+)-([A-Z])(?:-|$)/);
+  if (!m) return null;
+  return { family: m[1], material: m[2] };
+}
+
+/** Load and cache all datasheet entries from the manifest. */
 export function getDatasheetManifest(): DatasheetEntry[] {
-  if (_manifest) return _manifest;
+  if (_cache) return _cache;
+  const manifestPath = resolve('public/files/manifest.json');
+  if (!existsSync(manifestPath)) {
+    _cache = [];
+    return [];
+  }
   try {
-    const raw = readFileSync(resolve('public/files/datasheets/index.json'), 'utf-8');
-    _manifest = JSON.parse(raw);
-    return _manifest!;
+    const raw: RawManifest = JSON.parse(readFileSync(manifestPath, 'utf-8'));
+    _cache = raw.files
+      .filter((f) => f.code.startsWith('CT-DS-'))
+      .map((f) => {
+        const fm = parseFamilyMaterial(f.code)!;
+        return {
+          code: f.code,
+          family: fm.family,
+          material: fm.material,
+          pages: f.pages ?? 0,
+          url: f.path.startsWith('public/') ? `/${f.path.slice('public/'.length)}` : `/${f.path}`,
+        };
+      });
+    return _cache;
   } catch {
-    _manifest = [];
+    _cache = [];
     return [];
   }
 }
 
 /**
- * Handle → SKU-prefix mapping for matching datasheets.
- * Maps product handles to their family-material code pairs.
+ * Handle → family-material mapping for matching datasheets to product pages.
  */
 const HANDLE_TO_FAMILY_MATERIAL: Record<string, { family: string; material: string }> = {
   'charuco-composite': { family: 'CHA', material: 'P' },
   'charuco-ceramic': { family: 'CHA', material: 'C' },
   'checkerboard-composite': { family: 'CHT', material: 'P' },
   'checkerboard-ceramic': { family: 'CHT', material: 'C' },
+  'aprilgrid-composite': { family: 'APR', material: 'P' },
+  'circlegrid-composite': { family: 'CIR', material: 'P' },
+  'halcon-composite': { family: 'HAL', material: 'P' },
   'mounting-fixture': { family: 'ACC', material: 'A' },
 };
 
@@ -60,11 +104,9 @@ export function findDatasheetUrl(handle: string): string | null {
   if (!fm) return null;
 
   const entry = manifest.find(
-    (e) => (e.type === 'datasheet' || e.type === 'service') && e.family === fm.family && e.material === fm.material,
+    (e) => e.family === fm.family && e.material === fm.material,
   );
-  if (!entry) return null;
-
-  return `/files/datasheets/${entry.code}.pdf`;
+  return entry?.url ?? null;
 }
 
 /**
