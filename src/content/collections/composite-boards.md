@@ -1,60 +1,60 @@
 ---
-seoDescription: "Rigid aluminium composite with a UV-printed matte pattern, the standard choice for robotics and machine vision. 200-800 mm standard, to 1200 mm on request."
-title: Composite boards
-description: "Rigid aluminium composite, UV-printed matte pattern, outdoor-safe."
+seoDescription: "Rigid aluminium composite boards with a matte UV-printed pattern — the board most of your robotics and vision work needs. 200–800 mm, larger on request."
+title: "Aluminium Composite Targets"
+description: "Rigid aluminium composite, matte UV print. Built for your bench and the field."
 sellingPoints:
-  - "UV-printed on rigid aluminium composite — flat, lightweight, durable"
-  - "Every board ships with an inspection report and config files for OpenCV, Kalibr, ROS 2 and HALCON"
+  - "Flat, light and tough: a matte pattern UV-printed on rigid aluminium composite"
+  - "Measured before it ships, with config files for OpenCV, Kalibr, ROS 2 and HALCON"
 color: brand
 pairsWith:
   - mounting-fixture
 specsTable:
-  - { label: "Substrate", value: "Aluminium composite (PE core)" }
+  - { label: "Substrate", value: "Aluminium / LDPE / aluminium composite" }
   - { label: "Thickness", value: "6 mm" }
-  - { label: "Print", value: "UV flatbed, matte finish" }
-  - { label: "Feature tolerance", value: "±0.3 mm" }
-  - { label: "Flatness", value: "< 0.5 mm over 600 mm" }
-  - { label: "Operating temperature", value: "-20 to +80 °C" }
-  - { label: "Weight (300 × 200)", value: "~250 g" }
-founderQuote: "I started Calib.Tools because I kept wasting afternoons printing targets on paper and taping them to foam board. Every board we ship is the one I wish I could have ordered on day one."
+  - { label: "Print", value: "Direct UV print, matte, black on white" }
+  - { label: "Feature tolerance", value: "±0.3 mm + 0.2 mm/m (at 20 °C)" }
+  - { label: "Flatness", value: "≤ 0.5 mm per metre (three-point support)" }
+  - { label: "Operating temperature", value: "−50 to +80 °C" }
+  - { label: "Weight", value: "6.6 kg/m² (300 × 200: ≈ 0.4 kg)" }
+brandNote: "We make the board we would want on our own bench: flat, measured, and printed with its own parameters, so nobody has to guess them later."
 ---
 
 ## Overview
 
-Composite calibration boards are the everyday workhorse for camera calibration. The aluminium composite substrate stays flat across a wide temperature range and survives workshop handling without chipping or warping.
+This is the board most of your calibration work needs. The aluminium composite stays flat when the lab warms up, and it survives being carried to the robot cell, the test track or the field.
 
-UV flatbed printing delivers crisp edges at ±0.3 mm feature accuracy — more than sufficient for most machine-vision and robotics applications. Each board ships with a dimensional inspection report so you can verify accuracy out of the box.
+We UV-print the pattern to ±0.3 mm + 0.2 mm/m (any corner to nominal, at 20 °C). That covers most robotics and machine-vision jobs. Every board is measured before it ships, and you get its inspection report under the board's serial number.
 
-Available as Checkerboard, ChArUco, AprilGrid, circle grid, and HALCON patterns in sizes from 200 × 150 mm to 800 × 600 mm, with larger custom sizes on request.
+Choose checkerboard, ChArUco, AprilGrid, circle grid or HALCON patterns, from 200 × 150 mm to 800 × 600 mm. Need it bigger? We make up to 1200 × 800 mm on request.
 
 ## Specifications
 
-General specifications for the composite substrate are shown in the table above. Per-product geometry (grid size, square size, marker size, dictionary) is listed in each product group below.
+The table above covers the material. You'll find grid size, square size, marker size and dictionary for each pattern in the product groups below.
 
 ## Files
 
-Every composite board comes with:
+With every composite board you get:
 
-- **Datasheet PDF** — dimensions, tolerances, material properties
-- **Inspection report** — measured feature positions from coordinate measurement
-- **Config files** — OpenCV JSON, Kalibr YAML, ROS 2 YAML, HALCON description
+- **Datasheet PDF** — dimensions, tolerances, material
+- **Inspection report** — dimensional, flatness and visual check of your board, under its serial number
+- **Config files** — OpenCV JSON, Kalibr YAML, ROS 2 YAML, HALCON .descr
 
-Config files are generated to match the exact geometry of your board and can be downloaded from the product page.
+We generate the config files for your exact board geometry. You can download them from the product page before your board arrives.
 
 ## Cleaning & care
 
-- Wipe with a soft, dry or lightly damp cloth. Avoid solvents.
-- Store flat or hang from the mounting hole. Do not stack heavy objects on the board surface.
-- The matte UV print is scratch-resistant but not scratch-proof. Avoid sliding the board across rough surfaces.
-- Suitable for indoor and outdoor use. Prolonged UV exposure (months) may cause slight yellowing of the white areas; this does not affect calibration accuracy.
+- Wipe with a soft, dry or slightly damp cloth. Water or isopropyl alcohol up to 70 % is fine.
+- Store it flat or hang it up. Don't stack heavy things on the printed face.
+- The matte print resists scratches but isn't scratch-proof. Don't slide it across rough surfaces.
+- You can use it outdoors: the print is UV-stable for up to three years. After months in direct sun the white may yellow slightly; that doesn't move the features.
 
 ## FAQ
 
-**Can I use composite boards outdoors?**
-Yes. The aluminium composite substrate and UV print are weather-resistant. For permanent outdoor installations, consider a protective clear coat.
+**Can I use my board outdoors?**
+Yes. The composite and the UV print are weather-resistant, with up to three years of outdoor life. For a permanent outdoor installation, consider adding a clear protective coat.
 
-**What is the largest size available?**
-Standard sizes go up to 800 × 600 mm. Custom sizes up to 1200 × 800 mm are available on request — contact us for a quote.
+**What's the largest board you make?**
+Standard sizes go up to 800 × 600 mm. We make custom sizes up to 1200 × 800 mm on request — send us your size and we'll quote.
 
-**How does ±0.3 mm compare to ceramic targets?**
-Ceramic targets have a ±2 µm target accuracy (about 150× tighter). For most robotics and industrial vision tasks, ±0.3 mm is more than adequate. Choose ceramic when your application demands sub-pixel accuracy.
+**Is ±0.3 mm accurate enough for me?**
+For most robotics and industrial vision work, yes. If you need sub-pixel accuracy at short range or high magnification, look at our ceramic targets (±2 µm target) instead. The [selection wizard](/tools/wizard/) tells you which one fits your camera and lens.

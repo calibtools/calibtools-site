@@ -1,37 +1,37 @@
 ---
-seoTitle: "Mounts, accessories and services"
-seoDescription: "Mounting fixtures and stands designed for Calib.Tools calibration targets. Position the board squarely, keep it stable, and get repeatable results."
-title: "Mounts & accessories"
-description: "Fixtures, stands, and services to complement your calibration targets."
+seoTitle: "Mounts and accessories for calibration targets"
+seoDescription: "Fixtures that hold your Calib.Tools board square and still, so your captures repeat from one session to the next. ¼″-20 thread, fits composite and ceramic."
+title: "Mounts & Accessories"
+description: "Fixtures that hold your board square and still."
 sellingPoints:
-  - "Mounting fixtures and stands designed for repeatable target positioning"
-  - "Designed for repeatable, stable target positioning in any setup"
+  - "Holds your board square and still, so your captures repeat session to session"
+  - "Standard ¼″-20 thread — fits your tripod, lab post or clamp"
 color: grey
 pairsWith: []
 specsTable:
   - { label: "Fixture thread", value: "¼″-20 UNC" }
   - { label: "Fixture material", value: "Anodised aluminium" }
-founderQuote: "I started Calib.Tools because I kept wasting afternoons printing targets on paper and taping them to foam board. Every board we ship is the one I wish I could have ordered on day one."
+brandNote: "A good board on a wobbly mount still gives you a bad calibration. Start with something that holds still."
 ---
 
 ## Overview
 
-Accessories that pair with Calib.Tools calibration targets. The mounting fixture provides a stable, repeatable hold for any board with a ¼″ mounting hole.
+Accessories for your Calib.Tools targets. The Target Mounting Fixture, ¼″-20, clamps any of our boards by the edge, composite or ceramic, and holds it steady on a tripod or lab post.
 
 ## Specifications
 
-See individual product groups below for detailed specifications.
+You'll find detailed specifications on each product page.
 
 ## Files
 
-Datasheets are provided with physical products. Calibration certificates are delivered as PDF.
+Each accessory comes with its datasheet.
 
 ## Cleaning & care
 
-- Mounting fixture: wipe with a dry cloth. The anodised finish resists fingerprints and light corrosion.
-- Store in a dry environment.
+- Wipe the fixture with a dry cloth. The anodised finish resists fingerprints and light corrosion.
+- Store it somewhere dry.
 
 ## FAQ
 
-**Does the mounting fixture fit all board sizes?**
-Yes. The ¼″-20 UNC thread is compatible with all Calib.Tools boards that have a mounting hole, as well as standard camera tripods and lab clamps.
+**Does the fixture fit my board?**
+It clamps any Calib.Tools board up to 800 × 600 mm, with jaws from 2 to 16 mm. The ¼″-20 UNC thread fits standard camera tripods and lab clamps.

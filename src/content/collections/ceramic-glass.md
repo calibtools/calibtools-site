@@ -1,54 +1,56 @@
 ---
-seoTitle: "Ceramic and glass targets"
-seoDescription: "Lithographed chrome on alumina ceramic or borosilicate glass, for calibration tasks where a printed board is the limiting factor. Certificate optional."
-title: "Ceramic & glass"
-description: "Lithographed on alumina or borosilicate glass, ±2 µm (target) feature accuracy."
+seoTitle: "Ceramic and glass calibration targets"
+seoDescription: "Chrome lithographed on alumina ceramic, ±2 µm target feature accuracy, for your calibrations where a printed board is the limit. Glass quoted on request."
+title: "Ceramic & Glass Targets"
+description: "Chrome lithographed on alumina ceramic. ±2 µm target feature accuracy."
 sellingPoints:
-  - "Lithographed blue chrome on alumina — ±2 µm target accuracy; measurement method to be published"
-  - "Inspection report with measured feature positions included with every target"
+  - "Chrome lithographed on alumina ceramic — ±2 µm target; measurement method to be published"
+  - "Measured before it ships, with per-feature coordinates for your board"
 color: slate-blue
 pairsWith:
   - mounting-fixture
 specsTable:
-  - { label: "Substrate", value: "96 % alumina ceramic" }
-  - { label: "Thickness", value: "1.5 mm (ceramic), 3 mm (glass)" }
-  - { label: "Print", value: "Blue chrome lithography" }
-  - { label: "Feature tolerance", value: "±2 µm (target)" }
-  - { label: "Flatness", value: "< 10 µm over 100 mm" }
-  - { label: "CTE", value: "6.5 ppm/°C (alumina)" }
-  - { label: "Operating temperature", value: "-40 to +150 °C" }
-founderQuote: "I started Calib.Tools because I kept wasting afternoons printing targets on paper and taping them to foam board. Every board we ship is the one I wish I could have ordered on day one."
+  - { label: "Substrate", value: "Alumina ceramic (Al₂O₃ ≥ 96 %)" }
+  - { label: "Thickness", value: "3 mm" }
+  - { label: "Pattern", value: "Chrome, blue-black, lithographed, low gloss" }
+  - { label: "Feature tolerance", value: "±2 µm (target, at 20 °C)" }
+  - { label: "Flatness", value: "≤ 20 µm over the pattern area" }
+  - { label: "Thermal expansion", value: "≈ 7.2 µm/(m·°C)" }
+  - { label: "Operating temperature", value: "−50 to +200 °C" }
+brandNote: "We make these for the jobs where a printed board would be the weakest link in your chain — and we tell you what we measured."
 ---
 
 ## Overview
 
-Ceramic and glass calibration targets deliver the highest feature accuracy we offer. Blue chrome lithography on 96 % alumina targets ±2 µm feature positions; measurement method to be published.
+When a printed board becomes the largest error in your calibration, this is where you go next. We lithograph the pattern in chrome on 96 % alumina, with a ±2 µm target for feature position at 20 °C. We will publish the measurement method with the first production boards.
 
-Ideal for metrology, medical imaging, microscopy, and any application where sub-pixel calibration accuracy is critical.
+Choose ceramic for metrology, medical imaging, microscopy, and any setup where you need sub-pixel accuracy.
+
+Glass targets aren't in the shop yet. If you need one, send us your requirements and we'll quote.
 
 ## Specifications
 
-General specifications for the ceramic substrate are shown above. Individual product geometry is listed in the product groups below.
+The table above covers the ceramic substrate. You'll find the geometry of each target in the product groups below.
 
 ## Files
 
-Each ceramic target includes:
+With every ceramic target you get:
 
-- **Datasheet PDF** — dimensions, tolerances, material properties
-- **Dimensional inspection report** — measured feature positions from coordinate measurement
-- **Config files** — OpenCV JSON, Kalibr YAML, ROS 2 YAML, HALCON description
+- **Datasheet PDF** — dimensions, tolerances, material
+- **Inspection report** — per-feature coordinates (CSV), flatness and visual check, under your board's serial number
+- **Config files** — OpenCV JSON, Kalibr YAML, ROS 2 YAML, HALCON .descr
 
 ## Cleaning & care
 
-- Clean with isopropanol and a lint-free cloth. Avoid abrasive cleaners.
-- Handle by the edges. The lithographic surface is durable but can chip if dropped on a hard surface.
-- Store in the provided padded case or a lint-free sleeve.
-- Do not expose to thermal shock (rapid temperature changes > 100 °C).
+- Clean with lens tissue and isopropyl alcohol. No abrasives.
+- Hold it by the edges. The pattern is durable, but ceramic can chip if it falls on a hard floor.
+- Keep it in its padded case when you're not using it.
+- Avoid sudden temperature changes of more than 100 °C.
 
 ## FAQ
 
-**When do I need a ceramic target instead of composite?**
-When your application requires sub-pixel calibration accuracy, traceable measurement, or operation in extreme temperatures. Common use cases: metrology, medical imaging, semiconductor inspection.
+**When do I need ceramic instead of composite?**
+When you need sub-pixel accuracy, work at high magnification, or run at temperatures composite can't take (ceramic: −50 to +200 °C). Typical jobs: metrology, medical imaging, semiconductor inspection.
 
-**Is a calibration certificate available?**
-Contact us about accredited calibration options. The included inspection report confirms dimensional accuracy for most applications.
+**Can I get an accredited calibration certificate?**
+Not at the moment — we're still choosing the laboratory. Your target ships with our own inspection report. If your audit needs an accredited certificate, contact us and we'll tell you what we can arrange.

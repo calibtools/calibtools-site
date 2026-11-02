@@ -1,6 +1,6 @@
 ---
-seoDescription: "ChArUco board for OpenCV stereo and multi-camera calibration: markers identify every corner, so the board still works partly outside the frame. 200-800 mm."
-summary: "ChArUco composite board for OpenCV stereo and multi-camera calibration"
+seoDescription: "A ChArUco board you can push half out of frame and still detect: every corner carries a marker ID. Made for your OpenCV stereo and multi-camera rigs."
+summary: "See every corner, even at the frame edge — for your OpenCV stereo and multi-camera rigs"
 decideSpecs:
   - "Feature position tolerance"
   - "Substrate"
@@ -9,5 +9,5 @@ chips:
   - "±0.3 mm + 0.2 mm/m"
   - "6 mm"
   - "200–800 mm"
-story: "ChArUco combines a checkerboard with ArUco markers in the white squares. Markers identify each corner, so the board works even when partially outside the frame — exactly where lens distortion is strongest.\n\nNative in OpenCV, supported by MATLAB and most multi-camera toolchains."
+story: "Your lens distorts most at the edges of the frame, and that is exactly where a plain checkerboard stops being detected. On this board every white square carries an ArUco marker, so OpenCV identifies each corner on its own. Push the board into the corners of your image and you still get usable points.\n\nWe print the grid size, square size and ID range on the board itself, so nobody on your team has to guess the parameters six months from now. It works natively in OpenCV, and with MATLAB and most multi-camera toolchains."
 ---

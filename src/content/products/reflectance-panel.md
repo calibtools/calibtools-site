@@ -1,6 +1,6 @@
 ---
-seoDescription: "Lambertian diffuse reflectance panel for LiDAR intensity calibration and range verification. Reflectance level, size and mounting set to your test setup."
-summary: "Calibrated Lambertian reflectance panel for LiDAR intensity calibration"
+seoDescription: "Diffuse Lambertian panels at 10, 50 and 90 % reflectance, so you can normalise LiDAR intensity across range and angle. Built to your setup — ask for a quote."
+summary: "Lambertian reflectance panels for your LiDAR intensity calibration"
 decideSpecs:
   - "Reflectance"
   - "Size"
@@ -9,5 +9,5 @@ chips:
   - "R10/R50/R90"
   - "300 × 300 mm"
   - "±2 %"
-story: "LiDAR sensors report intensity values that depend on the reflectance of the surface they illuminate. A Lambertian panel with a known, uniform reflectance provides the ground-truth reference needed to normalise intensity across range, angle, and sensor models.\n\nPanels are available at 10 %, 50 %, and 90 % nominal reflectance. Using multiple panels in a single scan enables multi-point intensity calibration for both mapping and automotive-grade systems. Specifications shown are target values. Contact us for availability and lead times."
+story: "Your LiDAR reports an intensity that depends on what it hits. To make those numbers comparable across range, angle and sensor, you need a surface with a known, uniform reflectance. That is this panel.\n\nChoose 10 %, 50 % or 90 % nominal reflectance. Put two or three in the same scan and you have a multi-point intensity calibration. We set size and mounting to your test setup. The specifications shown are target values — tell us what you are testing and we will confirm availability and lead time."
 ---

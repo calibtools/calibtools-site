@@ -1,6 +1,6 @@
 ---
-seoDescription: "The classic pattern, with the highest corner accuracy of any planar target when the whole board is in view. Aluminium composite, 200-800 mm, fine or coarse."
-summary: "Classic checkerboard target — highest corner accuracy when fully in view"
+seoDescription: "The pattern every calibration toolchain reads. When the whole board fits in your frame, a checkerboard gives you the most accurate corners. 200–800 mm."
+summary: "The classic checkerboard — your sharpest corners when the whole board is in view"
 decideSpecs:
   - "Feature position tolerance"
   - "Substrate"
@@ -9,5 +9,5 @@ chips:
   - "±0.3 mm + 0.2 mm/m"
   - "6 mm"
   - "200–800 mm"
-story: "The classic pattern: highest corner localisation accuracy of any planar target when the whole board is in view. Supported by every calibration toolchain.\n\nChoose Fine for more corners per image or Coarse for low-resolution and long-distance setups."
+story: "If you can keep the whole board in view, a checkerboard gives you the most precise corners of any planar pattern. Every calibration toolchain reads it, with nothing to configure.\n\nPick Fine when you want more corners in each image. Pick Coarse when your camera is low-resolution or far from the board. Not sure which? The free selection wizard sizes it for your camera and lens."
 ---

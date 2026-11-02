@@ -1,6 +1,6 @@
 ---
-seoDescription: "Symmetric and asymmetric circle grids for OpenCV findCirclesGrid and HALCON. Rigid aluminium composite, 200-800 mm, inspection report included."
-summary: "Symmetric and asymmetric circle grid calibration targets for OpenCV and HALCON"
+seoDescription: "Symmetric or asymmetric circle grids for OpenCV findCirclesGrid and HALCON. Your dot centres stay accurate under defocus and low light. 200–800 mm."
+summary: "Circle grids for OpenCV and HALCON — robust when your images are soft or dim"
 decideSpecs:
   - "Feature position tolerance"
   - "Substrate"
@@ -9,5 +9,5 @@ chips:
   - "±0.3 mm + 0.2 mm/m"
   - "6 mm"
   - "200–800 mm"
-story: "Circle grid targets detect features from the centroid of each dot. Centroids are computed by fitting an ellipse to the projected circle, making them robust under defocus, mild motion blur, and low-contrast lighting where corner detectors struggle.\n\nBoth symmetric and asymmetric layouts are supported natively by OpenCV's findCirclesGrid and by MVTec HALCON, covering the full range of monocular, stereo, and structured-light setups."
+story: "Corner detectors struggle when your image is slightly out of focus, blurred or dim. Circle grids don't depend on sharp corners: the centre of each dot comes from an ellipse fit, so it holds up in exactly those conditions.\n\nChoose a symmetric or an asymmetric layout. Both work natively with OpenCV findCirclesGrid and with MVTec HALCON, for mono, stereo and structured-light setups."
 ---

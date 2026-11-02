@@ -1,6 +1,6 @@
 ---
-seoDescription: "Calibration board for thermal and near-infrared camera systems. Configured to your wavelength band, format and mounting: request a quote with your needs."
-summary: "IR-compatible calibration board for thermal and near-infrared camera systems"
+seoDescription: "Your thermal or NIR camera can't see printed ink. This board uses emissivity contrast for a sharp edge. Built to your band, size and mount — ask for a quote."
+summary: "IR calibration board for your thermal and NIR cameras — built to your band"
 decideSpecs:
   - "Wavelength range"
   - "Substrate"
@@ -9,5 +9,5 @@ chips:
   - "3–14 µm"
   - "Aluminium"
   - "Checkerboard"
-story: "Thermal and NIR cameras cannot see the ink or paint contrast used on visible-light boards. IR calibration boards create emissivity contrast between adjacent squares — one surface emits strongly, the other reflects — giving a sharp, detectable checkerboard edge across the LWIR (8–14 µm) and NIR (0.7–2.5 µm) bands.\n\nThe aluminium substrate conducts heat evenly to minimise thermal gradients across the board surface, keeping corner positions stable throughout a calibration session. Specifications shown are target values. Contact us for availability and lead times."
+story: "Your thermal or NIR camera doesn't see the ink contrast a visible-light board relies on. An IR board creates contrast through emissivity instead: one surface emits strongly, its neighbour reflects. You get a clean checkerboard edge in the LWIR (8–14 µm) and NIR (0.7–2.5 µm) bands.\n\nThe aluminium base spreads heat evenly, so corners don't drift as the board warms up during your session. We build each board to your wavelength band, size and mounting. The specifications shown are target values — tell us about your setup and we will confirm what we can deliver, and when."
 ---

@@ -1,41 +1,41 @@
 ---
-seoDescription: "Reflectance panels, ISO 12233 resolution charts and IR-compatible boards for LiDAR, thermal and image-quality work. Configured to your test setup."
-title: "LiDAR & image quality"
-description: "Reflectance panels, ISO 12233 charts, IR-compatible boards for LiDAR and imaging systems."
+seoDescription: "Reflectance panels, ISO 12233 resolution charts and IR boards for your LiDAR, thermal and image-quality tests. Each one built to your setup — ask for a quote."
+title: "LiDAR & Image Quality Targets"
+description: "Reflectance panels, ISO 12233 charts and IR boards for your LiDAR and imaging tests."
 sellingPoints:
-  - "Calibrated reflectance panels and resolution charts for LiDAR and imaging QA"
-  - "ISO 12233 and custom patterns — designed for automated analysis pipelines"
+  - "Reflectance panels and resolution charts for your LiDAR and image-quality testing"
+  - "Built to your test setup: wavelength band, size, reflectance and mounting"
 color: amber
 pairsWith:
   - mounting-fixture
 specsTable:
   - { label: "Substrate", value: "Varies by product" }
-  - { label: "Reflectance accuracy", value: "±2 % (panels)" }
-  - { label: "Resolution", value: "Up to 4000 LP/PH (charts)" }
-founderQuote: "I started Calib.Tools because I kept wasting afternoons printing targets on paper and taping them to foam board. Every board we ship is the one I wish I could have ordered on day one."
+  - { label: "Reflectance accuracy", value: "±2 % (panels, target)" }
+  - { label: "Resolution", value: "Up to 4000 LP/PH (charts, target)" }
+brandNote: "Tell us what you're testing. We would rather build the right target once than sell you a standard one that almost fits."
 ---
 
 ## Overview
 
-LiDAR and image quality targets are designed for sensor characterisation and quality assurance beyond standard camera calibration.
+These targets are for testing your sensors beyond geometric calibration.
 
-This collection includes [reflectance panels](/targets/reflectance-panel/) for LiDAR intensity calibration, [ISO 12233 resolution charts](/targets/resolution-chart/) for MTF and SFR evaluation, and [IR-compatible calibration boards](/targets/ir-board/) for thermal and near-infrared camera systems.
+You'll find [reflectance panels](/targets/reflectance-panel/) for LiDAR intensity calibration, [ISO 12233 resolution charts](/targets/resolution-chart/) for MTF and SFR, and [IR calibration boards](/targets/ir-board/) for thermal and near-infrared cameras.
 
-All products in this collection are quote-only. Contact us to discuss your requirements and lead times.
+We build each one to your setup, so they are quote-only. Tell us what you're testing and we'll come back with options and a lead time.
 
 ## Specifications
 
-Specifications vary by product type. See individual product pages for target specifications.
+Specifications depend on the product. Each product page lists its target values.
 
 ## Files
 
-Datasheets and measurement reports are provided with each product.
+You get a datasheet with every product. Your quote states which measurement data comes with it.
 
 ## Cleaning & care
 
-Care instructions vary by product. Refer to the product datasheet.
+Care depends on the product. You'll find instructions in its datasheet.
 
 ## FAQ
 
-**How do I order LiDAR targets?**
-Use the "Request a quote" button on any product page, or email hello@calib.tools with your requirements. We reply within one business day.
+**How do I order?**
+Press "Request a quote" on any product page, or email hello@calib.tools with your setup. We reply within one business day.

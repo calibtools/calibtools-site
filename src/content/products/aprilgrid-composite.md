@@ -1,6 +1,6 @@
 ---
-seoDescription: "AprilGrid board with AprilTag 36h11 markers for Kalibr camera-IMU calibration. Rigid aluminium composite, 200-800 mm, inspection report included."
-summary: "AprilGrid composite board for Kalibr camera–IMU and multi-sensor calibration"
+seoDescription: "The AprilGrid your Kalibr camera–IMU calibration expects: an AprilTag 36h11 in every cell, Kalibr YAML supplied. Rigid aluminium composite, 200–800 mm."
+summary: "AprilGrid for your Kalibr camera–IMU and multi-sensor calibration"
 decideSpecs:
   - "Feature position tolerance"
   - "Substrate"
@@ -9,5 +9,5 @@ chips:
   - "±0.3 mm + 0.2 mm/m"
   - "6 mm"
   - "200–800 mm"
-story: "AprilGrid is the standard target for the Kalibr camera–IMU calibration toolchain. Each cell contains an AprilTag 36h11 marker, giving every grid point a unique ID so the board can be detected at any orientation and under partial occlusion.\n\nThe grid layout provides dense, evenly distributed feature coverage across the image plane, which is essential for accurate intrinsic and extrinsic estimation in multi-camera and camera–IMU setups."
+story: "If you calibrate with Kalibr, this is the board it is built around. Every cell holds an AprilTag 36h11 marker, so each grid point has its own ID. Move fast, tilt hard, cover part of the board with your hand — Kalibr still finds it. That is what your camera–IMU sequences need.\n\nWe supply the Kalibr YAML for your exact board. Load it and start recording, instead of measuring tags with a ruler."
 ---

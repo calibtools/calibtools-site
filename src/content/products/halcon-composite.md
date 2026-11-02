@@ -1,6 +1,6 @@
 ---
-seoDescription: "HALCON calibration plate with MVTec mark layout, supplied with the matching .descr description file. Rigid aluminium composite, 200-800 mm."
-summary: "HALCON calibration plate with MVTec mark layout for industrial machine vision"
+seoDescription: "A HALCON calibration plate with the MVTec mark layout, shipped with the matching .descr file so find_caltab works straight away. Composite, 200–800 mm."
+summary: "HALCON plate with the MVTec mark layout and a matching .descr file for your line"
 decideSpecs:
   - "Feature position tolerance"
   - "Substrate"
@@ -9,5 +9,5 @@ chips:
   - "±0.3 mm + 0.2 mm/m"
   - "6 mm"
   - "200–800 mm"
-story: "The MVTec HALCON calibration plate uses a precise mark layout: a central reference circle surrounded by a regular grid of smaller dots. This layout is recognised directly by HALCON's find_caltab operator, and the full camera model — including lens distortion — is solved with calibrate_cameras.\n\nEach board ships with a matching .descr descriptor file containing the exact mark coordinates, so no manual measurement or data entry is required before running calibration."
+story: "If your line runs HALCON, you want a plate that find_caltab recognises without fuss. This one uses the MVTec mark layout, and calibrate_cameras solves your full camera model from it, lens distortion included.\n\nWe ship the matching .descr file with the exact mark coordinates of your plate. Point HALCON at it and calibrate. No measuring, no typing in coordinates."
 ---
