@@ -21,6 +21,7 @@ const WIDTHS = [320, 360, 390, 414, 768, 1024, 1280, 1440, 1920];
 const LANDSCAPE = { width: 844, height: 390 };
 
 const SCREENSHOT_WIDTHS = [360, 768, 1440];
+const SCREENSHOTS_ENABLED = process.env.LAYOUT_SCREENSHOTS === '1';
 const SCREENSHOT_DIR = resolve(process.cwd(), 'docs/design/layout-audit-2026-11-01',
   process.env.LAYOUT_PHASE === 'before' ? 'before' : 'after');
 
@@ -251,8 +252,10 @@ async function fixedElementOverlap(page: Page) {
 
 // ─── Tests ────────────────────────────────────────────────────────────
 
-// Ensure screenshot dirs exist
-try { mkdirSync(SCREENSHOT_DIR, { recursive: true }); } catch { /* exists */ }
+// Ensure screenshot dirs exist (only when screenshots are enabled)
+if (SCREENSHOTS_ENABLED) {
+  try { mkdirSync(SCREENSHOT_DIR, { recursive: true }); } catch { /* exists */ }
+}
 
 for (const path of PAGES) {
   const slug = path === '/' ? 'home' : path.replace(/^\/|\/$/g, '').replace(/\//g, '-');
@@ -360,9 +363,10 @@ for (const path of PAGES) {
     });
   }
 
-  // ── Screenshots at 360, 768, 1440 (Chromium only) ──
+  // ── Screenshots at 360, 768, 1440 (Chromium only, opt-in) ──
   for (const w of SCREENSHOT_WIDTHS) {
     test(`screenshot: ${slug} @ ${w}`, async ({ page, browserName }) => {
+      test.skip(!SCREENSHOTS_ENABLED, 'Set LAYOUT_SCREENSHOTS=1 to capture');
       test.skip(browserName !== 'chromium', 'Screenshots only on Chromium');
       await page.setViewportSize({ width: w, height: 900 });
       await page.goto(path, { waitUntil: 'networkidle' });
