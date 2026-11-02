@@ -1,9 +1,10 @@
 ---
 import Base from '@/layouts/Base.astro';
 import { breadcrumbLd } from '@/lib/seo';
+import { CONTACT_EMAIL } from '@/lib/claims';
 const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: 'Legal notice' }]);
 ---
-<Base title="Legal notice" description="Company information, registered address and responsible contact for Calib.Tools LLC, supplier of camera calibration targets and free browser tools." jsonLd={bcLd}>
+<Base title="Legal notice" description="Company details for Calib.Tools LLC, supplier of camera calibration targets and free browser tools: registered address, contact, trademarks and liability." jsonLd={bcLd}>
   <div class="container-x py-10 md:py-16">
     <div class="prose-calib mx-auto flex max-w-[720px] flex-col gap-5">
       <h1 class="h-display m-0 text-[32px] md:text-[40px]">Legal notice</h1>
@@ -12,13 +13,22 @@ const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: 'Legal notice' }]
       <p>
         Calib.Tools LLC<br />
         1401 21st Street, Suite R, Sacramento, CA 95811, USA<br />
-        Incorporated in California
+        Limited liability company, incorporated in California
       </p>
 
       <h2>Contact</h2>
       <p>
-        Email: <a href="mailto:hello@calib.tools">hello@calib.tools</a>
+        Email: <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
       </p>
+
+      <h2>Trademarks</h2>
+      <p>OpenCV, HALCON, Kalibr, ROS and AprilTag are trademarks or names of their respective owners. We use them only to describe compatibility; Calib.Tools is not affiliated with or endorsed by them.</p>
+
+      <h2>Content and links</h2>
+      <p>We keep this site accurate and up to date, but specifications can change between revisions; the datasheet revision you received with your order applies. We&rsquo;re not responsible for the content of external sites we link to.</p>
+
+      <h2>Copyright</h2>
+      <p>Text, images, datasheets and tool code on this site are &copy; Calib.Tools LLC unless stated otherwise. Patterns and files you create with our free tools are yours to use.</p>
     </div>
   </div>
 </Base>

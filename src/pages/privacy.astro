@@ -1,47 +1,58 @@
 ---
 import Base from '@/layouts/Base.astro';
 import { breadcrumbLd } from '@/lib/seo';
+import { CONTACT_EMAIL } from '@/lib/claims';
 const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: 'Privacy policy' }]);
+
+/** Build-time date for "Last updated" line. */
+const lastUpdated = new Date().toISOString().slice(0, 10);
 ---
-<Base title="Privacy policy" description="No tracking, no advertising cookies, no third-party scripts. Server-side page counters store anonymous totals only. Here is exactly what we store." jsonLd={bcLd}>
+<Base title="Privacy policy" description="No tracking cookies, no ads, no third-party scripts. Exactly what we store when you browse, use the free tools, request a quote, order or review." jsonLd={bcLd}>
   <div class="container-x py-10 md:py-16">
     <div class="prose-calib mx-auto flex max-w-[720px] flex-col gap-5">
       <h1 class="h-display m-0 text-[32px] md:text-[40px]">Privacy policy</h1>
 
-      <h2>Controller</h2>
+      <p><strong>In short:</strong> we don&rsquo;t track you, set no advertising or analytics cookies and load no third-party scripts. We only keep what we need to answer you, ship your order and run the site.</p>
+
+      <h2>Who is responsible</h2>
       <p>
-        Calib.Tools LLC<br />
-        1401 21st Street, Suite R, Sacramento, CA 95811, USA<br />
-        Email: <a href="mailto:hello@calib.tools">hello@calib.tools</a>
+        Calib.Tools LLC, 1401 21st Street, Suite R, Sacramento, CA 95811, USA &mdash; <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
       </p>
 
-      <h2>What we do not do</h2>
-      <p>We do not track individual visitors. We do not set advertising or analytics cookies. No third-party scripts or external fonts are loaded on this site. Everything you enter into the browser tools stays in your browser and is never uploaded to our servers.</p>
+      <h2>Browsing the site</h2>
+      <ul class="ml-5 flex flex-col gap-2 text-[15px] list-disc">
+        <li><strong>Hosting.</strong> The site runs on Cloudflare Pages. Cloudflare processes your IP address and browser details to deliver pages and block attacks. See <a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener">Cloudflare&rsquo;s privacy policy</a>.</li>
+        <li><strong>Page counts.</strong> We count page views on the server: page path and a referrer category such as &ldquo;generator&rdquo; or &ldquo;guide&rdquo;. No IP addresses, visitor IDs or sessions are stored, so a count can&rsquo;t be traced back to you. Known crawlers are skipped; the User-Agent is read for that check and not stored.</li>
+        <li><strong>In your browser.</strong> The only thing we store on your device is a cart ID (<code>localStorage</code> key <code>calib-cart-id</code>), created when you first add something to the cart. No cookies.</li>
+        <li><strong>Fonts.</strong> Geist fonts are served from our own domain; no external font services.</li>
+      </ul>
 
-      <h2>What is stored in your browser</h2>
-      <p>The only thing this site stores on your device is a shopping cart identifier (<code>localStorage</code> key <code>calib-cart-id</code>). It is created only after you add an item to your cart, and it is used solely to keep your cart contents across page loads. No cookies are set.</p>
+      <h2>Free tools</h2>
+      <p>Everything you enter in the generator, calculators and image checks stays in your browser. Images you check are not uploaded.</p>
 
-      <h2>Server-side page counters</h2>
-      <p>We count page views on the server to understand which pages are visited. These counters store anonymous totals only: the page path and a referrer category (such as &ldquo;generator&rdquo; or &ldquo;guide&rdquo;).</p>
-      <p>Requests from known crawlers are skipped; the User-Agent header is read for that check and is not stored. No IP addresses, no visitor identifiers, and no cross-page session data are stored. It is not possible to trace a count back to an individual.</p>
+      <h2>Quote requests</h2>
+      <p>When you send the quote form, we receive your name, company, email, product and message by email (sent through Resend) and keep a copy in our Cloudflare storage so no request is lost. Your IP address is used for one hour to limit spam. We use this only to answer and follow up on your request.</p>
 
-      <h2>Hosting</h2>
-      <p>The site is hosted on Cloudflare Pages. Cloudflare may process your IP address and browser metadata to deliver the pages. See <a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener">Cloudflare&rsquo;s privacy policy</a>.</p>
+      <h2>Orders</h2>
+      <p>Checkout runs on Shopify. Shopify processes your name, address, email and payment details to take payment and ship your order; we never see your full card number. We share your address with the carrier that delivers it. See <a href="https://www.shopify.com/legal/privacy" target="_blank" rel="noopener">Shopify&rsquo;s privacy policy</a>.</p>
 
-      <h2>Shop &amp; checkout</h2>
-      <p>When you place an order, checkout is handled by Shopify on <code>shop.calib.tools</code>. Shopify processes your name, address, email and payment details to fulfil the order. See <a href="https://www.shopify.com/legal/privacy" target="_blank" rel="noopener">Shopify&rsquo;s privacy policy</a>.</p>
+      <h2>Review invitations</h2>
+      <p>After your order ships, we store your name, email and the product you bought for up to 30 days so we can invite you to review it. If you write a review, we publish your name as you entered it and your text. See the <a href="/reviews-policy/">Reviews policy</a>.</p>
 
-      <h2>Email</h2>
-      <p>If you subscribe to the newsletter, your email address is stored by Shopify. You can unsubscribe at any time via the link in every email.</p>
+      <h2>Newsletter</h2>
+      <p>If you subscribe, Shopify stores your email address. Every email has an unsubscribe link.</p>
 
-      <h2>Fonts</h2>
-      <p>This site uses Geist Sans, Geist Mono and Geist Pixel by Vercel, SIL Open Font License 1.1, self-hosted. No external font services are loaded &mdash; all font files are served from our own domain.</p>
+      <h2>How long we keep data</h2>
+      <p>Quote and order emails are kept as long as we need them for the request, the order, warranty and tax records. Review invitations expire after 30 days. Ask us any time to delete data we don&rsquo;t need to keep by law.</p>
 
       <h2>Your rights</h2>
-      <p>Under the GDPR you have the right to access, rectify, erase or port your data, and to object to or restrict processing. Contact <a href="mailto:hello@calib.tools">hello@calib.tools</a>.</p>
+      <p>You can ask what we hold about you, correct it, delete it, take a copy or object to how we use it. Email <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>. If you&rsquo;re in the EU or UK, you can also complain to your local data protection authority. California residents: we don&rsquo;t sell or share personal information for advertising.</p>
 
-      <h2>Data protection authority</h2>
-      <p>You may lodge a complaint with the data protection authority where you live.</p>
+      <h2>Legal basis (EU/UK)</h2>
+      <p>Order and quote data: to perform a contract or take steps toward one. Hosting, spam limits and page counts: our legitimate interest in running a secure site. Newsletter: your consent.</p>
+
+      <h2>Changes</h2>
+      <p>We update this page when what we collect changes. Last updated: {lastUpdated}.</p>
     </div>
   </div>
 </Base>

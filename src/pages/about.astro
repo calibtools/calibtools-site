@@ -1,33 +1,44 @@
 ---
 import Base from '@/layouts/Base.astro';
 import { breadcrumbLd } from '@/lib/seo';
+import { INSPECTION_CLAIM, CONTACT_EMAIL } from '@/lib/claims';
 const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: 'About' }]);
 ---
-<Base title="About Calib.Tools" description="Who builds Calib.Tools, how we inspect every board, and why calibration target accuracy matters. Know your target to the micron." jsonLd={bcLd}>
+<Base title="About Calib.Tools" description="Calib.Tools makes calibration targets with published specs, measures every board before it ships and builds free tools for the setup around it." jsonLd={bcLd}>
   <div class="container-x py-10 md:py-16">
     <div class="prose-calib mx-auto flex max-w-[720px] flex-col gap-8">
       <h1 class="h-display m-0 text-[32px] md:text-[40px]">About Calib.Tools</h1>
 
+      <p>We make camera calibration targets you can trust without measuring them yourself &mdash; and the free tools to use them well.</p>
 
       <section class="flex flex-col gap-3">
-        <h2>Where</h2>
-        <p>We sell from the US, manufacture with a partner factory and measure every board before it ships. Shipping worldwide.</p>
+        <h2>What we make</h2>
+        <p>ChArUco, checkerboard, AprilGrid, circle grid and HALCON targets on aluminium composite and ceramic, from palm-sized boards for microscope optics to 800&nbsp;&times;&nbsp;600&nbsp;mm boards for robot cells. Every pattern follows OpenCV conventions, and every target has a datasheet with its real tolerances.</p>
       </section>
 
       <section class="flex flex-col gap-3">
-        <h2>How we inspect</h2>
-        <p>Every board is measured at the factory before shipping by comparison against a golden sample.</p>
+        <h2>How we work</h2>
+        <ul class="ml-5 flex flex-col gap-2 text-[15px] list-disc">
+          <li><strong>Specs first.</strong> Tolerance, flatness and material are on the product page and datasheet before you buy, not after you ask.</li>
+          <li><strong>Measured before it ships.</strong> {INSPECTION_CLAIM}.</li>
+          <li><strong>Files that match the board.</strong> Marker ID ranges, config files and drawings come from the same data as the target itself.</li>
+        </ul>
       </section>
 
       <section class="flex flex-col gap-3">
-        <h2>Why</h2>
-        <p>Calibration targets should be affordable, well-documented and shipped with the files you actually need. The free tools exist because a good target paired with a bad setup wastes money. We want every team — from a PhD student to a production line — to know their targets are measured before they ship.</p>
+        <h2>Free tools</h2>
+        <p>A good target in a bad setup still wastes time. Our <a href="/tools/generator/">pattern generator</a>, <a href="/tools/fov/">field-of-view calculator</a>, <a href="/tools/capture/">capture planner</a> and <a href="/tools/check/">image checks</a> are free, run in your browser and need no account.</p>
+      </section>
+
+      <section class="flex flex-col gap-3">
+        <h2>Who we are</h2>
+        <p>Calib.Tools LLC is a US company. We design and specify the targets, and produce them with a partner factory that measures each one against a golden-sample reference. We ship worldwide.</p>
       </section>
 
       <div class="flex flex-wrap gap-3 border-t border-line pt-6">
         <a href="/targets/" class="btn-md btn-primary">Shop targets</a>
         <a href="/tools/" class="btn-md btn-secondary">Open free tools</a>
-        <a href="mailto:hello@calib.tools" class="btn-md btn-secondary">hello@calib.tools</a>
+        <a href={`mailto:${CONTACT_EMAIL}`} class="btn-md btn-secondary">Email us</a>
       </div>
     </div>
   </div>

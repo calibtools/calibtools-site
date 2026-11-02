@@ -5,21 +5,34 @@ import { CONTACT_EMAIL } from '@/lib/claims';
 
 const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: 'Contact' }]);
 ---
-<Base title="Contact and quotes" description="Ask about specifications, request a quote for custom or large-format targets, or discuss institutional and volume orders. Technical questions welcome." section="support" jsonLd={bcLd}>
+<Base title="Contact and quotes" description="Questions about a target, a custom size or a volume order? Email an engineer or request a quote. We reply within one business day." section="support" jsonLd={bcLd}>
   <div class="container-x py-[var(--section-y)]">
     <div class="mx-auto max-w-[720px] prose-calib flex flex-col gap-5">
       <h1 class="h-display m-0 text-[32px] md:text-[40px]">Contact</h1>
 
-      <p>Email <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a> &mdash; we reply within one business day.</p>
+      <p>Email <strong><a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a></strong>. An engineer reads every message and replies within one business day.</p>
 
-      <p>For custom targets, large quantities or institutional purchase orders, use the <a href="/quote/">Request a quote</a> form.</p>
+      <h2>Technical questions</h2>
+      <p>Tell us your camera (sensor, lens, working distance) and what you&rsquo;re calibrating. We&rsquo;ll suggest a pattern, size and substrate &mdash; or tell you if a printed target will do.</p>
 
-      <h2>What to include</h2>
+      <h2>Quotes, custom sizes and volume orders</h2>
+      <p>Use the <a href="/quote/">Request a quote</a> form. It helps to include:</p>
       <ul class="ml-5 flex flex-col gap-2 text-[15px] list-disc">
-        <li>Pattern type and dimensions (or a link to your pattern generator export)</li>
-        <li>Quantity and substrate preference (composite or ceramic)</li>
-        <li>Shipping destination</li>
+        <li>Pattern type and size, or a file exported from our <a href="/tools/generator/">pattern generator</a></li>
+        <li>Quantity and substrate (composite or ceramic)</li>
+        <li>Shipping destination, and whether you need DDP or a purchase order</li>
       </ul>
+
+      <h2>Orders and returns</h2>
+      <p>Include your order number. For returns, see the <a href="/returns/">Returns</a> page first &mdash; it explains how to get a return number.</p>
+
+      <div class="flex flex-wrap gap-3 border-t border-line pt-6">
+        <a href="/faq/" class="text-sm text-ink-muted no-underline hover:text-brand">FAQ</a>
+        <span class="text-ink-muted">&middot;</span>
+        <a href="/shipping/" class="text-sm text-ink-muted no-underline hover:text-brand">Shipping, duties &amp; taxes</a>
+        <span class="text-ink-muted">&middot;</span>
+        <a href="/returns/" class="text-sm text-ink-muted no-underline hover:text-brand">Returns</a>
+      </div>
     </div>
   </div>
 </Base>
