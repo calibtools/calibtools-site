@@ -1,0 +1,169 @@
+/**
+ * Calib.Tools part-number grammar (Part Numbering System v3).
+ *
+ * Board-type families:  CT-FFF-M-SIZE-VAR[-OPT[-OPT]]
+ * Accessories:          CT-ACC-M-{TYPE}{SPEC}        e.g. CT-ACC-M-FIX14
+ * Services:             CT-SVC-{TYPE}[-{SPEC}]       e.g. CT-SVC-CERT-ILAC
+ * Kits:                 CT-KIT-X-{NNN}               e.g. CT-KIT-X-001
+ *
+ * Single source of truth for parsing, building and validating part numbers.
+ * The registry lives in data/part-numbers.csv; scripts/check-part-numbers.ts
+ * validates every row with this module.
+ */
+
+export const BRAND = 'CT';
+
+/** Hard limit: SAP vendor material number (IDNLF) is 35 chars; we stay well below. */
+export const MAX_LENGTH = 26;
+/** Soft limit for the core number (without options): fits a cart line and a label row. */
+export const CORE_SOFT_LIMIT = 20;
+
+export const FAMILIES = {
+  CHT: 'Checkerboard',
+  CHA: 'ChArUco',
+  APR: 'AprilGrid',
+  CIR: 'Circle grid',
+  HAL: 'HALCON plate',
+  CBM: 'Checkerboard with markers',
+  VND: 'Vendor-specific pattern',
+  CUB: 'Calibration cube',
+  LDR: 'LiDAR reflectance',
+  IRT: 'Infrared',
+  LUM: 'Backlit',
+  IQC: 'Image-quality chart',
+  RES: 'Resolution / metrology',
+  SPH: 'Sphere / ball bar',
+  TCP: 'Robot TCP artefact',
+  ACC: 'Accessory',
+  KIT: 'Kit',
+  SVC: 'Service',
+  OEM: 'OEM / project',
+} as const;
+export type Family = keyof typeof FAMILIES;
+
+/** Single-letter material codes. I, O and Q are never used (confusable with 1 / 0). */
+export const MATERIALS = {
+  P: 'Aluminium composite',
+  C: 'Alumina ceramic',
+  G: 'Soda-lime glass',
+  W: 'Opal (white) glass',
+  F: 'Fused silica',
+  K: 'Carbon fibre',
+  H: 'Aluminium honeycomb',
+  M: 'Metal',
+  L: 'Film',
+  T: 'Film laminated on glass / ceramic',
+  X: 'Not applicable',
+} as const;
+export type Material = keyof typeof MATERIALS;
+
+/** Allowed variant codes per board-type family (regex sources). */
+export const VARIANTS: Partial<Record<Family, RegExp>> = {
+  CHT: /^(F|C|G\d{1,2}X\d{1,2})$/,
+  CBM: /^(F|C)$/,
+  CHA: /^(D4|D5|D6|T36)$/,
+  APR: /^(T36|T25)$/,
+  CIR: /^(SYM|ASY)$/,
+  HAL: /^(STD|H12)$/,
+  VND: /^(ZIV|PHO|ZEB)$/,
+  CUB: /^C[3-6]$/,
+  LDR: /^(R\d{1,2}|STP\d|FUS)$/,
+  IRT: /^(N850|N940|LWIR)$/,
+  LUM: /^(BL|IR)$/,
+  IQC: /^(ESFR|SFR|SFRP|SFRN2|SFRN4|COLR|FOCS|GRY11)$/,
+  RES: /^(USAF|SCL|CON|MLT|RON)$/,
+  SPH: /^(BAL|BAR)$/,
+  TCP: /^[A-Z0-9]{2,4}$/,
+  OEM: /^[A-Z0-9]{2,6}$/,
+};
+
+/** Options, in the only order they may appear. B1–B4 is used on labels only, never as a SKU. */
+export const OPTION_ORDER = ['905', '1550', 'NEG', 'LG'] as const;
+
+const SIZE_RE = /^(\d{2,4})X(\d{2,4})$|^A[0-4]$|^D\d{1,3}$|^L\d{2,4}$/;
+
+export interface PartNumber {
+  family: Family;
+  material: Material | '';
+  size: string;
+  variant: string;
+  options: string[];
+}
+
+export interface ParseResult {
+  ok: boolean;
+  value?: PartNumber;
+  errors: string[];
+}
+
+export function parse(pn: string): ParseResult {
+  const errors: string[] = [];
+  if (pn !== pn.toUpperCase()) errors.push('must be upper case');
+  if (!/^[A-Z0-9-]+$/.test(pn)) errors.push('only A–Z, 0–9 and hyphen allowed');
+  if (/--|^-|-$/.test(pn)) errors.push('empty segment');
+  if (pn.length > MAX_LENGTH) errors.push(`longer than ${MAX_LENGTH} characters`);
+  const seg = pn.split('-');
+  if (seg[0] !== BRAND) errors.push('must start with CT-');
+  const family = seg[1] as Family;
+  if (!(family in FAMILIES)) {
+    errors.push(`unknown family "${seg[1] ?? ''}"`);
+    return { ok: false, errors };
+  }
+
+  if (family === 'SVC') {
+    if (seg.length < 3 || seg.length > 4) errors.push('service format is CT-SVC-TYPE[-SPEC]');
+    const value: PartNumber = { family, material: '', size: '', variant: seg.slice(2).join('-'), options: [] };
+    return { ok: errors.length === 0, value, errors };
+  }
+  if (family === 'ACC') {
+    if (seg.length !== 4) errors.push('accessory format is CT-ACC-M-TYPESPEC');
+    if (seg[2] && !(seg[2] in MATERIALS)) errors.push(`unknown material "${seg[2]}"`);
+    if (seg[3] && !/^[A-Z]{3}[A-Z0-9]{1,6}$/.test(seg[3])) errors.push('accessory code is 3 letters + spec, e.g. FIX14');
+    const value: PartNumber = { family, material: (seg[2] ?? '') as Material, size: '', variant: seg[3] ?? '', options: [] };
+    return { ok: errors.length === 0, value, errors };
+  }
+  if (family === 'KIT') {
+    if (seg.length !== 4 || seg[2] !== 'X' || !/^\d{3}$/.test(seg[3] ?? '')) errors.push('kit format is CT-KIT-X-NNN');
+    const value: PartNumber = { family, material: 'X', size: '', variant: seg[3] ?? '', options: [] };
+    return { ok: errors.length === 0, value, errors };
+  }
+
+  // Board-type families
+  if (seg.length < 5 || seg.length > 7) errors.push('format is CT-FFF-M-SIZE-VAR[-OPT[-OPT]]');
+  const [, , material, size, variant, ...options] = seg;
+  if (!material || !(material in MATERIALS)) errors.push(`unknown material "${material ?? ''}"`);
+  if (!size || !SIZE_RE.test(size)) errors.push(`bad size "${size ?? ''}" (use 300X200, A3, D25 or L300)`);
+  const m = size?.match(/^(\d{2,4})X(\d{2,4})$/);
+  if (m && (m[1].startsWith('0') || m[2].startsWith('0'))) errors.push('no leading zeros in size');
+  const vre = VARIANTS[family];
+  if (!variant || (vre && !vre.test(variant))) errors.push(`variant "${variant ?? ''}" not allowed for ${family}`);
+  let last = -1;
+  for (const o of options) {
+    const idx = OPTION_ORDER.indexOf(o as (typeof OPTION_ORDER)[number]);
+    if (idx === -1) errors.push(`unknown option "${o}"`);
+    else if (idx <= last) errors.push('options out of order or repeated');
+    last = Math.max(last, idx);
+  }
+  if ((options.includes('905') || options.includes('1550')) && family !== 'LDR') errors.push('wavelength option only for LDR');
+  const value: PartNumber = { family, material: (material ?? '') as Material, size: size ?? '', variant: variant ?? '', options };
+  return { ok: errors.length === 0, value, errors };
+}
+
+export function build(p: PartNumber): string {
+  if (p.family === 'SVC') return [BRAND, 'SVC', p.variant].join('-');
+  if (p.family === 'ACC') return [BRAND, 'ACC', p.material, p.variant].join('-');
+  if (p.family === 'KIT') return [BRAND, 'KIT', 'X', p.variant].join('-');
+  return [BRAND, p.family, p.material, p.size, p.variant, ...p.options].join('-');
+}
+
+/** Core = number without options. */
+export function core(pn: string): string {
+  const r = parse(pn);
+  if (!r.value || ['SVC', 'ACC', 'KIT'].includes(r.value.family)) return pn;
+  return build({ ...r.value, options: [] });
+}
+
+/** Lower-case file stem used for configuration files, e.g. ct-cha-p-300x200-d6. */
+export function fileStem(pn: string): string {
+  return pn.toLowerCase();
+}
