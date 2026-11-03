@@ -1,16 +1,15 @@
 /**
- * SKU convention check: reads all variants via Storefront API and fails
- * if any SKU does not match the expected pattern.
+ * SKU check against the part-number registry (Part Numbering System v3).
  *
- * Pattern: PREFIX-MATERIAL-...
- *   PREFIX:   CHT|CHA|APR|CIR|ACR|HAL|CBM|VND|CUS|CUB|LUM|LDR|IRT|IQC|SPH|TCP|RES|ACC|SVC|OEM
- *   MATERIAL: P|C|G|Q|O|F|H|A|S|X
- *
- * Full regex: /^(CHT|CHA|APR|CIR|ACR|HAL|CBM|VND|CUS|CUB|LUM|LDR|IRT|IQC|SPH|TCP|RES|ACC|SVC|OEM)-[PCGQOFHASX]-/
+ * Reads every variant SKU via the Storefront API and compares it with
+ * data/part-numbers.csv (validated by scripts/check-part-numbers.ts):
+ *   - SKU equals a registry `pn`            → OK
+ *   - SKU equals a registry `legacy_sku`    → awaiting migration (warning)
+ *   - anything else                         → error (unregistered SKU)
  *
  * Usage:
- *   node scripts/check-skus.mjs          # exits 1 on violations
- *   node scripts/check-skus.mjs --warn   # exits 0 even with violations (CI warning mode)
+ *   node scripts/check-skus.mjs          # exits 1 on unregistered SKUs or pending migrations
+ *   node scripts/check-skus.mjs --warn   # exits 0 (CI warning mode)
  *
  * Requires PUBLIC_SHOPIFY_DOMAIN and PUBLIC_SHOPIFY_STOREFRONT_TOKEN.
  */
@@ -41,8 +40,17 @@ if (!domain || !token) {
 
 const warnOnly = process.argv.includes('--warn');
 
-/** @type {RegExp} */
-export const SKU_PATTERN = /^(CHT|CHA|APR|CIR|ACR|HAL|CBM|VND|CUS|CUB|LUM|LDR|IRT|IQC|SPH|TCP|RES|ACC|SVC|OEM)-[PCGQOFHASX]-/;
+// --- Registry ---
+function parseCsv(text) {
+  const lines = text.trim().split(/\r?\n/);
+  const split = (l) => { const out = []; let f = '', q = false; for (let i = 0; i < l.length; i++) { const c = l[i]; if (q) { if (c === '"' && l[i + 1] === '"') { f += '"'; i++; } else if (c === '"') q = false; else f += c; } else if (c === '"') q = true; else if (c === ',') { out.push(f); f = ''; } else f += c; } out.push(f); return out; };
+  const head = split(lines[0]);
+  return lines.slice(1).map((l) => Object.fromEntries(split(l).map((v, i) => [head[i], v])));
+}
+const registry = parseCsv(readFileSync('data/part-numbers.csv', 'utf-8'));
+const byPn = new Map(registry.map((r) => [r.pn, r]));
+const byLegacy = new Map(registry.filter((r) => r.legacy_sku).map((r) => [r.legacy_sku, r]));
+
 
 // --- Query ---
 
@@ -78,50 +86,29 @@ if (json.errors?.length) {
 }
 
 const products = json.data.products.nodes;
-const offenders = [];
+const unregistered = [];
+const pending = [];
 let totalVariants = 0;
 
 for (const p of products) {
   for (const v of p.variants.nodes) {
-    if (!v.sku) continue; // skip variants without SKU
+    if (!v.sku) continue;
     totalVariants++;
-    if (!SKU_PATTERN.test(v.sku)) {
-      offenders.push({
-        handle: p.handle,
-        variant: v.title,
-        sku: v.sku,
-      });
-    }
+    if (byPn.has(v.sku)) continue;
+    const legacy = byLegacy.get(v.sku);
+    if (legacy) pending.push({ handle: p.handle, variant: v.title, sku: v.sku, next: legacy.pn });
+    else unregistered.push({ handle: p.handle, variant: v.title, sku: v.sku });
   }
 }
 
-// --- Output ---
+console.log(`\n[check-skus] Checked ${totalVariants} variants across ${products.length} products.`);
+for (const o of pending) console.log(`  pending   ${o.sku.padEnd(22)} → ${o.next.padEnd(26)} ${o.handle} / ${o.variant}`);
+for (const o of unregistered) console.log(`  UNKNOWN   ${o.sku.padEnd(22)}   ${o.handle} / ${o.variant}`);
 
-console.log(`\n[check-skus] Checked ${totalVariants} variants across ${products.length} products.\n`);
-
-if (offenders.length === 0) {
-  console.log('[check-skus] OK — all SKUs match convention.\n');
+if (!pending.length && !unregistered.length) {
+  console.log('[check-skus] OK — every SKU is a registered part number.\n');
   process.exit(0);
 }
-
-console.log(`[check-skus] ${offenders.length} SKU${offenders.length !== 1 ? 's' : ''} violate convention:\n`);
-console.log('  SKU                           Product                         Variant');
-console.log('  ' + '─'.repeat(85));
-
-for (const o of offenders) {
-  console.log(`  ${o.sku.padEnd(32)} ${o.handle.padEnd(32)} ${o.variant}`);
-}
-
-console.log('');
-console.log(`  Expected pattern: PREFIX-MATERIAL-... where`);
-console.log(`    PREFIX:   CHT|CHA|APR|CIR|ACR|HAL|CBM|VND|CUS|CUB|LUM|LDR|IRT|IQC|SPH|TCP|RES|ACC|SVC|OEM`);
-console.log(`    MATERIAL: P(composite) C(ceramic) G(glass) Q(quartz) O(polymer) F(film) H(chrome) A(aluminium) S(steel) X(other)`);
-console.log('');
-
-if (warnOnly) {
-  console.log('[check-skus] WARNING — violations found but --warn mode, exiting 0.\n');
-  process.exit(0);
-} else {
-  console.error('[check-skus] FAIL — SKU convention violations found. Use --warn for CI warning-only mode.\n');
-  process.exit(1);
-}
+console.log(`\n[check-skus] ${pending.length} awaiting migration, ${unregistered.length} unregistered.`);
+if (warnOnly) { console.log('[check-skus] --warn mode, exiting 0.\n'); process.exit(0); }
+process.exit(1);
