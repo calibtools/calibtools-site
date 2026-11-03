@@ -8,9 +8,10 @@
  */
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { parse, build, core, CORE_SOFT_LIMIT, MAX_LENGTH } from '../src/lib/partNumber';
+import { parse, build, CORE_SOFT_LIMIT, MAX_LENGTH } from '../src/lib/partNumber';
 
 export function parseCsv(text: string): Record<string, string>[] {
+  text = text.replace(/^\uFEFF/, '');
   const rows: string[][] = [];
   let row: string[] = [];
   let field = '';
@@ -35,11 +36,14 @@ export function parseCsv(text: string): Record<string, string>[] {
   return body.map((r) => Object.fromEntries(head.map((h, i) => [h, r[i] ?? ''])));
 }
 
+const REQUIRED_COLS = ['pn','status','family','material','size','variant','options','name_en','product_handle','legacy_sku'];
 const STATUSES = new Set(['active', 'draft', 'planned', 'paused', 'discontinued', 'reserved']);
 
 export function checkRegistry(rows: Record<string, string>[]) {
   const errors: string[] = [];
   const warnings: string[] = [];
+  const missing = REQUIRED_COLS.filter((c) => rows.length && !(c in rows[0]));
+  if (missing.length) return { errors: [`missing columns: ${missing.join(', ')}`], warnings, summary: { rows: rows.length } as never };
   const seen = new Map<string, number>();
   const seenSupply = new Map<string, number>();
   const seenLegacy = new Map<string, number>();
@@ -56,12 +60,13 @@ export function checkRegistry(rows: Record<string, string>[]) {
       const expect = { family: v.family, material: v.material, size: v.size, variant: v.variant, options: v.options.join('|') };
       if (r.family !== expect.family) errors.push(`L${line} ${pn}: family column "${r.family}" ≠ ${expect.family}`);
       if (!['SVC'].includes(v.family) && r.material !== expect.material) errors.push(`L${line} ${pn}: material column "${r.material}" ≠ ${expect.material}`);
+      if (['SVC', 'ACC', 'KIT'].includes(v.family) && r.variant !== expect.variant) errors.push(`L${line} ${pn}: variant column "${r.variant}" ≠ ${expect.variant}`);
       if (!['SVC', 'ACC', 'KIT'].includes(v.family)) {
         if (r.size !== expect.size) errors.push(`L${line} ${pn}: size column "${r.size}" ≠ ${expect.size}`);
         if (r.variant !== expect.variant) errors.push(`L${line} ${pn}: variant column "${r.variant}" ≠ ${expect.variant}`);
         if (opts.join('|') !== expect.options) errors.push(`L${line} ${pn}: options column "${r.options}" ≠ ${expect.options}`);
       }
-      if (core(pn).length > CORE_SOFT_LIMIT) warnings.push(`L${line} ${pn}: core ${core(pn).length} > ${CORE_SOFT_LIMIT}`);
+      if (pn.length > CORE_SOFT_LIMIT) warnings.push(`L${line} ${pn}: ${pn.length} chars > ${CORE_SOFT_LIMIT} (use 2D code on labels)`);
     }
     if (!STATUSES.has(r.status)) errors.push(`L${line} ${pn}: bad status "${r.status}"`);
     if (!r.name_en) errors.push(`L${line} ${pn}: missing name_en`);

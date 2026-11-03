@@ -40,6 +40,18 @@ describe('partNumber.parse', () => {
     ['CT-CHA-P-0300X200-D6', 'leading zeros'],
     ['CT-ACC-FIX-14', 'accessory'],
     ['CT-CHA-P-300X200-D6 ', 'A–Z'],
+    ['CT-CHA-X-300X200-D6', 'material X'],
+    ['CT-CHA-P-A3-D6', 'size form'],
+    ['CT-CHT-P-D25-F', 'size form'],
+    ['CT-CHA-P-200X300-D6', 'width ≥ height'],
+    ['CT-LDR-M-300X300-R5-905-1550', 'mutually exclusive'],
+    ['CT-RES-G-L0100-SCL', 'leading zeros'],
+    ['CT-LDR-M-300X300-R05', 'leading zeros'],
+    ['CT-CHT-P-300X200-G0X0', 'zero count'],
+    ['CT-KIT-X-000', 'kit format'],
+    ['CT-SVC-0-0', 'service type'],
+    ['CT-ACC-M-FIXFIX', 'accessory'],
+    ['CT-ACC-M-BOX10', 'accessory type'],
   ])('rejects %s (%s)', (pn, why) => {
     const r = parse(pn);
     expect(r.ok).toBe(false);

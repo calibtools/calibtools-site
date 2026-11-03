@@ -55,4 +55,4 @@ CT-CHA-C-185X110-D5,active,CHA,C,185X110,D5,,"ChArUco Calibration Target, Alumin
 CT-CHA-C-230X140-D6,active,CHA,C,230X140,D6,,"ChArUco Calibration Target, Alumina Ceramic",charuco-ceramic,CHA-C-230140-6X6,
 CT-CHA-C-230X140-D5,active,CHA,C,230X140,D5,,"ChArUco Calibration Target, Alumina Ceramic",charuco-ceramic,CHA-C-230140-5X5,
 CT-ACC-M-FIX14,active,ACC,M,,FIX14,,"Target Mounting Fixture, ¼″-20",mounting-fixture,ACC-FIX-14,
-CT-SVC-CERT-ILAC,draft,SVC,,,CERT,ILAC,"Calibration Certificate, ILAC Accredited Laboratory",certificate-ilac,SVC-CERT-ILAC,
+CT-SVC-CERT-ILAC,draft,SVC,,,CERT-ILAC,,"Calibration Certificate, ILAC Accredited Laboratory",certificate-ilac,SVC-CERT-ILAC,
