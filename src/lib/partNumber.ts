@@ -80,7 +80,25 @@ export const VARIANTS: Partial<Record<Family, RegExp>> = {
 /** Options, in the only order they may appear. B1–B4 is used on labels only, never as a SKU. */
 export const OPTION_ORDER = ['905', '1550', 'NEG', 'LG'] as const;
 
-const SIZE_RE = /^(\d{2,4})X(\d{2,4})$|^A[0-4]$|^D\d{1,3}$|^L\d{2,4}$/;
+const SIZE_RE = /^([1-9]\d{1,3})X([1-9]\d{1,3})$|^A[0-4]$|^D[1-9]\d{0,2}$|^L[1-9]\d{1,3}$/;
+
+/** Which size forms each board-type family may use. WH = width X height. */
+export const SIZE_FORMS: Partial<Record<Family, Array<'WH' | 'A' | 'D' | 'L'>>> = {
+  CHT: ['WH'], CHA: ['WH'], APR: ['WH'], CIR: ['WH'], HAL: ['WH'], CBM: ['WH'], VND: ['WH'], CUB: ['WH'],
+  LDR: ['WH'], IRT: ['WH'], LUM: ['WH'], IQC: ['A', 'WH'], RES: ['WH', 'L', 'D'], SPH: ['D', 'L'], TCP: ['WH', 'D'], OEM: ['WH'],
+};
+
+/** Accessory types and service types (whitelists). */
+export const ACC_TYPES = ['FIX', 'PLT', 'STD', 'FLG', 'MAG', 'CSE'] as const;
+export const SVC_TYPES = /^(CERT-(ILAC|DAKKS)|RECAL|CUS-Q\d{5})$/;
+
+function sizeForm(size: string): 'WH' | 'A' | 'D' | 'L' | null {
+  if (/^\d+X\d+$/.test(size)) return 'WH';
+  if (/^A\d$/.test(size)) return 'A';
+  if (/^D\d+$/.test(size)) return 'D';
+  if (/^L\d+$/.test(size)) return 'L';
+  return null;
+}
 
 export interface PartNumber {
   family: Family;
@@ -112,18 +130,20 @@ export function parse(pn: string): ParseResult {
 
   if (family === 'SVC') {
     if (seg.length < 3 || seg.length > 4) errors.push('service format is CT-SVC-TYPE[-SPEC]');
+    if (!SVC_TYPES.test(seg.slice(2).join('-'))) errors.push('unknown service type');
     const value: PartNumber = { family, material: '', size: '', variant: seg.slice(2).join('-'), options: [] };
     return { ok: errors.length === 0, value, errors };
   }
   if (family === 'ACC') {
     if (seg.length !== 4) errors.push('accessory format is CT-ACC-M-TYPESPEC');
     if (seg[2] && !(seg[2] in MATERIALS)) errors.push(`unknown material "${seg[2]}"`);
-    if (seg[3] && !/^[A-Z]{3}[A-Z0-9]{1,6}$/.test(seg[3])) errors.push('accessory code is 3 letters + spec, e.g. FIX14');
+    if (seg[3] && !/^[A-Z]{3}[1-9][0-9]{0,4}[A-Z]?$/.test(seg[3])) errors.push('accessory code is 3 letters + spec, e.g. FIX14');
+    if (seg[3] && !(ACC_TYPES as readonly string[]).includes(seg[3].slice(0, 3))) errors.push('unknown accessory type');
     const value: PartNumber = { family, material: (seg[2] ?? '') as Material, size: '', variant: seg[3] ?? '', options: [] };
     return { ok: errors.length === 0, value, errors };
   }
   if (family === 'KIT') {
-    if (seg.length !== 4 || seg[2] !== 'X' || !/^\d{3}$/.test(seg[3] ?? '')) errors.push('kit format is CT-KIT-X-NNN');
+    if (seg.length !== 4 || seg[2] !== 'X' || !/^\d{3}$/.test(seg[3] ?? '') || seg[3] === '000') errors.push('kit format is CT-KIT-X-NNN (001–999)');
     const value: PartNumber = { family, material: 'X', size: '', variant: seg[3] ?? '', options: [] };
     return { ok: errors.length === 0, value, errors };
   }
@@ -132,11 +152,17 @@ export function parse(pn: string): ParseResult {
   if (seg.length < 5 || seg.length > 7) errors.push('format is CT-FFF-M-SIZE-VAR[-OPT[-OPT]]');
   const [, , material, size, variant, ...options] = seg;
   if (!material || !(material in MATERIALS)) errors.push(`unknown material "${material ?? ''}"`);
+  if (material === 'X') errors.push('material X is not allowed for board-type families');
   if (!size || !SIZE_RE.test(size)) errors.push(`bad size "${size ?? ''}" (use 300X200, A3, D25 or L300)`);
-  const m = size?.match(/^(\d{2,4})X(\d{2,4})$/);
-  if (m && (m[1].startsWith('0') || m[2].startsWith('0'))) errors.push('no leading zeros in size');
+  if (size && /(^|[A-Z])0\d/.test(size)) errors.push('no leading zeros in size');
+  const m = size?.match(/^(\d+)X(\d+)$/);
+  if (m && Number(m[1]) < Number(m[2])) errors.push('size is width X height with width ≥ height (landscape)');
+  const form = size ? sizeForm(size) : null;
+  if (form && SIZE_FORMS[family] && !SIZE_FORMS[family]!.includes(form)) errors.push(`size form ${form} not allowed for ${family}`);
   const vre = VARIANTS[family];
   if (!variant || (vre && !vre.test(variant))) errors.push(`variant "${variant ?? ''}" not allowed for ${family}`);
+  if (variant && /(^|[A-Z])0\d/.test(variant)) errors.push('no leading zeros in variant');
+  if (variant && /^(G0X|G\d+X0$|STP0$|R0$|C0$)/.test(variant)) errors.push('zero count in variant');
   let last = -1;
   for (const o of options) {
     const idx = OPTION_ORDER.indexOf(o as (typeof OPTION_ORDER)[number]);
@@ -145,6 +171,7 @@ export function parse(pn: string): ParseResult {
     last = Math.max(last, idx);
   }
   if ((options.includes('905') || options.includes('1550')) && family !== 'LDR') errors.push('wavelength option only for LDR');
+  if (options.includes('905') && options.includes('1550')) errors.push('905 and 1550 are mutually exclusive');
   const value: PartNumber = { family, material: (material ?? '') as Material, size: size ?? '', variant: variant ?? '', options };
   return { ok: errors.length === 0, value, errors };
 }
