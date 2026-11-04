@@ -32,7 +32,7 @@ async function main() {
 
   const review = await res.json();
   review.reply = {
-    name: 'Jun',
+    name: 'Calib.Tools',
     body: replyText,
     date: new Date().toISOString().slice(0, 10),
   };

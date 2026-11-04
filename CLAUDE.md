@@ -22,6 +22,7 @@ catalogue pages from the Storefront API and links into the cart.
 - No analytics or tracking scripts. No cookies beyond what Shopify needs on its own domain.
 
 ## Conventions
+- No personal names anywhere: not on the site, in copy, metadata, structured data, PDFs, review replies or docs. Sign as "Calib.Tools" or "Calib.Tools Engineering"; use role mailboxes (hello@, support@ …), never a personal address.
 - Brand in prose = Calib.Tools; domain/URLs/logo stay lowercase calib.tools.
 - Tool metadata lives in `src/lib/tools.ts` (single source of truth for live/coming-soon status).
 - Units: mm internally; px only for screen rendering.

@@ -63,14 +63,14 @@ export default function CollectionTabs({ collectionHandle, specsTable, brandNote
         </div>
       )}
 
-      {/* Founder contact card */}
+      {/* Engineering contact card (no personal names on the site) */}
       <div className="card flex flex-col sm:flex-row gap-4 p-5 bg-ground-alt">
         <div className="w-16 h-16 rounded-full bg-ground-panel flex items-center justify-center shrink-0 border border-line">
           <User size={28} strokeWidth={1.5} className="text-ink-soft" aria-hidden="true" />
         </div>
         <div className="flex flex-col gap-1.5">
-          <strong className="text-[15px]">Calib.Tools</strong>
-          <span className="text-sm text-ink-muted">Founder, Calib.Tools</span>
+          <strong className="text-[15px]">Calib.Tools Engineering</strong>
+          <span className="text-sm text-ink-muted">Sizing, patterns and custom targets</span>
           {brandNote && (
             <p className="m-0 text-sm text-ink-muted leading-relaxed">{brandNote}</p>
           )}
