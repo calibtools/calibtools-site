@@ -15,10 +15,10 @@ export interface BlacklistRule {
  * Each rule matches a single line. Patterns are case-insensitive.
  */
 export const BLACKLIST_RULES: BlacklistRule[] = [
-  // "inspection report" + "included/includes" in the same sentence; "included inspection"
+  // "inspection report" + "included/includes" in the same sentence (not crossing . ? ! \n); "included inspection"
   {
     label: '"inspection report" with "included/includes" or "included inspection"',
-    pattern: /(?:inspection\s+report.*?\b(?:included|includes)\b|(?:included|includes)\b.*?inspection\s+report|\bincluded\s+inspection\b)/i,
+    pattern: /(?:inspection\s+report[^.?!\n]*?\b(?:included|includes)\b|(?:included|includes)\b[^.?!\n]*?inspection\s+report|\bincluded\s+inspection\b)/i,
   },
   // "report included" standalone
   { label: '"report included" standalone', pattern: /\breport\s+included\b/i },

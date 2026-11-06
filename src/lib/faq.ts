@@ -11,7 +11,7 @@ export interface FaqItem {
 const SHARED: FaqItem[] = [
   {
     question: 'What tolerances can I expect?',
-    answer: 'Our aluminium composite targets are printed to ±0.3 mm + 0.2 mm/m (at 20 °C). Our ceramic targets have a ±2 µm target; we will publish the measurement method with the first production boards. Every target is measured before it ships, and you get its inspection report.',
+    answer: 'Our aluminium composite targets are printed to ±0.3 mm + 0.2 mm/m (at 20 °C). Our ceramic targets have a ±2 µm target; we will publish the measurement method with the first production boards. Every target is measured before it ships.',
   },
   {
     question: 'What is included with each target?',

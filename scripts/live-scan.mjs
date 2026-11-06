@@ -13,7 +13,7 @@
 const BLACKLIST_RULES = [
   {
     label: '"inspection report" with "included/includes"',
-    pattern: /(?:inspection\s+report.*?\b(?:included|includes)\b|(?:included|includes)\b.*?inspection\s+report|\bincluded\s+inspection\b)/i,
+    pattern: /(?:inspection\s+report[^.?!\n]*?\b(?:included|includes)\b|(?:included|includes)\b[^.?!\n]*?inspection\s+report|\bincluded\s+inspection\b)/i,
   },
   { label: '"ships from Germany"', pattern: /\bships\s+from\s+Germany\b/i },
   { label: '"Munich"', pattern: /\bMunich\b/i },
