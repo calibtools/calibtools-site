@@ -20,6 +20,10 @@ Structure
 
 Deploy: Cloudflare Pages, build command `pnpm build`, output `dist`.
 
+## CI policy
+
+CI (`pnpm test`, `pnpm check`, `pnpm build`) must be green before merging to main.
+
 ## GitHub Actions secrets
 
 The **Review invites** workflow (`.github/workflows/review-invites.yml`) runs daily
