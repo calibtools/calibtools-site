@@ -15,7 +15,7 @@ const SHARED: FaqItem[] = [
   },
   {
     question: 'What is included with each target?',
-    answer: 'Every target comes with the board, a dimensional inspection report, a datasheet PDF, and downloadable config files for OpenCV, Kalibr, ROS 2 and HALCON.',
+    answer: 'Every target comes with the board, a datasheet PDF, and downloadable config files for OpenCV, Kalibr, ROS 2 and HALCON. Every target is measured before it ships.',
   },
   {
     question: 'How long does shipping take?',
