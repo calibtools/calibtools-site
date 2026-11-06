@@ -37,7 +37,7 @@ The table above covers the ceramic substrate. You'll find the geometry of each t
 With every ceramic target you get:
 
 - **Datasheet PDF** — dimensions, tolerances, material
-- **Inspection report** — per-feature coordinates (CSV), flatness and visual check, under your board's serial number
+- **Measurement record** — coordinates under your board's serial number at /verify
 - **Config files** — OpenCV JSON, Kalibr YAML, ROS 2 YAML, HALCON .descr
 
 ## Cleaning & care
@@ -53,4 +53,4 @@ With every ceramic target you get:
 When you need sub-pixel accuracy, work at high magnification, or run at temperatures composite can't take (ceramic: −50 to +200 °C). Typical jobs: metrology, medical imaging, semiconductor inspection.
 
 **Can I get an accredited calibration certificate?**
-Not at the moment — we're still choosing the laboratory. Your target ships with our own inspection report. If your audit needs an accredited certificate, contact us and we'll tell you what we can arrange.
+Every target is measured before it ships. A certificate is not required for most applications. For regulated environments, contact us about third-party calibration certificates; lead time depends on the accredited lab.

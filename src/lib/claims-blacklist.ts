@@ -20,6 +20,8 @@ export const BLACKLIST_RULES: BlacklistRule[] = [
     label: '"inspection report" with "included/includes" or "included inspection"',
     pattern: /(?:inspection\s+report.*?\b(?:included|includes)\b|(?:included|includes)\b.*?inspection\s+report|\bincluded\s+inspection\b)/i,
   },
+  // "report included" standalone
+  { label: '"report included" standalone', pattern: /\breport\s+included\b/i },
   // Geographic origin claims
   { label: '"ships from Germany"', pattern: /\bships\s+from\s+Germany\b/i },
   { label: '"Munich"', pattern: /\bMunich\b/i },

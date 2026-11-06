@@ -71,7 +71,7 @@ export const faqGroups: FaqGroup[] = [
       },
       {
         question: 'Do you offer calibration certificates?',
-        answer: `Not yet. We\u2019re selecting an accredited laboratory and will add certificates once that\u2019s in place. If you need one for a regulated application, tell us and we\u2019ll let you know when it\u2019s ready.`,
+        answer: 'A certificate is not required for most applications. Every target is measured before it ships. For regulated environments (medical, automotive, aerospace), contact us about third-party calibration certificates; lead time depends on the accredited lab.',
       },
       {
         question: 'What\u2019s in the box?',
