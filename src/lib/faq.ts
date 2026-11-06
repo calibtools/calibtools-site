@@ -27,7 +27,7 @@ const SHARED: FaqItem[] = [
   },
   {
     question: 'Do I need a calibration certificate?',
-    answer: 'A certificate is not required for most applications. The included inspection report confirms dimensional accuracy. For regulated environments (medical, automotive, aerospace), contact us about accredited calibration options.',
+    answer: 'A certificate is not required for most applications. Every target is measured before it ships. For regulated environments (medical, automotive, aerospace), contact us about accredited calibration options.',
   },
   {
     question: 'Is this compatible with OpenCV?',
