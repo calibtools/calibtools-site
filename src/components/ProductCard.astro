@@ -44,9 +44,7 @@ const displaySummary = summary || sub || '';
       />
     ) : image ? (
       <img src={image} alt="" class="h-full w-full object-cover" loading="lazy" />
-    ) : (
-      <span class="text-sm text-ink-soft">{placeholder}</span>
-    )}
+    ) : null}
   </div>
   <div class="flex flex-col gap-1.5 p-5">
     <strong class="text-[17px]">{title}</strong>
