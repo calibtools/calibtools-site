@@ -23,7 +23,7 @@ brandNote: "We make the board we would want on our own bench: flat, measured, an
 
 This is the board most of your calibration work needs. The aluminium composite stays flat when the lab warms up, and it survives being carried to the robot cell, the test track or the field.
 
-We UV-print the pattern to ±0.3 mm + 0.2 mm/m (any corner to nominal, at 20 °C). That covers most robotics and machine-vision jobs. Every board is measured before it ships, and you get its inspection report under the board's serial number.
+We UV-print the pattern to ±0.3 mm + 0.2 mm/m (any corner to nominal, at 20 °C). That covers most robotics and machine-vision jobs. Every board is measured before it ships.
 
 Choose checkerboard, ChArUco, AprilGrid, circle grid or HALCON patterns, from 200 × 150 mm to 800 × 600 mm. Need it bigger? We make up to 1200 × 800 mm on request.
 
@@ -36,7 +36,7 @@ The table above covers the material. You'll find grid size, square size, marker 
 With every composite board you get:
 
 - **Datasheet PDF** — dimensions, tolerances, material
-- **Inspection report** — dimensional, flatness and visual check of your board, under its serial number
+- **Measured before it ships** — dimensional, flatness and visual check on every board
 - **Config files** — OpenCV JSON, Kalibr YAML, ROS 2 YAML, HALCON .descr
 
 We generate the config files for your exact board geometry. You can download them from the product page before your board arrives.

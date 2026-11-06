@@ -431,7 +431,7 @@ const orderingRows = (productData?.orderingRows ?? []).map((row) => {
       {/* Badges */}
       <div class="flex flex-wrap gap-2">
         <span class="badge bg-brand/10 text-brand-dark inline-flex items-center gap-1.5"><Clock size={14} stroke-width={1.6} aria-hidden="true" />{eyebrow}</span>
-        <span class="badge bg-ink text-white inline-flex items-center gap-1.5"><FileCheckIcon size={14} stroke-width={1.6} aria-hidden="true" />Report included</span>
+        <span class="badge bg-ink text-white inline-flex items-center gap-1.5"><FileCheckIcon size={14} stroke-width={1.6} aria-hidden="true" />Measured before it ships</span>
       </div>
 
       {/* h1 */}
@@ -610,7 +610,6 @@ const orderingRows = (productData?.orderingRows ?? []).map((row) => {
                 {isBoardProduct ? (
                   <>
                     <li>Calibration board</li>
-                    <li>Inspection report CT-IR-<em class="font-mono text-[13px] not-italic text-ink-muted">&lt;SN&gt;</em> (printed, and online at <a href="/verify/">/verify</a>)</li>
                     <li>Datasheet</li>
                     <li>Download card for pattern files</li>
                     <li>Tamper seal with the serial number</li>
@@ -618,7 +617,6 @@ const orderingRows = (productData?.orderingRows ?? []).map((row) => {
                 ) : (
                   <>
                     <li>Calibration board in protective case</li>
-                    <li>Dimensional inspection report (PDF)</li>
                     <li>Edge label with serial number</li>
                   </>
                 )}
@@ -666,15 +664,15 @@ const orderingRows = (productData?.orderingRows ?? []).map((row) => {
         </table>
       </details>
 
-      {/* 4. Inspection report & certificate */}
+      {/* 4. Measurement & certificate */}
       <details class="group" id="inspection">
         <summary class="flex cursor-pointer list-none items-center justify-between gap-4 py-5 text-[20px] font-semibold [&::-webkit-details-marker]:hidden">
-          <span class="flex items-center gap-3"><CircleDot size={22} stroke-width={1.6} class="text-ink-soft" aria-hidden="true" />Inspection report &amp; certificate</span>
+          <span class="flex items-center gap-3"><CircleDot size={22} stroke-width={1.6} class="text-ink-soft" aria-hidden="true" />Measurement &amp; certificate</span>
           <Plus size={22} stroke-width={1.6} class="shrink-0 text-ink-soft transition-transform group-open:rotate-45" aria-hidden="true" />
         </summary>
         <div class="flex flex-col gap-4 pb-6 text-[15px] leading-relaxed text-ink-muted">
           <p class="m-0">
-            <strong class="text-ink">Factory inspection report</strong> &mdash; every board is measured before it ships, by comparison against a golden sample. Report PDF and coordinates CSV at <a href="/verify/">calib.tools/verify</a>.
+            <strong class="text-ink">Measured before it ships</strong> &mdash; every board is compared against a golden-sample reference. Tolerances on the datasheet are what we measure against.
           </p>
           <div class="flex flex-col gap-2 rounded border border-line bg-ground-alt p-4 text-[13px] text-ink-soft">
             <p class="m-0"><strong>Measurement uncertainty</strong> &mdash; a quantified range within which the true value lies at a stated confidence level. An uncertainty can be stated for any properly performed measurement, including in-house inspections.</p>
@@ -778,7 +776,7 @@ const orderingRows = (productData?.orderingRows ?? []).map((row) => {
               sub={p.description}
               from={p.priceFrom}
               image={p.image}
-              placeholder={p.title.toUpperCase()}
+              placeholder={p.title}
               rating={cd?.rating}
               reviewCount={cd?.count}
               chips={cd?.chips}

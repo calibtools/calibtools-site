@@ -2,18 +2,18 @@
 import Base from '@/layouts/Base.astro';
 import { CONTACT_EMAIL } from '@/lib/claims';
 ---
-<Base title="Look up a serial number" description="Look up the inspection record for a Calib.Tools target by its serial number." noindex>
+<Base title="Look up a serial number" description="Enter a serial number to check your Calib.Tools target. Records appear once production begins." noindex>
   <section class="container-x flex flex-col items-center gap-6 py-16 md:py-24">
     <div class="flex flex-col items-center gap-2.5 text-center">
       <span class="eyebrow">Verify</span>
       <h1 class="h-display m-0 text-[36px] md:text-[48px]">Look up a serial number</h1>
-      <p class="m-0 max-w-[480px] text-base text-ink-muted">Targets that ship with an inspection record carry a serial number on the box label, e.g.&nbsp;SN&nbsp;000311. Enter it to see the part number, marker ID range, inspection date and report.</p>
+      <p class="m-0 max-w-[480px] text-base text-ink-muted">Every target carries a serial number on its label. Once production begins, enter the serial number here to see part details and inspection date.</p>
     </div>
     <form id="verify-form" class="flex w-full max-w-[400px] gap-3">
       <input
         type="text"
         name="sn"
-        placeholder="e.g. 000311"
+        placeholder="e.g. 000400"
         required
         pattern="[0-9A-Za-z\-]+"
         class="flex-1 rounded-lg border border-line bg-ground px-4 py-3 text-base text-ink placeholder:text-ink-muted focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand spec"

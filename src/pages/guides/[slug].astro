@@ -34,9 +34,7 @@ for (const p of linkedProducts) {
 
 // Sample-file links
 const sampleLinks = {
-  report: { href: '/files/reports/CT-IR-000311.pdf', label: 'Sample inspection report (PDF)' },
   datasheet: { href: '/files/datasheets/CT-DS-CHA-C.pdf', label: 'Sample datasheet (PDF)' },
-  csv: { href: '/files/reports/CT-CSV-000311.csv', label: 'Measured coordinates (CSV)' },
 };
 const showSampleFiles = d.sampleFiles.length > 0;
 
@@ -145,9 +143,6 @@ const jsonLdItems = [articleLd, breadcrumbLd, ...(faqLd ? [faqLd] : [])];
                 </a>
               ) : null;
             })}
-            <a href="/verify/000311" class="inline-flex items-center gap-1.5 text-[14px] font-medium text-brand-dark no-underline">
-              Verify serial 000311 online <ExternalLink size={14} stroke-width={1.6} aria-hidden="true" />
-            </a>
           </div>
         </div>
       )}
@@ -180,7 +175,7 @@ const jsonLdItems = [articleLd, breadcrumbLd, ...(faqLd ? [faqLd] : [])];
                   sub={p.description}
                   from={p.priceFrom}
                   image={p.image}
-                  placeholder={p.title.toUpperCase()}
+                  placeholder={p.title}
                   rating={cd?.rating}
                   reviewCount={cd?.count}
                   chips={cd?.chips}

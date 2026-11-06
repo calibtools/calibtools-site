@@ -69,7 +69,7 @@ for (const p of products) {
             from={hasPurchasable ? (firstProduct?.priceFrom ?? '') : ''}
             localImage={localHero}
             image={!localHero ? (c.image ?? firstProduct?.image) : undefined}
-            placeholder={displayTitle.toUpperCase()}
+            placeholder={displayTitle}
           />
         );
       })}

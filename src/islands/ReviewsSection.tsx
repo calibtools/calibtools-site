@@ -137,10 +137,7 @@ export default function ReviewsSection({ reviews, handle }: Props) {
               <h3 className="m-0 text-[17px] font-semibold">No reviews yet</h3>
               <p className="m-0 pt-2 text-[15px] leading-relaxed text-ink-muted">
                 Reviews arrive by invitation about two weeks after delivery.
-                Until then, the inspection report of every unit is public at{' '}
-                <a href="/verify/" className="text-brand-dark hover:text-brand">
-                  calib.tools/verify/&lt;SN&gt;
-                </a>.
+                Every target is measured before it ships.
               </p>
             </div>
           )}

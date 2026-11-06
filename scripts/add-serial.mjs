@@ -3,10 +3,10 @@
  * Append a serial record and render its inspection-report PDF.
  *
  * Usage:
- *   tsx scripts/add-serial.mjs <sn> <part_number> <id_range> <date> <initials>
+ *   tsx scripts/add-serial.mjs <sn> <part_number> <id_range> <date> [initials]
  *
  * Example:
- *   tsx scripts/add-serial.mjs 000311 CT-CHA-C-200150-6X6 "0\u2013101" 2026-10-24 JG
+ *   tsx scripts/add-serial.mjs 000400 CT-CHA-C-200150-6X6 "0\u2013101" 2026-11-07
  *
  * Outputs:
  *   - Appends/updates record in data/serials.json
@@ -26,10 +26,10 @@ const MANIFEST_PATH = resolve(ROOT, 'public/files/manifest.json');
 
 // ── Parse args ──────────────────────────────────────────────────────
 
-const [,, sn, partNumber, idRange, date, initials] = process.argv;
+const [,, sn, partNumber, idRange, date, initials = 'QC'] = process.argv;
 
-if (!sn || !partNumber || !idRange || !date || !initials) {
-  console.error('Usage: tsx scripts/add-serial.mjs <sn> <part_number> <id_range> <date> <initials>');
+if (!sn || !partNumber || !idRange || !date) {
+  console.error('Usage: tsx scripts/add-serial.mjs <sn> <part_number> <id_range> <date> [initials]');
   process.exit(1);
 }
 

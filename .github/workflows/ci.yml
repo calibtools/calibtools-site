@@ -35,6 +35,8 @@ jobs:
         run: pnpm exec playwright install-deps chromium
 
       - run: pnpm test
+        env:
+          BLOCKED_NAMES: ${{ secrets.BLOCKED_NAMES }}
       - run: pnpm check
       - run: pnpm build
         env:

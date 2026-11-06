@@ -64,7 +64,7 @@ describe('files/index.astro copy', () => {
 describe('verify/index.astro copy', () => {
   const src = read('src/pages/verify/index.astro');
   it('has the approved h1', () => expect(src).toContain('Look up a serial number'));
-  it('explains what serial numbers are', () => expect(src).toContain('inspection record carry a serial number'));
+  it('explains what serial numbers are', () => expect(src).toContain('serial number on its label'));
 });
 
 describe('verify/[sn].astro not-found copy', () => {
