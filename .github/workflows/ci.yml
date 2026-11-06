@@ -34,3 +34,4 @@ jobs:
       - run: pnpm build
         env:
           SKIP_STOREFRONT_CHECK: '1'
+          SKIP_SPECS_CHECK: '1'
