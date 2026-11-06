@@ -32,7 +32,26 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      - name: Check required secrets
+        id: secrets-check
+        run: |
+          missing=()
+          [ -z "$CF_ACCOUNT_ID" ] && missing+=("CF_ACCOUNT_ID")
+          [ -z "$CF_KV_REVIEWS_NAMESPACE_ID" ] && missing+=("CF_KV_REVIEWS_NAMESPACE_ID")
+          [ -z "$CF_API_TOKEN" ] && missing+=("CF_API_TOKEN")
+          [ -z "$RESEND_API_KEY" ] && missing+=("RESEND_API_KEY")
+          if [ ${#missing[@]} -gt 0 ]; then
+            echo "Review invites skipped: secrets not configured"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          fi
+        env:
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+          CF_KV_REVIEWS_NAMESPACE_ID: ${{ secrets.CF_KV_REVIEWS_NAMESPACE_ID }}
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+
       - name: Send review invites
+        if: steps.secrets-check.outputs.skip != 'true'
         run: node scripts/send-review-invites.mjs
         env:
           CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
