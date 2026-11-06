@@ -37,7 +37,7 @@ The table above covers the ceramic substrate. You'll find the geometry of each t
 With every ceramic target you get:
 
 - **Datasheet PDF** — dimensions, tolerances, material
-- **Measurement record** — coordinates under your board's serial number at /verify
+- **Measured before it ships** — every board is checked against a golden-sample reference
 - **Config files** — OpenCV JSON, Kalibr YAML, ROS 2 YAML, HALCON .descr
 
 ## Cleaning & care
