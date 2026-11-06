@@ -20,13 +20,13 @@ export function getStaticPaths() {
     serials = JSON.parse(readFileSync(resolve('data/serials.json'), 'utf-8'));
   } catch { /* empty register */ }
 
-  const paths = serials.map((s) => ({
+  const paths: { params: { sn: string }; props: { record: SerialRecord | null; found: boolean } }[] = serials.map((s) => ({
     params: { sn: s.sn },
     props: { record: s, found: true },
   }));
   paths.push({
     params: { sn: 'unknown' },
-    props: { record: null as unknown as SerialRecord, found: false as const },
+    props: { record: null, found: false },
   });
   return paths;
 }
