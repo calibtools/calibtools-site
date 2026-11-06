@@ -6,7 +6,7 @@ updated: 2026-10-22
 readingTime: "8 min"
 related: []
 products: ["charuco-composite", "checkerboard-composite", "aprilgrid-composite", "circlegrid-composite"]
-sampleFiles: ["report"]
+sampleFiles: []
 ---
 
 ## The short answer

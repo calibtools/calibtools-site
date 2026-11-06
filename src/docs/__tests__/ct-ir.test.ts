@@ -23,7 +23,7 @@ const SAMPLE_DATA: IRData = {
   part_number: 'CT-CHA-C-185110-6X6',
   lot: 'L-2611-0382',
   id_range: '0\u201341',
-  inspector: 'JG',
+  inspector: 'QC',
   date: '2026-10-24',
   description: 'ChArUco calibration target, ceramic, 185 \u00d7 110 mm',
   datasheet: 'CT-DS-CHA-C',

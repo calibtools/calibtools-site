@@ -7,7 +7,7 @@ readingTime: "3 min"
 related: ["charuco-vs-checkerboard-vs-aprilgrid"]
 keyRule: "Each board's start ID = board index × markers per board. A 7×10 ChArUco has 35 markers, so board 2 starts at 35."
 products: ["charuco-composite"]
-sampleFiles: ["report"]
+sampleFiles: []
 faq:
   - q: "How many markers does a ChArUco board have?"
     a: "floor(rows × cols / 2). A 7×10 board has 35 markers."
