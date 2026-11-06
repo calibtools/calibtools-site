@@ -2,6 +2,7 @@
   "name": "calibtools-site",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@10.30.2",
   "type": "module",
   "scripts": {
     "dev": "astro dev",
