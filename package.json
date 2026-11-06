@@ -2,6 +2,7 @@
   "name": "calibtools-site",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@10.30.2",
   "type": "module",
   "scripts": {
     "dev": "astro dev",
@@ -13,7 +14,8 @@
     "preview": "astro preview",
     "check": "astro check",
     "test": "vitest run",
-    "page-views": "node scripts/page-views.mjs"
+    "page-views": "node scripts/page-views.mjs",
+    "scan:live": "node scripts/live-scan.mjs"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.12",

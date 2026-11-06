@@ -148,10 +148,10 @@ describe('generated report PDF', () => {
     // Collect all font names from every page's resource dictionary
     const fontNames: string[] = [];
     for (const page of doc.getPages()) {
-      const fonts = page.node.get(page.node.context.obj('Resources'))?.get(page.node.context.obj('Font'));
+      const fonts = (page.node.get(page.node.context.obj('Resources')) as any)?.get(page.node.context.obj('Font'));
       if (!fonts) continue;
       // Iterate font dict keys
-      const dict = page.node.Resources()?.get('Font');
+      const dict = page.node.Resources()?.get(page.node.context.obj('Font'));
       if (dict && 'entries' in dict) {
         for (const [key] of (dict as any).entries()) {
           fontNames.push(key.toString());

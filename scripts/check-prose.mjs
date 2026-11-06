@@ -102,6 +102,7 @@ const bannedScanFiles = [
   if (rel.endsWith('.test.ts') || rel.endsWith('.test.tsx')) return false;
   if (rel === 'src/assets/products/report.md') return false;
   if (rel.startsWith('docs/brand/')) return false;
+  if (rel === 'src/lib/claims-blacklist.ts') return false;
   return true;
 });
 

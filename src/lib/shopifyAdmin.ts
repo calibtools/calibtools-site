@@ -5,6 +5,13 @@
  * Tokens are cached in KV (if bound) with an in-memory fallback.
  */
 
+/** Minimal Cloudflare KV type — full types live in the `functions/` dir (excluded from astro check). */
+export interface KVNamespace {
+  get(key: string): Promise<string | null>;
+  put(key: string, value: string, options?: { expirationTtl?: number }): Promise<void>;
+  delete(key: string): Promise<void>;
+}
+
 interface Env {
   SHOPIFY_CLIENT_ID?: string;
   SHOPIFY_CLIENT_SECRET?: string;

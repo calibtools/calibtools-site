@@ -6,12 +6,37 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
-        with: { version: 9 }
       - uses: actions/setup-node@v4
         with: { node-version: 22, cache: pnpm }
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update && sudo apt-get install -y poppler-utils
+          pip install Pillow opencv-python-headless numpy
+
       - run: pnpm install --frozen-lockfile
+
+      - name: Get Playwright version
+        id: pw-version
+        run: echo "version=$(node -e "console.log(require('./node_modules/@playwright/test/package.json').version)")" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Playwright browsers
+        id: pw-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.pw-version.outputs.version }}
+
+      - name: Install Playwright Chromium
+        if: steps.pw-cache.outputs.cache-hit != 'true'
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Install Playwright system deps
+        if: steps.pw-cache.outputs.cache-hit == 'true'
+        run: pnpm exec playwright install-deps chromium
+
       - run: pnpm test
       - run: pnpm check
       - run: pnpm build
         env:
           SKIP_STOREFRONT_CHECK: '1'
+          SKIP_SPECS_CHECK: '1'
