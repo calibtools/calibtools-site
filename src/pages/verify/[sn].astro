@@ -26,7 +26,7 @@ export function getStaticPaths() {
   }));
   paths.push({
     params: { sn: 'unknown' },
-    props: { record: null as SerialRecord | null, found: false },
+    props: { record: null as unknown as SerialRecord, found: false as const },
   });
   return paths;
 }

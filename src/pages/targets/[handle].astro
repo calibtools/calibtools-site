@@ -262,7 +262,7 @@ const variesBy = [...new Set(
       if (PATTERN_OPTIONS.has(key)) return 'https://schema.org/pattern';
       return null;
     })
-    .filter((v): v is string => v !== null),
+    .filter((v: string | null): v is string => v !== null),
 )];
 
 // Price valid until — 1 year from build date

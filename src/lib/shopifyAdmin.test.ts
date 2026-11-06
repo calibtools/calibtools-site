@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { getAdminToken, adminFetch, _resetMemCache } from './shopifyAdmin';
+import { getAdminToken, adminFetch, _resetMemCache, type KVNamespace } from './shopifyAdmin';
 
 // --- helpers ---
 

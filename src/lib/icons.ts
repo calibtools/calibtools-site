@@ -26,7 +26,6 @@ export { ArrowRight, ArrowUp, ArrowDown } from 'lucide-react';
 export { Mail } from 'lucide-react';
 
 // ── Footer ──────────────────────────────────────────────────────────
-export { Github } from 'lucide-react';
 
 // ── Product page badges ─────────────────────────────────────────────
 export { Clock } from 'lucide-react';
