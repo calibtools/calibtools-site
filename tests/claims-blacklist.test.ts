@@ -129,3 +129,34 @@ describe('claims blacklist', () => {
     }
   });
 });
+
+// ---------- sentence-boundary tests for "inspection report" + "included/includes" ----------
+
+describe('inspection-report + included/includes rule', () => {
+  const rule = BLACKLIST_RULES.find((r) => r.label.includes('inspection report'));
+
+  it('matches when both terms are in the same sentence', () => {
+    expect(rule!.pattern.test('Inspection report included with every board')).toBe(true);
+    expect(rule!.pattern.test('The inspection report is included')).toBe(true);
+    expect(rule!.pattern.test('Each unit includes an inspection report')).toBe(true);
+  });
+
+  it('does not match across sentence boundaries', () => {
+    // Period separates
+    expect(rule!.pattern.test('See the inspection report. Files included below')).toBe(false);
+    // Question mark separates
+    expect(rule!.pattern.test('What is included? The inspection report has details')).toBe(false);
+    // Exclamation mark separates
+    expect(rule!.pattern.test('Inspection report ready! Kit includes a case')).toBe(false);
+    // Newline separates
+    expect(rule!.pattern.test('Inspection report\nFiles included')).toBe(false);
+  });
+
+  it('does not match "Files included" without "inspection report" in the same sentence', () => {
+    expect(rule!.pattern.test('Files included: DXF, JSON, YAML')).toBe(false);
+  });
+
+  it('does not match "lens distortion included" without "inspection report" in the same sentence', () => {
+    expect(rule!.pattern.test('Lens distortion included in the model')).toBe(false);
+  });
+});
