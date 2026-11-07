@@ -84,7 +84,14 @@ const productHandles = [
   { handle: 'halcon-composite', title: 'HALCON Calibration Plate, Aluminium Composite' },
   { handle: 'reflectance-panel', title: 'LiDAR Reflectance Panel, Lambertian' },
   { handle: 'resolution-chart', title: 'ISO 12233 Resolution Test Chart' },
-  { handle: 'ir-board', title: 'IR Calibration Target, Thermal & NIR' },
+  { handle: "lidar-camera-target", title: "LiDAR-Camera Calibration Target" },
+  { handle: "thermal-calibration-target", title: "Heated Thermal Calibration Target" },
+  { handle: "nir-calibration-target", title: "NIR Calibration Target, 850 / 940 nm" },
+  { handle: "depth-camera-target", title: "Depth & ToF Camera Calibration Targets" },
+  { handle: "hand-eye-calibration-kit", title: "Hand-Eye Calibration Kit" },
+  { handle: "multi-camera-target", title: "Multi-Camera Calibration Target" },
+  { handle: "line-scan-target", title: "Line-Scan Camera Calibration Target" },
+  { handle: "radar-camera-target", title: "Radar-Camera Calibration Target" },
 ];
 
 for (const { handle, title } of productHandles) {

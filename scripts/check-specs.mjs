@@ -6,7 +6,7 @@ if (process.env.SKIP_SPECS_CHECK === '1') { console.log('[check-specs] Skipped (
  * Product types:
  * - Board products: require material, thickness_mm, feature_tolerance, lead_time, files_included
  * - Accessory products (mounting-fixture): require material, lead_time
- * - Quote-only products (ir-board, reflectance-panel, resolution-chart): require "Request a quote" CTA, no price
+ * - Quote-only products (reflectance-panel, resolution-chart, multi-sensor families): require "Request a quote" CTA, no price
  * - Withdrawn handles: skipped entirely
  *
  * Bypass: SKIP_SPECS_CHECK=1
@@ -24,7 +24,7 @@ if (process.env.SKIP_SPECS_CHECK === '1') {
 
 const WITHDRAWN = new Set(['certificate-ilac']);
 const ACCESSORIES = new Set(['mounting-fixture']);
-const QUOTE_ONLY = new Set(['ir-board', 'reflectance-panel', 'resolution-chart']);
+const QUOTE_ONLY = new Set(['reflectance-panel', 'resolution-chart', "lidar-camera-target", "thermal-calibration-target", "nir-calibration-target", "depth-camera-target", "hand-eye-calibration-kit", "multi-camera-target", "line-scan-target", "radar-camera-target"]);
 
 // --- Label map: metafield key → possible rendered labels ---
 // Datasheet-sourced spec tables may use different labels than the metafield key.
