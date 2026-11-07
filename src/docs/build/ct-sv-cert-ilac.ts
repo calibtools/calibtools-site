@@ -100,7 +100,7 @@ export async function buildILACCert(opts: {
       ],
       [
         'ILAC-MRA certificate',
-        '<span class="mono">SVC-X-CERT-ILAC</span> · add-on service',
+        '<span class="mono">CT-SVC-CERT-ILAC</span> · add-on service',
         'CNAS-accredited laboratory',
       ],
       [

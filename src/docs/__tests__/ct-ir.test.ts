@@ -20,7 +20,7 @@ import { buildCSV } from '../build/ct-csv';
 
 const SAMPLE_DATA: IRData = {
   sn: '000311',
-  part_number: 'CT-CHA-C-185110-6X6',
+  part_number: 'CT-CHA-C-185X110-D6',
   lot: 'L-2611-0382',
   id_range: '0\u201341',
   inspector: 'QC',
@@ -41,7 +41,7 @@ const SAMPLE_DATA: IRData = {
   corners: 66,
   markers: 42,
   label_line:
-    'CALIB.TOOLS   CT-CHA-C-185110-6X6   ChArUco 7\u00d712 \u00b7 14/10.5 mm \u00b7 DICT_6X6_250 \u00b7 IDs 0\u201341   SN 000311 \u00b7 Rev A',
+    'CALIB.TOOLS   CT-CHA-C-185X110-D6   ChArUco 7\u00d712 \u00b7 14/10.5 mm \u00b7 DICT_6X6_250 \u00b7 IDs 0\u201341   SN 000311 \u00b7 Rev A',
   axes_spec: [4.5, 4.5, 6.5, 0.6],
 };
 
@@ -77,8 +77,8 @@ const SAMPLE_COORDS: Coord[] = [
 // ── parsePartNumber ──
 
 describe('parsePartNumber', () => {
-  it('parses CT-CHA-C-185110-6X6', () => {
-    const r = parsePartNumber('CT-CHA-C-185110-6X6');
+  it('parses CT-CHA-C-185X110-D6', () => {
+    const r = parsePartNumber('CT-CHA-C-185X110-D6');
     expect(r.W).toBe(185);
     expect(r.H).toBe(110);
     expect(r.rows).toBe(7);
@@ -91,7 +91,7 @@ describe('parsePartNumber', () => {
   });
 
   it('throws on unknown part number', () => {
-    expect(() => parsePartNumber('CT-CHA-C-300200-6X6')).toThrow();
+    expect(() => parsePartNumber('CT-CHA-C-300X200-D6')).toThrow();
   });
 });
 
@@ -100,7 +100,7 @@ describe('parsePartNumber', () => {
 describe('identBlock', () => {
   it('contains part number and serial number', () => {
     const html = identBlock(SAMPLE_DATA);
-    expect(html).toContain('CT-CHA-C-185110-6X6');
+    expect(html).toContain('CT-CHA-C-185X110-D6');
     expect(html).toContain('000311');
     expect(html).toContain('L-2611-0382');
     expect(html).toContain('DICT_6X6_250');

@@ -17,21 +17,21 @@ Circle grids use filled dot centroids rather than corner intersections. Centroid
 
 | Part number | Size (W × H) | Circles (rows × cols) | Circle ⌀ / spacing | Total circles |
 |---|---|---|---|---|
-| CT-CIR-P-200150-SYM | 200 × 150 mm | 7 × 10 | 12 / 20 mm | 70 |
-| CT-CIR-P-300200-SYM | 300 × 200 mm | 9 × 14 | 14 / 22 mm | 126 |
-| CT-CIR-P-400300-SYM | 400 × 300 mm | 11 × 16 | 17 / 25 mm | 176 |
-| CT-CIR-P-600400-SYM | 600 × 400 mm | 13 × 20 | 20 / 30 mm | 260 |
-| CT-CIR-P-800600-SYM | 800 × 600 mm | 16 × 24 | 22 / 33 mm | 384 |
+| CT-CIR-P-200X150-SYM | 200 × 150 mm | 7 × 10 | 12 / 20 mm | 70 |
+| CT-CIR-P-300X200-SYM | 300 × 200 mm | 9 × 14 | 14 / 22 mm | 126 |
+| CT-CIR-P-400X300-SYM | 400 × 300 mm | 11 × 16 | 17 / 25 mm | 176 |
+| CT-CIR-P-600X400-SYM | 600 × 400 mm | 13 × 20 | 20 / 30 mm | 260 |
+| CT-CIR-P-800X600-SYM | 800 × 600 mm | 16 × 24 | 22 / 33 mm | 384 |
 
 ### Asymmetric (ASYM)
 
 | Part number | Size (W × H) | Circles (rows × cols) | Circle ⌀ / spacing | Total circles |
 |---|---|---|---|---|
-| CT-CIR-P-200150-ASYM | 200 × 150 mm | 7 × 5 | 12 / 20 mm | 35 |
-| CT-CIR-P-300200-ASYM | 300 × 200 mm | 9 × 7 | 14 / 22 mm | 63 |
-| CT-CIR-P-400300-ASYM | 400 × 300 mm | 11 × 8 | 17 / 25 mm | 88 |
-| CT-CIR-P-600400-ASYM | 600 × 400 mm | 13 × 10 | 20 / 30 mm | 130 |
-| CT-CIR-P-800600-ASYM | 800 × 600 mm | 16 × 12 | 22 / 33 mm | 192 |
+| CT-CIR-P-200X150-ASY | 200 × 150 mm | 7 × 5 | 12 / 20 mm | 35 |
+| CT-CIR-P-300X200-ASY | 300 × 200 mm | 9 × 7 | 14 / 22 mm | 63 |
+| CT-CIR-P-400X300-ASY | 400 × 300 mm | 11 × 8 | 17 / 25 mm | 88 |
+| CT-CIR-P-600X400-ASY | 600 × 400 mm | 13 × 10 | 20 / 30 mm | 130 |
+| CT-CIR-P-800X600-ASY | 800 × 600 mm | 16 × 12 | 22 / 33 mm | 192 |
 
 Spacing is centre-to-centre pitch. Asymmetric boards use a half-pitch row offset; pass `CALIB_CB_ASYMMETRIC_GRID` to `cv::findCirclesGrid`. Other grid sizes or circle dimensions: custom order (CUS).
 
@@ -56,7 +56,7 @@ Pattern area is centred with a white quiet zone ≥ 1 circle pitch on all sides;
 | Weight | 6.6 kg/m² (300 × 200: ≈ 0.4 kg · 800 × 600: ≈ 3.2 kg) |
 | Pattern | Direct UV print, matte, black on white; optical density ≥ 1.6 |
 | Flatness | ≤ 0.5 mm per metre, board supported on three points |
-| Mounting | 4 × M4 threaded inserts on the rear (300 × 200 and larger); ¼″ fixture ACC-A-FIX-14 clamps any size |
+| Mounting | 4 × M4 threaded inserts on the rear (300 × 200 and larger); ¼″ fixture CT-ACC-M-FIX14 clamps any size |
 
 ### Environment
 
@@ -76,7 +76,7 @@ Pattern area is centred with a white quiet zone ≥ 1 circle pitch on all sides;
 | Files | `.opencv.json`, `.kalibr.yaml` (symmetric only), `.dxf` |
 | Documents | this datasheet, CT-UM-GEN user manual |
 | Lead time | Made to order · ships in 2–3 weeks |
-| Options | Logo print (-L) · hard case (ACC-A-CSE) · custom NRE |
+| Options | Logo print (-L) · hard case (CT-ACC-M-CSE400) · custom NRE |
 
 ## Compliance and customs
 

@@ -65,14 +65,14 @@ function makeSampleCoords(): Coord[] {
 }
 
 function makeIRData(): IRData {
-  const geo = parsePartNumber('CT-CHA-C-185110-6X6');
+  const geo = parsePartNumber('CT-CHA-C-185X110-D6');
   return {
     sn: '000311',
     lot: 'L-2611-0382',
     id_range: '0\u201341',
     inspector: 'QC',
     date: '2026-10-24',
-    label_line: 'CALIB.TOOLS   CT-CHA-C-185110-6X6   ChArUco 7\u00d712   SN 000311 \u00b7 Rev A',
+    label_line: 'CALIB.TOOLS   CT-CHA-C-185X110-D6   ChArUco 7\u00d712   SN 000311 \u00b7 Rev A',
     ...geo,
   };
 }

@@ -15,11 +15,11 @@ The classic pattern: highest corner localisation accuracy of any planar target w
 
 | Part number | Size (W × H) | Fine (F): squares · size | Coarse (C): squares · size |
 |---|---|---|---|
-| CT-CHT-P-200150-{F\|C} | 200 × 150 mm | 7 × 10 · 18 mm | 5 × 7 · 25 mm |
-| CT-CHT-P-300200-{F\|C} | 300 × 200 mm | 9 × 14 · 20 mm | 7 × 10 · 25 mm |
-| CT-CHT-P-400300-{F\|C} | 400 × 300 mm | 11 × 15 · 25 mm | 8 × 11 · 35 mm |
-| CT-CHT-P-600400-{F\|C} | 600 × 400 mm | 12 × 18 · 30 mm | 9 × 14 · 40 mm |
-| CT-CHT-P-800600-{F\|C} | 800 × 600 mm | 13 × 18 · 42 mm | 11 × 15 · 50 mm |
+| CT-CHT-P-200X150-{F\|C} | 200 × 150 mm | 7 × 10 · 18 mm | 5 × 7 · 25 mm |
+| CT-CHT-P-300X200-{F\|C} | 300 × 200 mm | 9 × 14 · 20 mm | 7 × 10 · 25 mm |
+| CT-CHT-P-400X300-{F\|C} | 400 × 300 mm | 11 × 15 · 25 mm | 8 × 11 · 35 mm |
+| CT-CHT-P-600X400-{F\|C} | 600 × 400 mm | 12 × 18 · 30 mm | 9 × 14 · 40 mm |
+| CT-CHT-P-800X600-{F\|C} | 800 × 600 mm | 13 × 18 · 42 mm | 11 × 15 · 50 mm |
 
 Inner corners = (rows − 1) × (cols − 1). Odd × even square counts are used so the pattern has a unique orientation (one black and one white corner square along each edge). Other grids: custom order (CUS) or generate at `calib.tools/tools/generator/` and order as custom.
 
@@ -42,7 +42,7 @@ Inner corners = (rows − 1) × (cols − 1). Odd × even square counts are used
 | Weight | 6.6 kg/m² |
 | Pattern | Direct UV print, matte, black on white; optical density ≥ 1.6 |
 | Flatness | ≤ 0.5 mm per metre, three-point support |
-| Mounting | 4 × M4 rear inserts (300 × 200 and larger); ¼″ fixture ACC-A-FIX-14 |
+| Mounting | 4 × M4 rear inserts (300 × 200 and larger); ¼″ fixture CT-ACC-M-FIX14 |
 
 ### Environment
 
@@ -54,7 +54,7 @@ Inner corners = (rows − 1) × (cols − 1). Odd × even square counts are used
 
 ### Deliverables
 
-Measured before it ships · `.opencv.json`, `.kalibr.yaml`, `.ros2.yaml`, `.halcon.txt`, `.dxf` · CT-UM-GEN manual · Made to order · ships in 2–3 weeks · Options: -L logo, ACC-A-CSE case, custom NRE.
+Measured before it ships · `.opencv.json`, `.kalibr.yaml`, `.ros2.yaml`, `.halcon.txt`, `.dxf` · CT-UM-GEN manual · Made to order · ships in 2–3 weeks · Options: -L logo, CT-ACC-M-CSE400 case, custom NRE.
 
 ## Compliance and customs
 

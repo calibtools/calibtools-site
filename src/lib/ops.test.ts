@@ -2,7 +2,6 @@
  * Tests for operational safety scripts:
  * - CSV metafield header format (export-metafield-template)
  * - Shopify HMAC-SHA256 verification (rebuild webhook)
- * - SKU convention regex (check-skus)
  */
 
 import { describe, it, expect } from 'vitest';
@@ -128,45 +127,4 @@ describe('verifyShopifyHmac', () => {
   });
 });
 
-// --- SKU regex ---
-
-const SKU_PATTERN = /^(CHT|CHA|APR|CIR|ACR|HAL|CBM|VND|CUS|CUB|LUM|LDR|IRT|IQC|SPH|TCP|RES|ACC|SVC|OEM)-[PCGQOFHASX]-/;
-
-describe('SKU convention regex', () => {
-  const valid = [
-    'CHA-P-6X6-300x200-25',
-    'CHT-P-7x10-400x300-30',
-    'CHA-C-6X6-150x150-20',
-    'APR-P-36H11-600x400',
-    'ACC-A-MNT-01',
-    'SVC-X-CERT-ILAC',
-    'CIR-G-ASY-100x100',
-    'HAL-C-150x150',
-    'OEM-S-CUSTOM-001',
-  ];
-
-  const invalid = [
-    'CHARUCO-P-6X6-300',    // prefix too long
-    'CH-P-6X6',             // prefix too short
-    'CHA-Z-6X6',            // invalid material letter
-    'CHA-p-6X6',            // lowercase material
-    'CHA--6X6',             // missing material
-    'cHA-P-6X6',            // lowercase prefix
-    'RANDOM-SKU-123',       // unknown prefix
-    '',                     // empty
-    'CHA',                  // too short
-    'CHA-P',                // no trailing dash
-  ];
-
-  for (const sku of valid) {
-    it(`accepts valid SKU: ${sku}`, () => {
-      expect(SKU_PATTERN.test(sku)).toBe(true);
-    });
-  }
-
-  for (const sku of invalid) {
-    it(`rejects invalid SKU: "${sku}"`, () => {
-      expect(SKU_PATTERN.test(sku)).toBe(false);
-    });
-  }
-});
+// SKU validation moved to the part-number registry (src/lib/partNumber.ts, tested in partNumber.test.ts).

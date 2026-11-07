@@ -15,13 +15,13 @@ ChArUco combines a checkerboard with ArUco markers in the white squares. Markers
 
 | Part number | Size (W × H) | Squares (rows × cols) | Square / marker | Dictionary | Corners | Markers |
 |---|---|---|---|---|---|---|
-| CT-CHA-P-200150-{DICT} | 200 × 150 mm | 5 × 7 | 25 / 18 mm | see below | 24 | 17 |
-| CT-CHA-P-300200-{DICT} | 300 × 200 mm | 7 × 10 | 25 / 18 mm | | 54 | 35 |
-| CT-CHA-P-400300-{DICT} | 400 × 300 mm | 9 × 12 | 30 / 22 mm | | 88 | 54 |
-| CT-CHA-P-600400-{DICT} | 600 × 400 mm | 9 × 14 | 40 / 30 mm | | 104 | 63 |
-| CT-CHA-P-800600-{DICT} | 800 × 600 mm | 11 × 15 | 50 / 37 mm | | 140 | 82 |
+| CT-CHA-P-200X150-{DICT} | 200 × 150 mm | 5 × 7 | 25 / 18 mm | see below | 24 | 17 |
+| CT-CHA-P-300X200-{DICT} | 300 × 200 mm | 7 × 10 | 25 / 18 mm | | 54 | 35 |
+| CT-CHA-P-400X300-{DICT} | 400 × 300 mm | 9 × 12 | 30 / 22 mm | | 88 | 54 |
+| CT-CHA-P-600X400-{DICT} | 600 × 400 mm | 9 × 14 | 40 / 30 mm | | 104 | 63 |
+| CT-CHA-P-800X600-{DICT} | 800 × 600 mm | 11 × 15 | 50 / 37 mm | | 140 | 82 |
 
-`{DICT}`: `6X6` = DICT_6X6_250 (default, most robust) · `5X5` = DICT_5X5_100 · `4X4` = DICT_4X4_50 (decodes at lower resolution, fewer unique IDs) · `AT36` = AprilTag 36h11. Start ID 0, row-major over white squares, OpenCV ≥ 4.6 placement convention (`legacy_pattern: false`). Other grids, dictionaries or start IDs: custom order (CUS).
+`{DICT}`: `D6` = DICT_6X6_250 (default, most robust) · `D5` = DICT_5X5_100 · `D4` = DICT_4X4_50 (decodes at lower resolution, fewer unique IDs) · `T36` = AprilTag 36h11. Start ID 0, row-major over white squares, OpenCV ≥ 4.6 placement convention (`legacy_pattern: false`). Other grids, dictionaries or start IDs: custom order (CUS).
 
 Pattern area is centred with a white quiet zone ≥ 1 square on all sides; the edge strip with part number, serial and 100 mm scale bar sits outside the quiet zone.
 
@@ -46,7 +46,7 @@ Pattern area is centred with a white quiet zone ≥ 1 square on all sides; the e
 | Pattern | Direct UV print, matte, black on white; optical density ≥ 1.6 |
 | Flatness | ≤ 0.5 mm per metre, board supported on three points |
 | Rigidity (E·J) | ≈ 3800 kN·cm²/m |
-| Mounting | 4 × M4 threaded inserts on the rear (300 × 200 and larger); ¼″ fixture ACC-A-FIX-14 clamps any size |
+| Mounting | 4 × M4 threaded inserts on the rear (300 × 200 and larger); ¼″ fixture CT-ACC-M-FIX14 clamps any size |
 
 ### Environment
 
@@ -66,7 +66,7 @@ Pattern area is centred with a white quiet zone ≥ 1 square on all sides; the e
 | Files | `.opencv.json`, `.ros2.yaml`, `.halcon.txt` (HALCON point tuple), `.dxf` |
 | Documents | this datasheet, CT-UM-GEN user manual, CT-UM-CHA-P quick start |
 | Lead time | Made to order · ships in 2–3 weeks |
-| Options | Logo print (-L) · hard case (ACC-A-CSE) · custom NRE |
+| Options | Logo print (-L) · hard case (CT-ACC-M-CSE400) · custom NRE |
 
 ## Compliance and customs
 
