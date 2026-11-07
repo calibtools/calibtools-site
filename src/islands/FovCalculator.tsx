@@ -1,10 +1,10 @@
 import { useMemo, useState } from 'react';
 import { ScanLine } from '@/lib/icons';
-import { calculateFov, minDistance, SENSOR_PRESETS, type FovResult } from '@/lib/fov';
+import { calculateFov, minDistance, recommendBoard, requiredFocal, SENSOR_PRESETS, TARGET_FILL, type FovResult } from '@/lib/fov';
 
 const PRESET_NAMES = Object.keys(SENSOR_PRESETS);
 
-export default function FovCalculator() {
+export default function FovCalculator({ heading = 'FOV calculator' }: { heading?: string } = {}) {
   const [preset, setPreset] = useState('2/3" (IMX174)');
   const [sensorW, setSensorW] = useState(8.77);
   const [sensorH, setSensorH] = useState(6.60);
@@ -14,6 +14,8 @@ export default function FovCalculator() {
   const [distance, setDistance] = useState(500);
   const [targetW, setTargetW] = useState(250);
   const [targetH, setTargetH] = useState(175);
+  const [wantW, setWantW] = useState(300);
+  const [wantH, setWantH] = useState(0);
 
   const applyPreset = (name: string) => {
     setPreset(name);
@@ -36,6 +38,17 @@ export default function FovCalculator() {
     [targetW, targetH, sensorW, sensorH, focal],
   );
 
+  const needFocal = useMemo(
+    () => requiredFocal(sensorW, sensorH, distance, wantW, wantH),
+    [sensorW, sensorH, distance, wantW, wantH],
+  );
+
+  const rec = useMemo(
+    () => recommendBoard(fov.hCoverage, fov.vCoverage, fov.gsd),
+    [fov],
+  );
+  const genUrl = `/tools/generator/?type=ChArUco&rows=${rec.board.rows}&cols=${rec.board.cols}&square=${rec.board.square}&marker=${rec.board.marker}&dict=DICT_6X6_250`;
+
   const fmt = (v: number, d = 1) => v.toFixed(d);
   const fmtMm = (v: number) => (v >= 1000 ? `${(v / 1000).toFixed(2)} m` : `${v.toFixed(1)} mm`);
 
@@ -45,8 +58,8 @@ export default function FovCalculator() {
     <section className="flex flex-wrap gap-10">
       {/* Input panel */}
       <form className="card flex basis-[380px] flex-col gap-5 self-start p-7" onSubmit={(e) => e.preventDefault()}>
-        <h1 className="m-0 flex items-center gap-3 text-[26px] font-extrabold tracking-[-0.02em]"><ScanLine size={24} strokeWidth={1.6} className="text-brand" aria-hidden="true" />FOV calculator</h1>
-        <p className="m-0 text-sm leading-relaxed text-ink-muted">Calculate field of view, coverage and GSD for your camera + lens setup.</p>
+        <h1 className="m-0 flex items-center gap-3 text-[26px] font-extrabold tracking-[-0.02em]"><ScanLine size={24} strokeWidth={1.6} className="text-brand" aria-hidden="true" />{heading}</h1>
+        <p className="m-0 text-sm leading-relaxed text-ink-muted">Calculate field of view, coverage and GSD for your camera and lens, find the focal length for a given field, and size a calibration board.</p>
 
         <label className="flex flex-col gap-2 text-[13px] font-semibold">Sensor preset
           <select className={field} value={preset} onChange={(e) => applyPreset(e.target.value)}>
@@ -76,6 +89,19 @@ export default function FovCalculator() {
         <label className="flex flex-col gap-2 text-[13px] font-semibold">Working distance (mm)
           <input className={field} type="number" min={1} value={distance} onChange={(e) => setDistance(+e.target.value)} />
         </label>
+
+        <div className="border-t border-line pt-4">
+          <span className="text-[13px] font-semibold">Lens finder (optional)</span>
+          <p className="m-0 mb-3 text-xs text-ink-muted">Enter the field you need to see at the working distance. Leave height at 0 to size by width only.</p>
+          <div className="grid grid-cols-2 gap-3">
+            <label className="flex flex-col gap-2 text-[13px] font-semibold">Field width (mm)
+              <input className={field} type="number" min={1} value={wantW} onChange={(e) => setWantW(+e.target.value)} />
+            </label>
+            <label className="flex flex-col gap-2 text-[13px] font-semibold">Field height (mm)
+              <input className={field} type="number" min={0} value={wantH} onChange={(e) => setWantH(+e.target.value)} />
+            </label>
+          </div>
+        </div>
 
         <div className="border-t border-line pt-4">
           <span className="text-[13px] font-semibold">Target fill (optional)</span>
@@ -134,8 +160,46 @@ export default function FovCalculator() {
           </button>
         </div>
 
+        {/* Lens finder result */}
         <div className="card flex flex-wrap items-center justify-between gap-3 bg-ground-alt px-5 py-4">
-          <span className="text-[15px]"><strong>Need a calibration target?</strong> <span className="text-ink-muted">Print-exact patterns with 0.3 mm tolerance.</span></span>
+          <div>
+            <p className="m-0 text-[15px]"><strong>Focal length needed</strong> to see {wantW}{wantH > 0 ? ` × ${wantH}` : ''} mm at {fmtMm(distance)}:</p>
+            <p className="m-0 mt-1 font-mono text-lg font-bold">{Number.isFinite(needFocal) && needFocal > 0 ? `${fmt(needFocal)} mm` : '—'}</p>
+            <p className="m-0 mt-1 text-xs text-ink-muted">Pick the nearest stock focal length at or below this value.</p>
+          </div>
+          <button
+            type="button"
+            className="rounded bg-ink px-4 py-2.5 text-sm font-semibold text-white"
+            disabled={!Number.isFinite(needFocal) || needFocal <= 0}
+            onClick={() => setFocal(Math.round(needFocal * 10) / 10)}
+          >
+            Use this focal length
+          </button>
+        </div>
+
+        {/* Board recommendation */}
+        <div className="card p-7">
+          <h2 className="m-0 mb-2 text-lg font-bold">Recommended calibration board</h2>
+          <p className="m-0 mb-5 text-sm text-ink-muted">For the field at {fmtMm(distance)}, aiming for about {Math.round(TARGET_FILL * 100)} % frame fill.</p>
+          <div className="grid grid-cols-3 gap-4">
+            <ResultCard label="Board" value={`${rec.board.label} mm`} />
+            <ResultCard label="Frame fill" value={`${Math.round(rec.fill * 100)} %`} />
+            <ResultCard label="Pixels per square" value={fmt(rec.pxPerSquare, 0)} />
+          </div>
+          <p className="m-0 mt-4 text-sm">
+            ChArUco {rec.board.cols} × {rec.board.rows}, {rec.board.square} mm squares, {rec.board.marker} mm markers (DICT_6X6_250): {fmt(rec.pxPerBit)} px per marker bit.
+            {rec.fill > 0.9 && ' The field is smaller than every stock board; use a printed pattern sized to the field or move the camera back.'}
+            {!rec.decodable && ' Markers will be too small to decode reliably at this distance; move closer or use a longer lens.'}
+          </p>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <button type="button" className="rounded border border-ink px-4 py-2.5 text-sm font-semibold" onClick={() => { setTargetW(rec.boardW); setTargetH(rec.boardH); }}>Use as target</button>
+            <a href={genUrl} className="rounded bg-ink px-4 py-2.5 text-sm font-semibold text-white no-underline hover:text-white inline-flex items-center">Print this pattern free</a>
+            <a href={rec.productPath} className="rounded border border-ink px-4 py-2.5 text-sm font-semibold text-ink no-underline inline-flex items-center">Rigid board details</a>
+          </div>
+        </div>
+
+        <div className="card flex flex-wrap items-center justify-between gap-3 bg-ground-alt px-5 py-4">
+          <span className="text-[15px]"><strong>Need a calibration target?</strong> <span className="text-ink-muted">Print 1:1 patterns with a 100 mm scale bar to check your printer.</span></span>
           <a href="/tools/generator/" className="rounded bg-ink px-4 py-2.5 text-sm font-semibold text-white no-underline hover:text-white min-h-[44px] md:min-h-[24px] inline-flex items-center">Generate pattern</a>
         </div>
       </div>

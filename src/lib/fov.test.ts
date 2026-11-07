@@ -66,3 +66,51 @@ describe('minDistance', () => {
     expect(d100).toBeLessThan(d80);
   });
 });
+
+import { requiredFocal, recommendBoard } from './fov';
+
+describe('requiredFocal', () => {
+  // Full frame 36 × 24, 1000 mm distance, want 720 × 480 coverage → 50 mm
+  it('inverts calculateFov coverage', () => {
+    expect(requiredFocal(36, 24, 1000, 720, 480)).toBeCloseTo(50, 6);
+  });
+  it('takes the shorter focal so both dimensions are covered', () => {
+    // width needs 50 mm, height 600 mm needs 40 mm → 40
+    expect(requiredFocal(36, 24, 1000, 720, 600)).toBeCloseTo(40, 6);
+  });
+  it('round-trips with calculateFov', () => {
+    const f = requiredFocal(8.77, 6.6, 500, 400, 0);
+    const r = calculateFov(8.77, 6.6, f, 500, 1920, 1200);
+    expect(r.hCoverage).toBeCloseTo(400, 6);
+  });
+});
+
+describe('recommendBoard', () => {
+  it('IMX174 + 12 mm at 500 mm picks the 200 × 150 composite board', () => {
+    const r = calculateFov(8.77, 6.6, 12, 500, 1920, 1200);
+    const rec = recommendBoard(r.hCoverage, r.vCoverage, r.gsd);
+    expect(rec.board.label).toBe('200 × 150');
+    expect(rec.productPath).toBe('/targets/charuco-composite/');
+    expect(rec.fill).toBeLessThanOrEqual(0.9);
+    expect(rec.pxPerSquare).toBeCloseTo(25 / r.gsd, 6);
+    expect(rec.decodable).toBe(true);
+  });
+  it('small field picks a ceramic board', () => {
+    const rec = recommendBoard(180, 135, 0.1);
+    expect(rec.productPath).toBe('/targets/charuco-ceramic/');
+    expect(rec.fill).toBeLessThanOrEqual(0.9);
+  });
+  it('large field picks the 800 × 600 board', () => {
+    const rec = recommendBoard(1400, 1000, 0.7);
+    expect(rec.board.label).toBe('800 × 600');
+  });
+  it('field smaller than every board returns the smallest', () => {
+    const rec = recommendBoard(50, 40, 0.03);
+    expect(rec.board.label).toBe('110 × 85');
+    expect(rec.fill).toBeGreaterThan(0.9);
+  });
+  it('flags markers too small to decode', () => {
+    const rec = recommendBoard(4000, 3000, 2);
+    expect(rec.decodable).toBe(false);
+  });
+});
