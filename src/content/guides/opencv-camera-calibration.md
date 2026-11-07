@@ -5,7 +5,7 @@ date: 2026-11-07
 updated: 2026-11-07
 readingTime: "12 min"
 keyRule: "Fill the image corners with board views, keep focus and zoom fixed, and judge the result by per-view error, not the overall RMS alone."
-related: ["charuco-vs-checkerboard-vs-aprilgrid", "multi-board-marker-ids"]
+related: ["calibration-target-size", "reprojection-error", "charuco-vs-checkerboard-vs-aprilgrid", "multi-board-marker-ids"]
 products: ["charuco-composite", "charuco-ceramic", "checkerboard-composite"]
 sampleFiles: []
 faq:
