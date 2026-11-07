@@ -57,7 +57,7 @@ With OpenCV, use `cv2.aruco.DICT_APRILTAG_36h11` and the default one-bit border.
 
 ## Free for commercial use
 
-Tags from this generator are free to use for any purpose, including commercial work. That is different from some other online generators: calib.io's pattern generator page (checked November 2026) limits its output to internal development or educational use.
+Tags from this generator are free to use for any purpose: internal, educational or commercial, including products and client work. No sign-up and no attribution needed.
 
 ## Related
 

@@ -1,7 +1,7 @@
 ---
-seoTitle: "ChArUco board generator — free PDF download"
-seoDescription: "Generate and download a ChArUco calibration board as print-exact PDF with OpenCV config. Choose dictionary, grid size and marker ratio. Free, in-browser."
-h1: "ChArUco pattern generator"
+seoTitle: "ChArUco board generator — free PDF, OpenCV"
+seoDescription: "Generate a ChArUco calibration board as a 1:1 PDF, SVG or DXF with OpenCV, ROS 2 and HALCON config files. Choose dictionary, grid and sizes. Free to use."
+h1: "ChArUco board generator"
 faq:
   - q: "What is a ChArUco board?"
     a: "A ChArUco board combines a checkerboard with ArUco markers in the white squares. It allows sub-pixel corner detection even when the board is partially occluded."
@@ -9,16 +9,73 @@ faq:
     a: "ChArUco boards work with partial views — if some corners are outside the frame, the markers identify which corners are visible. This makes them ideal for stereo, multi-camera and wide-angle setups."
   - q: "Which dictionary should I use?"
     a: "DICT_6X6_250 is the most common. It has 250 unique markers with 6×6 bit patterns, which is enough for any standard board and provides good detection robustness."
+  - q: "Can I use the board commercially?"
+    a: "Yes. Boards you generate here are free to use for any purpose, including commercial products, production lines and client work. No sign-up and no attribution needed."
+  - q: "Does it work with Kalibr?"
+    a: "Kalibr has no ChArUco target model, so no Kalibr file is generated for ChArUco. For camera–IMU calibration with Kalibr, use the AprilGrid generator."
+  - q: "My board was made with an older OpenCV version. Why are no corners found?"
+    a: "OpenCV 4.6 changed the marker layout for boards with an even number of rows. Call board.setLegacyPattern(True) for boards made with the old layout, or tick the legacy layout option here when printing."
 ---
 
 ## What it does
 
 Generate ChArUco calibration patterns — checkerboard grids with embedded ArUco markers for partial-view detection. ChArUco is the recommended pattern for OpenCV-based stereo and multi-camera calibration because markers allow corner identification even when the board edges are outside the frame.
 
+The PDF prints at 1:1 with a 100 mm scale bar, so you can check the printed size with a ruler before you calibrate.
+
 ## How to use it
 
-Set the pattern type to **ChArUco**, configure your grid dimensions (7 × 10 is a good default), square and marker sizes in millimetres, and select your ArUco dictionary. Download the PDF, print at 1:1 scale, and use the matching `opencv.json` config file with `cv2.aruco.CharucoBoard`.
+Set the grid in squares (7 × 10 is a good default), the square and marker sizes in millimetres, and the ArUco dictionary. A marker about 70–75 % of the square works well.
+
+Download the PDF and print at 100 % ("actual size"). Measure the scale bar and one square, then use the measured square size in your code.
+
+Not sure how big the board should be? The [FOV calculator](/tools/fov/) recommends a board size for your camera, lens and working distance.
+
+## Files you get
+
+- **PDF, SVG, PNG and DXF** — the pattern at 1:1 in millimetres.
+
+- **opencv.json** — rows, columns, square and marker size, dictionary and start ID for `cv2.aruco.CharucoBoard`.
+
+- **ros2.yaml** — parameters for ROS 2 `camera_calibration` with the ChArUco pattern.
+
+- **halcon.txt** — the inner corners as a 3D point tuple for HALCON's `set_calib_data_calib_object`.
+
+Corner order follows OpenCV: row-major over the inner corners, origin at the top-left square corner, x right, y down.
+
+## Detect it with OpenCV
+
+OpenCV 4.7 and later, Python. Columns come first in the board size:
+
+```python
+import cv2
+d = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_6X6_250)
+# (cols, rows), square and marker size in metres
+board = cv2.aruco.CharucoBoard((10, 7), 0.025, 0.018, d)
+```
+
+Then, for each image:
+
+```python
+detector = cv2.aruco.CharucoDetector(board)
+corners, ids, _, _ = detector.detectBoard(gray)
+obj_pts, img_pts = board.matchImagePoints(corners, ids)
+```
+
+Collect `obj_pts` and `img_pts` over 15–30 views at different tilts and positions, then pass them to `cv2.calibrateCamera`.
+
+## Free for commercial use
+
+Boards from this generator are free to use for any purpose: internal, educational or commercial, including products, production lines and client work. No sign-up and no attribution needed.
+
+## Paper or a rigid board?
+
+A printed sheet is fine for a first test. Paper stretches with humidity and does not stay flat, and office printers scale slightly.
+
+For repeatable sub-pixel results a rigid, measured board is worth it. See the [ChArUco aluminium composite board](/targets/charuco-composite/) and the [ChArUco ceramic target](/targets/charuco-ceramic/).
 
 ## Related guides
 
 - [ChArUco vs checkerboard vs AprilGrid](/guides/charuco-vs-checkerboard-vs-aprilgrid/) — when to use each pattern
+
+- [Multiple boards in one rig](/guides/multi-board-marker-ids/) — keeping marker IDs distinct

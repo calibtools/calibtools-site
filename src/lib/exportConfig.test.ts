@@ -191,6 +191,16 @@ describe('id_range in configs', () => {
   });
 });
 
+describe('opencvJson legacy_pattern', () => {
+  it('sets legacy_pattern for ChArUco with the legacy layout', () => {
+    expect(JSON.parse(opencvJson({ ...charuco, legacyLayout: true })).legacy_pattern).toBe(true);
+  });
+  it('omits legacy_pattern otherwise', () => {
+    expect(JSON.parse(opencvJson(charuco)).legacy_pattern).toBeUndefined();
+    expect(JSON.parse(opencvJson({ ...checker, legacyLayout: true })).legacy_pattern).toBeUndefined();
+  });
+});
+
 describe('opencvJson checkerboard flags', () => {
   it('includes marker:true when finderMarkers is set', () => {
     const spec: PatternSpec = { ...checker, finderMarkers: true };
