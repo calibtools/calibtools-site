@@ -21,6 +21,18 @@ describe('partNumber.parse', () => {
     'CT-SVC-RECAL',
     'CT-KIT-X-001',
     'CT-CHA-P-1200X900-D6-LG',
+    // v5 codes (2026-11-06)
+    'CT-ARU-P-300X200-D6',
+    'CT-ARU-P-200X150-T36',
+    'CT-GRD-G-100X100-XG',
+    'CT-DEP-C-100X100-ST5',
+    'CT-LSC-G-600X30',
+    'CT-RDR-M-D150-TRI',
+    'CT-RDR-H-600X400-FUS',
+    'CT-CIR-C-150X100-CON',
+    'CT-RES-G-76X76-STAR-NEG',
+    'CT-IRT-P-600X400-TOF',
+    'CT-CHA-P-300X200-D6-SFR',
   ])('accepts %s and round-trips', (pn) => {
     const r = parse(pn);
     expect(r.errors).toEqual([]);
@@ -52,6 +64,10 @@ describe('partNumber.parse', () => {
     ['CT-SVC-0-0', 'service type'],
     ['CT-ACC-M-FIXFIX', 'accessory'],
     ['CT-ACC-M-BOX10', 'accessory type'],
+    ['CT-CHT-P-300X200-F-SFR', 'option SFR only for CHA'],
+    ['CT-GRD-G-100X100-ST3', 'variant'],
+    ['CT-LSC-G-600X30-XG-LG-NEG-SFR', 'format'],
+    ['CT-RDR-M-A3-TRI', 'size form'],
   ])('rejects %s (%s)', (pn, why) => {
     const r = parse(pn);
     expect(r.ok).toBe(false);

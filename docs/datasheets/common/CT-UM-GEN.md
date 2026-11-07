@@ -19,7 +19,7 @@ Check the board on arrival: no dents on edges, no delamination, print intact. Re
 
 ## 2. Identification
 
-Every target carries an edge strip with: brand · full part number (e.g. `CT-CHA-P-300200-6X6`) · pattern summary (rows × columns · square / marker size · dictionary · start ID) · serial number (`YYWW-NNNNN`) · datasheet revision · a 100 mm scale bar.
+Every target carries an edge strip with: brand · full part number (e.g. `CT-CHA-P-300X200-D6`) · pattern summary (rows × columns · square / marker size · dictionary · start ID) · serial number (`YYWW-NNNNN`) · datasheet revision · a 100 mm scale bar.
 
 Quote the serial number in any support request.
 
@@ -34,7 +34,7 @@ Quote the serial number in any support request.
 
 Accuracy depends on the board staying flat during capture.
 
-- **Tripod / stand**: use the ¼″ mounting fixture (ACC-A-FIX-14) or an M4 insert plate where available. Clamp across the full edge, not at a point.
+- **Tripod / stand**: use the ¼″ mounting fixture (CT-ACC-M-FIX14) or an M4 insert plate where available. Clamp across the full edge, not at a point.
 - **Wall / fixture**: mount on at least three points in one plane; do not bolt a board flat to a surface that is itself not flat.
 - **Robot**: use the ISO 9409-1-50 flange adapter (ACC-A-FLG-ISO50). Keep cable strain off the board.
 - **Hand-held**: acceptable for boards up to 400 × 300 mm. Hold at two opposite edges; keep the board still during exposure.
@@ -76,7 +76,7 @@ Units are millimetres unless stated. The files encode the as-designed geometry. 
 
 ## 8. Storage
 
-Store flat, pattern up, in the original carton or a hard case (ACC-A-CSE-…), away from direct sunlight and heat sources. Composite: −20 to +60 °C storage. Ceramic / glass: any indoor environment; protect from impact. Do not stack boards pattern-to-pattern without interleaving.
+Store flat, pattern up, in the original carton or a hard case (CT-ACC-M-CSE400), away from direct sunlight and heat sources. Composite: −20 to +60 °C storage. Ceramic / glass: any indoor environment; protect from impact. Do not stack boards pattern-to-pattern without interleaving.
 
 ## 9. Re-inspection and calibration certificates
 

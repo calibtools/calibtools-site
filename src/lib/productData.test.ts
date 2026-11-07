@@ -31,10 +31,10 @@ describe('getProductData', () => {
     if (!data) return;
 
     expect(data.orderingRows).toHaveLength(4);
-    expect(data.orderingRows[0].partNumber).toContain('CT-CHA-C-110085');
+    expect(data.orderingRows[0].partNumber).toContain('CT-CHA-C-110X85');
     expect(data.orderingRows[0].size).toContain('110');
     expect(data.orderingRows[0].corners).toBe('54');
-    expect(data.orderingRows[3].partNumber).toContain('CT-CHA-C-230140');
+    expect(data.orderingRows[3].partNumber).toContain('CT-CHA-C-230X140');
   });
 
   it('parses spec groups with expected headings', () => {

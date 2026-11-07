@@ -76,7 +76,7 @@ describe('parseDatasheet', () => {
     const ds = _parseDatasheet(CHA_C_MD);
     expect(ds.ordering).not.toBeNull();
     expect(ds.ordering!.rows.length).toBe(4);
-    expect(ds.ordering!.rows[0][0]).toContain('CT-CHA-C-110085');
+    expect(ds.ordering!.rows[0][0]).toContain('CT-CHA-C-110X85');
   });
 
   it('parses CHA-C spec groups (geometry, physical, environment)', () => {
@@ -107,7 +107,7 @@ describe('parseDatasheet', () => {
     expect(ds.ordering!.rows.length).toBe(5);
   });
 
-  it('parses ACC-A-FIX-14 as a flat spec table', () => {
+  it('parses CT-ACC-M-FIX14 as a flat spec table', () => {
     const ds = _parseDatasheet(ACC_FIX_MD);
     expect(ds.specGroups.length).toBeGreaterThanOrEqual(1);
     const specs = ds.specGroups[0];

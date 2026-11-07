@@ -15,7 +15,7 @@ Edge clamp that holds any Calib.Tools target on a tripod, light stand or arm wit
 
 | | |
 |---|---|
-| Part number | CT-ACC-A-FIX-14 (Shopify SKU ACC-A-FIX-14) |
+| Part number | CT-ACC-M-FIX14 |
 | Material | Anodised aluminium 6061, black; TPU soft jaws (Shore 70A) |
 | Jaw opening | 2 – 16 mm (covers 3 mm ceramic to 15 mm honeycomb) |
 | Jaw width | 120 mm |
@@ -34,7 +34,7 @@ Edge clamp that holds any Calib.Tools target on a tripod, light stand or arm wit
 - Centre the clamp on the edge. For boards ≥ 600 mm, use two fixtures on a cross-bar or support the lower edge.
 - Check: push the board top gently — no rotation in the jaws. If it rotates, re-seat deeper, do not over-tighten.
 
-Do not clamp across the pattern face. Do not use as a carrying handle for ceramic or glass. Replacement jaws: ACC-A-FIX-14-JAW.
+Do not clamp across the pattern face. Do not use as a carrying handle for ceramic or glass. Replacement jaws are available on request.
 
 ## Compliance and customs
 

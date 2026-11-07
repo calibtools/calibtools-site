@@ -15,11 +15,11 @@ MVTec HALCON calibration plate. A central reference circle is surrounded by smal
 
 | Part number | Size (W × H) | Mark grid | Central mark ⌀ | Grid mark ⌀ | Total marks |
 |---|---|---|---|---|---|
-| CT-HAL-P-200150 | 200 × 150 mm | 7 × 5 | 8 mm | 3 mm | 36 |
-| CT-HAL-P-300200 | 300 × 200 mm | 7 × 7 | 10 mm | 4 mm | 50 |
-| CT-HAL-P-400300 | 400 × 300 mm | 9 × 7 | 12 mm | 5 mm | 64 |
-| CT-HAL-P-600400 | 600 × 400 mm | 11 × 9 | 14 mm | 6 mm | 100 |
-| CT-HAL-P-800600 | 800 × 600 mm | 13 × 11 | 16 mm | 7 mm | 144 |
+| CT-HAL-P-200X150-STD | 200 × 150 mm | 7 × 5 | 8 mm | 3 mm | 36 |
+| CT-HAL-P-300X200-STD | 300 × 200 mm | 7 × 7 | 10 mm | 4 mm | 50 |
+| CT-HAL-P-400X300-STD | 400 × 300 mm | 9 × 7 | 12 mm | 5 mm | 64 |
+| CT-HAL-P-600X400-STD | 600 × 400 mm | 11 × 9 | 14 mm | 6 mm | 100 |
+| CT-HAL-P-800X600-STD | 800 × 600 mm | 13 × 11 | 16 mm | 7 mm | 144 |
 
 Mark grid is (rows × cols) including the central reference mark. Total marks = rows × cols. A `.descr` description file for HALCON is supplied with every board; it encodes the exact mark positions and diameters as measured during inspection. Other grid sizes: custom order (CUS).
 
@@ -44,7 +44,7 @@ Pattern area is centred with a white quiet zone ≥ 1 mark pitch on all sides; t
 | Weight | 6.6 kg/m² (300 × 200: ≈ 0.4 kg · 800 × 600: ≈ 3.2 kg) |
 | Pattern | Direct UV print, matte, black on white; optical density ≥ 1.6 |
 | Flatness | ≤ 0.5 mm per metre, board supported on three points |
-| Mounting | 4 × M4 threaded inserts on the rear (300 × 200 and larger); ¼″ fixture ACC-A-FIX-14 clamps any size |
+| Mounting | 4 × M4 threaded inserts on the rear (300 × 200 and larger); ¼″ fixture CT-ACC-M-FIX14 clamps any size |
 
 ### Environment
 
@@ -64,7 +64,7 @@ Pattern area is centred with a white quiet zone ≥ 1 mark pitch on all sides; t
 | Files | `.halcon.descr`, `.opencv.json`, `.dxf` |
 | Documents | this datasheet, CT-UM-GEN user manual |
 | Lead time | Made to order · ships in 2–3 weeks |
-| Options | Logo print (-L) · hard case (ACC-A-CSE) · custom NRE |
+| Options | Logo print (-L) · hard case (CT-ACC-M-CSE400) · custom NRE |
 
 ## Compliance and customs
 

@@ -94,21 +94,20 @@ export type Coord = {
 
 // ──────────────────────────────────────────────────── part-number parser
 
-/** Map a part number to product geometry.  Only CT-CHA-C-185110-6X6 for now. */
+/** Map a part number to product geometry.  Only CT-CHA-C-185X110-D6 for now. */
 export function parsePartNumber(pn: string): Omit<
   IRData,
   'sn' | 'lot' | 'id_range' | 'inspector' | 'date' | 'label_line'
 > {
-  // CT-CHA-C-185110-6X6
-  const m = pn.match(
-    /^CT-([A-Z]+)-([A-Z])-(\d{3})(\d{3})-(\d+)X(\d+)$/,
-  );
+  // CT-CHA-C-185X110-D6
+  // Part Numbering System v3: CT-FFF-M-WxH-Dn (ChArUco dictionaries D4/D5/D6)
+  const m = pn.match(/^CT-([A-Z]+)-([A-Z])-(\d+)X(\d+)-D(\d)$/);
   if (!m) throw new Error(`Cannot parse part number: ${pn}`);
-  const [, family, material, wStr, hStr, dictBits, _dictBits2] = m;
+  const [, family, material, wStr, hStr, dictBits] = m;
   const W = Number(wStr);
   const H = Number(hStr);
 
-  // Geometry lookup — currently only CHA-C-185110-6X6
+  // Geometry lookup — currently only CT-CHA-C-185X110-D6
   const PRODUCTS: Record<
     string,
     {
@@ -128,7 +127,7 @@ export function parsePartNumber(pn: string): Omit<
       axes_spec: [number, number, number, number];
     }
   > = {
-    'CT-CHA-C-185110-6X6': {
+    'CT-CHA-C-185X110-D6': {
       description: 'ChArUco calibration target, ceramic, 185 \u00d7 110 mm',
       datasheet: 'CT-DS-CHA-C',
       datasheet_rev: 'A',

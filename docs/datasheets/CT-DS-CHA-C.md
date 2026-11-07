@@ -15,10 +15,10 @@ Lithographed chrome pattern on a white alumina ceramic substrate. Feature accura
 
 | Part number | Size (W × H) | Squares (rows × cols) | Square / marker | Dictionary | Corners | Markers |
 |---|---|---|---|---|---|---|
-| CT-CHA-C-110085-{DICT} | 110 × 85 mm | 7 × 10 | 10 / 7.5 mm | 6X6 · 5X5 · 4X4 · AT36 | 54 | 35 |
-| CT-CHA-C-150100-{DICT} | 150 × 100 mm | 7 × 11 | 12.5 / 9.5 mm | | 60 | 38 |
-| CT-CHA-C-185110-{DICT} | 185 × 110 mm | 7 × 12 | 14 / 10.5 mm | | 66 | 42 |
-| CT-CHA-C-230140-{DICT} | 230 × 140 mm | 8 × 14 | 15 / 11 mm | | 91 | 56 |
+| CT-CHA-C-110X85-{DICT} | 110 × 85 mm | 7 × 10 | 10 / 7.5 mm | D6 · D5 · D4 · T36 | 54 | 35 |
+| CT-CHA-C-150X100-{DICT} | 150 × 100 mm | 7 × 11 | 12.5 / 9.5 mm | | 60 | 38 |
+| CT-CHA-C-185X110-{DICT} | 185 × 110 mm | 7 × 12 | 14 / 10.5 mm | | 66 | 42 |
+| CT-CHA-C-230X140-{DICT} | 230 × 140 mm | 8 × 14 | 15 / 11 mm | | 91 | 56 |
 
 Start ID 0, row-major, OpenCV ≥ 4.6 placement. Larger ceramic plates (up to 400 × 400 mm) and other grids on request with NRE.
 
@@ -42,7 +42,7 @@ Start ID 0, row-major, OpenCV ≥ 4.6 placement. Larger ceramic plates (up to 40
 | Surface | Lapped; Ra ≤ 0.4 µm |
 | Weight | ≈ 11 kg/m² (150 × 100: ≈ 0.17 kg) |
 | Edges | Ground, 0.5 mm chamfer |
-| Mounting | Supplied in a padded case; use ACC-A-FIX-14 soft-jaw fixture or a vacuum/three-point kinematic mount. No holes. |
+| Mounting | Supplied in a padded case; use CT-ACC-M-FIX14 soft-jaw fixture or a vacuum/three-point kinematic mount. No holes. |
 
 ### Environment
 
@@ -60,7 +60,7 @@ Start ID 0, row-major, OpenCV ≥ 4.6 placement. Larger ceramic plates (up to 40
 | Measurement | Every board is measured before it ships (features, flatness, visual) |
 | Files | `.opencv.json`, `.ros2.yaml`, `.halcon.txt` (HALCON point tuple), `.dxf` |
 | Lead time | Made to order — 10–15 business days to dispatch |
-| Options | Fixture ACC-A-FIX-14 · custom NRE |
+| Options | Fixture CT-ACC-M-FIX14 · custom NRE |
 
 ## Compliance and customs
 

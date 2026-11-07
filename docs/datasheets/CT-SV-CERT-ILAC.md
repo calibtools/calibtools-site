@@ -29,7 +29,7 @@ This is different from the inspection report included with every target: the ins
 
 ## How to order
 
-Add the ILAC-MRA certificate on the product page when buying a target, or order SVC-X-CERT-ILAC separately for a target you already own (return shipping both ways is on you; we handle the laboratory).
+Add the ILAC-MRA certificate on the product page when buying a target, or order CT-SVC-CERT-ILAC separately for a target you already own (return shipping both ways is on you; we handle the laboratory).
 
 ## Recalibration
 

@@ -38,6 +38,12 @@ export const FAMILIES = {
   KIT: 'Kit',
   SVC: 'Service',
   OEM: 'OEM / project',
+  // v5 families (decided 2026-11-06)
+  ARU: 'ArUco marker set',
+  GRD: 'Grid / cross-grid distortion target',
+  DEP: 'Depth step block',
+  LSC: 'Line-scan strip target',
+  RDR: 'Radar reflector / radar-camera target',
 } as const;
 export type Family = keyof typeof FAMILIES;
 
@@ -63,22 +69,36 @@ export const VARIANTS: Partial<Record<Family, RegExp>> = {
   CBM: /^(F|C)$/,
   CHA: /^(D4|D5|D6|T36)$/,
   APR: /^(T36|T25)$/,
-  CIR: /^(SYM|ASY)$/,
+  CIR: /^(SYM|ASY|CON)$/,
   HAL: /^(STD|H12)$/,
   VND: /^(ZIV|PHO|ZEB)$/,
   CUB: /^C[3-6]$/,
   LDR: /^(R\d{1,2}|STP\d|FUS)$/,
-  IRT: /^(N850|N940|LWIR)$/,
+  IRT: /^(N850|N940|LWIR|TOF)$/,
   LUM: /^(BL|IR)$/,
   IQC: /^(ESFR|SFR|SFRP|SFRN2|SFRN4|COLR|FOCS|GRY11)$/,
-  RES: /^(USAF|SCL|CON|MLT|RON)$/,
+  RES: /^(USAF|SCL|CON|MLT|RON|STAR)$/,
   SPH: /^(BAL|BAR)$/,
   TCP: /^[A-Z0-9]{2,4}$/,
   OEM: /^[A-Z0-9]{2,6}$/,
+  ARU: /^(D4|D5|D6|T36)$/,
+  GRD: /^XG$/,
+  DEP: /^ST[2-9]$/,
+  RDR: /^(TRI|FUS)$/,
+};
+
+/** Families whose numbers have no variant segment: CT-FFF-M-SIZE[-OPT]. */
+export const NO_VARIANT_FAMILIES: Family[] = ['LSC'];
+
+/** Options allowed only on some families. */
+export const OPTION_FAMILIES: Record<string, Family[]> = {
+  '905': ['LDR'],
+  '1550': ['LDR'],
+  SFR: ['CHA'],
 };
 
 /** Options, in the only order they may appear. B1–B4 is used on labels only, never as a SKU. */
-export const OPTION_ORDER = ['905', '1550', 'NEG', 'LG'] as const;
+export const OPTION_ORDER = ['905', '1550', 'NEG', 'LG', 'SFR'] as const;
 
 const SIZE_RE = /^([1-9]\d{1,3})X([1-9]\d{1,3})$|^A[0-4]$|^D[1-9]\d{0,2}$|^L[1-9]\d{1,3}$/;
 
@@ -86,6 +106,7 @@ const SIZE_RE = /^([1-9]\d{1,3})X([1-9]\d{1,3})$|^A[0-4]$|^D[1-9]\d{0,2}$|^L[1-9
 export const SIZE_FORMS: Partial<Record<Family, Array<'WH' | 'A' | 'D' | 'L'>>> = {
   CHT: ['WH'], CHA: ['WH'], APR: ['WH'], CIR: ['WH'], HAL: ['WH'], CBM: ['WH'], VND: ['WH'], CUB: ['WH'],
   LDR: ['WH'], IRT: ['WH'], LUM: ['WH'], IQC: ['A', 'WH'], RES: ['WH', 'L', 'D'], SPH: ['D', 'L'], TCP: ['WH', 'D'], OEM: ['WH'],
+  ARU: ['WH'], GRD: ['WH'], DEP: ['WH'], LSC: ['WH'], RDR: ['WH', 'D'],
 };
 
 /** Accessory types and service types (whitelists). */
@@ -149,8 +170,13 @@ export function parse(pn: string): ParseResult {
   }
 
   // Board-type families
-  if (seg.length < 5 || seg.length > 7) errors.push('format is CT-FFF-M-SIZE-VAR[-OPT[-OPT]]');
-  const [, , material, size, variant, ...options] = seg;
+  const noVariant = NO_VARIANT_FAMILIES.includes(family);
+  if (noVariant) {
+    if (seg.length < 4 || seg.length > 6) errors.push('format is CT-FFF-M-SIZE[-OPT[-OPT]]');
+  } else if (seg.length < 5 || seg.length > 7) errors.push('format is CT-FFF-M-SIZE-VAR[-OPT[-OPT]]');
+  const [, , material, size] = seg;
+  const variant = noVariant ? '' : seg[4];
+  const options = seg.slice(noVariant ? 4 : 5);
   if (!material || !(material in MATERIALS)) errors.push(`unknown material "${material ?? ''}"`);
   if (material === 'X') errors.push('material X is not allowed for board-type families');
   if (!size || !SIZE_RE.test(size)) errors.push(`bad size "${size ?? ''}" (use 300X200, A3, D25 or L300)`);
@@ -160,7 +186,7 @@ export function parse(pn: string): ParseResult {
   const form = size ? sizeForm(size) : null;
   if (form && SIZE_FORMS[family] && !SIZE_FORMS[family]!.includes(form)) errors.push(`size form ${form} not allowed for ${family}`);
   const vre = VARIANTS[family];
-  if (!variant || (vre && !vre.test(variant))) errors.push(`variant "${variant ?? ''}" not allowed for ${family}`);
+  if (!noVariant && (!variant || (vre && !vre.test(variant)))) errors.push(`variant "${variant ?? ''}" not allowed for ${family}`);
   if (variant && /(^|[A-Z])0\d/.test(variant)) errors.push('no leading zeros in variant');
   if (variant && /^(G0X|G\d+X0$|STP0$|R0$|C0$)/.test(variant)) errors.push('zero count in variant');
   let last = -1;
@@ -170,7 +196,10 @@ export function parse(pn: string): ParseResult {
     else if (idx <= last) errors.push('options out of order or repeated');
     last = Math.max(last, idx);
   }
-  if ((options.includes('905') || options.includes('1550')) && family !== 'LDR') errors.push('wavelength option only for LDR');
+  for (const o of options) {
+    const fams = OPTION_FAMILIES[o];
+    if (fams && !fams.includes(family)) errors.push(o === '905' || o === '1550' ? 'wavelength option only for LDR' : `option ${o} only for ${fams.join(', ')}`);
+  }
   if (options.includes('905') && options.includes('1550')) errors.push('905 and 1550 are mutually exclusive');
   const value: PartNumber = { family, material: (material ?? '') as Material, size: size ?? '', variant: variant ?? '', options };
   return { ok: errors.length === 0, value, errors };
@@ -180,6 +209,7 @@ export function build(p: PartNumber): string {
   if (p.family === 'SVC') return [BRAND, 'SVC', p.variant].join('-');
   if (p.family === 'ACC') return [BRAND, 'ACC', p.material, p.variant].join('-');
   if (p.family === 'KIT') return [BRAND, 'KIT', 'X', p.variant].join('-');
+  if (NO_VARIANT_FAMILIES.includes(p.family)) return [BRAND, p.family, p.material, p.size, ...p.options].join('-');
   return [BRAND, p.family, p.material, p.size, p.variant, ...p.options].join('-');
 }
 

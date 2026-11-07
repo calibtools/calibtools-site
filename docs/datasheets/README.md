@@ -32,4 +32,4 @@ material: P               # SKU material code (second segment)
 - `[CHECK]` markers render with a yellow highlight in the PDF.
 - Part numbers follow CT-{family}-{material}-{WWWHHH}-{PPPP}.
 - ILAC certificate references: "ILAC-MRA certificate issued by an accredited
-  third-party laboratory, available as SVC-X-CERT-ILAC".
+  third-party laboratory, available as CT-SVC-CERT-ILAC".

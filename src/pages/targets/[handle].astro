@@ -386,7 +386,11 @@ const faqJsonLd = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEn
 
 // Ordering rows with prices from Shopify variants
 const orderingRows = (productData?.orderingRows ?? []).map((row) => {
-  const matchedVariant = product.variants.find((v) => v.sku && row.partNumber.startsWith(v.sku.replace(/-6X6$|-5X5$|-4X4$|-AT36$/, '')));
+  // Exact part number first (CT-CIR-P-300X200-ASY), else same family-material-size (CT-CHA-P-300X200-{DICT})
+  const base = (pn: string) => pn.split('-').slice(0, 4).join('-');
+  const matchedVariant =
+    product.variants.find((v) => v.sku && row.partNumber === v.sku) ??
+    product.variants.find((v) => v.sku && base(row.partNumber) === base(v.sku));
   return { ...row, price: matchedVariant?.price ?? '' };
 });
 ---

@@ -6,7 +6,7 @@
  *   tsx scripts/add-serial.mjs <sn> <part_number> <id_range> <date> [initials]
  *
  * Example:
- *   tsx scripts/add-serial.mjs 000400 CT-CHA-C-200150-6X6 "0\u2013101" 2026-11-07
+ *   tsx scripts/add-serial.mjs 000400 CT-CHA-C-200X150-D6 "0\u2013101" 2026-11-07
  *
  * Outputs:
  *   - Appends/updates record in data/serials.json

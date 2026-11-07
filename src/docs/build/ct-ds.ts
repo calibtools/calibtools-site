@@ -161,7 +161,7 @@ export function parseDatasheet(md: string): DSParsed {
         }
       }
     } else {
-      // Flat table (like ACC-A-FIX-14)
+      // Flat table (like CT-ACC-M-FIX14)
       const tbl = parseMarkdownTable(specSection);
       if (tbl) {
         specGroups.push({
@@ -235,7 +235,7 @@ function mono(text: string): string {
 function chaCProductRendering(): string {
   const mk185 = CERAMIC_SIZES.find((s) => s.square === 14)!.marker;
   const label =
-    `CALIB.TOOLS   CT-CHA-C-185110-6X6   ChArUco 7\u00d712 \u00b7 14/${mk185} mm \u00b7 DICT_6X6_250 \u00b7 IDs 0\u201341   SN [per unit] \u00b7 Rev A`;
+    `CALIB.TOOLS   CT-CHA-C-185X110-D6   ChArUco 7\u00d712 \u00b7 14/${mk185} mm \u00b7 DICT_6X6_250 \u00b7 IDs 0\u201341   SN [per unit] \u00b7 Rev A`;
   const board = board_svg({
     W: 185, H: 110, rows: 7, cols: 12, sq: 14,
     marker: mk185, mx: 8.5, my: 6,
@@ -357,7 +357,7 @@ function chaCSpecTables(): string {
       ['Surface', '<span class="mono">Ra \u2264 0.4 \u00b5m</span>; lapped, non-glare.'],
       ['Edges', '<span class="mono">0.5 mm</span> chamfer, ground.'],
       ['Weight', '<span class="mono">\u2248 11 kg/m\u00b2</span>; 150 \u00d7 100: <span class="mono">0.17 kg</span>.'],
-      ['Mounting', 'No holes. Use ACC-A-FIX-14 fixture, vacuum chuck or kinematic mount.'],
+      ['Mounting', 'No holes. Use CT-ACC-M-FIX14 fixture, vacuum chuck or kinematic mount.'],
     ],
     '', undefined, ['28%', '72%'],
   );

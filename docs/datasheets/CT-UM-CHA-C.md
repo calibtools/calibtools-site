@@ -21,7 +21,7 @@ Read with CT-UM-GEN and the ChArUco composite quick start (same detection workfl
 
 No holes are provided (a hole is a flatness and stress risk). Use:
 
-- the soft-jaw ¼″ fixture ACC-A-FIX-14 clamping one long edge, or
+- the soft-jaw ¼″ fixture CT-ACC-M-FIX14 clamping one long edge, or
 - a three-point kinematic mount on the rear, or
 - a vacuum chuck for bench setups.
 

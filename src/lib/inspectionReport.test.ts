@@ -69,7 +69,7 @@ describe('part number → description mapping', () => {
   });
 
   it('CT-CHA-P serial renders composite description', () => {
-    const { description } = parsePartNumber('CT-CHA-P-300200-6X6');
+    const { description } = parsePartNumber('CT-CHA-P-300X200-D6');
     expect(description).toBe('ChArUco calibration target, composite');
   });
 });

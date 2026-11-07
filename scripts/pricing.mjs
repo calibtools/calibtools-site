@@ -117,112 +117,112 @@ export const CERAMIC_FIT = fitPowerLaw(
 
 const SHOPIFY_VARIANTS = {
   // Checkerboard composite — 2 variants per size (Fine/Coarse)
-  'CHT-P-200150': { shopifySkus: ['CHT-200150-F', 'CHT-200150-C'], oldUsd: 79 },
-  'CHT-P-300200': { shopifySkus: ['CHT-300200-F', 'CHT-300200-C'], oldUsd: 99 },
-  'CHT-P-400300': { shopifySkus: ['CHT-400300-F', 'CHT-400300-C'], oldUsd: 129 },
-  'CHT-P-600400': { shopifySkus: ['CHT-600400-F', 'CHT-600400-C'], oldUsd: 189 },
-  'CHT-P-800600': { shopifySkus: ['CHT-800600-F', 'CHT-800600-C'], oldUsd: 259 },
+  'CHT-P-200X150': { shopifySkus: ['CT-CHT-P-200X150-F', 'CT-CHT-P-200X150-C'], oldUsd: 79 },
+  'CHT-P-300X200': { shopifySkus: ['CT-CHT-P-300X200-F', 'CT-CHT-P-300X200-C'], oldUsd: 99 },
+  'CHT-P-400X300': { shopifySkus: ['CT-CHT-P-400X300-F', 'CT-CHT-P-400X300-C'], oldUsd: 129 },
+  'CHT-P-600X400': { shopifySkus: ['CT-CHT-P-600X400-F', 'CT-CHT-P-600X400-C'], oldUsd: 189 },
+  'CHT-P-800X600': { shopifySkus: ['CT-CHT-P-800X600-F', 'CT-CHT-P-800X600-C'], oldUsd: 259 },
 
   // ChArUco composite — 4 variants per size (6X6/5X5/4X4/AT36)
-  'CHA-P-200150': { shopifySkus: ['CHA-200150-6X6', 'CHA-200150-5X5', 'CHA-200150-4X4', 'CHA-200150-AT36'], oldUsd: 89 },
-  'CHA-P-300200': { shopifySkus: ['CHA-300200-6X6', 'CHA-300200-5X5', 'CHA-300200-4X4', 'CHA-300200-AT36'], oldUsd: 109 },
-  'CHA-P-400300': { shopifySkus: ['CHA-400300-6X6', 'CHA-400300-5X5', 'CHA-400300-4X4', 'CHA-400300-AT36'], oldUsd: 139 },
-  'CHA-P-600400': { shopifySkus: ['CHA-600400-6X6', 'CHA-600400-5X5', 'CHA-600400-4X4', 'CHA-600400-AT36'], oldUsd: 199 },
-  'CHA-P-800600': { shopifySkus: ['CHA-800600-6X6', 'CHA-800600-5X5', 'CHA-800600-4X4', 'CHA-800600-AT36'], oldUsd: 269 },
+  'CHA-P-200X150': { shopifySkus: ['CT-CHA-P-200X150-D6', 'CT-CHA-P-200X150-D5', 'CT-CHA-P-200X150-D4', 'CT-CHA-P-200X150-T36'], oldUsd: 89 },
+  'CHA-P-300X200': { shopifySkus: ['CT-CHA-P-300X200-D6', 'CT-CHA-P-300X200-D5', 'CT-CHA-P-300X200-D4', 'CT-CHA-P-300X200-T36'], oldUsd: 109 },
+  'CHA-P-400X300': { shopifySkus: ['CT-CHA-P-400X300-D6', 'CT-CHA-P-400X300-D5', 'CHA-400300-4X4', 'CT-CHA-P-400X300-T36'], oldUsd: 139 },
+  'CHA-P-600X400': { shopifySkus: ['CT-CHA-P-600X400-D6', 'CT-CHA-P-600X400-D5', 'CHA-600400-4X4', 'CT-CHA-P-600X400-T36'], oldUsd: 199 },
+  'CHA-P-800X600': { shopifySkus: ['CT-CHA-P-800X600-D6', 'CT-CHA-P-800X600-D5', 'CHA-800600-4X4', 'CT-CHA-P-800X600-T36'], oldUsd: 269 },
 
   // ChArUco ceramic — 2 variants per size (6X6/5X5)
-  'CHA-C-110085': { shopifySkus: ['CHA-C-11085-6X6', 'CHA-C-11085-5X5'], oldUsd: 189 },
-  'CHA-C-150100': { shopifySkus: ['CHA-C-150100-6X6', 'CHA-C-150100-5X5'], oldUsd: null },
-  'CHA-C-185110': { shopifySkus: ['CHA-C-185110-6X6', 'CHA-C-185110-5X5'], oldUsd: 239 },
-  'CHA-C-230140': { shopifySkus: ['CHA-C-230140-6X6', 'CHA-C-230140-5X5'], oldUsd: 299 },
+  'CHA-C-110X85': { shopifySkus: ['CT-CHA-C-110X85-D6', 'CT-CHA-C-110X85-D5'], oldUsd: 189 },
+  'CHA-C-150X100': { shopifySkus: ['CT-CHA-C-150X100-D6', 'CT-CHA-C-150X100-D5'], oldUsd: null },
+  'CHA-C-185X110': { shopifySkus: ['CT-CHA-C-185X110-D6', 'CT-CHA-C-185X110-D5'], oldUsd: 239 },
+  'CHA-C-230X140': { shopifySkus: ['CT-CHA-C-230X140-D6', 'CT-CHA-C-230X140-D5'], oldUsd: 299 },
 
   // AprilGrid composite — 1 variant per size (SKU = catalogue SKU)
-  'APR-P-200150': { shopifySkus: ['CT-APR-P-200150'], oldUsd: null },
-  'APR-P-300200': { shopifySkus: ['CT-APR-P-300200'], oldUsd: null },
-  'APR-P-400300': { shopifySkus: ['CT-APR-P-400300'], oldUsd: null },
-  'APR-P-600400': { shopifySkus: ['CT-APR-P-600400'], oldUsd: null },
-  'APR-P-800600': { shopifySkus: ['CT-APR-P-800600'], oldUsd: null },
+  'APR-P-200X150': { shopifySkus: ['CT-APR-P-200X150-T36'], oldUsd: null },
+  'APR-P-300X200': { shopifySkus: ['CT-APR-P-300X200-T36'], oldUsd: null },
+  'APR-P-400X300': { shopifySkus: ['CT-APR-P-400X300-T36'], oldUsd: null },
+  'APR-P-600X400': { shopifySkus: ['CT-APR-P-600X400-T36'], oldUsd: null },
+  'APR-P-800X600': { shopifySkus: ['CT-APR-P-800X600-T36'], oldUsd: null },
   // Circle grid composite (symmetric) — 1 variant per size
-  'CIR-P-200150': { shopifySkus: ['CT-CIR-P-200150'], oldUsd: null },
-  'CIR-P-300200': { shopifySkus: ['CT-CIR-P-300200'], oldUsd: null },
-  'CIR-P-400300': { shopifySkus: ['CT-CIR-P-400300'], oldUsd: null },
-  'CIR-P-600400': { shopifySkus: ['CT-CIR-P-600400'], oldUsd: null },
-  'CIR-P-800600': { shopifySkus: ['CT-CIR-P-800600'], oldUsd: null },
+  'CIR-P-200X150': { shopifySkus: ['CT-CIR-P-200X150-SYM'], oldUsd: null },
+  'CIR-P-300X200': { shopifySkus: ['CT-CIR-P-300X200-SYM'], oldUsd: null },
+  'CIR-P-400X300': { shopifySkus: ['CT-CIR-P-400X300-SYM'], oldUsd: null },
+  'CIR-P-600X400': { shopifySkus: ['CT-CIR-P-600X400-SYM'], oldUsd: null },
+  'CIR-P-800X600': { shopifySkus: ['CT-CIR-P-800X600-SYM'], oldUsd: null },
   // Asymmetric circle grid composite — 1 variant per size
-  'ACR-P-200150': { shopifySkus: ['CT-ACR-P-200150'], oldUsd: null },
-  'ACR-P-300200': { shopifySkus: ['CT-ACR-P-300200'], oldUsd: null },
-  'ACR-P-400300': { shopifySkus: ['CT-ACR-P-400300'], oldUsd: null },
-  'ACR-P-600400': { shopifySkus: ['CT-ACR-P-600400'], oldUsd: null },
-  'ACR-P-800600': { shopifySkus: ['CT-ACR-P-800600'], oldUsd: null },
+  'CIR-P-200X150-ASY': { shopifySkus: ['CT-CIR-P-200X150-ASY'], oldUsd: null },
+  'CIR-P-300X200-ASY': { shopifySkus: ['CT-CIR-P-300X200-ASY'], oldUsd: null },
+  'CIR-P-400X300-ASY': { shopifySkus: ['CT-CIR-P-400X300-ASY'], oldUsd: null },
+  'CIR-P-600X400-ASY': { shopifySkus: ['CT-CIR-P-600X400-ASY'], oldUsd: null },
+  'CIR-P-800X600-ASY': { shopifySkus: ['CT-CIR-P-800X600-ASY'], oldUsd: null },
   // HALCON composite — 1 variant per size
-  'HAL-P-200150': { shopifySkus: ['CT-HAL-P-200150'], oldUsd: null },
-  'HAL-P-300200': { shopifySkus: ['CT-HAL-P-300200'], oldUsd: null },
-  'HAL-P-400300': { shopifySkus: ['CT-HAL-P-400300'], oldUsd: null },
-  'HAL-P-600400': { shopifySkus: ['CT-HAL-P-600400'], oldUsd: null },
-  'HAL-P-800600': { shopifySkus: ['CT-HAL-P-800600'], oldUsd: null },
+  'HAL-P-200X150': { shopifySkus: ['CT-HAL-P-200X150-STD'], oldUsd: null },
+  'HAL-P-300X200': { shopifySkus: ['CT-HAL-P-300X200-STD'], oldUsd: null },
+  'HAL-P-400X300': { shopifySkus: ['CT-HAL-P-400X300-STD'], oldUsd: null },
+  'HAL-P-600X400': { shopifySkus: ['CT-HAL-P-600X400-STD'], oldUsd: null },
+  'HAL-P-800X600': { shopifySkus: ['CT-HAL-P-800X600-STD'], oldUsd: null },
 
   // Accessories / services — 1 variant each
-  'ACC-FIX-14':   { shopifySkus: ['ACC-FIX-14'], oldUsd: 39 },
-  'SVC-CERT-ILAC': { shopifySkus: ['SVC-CERT-ILAC'], oldUsd: 149 },
+  'CT-ACC-M-FIX14':   { shopifySkus: ['CT-ACC-M-FIX14'], oldUsd: 39 },
+  'CT-SVC-CERT-ILAC': { shopifySkus: ['CT-SVC-CERT-ILAC'], oldUsd: 149 },
 };
 
 // ── Catalogue ───────────────────────────────────────────────────────────
 
 const CATALOGUE = [
   // Checkerboard composite — anchor: calib.io checkerboard Alu/LDPE
-  { sku: 'CT-CHT-P-200150', sizeKey: 'CHT-P-200150', handle: 'checkerboard-composite', family: 'CHT-P', widthMm: 200, heightMm: 150, anchorEur: 103, anchorSource: 'calib.io CHT200150 Alu/LDPE', note: '' },
-  { sku: 'CT-CHT-P-300200', sizeKey: 'CHT-P-300200', handle: 'checkerboard-composite', family: 'CHT-P', widthMm: 300, heightMm: 200, anchorEur: 108, anchorSource: 'calib.io CHT300200 Alu/LDPE', note: '' },
-  { sku: 'CT-CHT-P-400300', sizeKey: 'CHT-P-400300', handle: 'checkerboard-composite', family: 'CHT-P', widthMm: 400, heightMm: 300, anchorEur: 127, anchorSource: 'calib.io CHT400300 Alu/LDPE', note: '' },
-  { sku: 'CT-CHT-P-600400', sizeKey: 'CHT-P-600400', handle: 'checkerboard-composite', family: 'CHT-P', widthMm: 600, heightMm: 400, anchorEur: 176, anchorSource: 'calib.io CHT600400 Alu/LDPE', note: '' },
-  { sku: 'CT-CHT-P-800600', sizeKey: 'CHT-P-800600', handle: 'checkerboard-composite', family: 'CHT-P', widthMm: 800, heightMm: 600, anchorEur: 263, anchorSource: 'calib.io CHT800600 Alu/LDPE', note: '' },
+  { sku: 'CT-CHT-P-200X150', sizeKey: 'CHT-P-200X150', handle: 'checkerboard-composite', family: 'CHT-P', widthMm: 200, heightMm: 150, anchorEur: 103, anchorSource: 'calib.io CHT200150 Alu/LDPE', note: '' },
+  { sku: 'CT-CHT-P-300X200', sizeKey: 'CHT-P-300X200', handle: 'checkerboard-composite', family: 'CHT-P', widthMm: 300, heightMm: 200, anchorEur: 108, anchorSource: 'calib.io CHT300200 Alu/LDPE', note: '' },
+  { sku: 'CT-CHT-P-400X300', sizeKey: 'CHT-P-400X300', handle: 'checkerboard-composite', family: 'CHT-P', widthMm: 400, heightMm: 300, anchorEur: 127, anchorSource: 'calib.io CHT400300 Alu/LDPE', note: '' },
+  { sku: 'CT-CHT-P-600X400', sizeKey: 'CHT-P-600X400', handle: 'checkerboard-composite', family: 'CHT-P', widthMm: 600, heightMm: 400, anchorEur: 176, anchorSource: 'calib.io CHT600400 Alu/LDPE', note: '' },
+  { sku: 'CT-CHT-P-800X600', sizeKey: 'CHT-P-800X600', handle: 'checkerboard-composite', family: 'CHT-P', widthMm: 800, heightMm: 600, anchorEur: 263, anchorSource: 'calib.io CHT800600 Alu/LDPE', note: '' },
 
   // ChArUco composite — anchor: calib.io charuco Alu/LDPE
-  { sku: 'CT-CHA-P-200150', sizeKey: 'CHA-P-200150', handle: 'charuco-composite', family: 'CHA-P', widthMm: 200, heightMm: 150, anchorEur: 116, anchorSource: 'calib.io CCT200150 Alu/LDPE', note: '' },
-  { sku: 'CT-CHA-P-300200', sizeKey: 'CHA-P-300200', handle: 'charuco-composite', family: 'CHA-P', widthMm: 300, heightMm: 200, anchorEur: 120, anchorSource: 'calib.io CCT300200 Alu/LDPE', note: '' },
-  { sku: 'CT-CHA-P-400300', sizeKey: 'CHA-P-400300', handle: 'charuco-composite', family: 'CHA-P', widthMm: 400, heightMm: 300, anchorEur: 134, anchorSource: 'calib.io CCT400300 Alu/LDPE', note: '' },
-  { sku: 'CT-CHA-P-600400', sizeKey: 'CHA-P-600400', handle: 'charuco-composite', family: 'CHA-P', widthMm: 600, heightMm: 400, anchorEur: 203, anchorSource: 'calib.io CCT600400 Alu/LDPE', note: '' },
-  { sku: 'CT-CHA-P-800600', sizeKey: 'CHA-P-800600', handle: 'charuco-composite', family: 'CHA-P', widthMm: 800, heightMm: 600, anchorEur: 273, anchorSource: 'calib.io CCT800600 Alu/LDPE', note: '' },
+  { sku: 'CT-CHA-P-200X150', sizeKey: 'CHA-P-200X150', handle: 'charuco-composite', family: 'CHA-P', widthMm: 200, heightMm: 150, anchorEur: 116, anchorSource: 'calib.io CCT200150 Alu/LDPE', note: '' },
+  { sku: 'CT-CHA-P-300X200', sizeKey: 'CHA-P-300X200', handle: 'charuco-composite', family: 'CHA-P', widthMm: 300, heightMm: 200, anchorEur: 120, anchorSource: 'calib.io CCT300200 Alu/LDPE', note: '' },
+  { sku: 'CT-CHA-P-400X300', sizeKey: 'CHA-P-400X300', handle: 'charuco-composite', family: 'CHA-P', widthMm: 400, heightMm: 300, anchorEur: 134, anchorSource: 'calib.io CCT400300 Alu/LDPE', note: '' },
+  { sku: 'CT-CHA-P-600X400', sizeKey: 'CHA-P-600X400', handle: 'charuco-composite', family: 'CHA-P', widthMm: 600, heightMm: 400, anchorEur: 203, anchorSource: 'calib.io CCT600400 Alu/LDPE', note: '' },
+  { sku: 'CT-CHA-P-800X600', sizeKey: 'CHA-P-800X600', handle: 'charuco-composite', family: 'CHA-P', widthMm: 800, heightMm: 600, anchorEur: 273, anchorSource: 'calib.io CCT800600 Alu/LDPE', note: '' },
 
   // AprilGrid composite — anchor: calib.io kalibr-targets (only 3 sizes available)
   // 200×150 and 300×200 use checkerboard anchors (same substrate + printing)
-  { sku: 'CT-APR-P-200150', sizeKey: 'APR-P-200150', handle: 'aprilgrid-composite', family: 'APR-P', widthMm: 200, heightMm: 150, anchorEur: 103, anchorSource: 'calib.io CHT200150 (proxy — no kalibr-targets 200×150)', note: '' },
-  { sku: 'CT-APR-P-300200', sizeKey: 'APR-P-300200', handle: 'aprilgrid-composite', family: 'APR-P', widthMm: 300, heightMm: 200, anchorEur: 108, anchorSource: 'calib.io CHT300200 (proxy — no kalibr-targets 300×200)', note: '' },
-  { sku: 'CT-APR-P-400300', sizeKey: 'APR-P-400300', handle: 'aprilgrid-composite', family: 'APR-P', widthMm: 400, heightMm: 300, anchorEur: 176, anchorSource: 'calib.io KLB400300', note: '' },
-  { sku: 'CT-APR-P-600400', sizeKey: 'APR-P-600400', handle: 'aprilgrid-composite', family: 'APR-P', widthMm: 600, heightMm: 400, anchorEur: 234, anchorSource: 'calib.io KLB600400', note: '' },
-  { sku: 'CT-APR-P-800600', sizeKey: 'APR-P-800600', handle: 'aprilgrid-composite', family: 'APR-P', widthMm: 800, heightMm: 600, anchorEur: 315, anchorSource: 'calib.io KLB800600', note: '' },
+  { sku: 'CT-APR-P-200X150-T36', sizeKey: 'APR-P-200X150', handle: 'aprilgrid-composite', family: 'APR-P', widthMm: 200, heightMm: 150, anchorEur: 103, anchorSource: 'calib.io CHT200150 (proxy — no kalibr-targets 200×150)', note: '' },
+  { sku: 'CT-APR-P-300X200-T36', sizeKey: 'APR-P-300X200', handle: 'aprilgrid-composite', family: 'APR-P', widthMm: 300, heightMm: 200, anchorEur: 108, anchorSource: 'calib.io CHT300200 (proxy — no kalibr-targets 300×200)', note: '' },
+  { sku: 'CT-APR-P-400X300-T36', sizeKey: 'APR-P-400X300', handle: 'aprilgrid-composite', family: 'APR-P', widthMm: 400, heightMm: 300, anchorEur: 176, anchorSource: 'calib.io KLB400300', note: '' },
+  { sku: 'CT-APR-P-600X400-T36', sizeKey: 'APR-P-600X400', handle: 'aprilgrid-composite', family: 'APR-P', widthMm: 600, heightMm: 400, anchorEur: 234, anchorSource: 'calib.io KLB600400', note: '' },
+  { sku: 'CT-APR-P-800X600-T36', sizeKey: 'APR-P-800X600', handle: 'aprilgrid-composite', family: 'APR-P', widthMm: 800, heightMm: 600, anchorEur: 315, anchorSource: 'calib.io KLB800600', note: '' },
 
   // Circle grid composite (symmetric) — anchor: calib.io circles
-  { sku: 'CT-CIR-P-200150', sizeKey: 'CIR-P-200150', handle: 'circlegrid-composite', family: 'CIR-P', widthMm: 200, heightMm: 150, anchorEur: 103, anchorSource: 'calib.io CT200150', note: '' },
-  { sku: 'CT-CIR-P-300200', sizeKey: 'CIR-P-300200', handle: 'circlegrid-composite', family: 'CIR-P', widthMm: 300, heightMm: 200, anchorEur: 108, anchorSource: 'calib.io CT300200', note: '' },
-  { sku: 'CT-CIR-P-400300', sizeKey: 'CIR-P-400300', handle: 'circlegrid-composite', family: 'CIR-P', widthMm: 400, heightMm: 300, anchorEur: 127, anchorSource: 'calib.io CT400300', note: '' },
-  { sku: 'CT-CIR-P-600400', sizeKey: 'CIR-P-600400', handle: 'circlegrid-composite', family: 'CIR-P', widthMm: 600, heightMm: 400, anchorEur: 176, anchorSource: 'calib.io CT600400', note: '' },
-  { sku: 'CT-CIR-P-800600', sizeKey: 'CIR-P-800600', handle: 'circlegrid-composite', family: 'CIR-P', widthMm: 800, heightMm: 600, anchorEur: 263, anchorSource: 'calib.io CT800600', note: '' },
+  { sku: 'CT-CIR-P-200X150-SYM', sizeKey: 'CIR-P-200X150', handle: 'circlegrid-composite', family: 'CIR-P', widthMm: 200, heightMm: 150, anchorEur: 103, anchorSource: 'calib.io CT200150', note: '' },
+  { sku: 'CT-CIR-P-300X200-SYM', sizeKey: 'CIR-P-300X200', handle: 'circlegrid-composite', family: 'CIR-P', widthMm: 300, heightMm: 200, anchorEur: 108, anchorSource: 'calib.io CT300200', note: '' },
+  { sku: 'CT-CIR-P-400X300-SYM', sizeKey: 'CIR-P-400X300', handle: 'circlegrid-composite', family: 'CIR-P', widthMm: 400, heightMm: 300, anchorEur: 127, anchorSource: 'calib.io CT400300', note: '' },
+  { sku: 'CT-CIR-P-600X400-SYM', sizeKey: 'CIR-P-600X400', handle: 'circlegrid-composite', family: 'CIR-P', widthMm: 600, heightMm: 400, anchorEur: 176, anchorSource: 'calib.io CT600400', note: '' },
+  { sku: 'CT-CIR-P-800X600-SYM', sizeKey: 'CIR-P-800X600', handle: 'circlegrid-composite', family: 'CIR-P', widthMm: 800, heightMm: 600, anchorEur: 263, anchorSource: 'calib.io CT800600', note: '' },
 
   // Asymmetric circle grid composite — anchor: calib.io asymmetric-circles
-  { sku: 'CT-ACR-P-200150', sizeKey: 'ACR-P-200150', handle: 'circlegrid-composite', family: 'ACR-P', widthMm: 200, heightMm: 150, anchorEur: 103, anchorSource: 'calib.io ACT200150', note: '' },
-  { sku: 'CT-ACR-P-300200', sizeKey: 'ACR-P-300200', handle: 'circlegrid-composite', family: 'ACR-P', widthMm: 300, heightMm: 200, anchorEur: 108, anchorSource: 'calib.io ACT300200', note: '' },
-  { sku: 'CT-ACR-P-400300', sizeKey: 'ACR-P-400300', handle: 'circlegrid-composite', family: 'ACR-P', widthMm: 400, heightMm: 300, anchorEur: 121, anchorSource: 'calib.io ACT400300', note: '' },
-  { sku: 'CT-ACR-P-600400', sizeKey: 'ACR-P-600400', handle: 'circlegrid-composite', family: 'ACR-P', widthMm: 600, heightMm: 400, anchorEur: 176, anchorSource: 'calib.io ACT600400', note: '' },
-  { sku: 'CT-ACR-P-800600', sizeKey: 'ACR-P-800600', handle: 'circlegrid-composite', family: 'ACR-P', widthMm: 800, heightMm: 600, anchorEur: 263, anchorSource: 'calib.io ACT800600', note: '' },
+  { sku: 'CT-CIR-P-200X150-ASY', sizeKey: 'CIR-P-200X150-ASY', handle: 'circlegrid-composite', family: 'ACR-P', widthMm: 200, heightMm: 150, anchorEur: 103, anchorSource: 'calib.io ACT200150', note: '' },
+  { sku: 'CT-CIR-P-300X200-ASY', sizeKey: 'CIR-P-300X200-ASY', handle: 'circlegrid-composite', family: 'ACR-P', widthMm: 300, heightMm: 200, anchorEur: 108, anchorSource: 'calib.io ACT300200', note: '' },
+  { sku: 'CT-CIR-P-400X300-ASY', sizeKey: 'CIR-P-400X300-ASY', handle: 'circlegrid-composite', family: 'ACR-P', widthMm: 400, heightMm: 300, anchorEur: 121, anchorSource: 'calib.io ACT400300', note: '' },
+  { sku: 'CT-CIR-P-600X400-ASY', sizeKey: 'CIR-P-600X400-ASY', handle: 'circlegrid-composite', family: 'ACR-P', widthMm: 600, heightMm: 400, anchorEur: 176, anchorSource: 'calib.io ACT600400', note: '' },
+  { sku: 'CT-CIR-P-800X600-ASY', sizeKey: 'CIR-P-800X600-ASY', handle: 'circlegrid-composite', family: 'ACR-P', widthMm: 800, heightMm: 600, anchorEur: 263, anchorSource: 'calib.io ACT800600', note: '' },
 
   // HALCON composite — anchor: calib.io halcon-targets
-  { sku: 'CT-HAL-P-200150', sizeKey: 'HAL-P-200150', handle: 'halcon-composite', family: 'HAL-P', widthMm: 200, heightMm: 150, anchorEur: 127, anchorSource: 'calib.io HAL200150F', note: '' },
-  { sku: 'CT-HAL-P-300200', sizeKey: 'HAL-P-300200', handle: 'halcon-composite', family: 'HAL-P', widthMm: 300, heightMm: 200, anchorEur: 133, anchorSource: 'calib.io HAL300200F', note: '' },
-  { sku: 'CT-HAL-P-400300', sizeKey: 'HAL-P-400300', handle: 'halcon-composite', family: 'HAL-P', widthMm: 400, heightMm: 300, anchorEur: 142, anchorSource: 'calib.io HAL400300F', note: '' },
-  { sku: 'CT-HAL-P-600400', sizeKey: 'HAL-P-600400', handle: 'halcon-composite', family: 'HAL-P', widthMm: 600, heightMm: 400, anchorEur: 208, anchorSource: 'calib.io HAL600400F', note: '' },
-  { sku: 'CT-HAL-P-800600', sizeKey: 'HAL-P-800600', handle: 'halcon-composite', family: 'HAL-P', widthMm: 800, heightMm: 600, anchorEur: 283, anchorSource: 'calib.io HAL800600F', note: '' },
+  { sku: 'CT-HAL-P-200X150-STD', sizeKey: 'HAL-P-200X150', handle: 'halcon-composite', family: 'HAL-P', widthMm: 200, heightMm: 150, anchorEur: 127, anchorSource: 'calib.io HAL200150F', note: '' },
+  { sku: 'CT-HAL-P-300X200-STD', sizeKey: 'HAL-P-300X200', handle: 'halcon-composite', family: 'HAL-P', widthMm: 300, heightMm: 200, anchorEur: 133, anchorSource: 'calib.io HAL300200F', note: '' },
+  { sku: 'CT-HAL-P-400X300-STD', sizeKey: 'HAL-P-400X300', handle: 'halcon-composite', family: 'HAL-P', widthMm: 400, heightMm: 300, anchorEur: 142, anchorSource: 'calib.io HAL400300F', note: '' },
+  { sku: 'CT-HAL-P-600X400-STD', sizeKey: 'HAL-P-600X400', handle: 'halcon-composite', family: 'HAL-P', widthMm: 600, heightMm: 400, anchorEur: 208, anchorSource: 'calib.io HAL600400F', note: '' },
+  { sku: 'CT-HAL-P-800X600-STD', sizeKey: 'HAL-P-800X600', handle: 'halcon-composite', family: 'HAL-P', widthMm: 800, heightMm: 600, anchorEur: 283, anchorSource: 'calib.io HAL800600F', note: '' },
 
   // ChArUco ceramic — owner decision A: calib.io anchor, power-law extrapolation
-  { sku: 'CT-CHA-C-110085', sizeKey: 'CHA-C-110085', handle: 'charuco-ceramic', family: 'CHA-C', widthMm: 110, heightMm: 85, anchorEur: 680, anchorSource: 'calib.io CCT100075F ceramic 100×75', note: 'Owner override €797/$887 (avoid repeated-digit look of 798/888)', ownerEur: 797, ownerUsd: 887 },
-  { sku: 'CT-CHA-C-150100', sizeKey: 'CHA-C-150100', handle: 'charuco-ceramic', family: 'CHA-C', widthMm: 150, heightMm: 100, anchorEur: 915, anchorSource: 'calib.io CCT150100F ceramic 150×100', note: 'Like-for-like; not yet in Shopify' },
-  { sku: 'CT-CHA-C-185110', sizeKey: 'CHA-C-185110', handle: 'charuco-ceramic', family: 'CHA-C', widthMm: 185, heightMm: 110, anchorEur: null, anchorSource: 'Power-law extrapolation from 110×85 + 150×100', note: `Extrapolated: €/cm² = ${CERAMIC_FIT.a.toFixed(2)} × area^${CERAMIC_FIT.b.toFixed(4)}` },
-  { sku: 'CT-CHA-C-230140', sizeKey: 'CHA-C-230140', handle: 'charuco-ceramic', family: 'CHA-C', widthMm: 230, heightMm: 140, anchorEur: null, anchorSource: 'Power-law extrapolation from 110×85 + 150×100', note: `Extrapolated: €/cm² = ${CERAMIC_FIT.a.toFixed(2)} × area^${CERAMIC_FIT.b.toFixed(4)}` },
+  { sku: 'CT-CHA-C-110X85', sizeKey: 'CHA-C-110X85', handle: 'charuco-ceramic', family: 'CHA-C', widthMm: 110, heightMm: 85, anchorEur: 680, anchorSource: 'calib.io CCT100075F ceramic 100×75', note: 'Owner override €797/$887 (avoid repeated-digit look of 798/888)', ownerEur: 797, ownerUsd: 887 },
+  { sku: 'CT-CHA-C-150X100', sizeKey: 'CHA-C-150X100', handle: 'charuco-ceramic', family: 'CHA-C', widthMm: 150, heightMm: 100, anchorEur: 915, anchorSource: 'calib.io CCT150100F ceramic 150×100', note: 'Like-for-like; not yet in Shopify' },
+  { sku: 'CT-CHA-C-185X110', sizeKey: 'CHA-C-185X110', handle: 'charuco-ceramic', family: 'CHA-C', widthMm: 185, heightMm: 110, anchorEur: null, anchorSource: 'Power-law extrapolation from 110×85 + 150×100', note: `Extrapolated: €/cm² = ${CERAMIC_FIT.a.toFixed(2)} × area^${CERAMIC_FIT.b.toFixed(4)}` },
+  { sku: 'CT-CHA-C-230X140', sizeKey: 'CHA-C-230X140', handle: 'charuco-ceramic', family: 'CHA-C', widthMm: 230, heightMm: 140, anchorEur: null, anchorSource: 'Power-law extrapolation from 110×85 + 150×100', note: `Extrapolated: €/cm² = ${CERAMIC_FIT.a.toFixed(2)} × area^${CERAMIC_FIT.b.toFixed(4)}` },
 
   // Mounting fixture — owner override
-  { sku: 'CT-ACC-A-FIX-14', sizeKey: 'ACC-FIX-14', handle: 'mounting-fixture', family: 'ACC', widthMm: null, heightMm: null, anchorEur: null, anchorSource: 'Owner override (band €140–180)', note: 'Owner-set €163; different construction from calib.io MNTFIX01 @ €240' },
+  { sku: 'CT-ACC-M-FIX14', sizeKey: 'CT-ACC-M-FIX14', handle: 'mounting-fixture', family: 'ACC', widthMm: null, heightMm: null, anchorEur: null, anchorSource: 'Owner override (band €140–180)', note: 'Owner-set €163; different construction from calib.io MNTFIX01 @ €240' },
 
   // ILAC certificate — owner decision from Calibvision anchor
-  { sku: 'CT-SVC-X-CERT-ILAC', sizeKey: 'SVC-CERT-ILAC', handle: 'certificate-ilac', family: 'SVC', widthMm: null, heightMm: null, anchorEur: null, anchorSource: 'Calibvision CNAS cert ≈$260/PN → owner $307', note: 'Owner-set $307; EUR derived via ECB rate' },
+  { sku: 'CT-SVC-CERT-ILAC', sizeKey: 'CT-SVC-CERT-ILAC', handle: 'certificate-ilac', family: 'SVC', widthMm: null, heightMm: null, anchorEur: null, anchorSource: 'Calibvision CNAS cert ≈$260/PN → owner $307', note: 'Owner-set $307; EUR derived via ECB rate' },
 ];
 
 // ── Generate ladder ─────────────────────────────────────────────────────
@@ -240,12 +240,12 @@ function generateLadder() {
       pctAbove = item.anchorEur != null
         ? (((proposedEur - item.anchorEur) / item.anchorEur) * 100).toFixed(1)
         : null;
-    } else if (item.sku === 'CT-ACC-A-FIX-14') {
+    } else if (item.sku === 'CT-ACC-M-FIX14') {
       // Owner override: €163
       proposedEur = 163;
       proposedUsd = convertToUsd(163);
       pctAbove = null; // no anchor comparison
-    } else if (item.sku === 'CT-SVC-X-CERT-ILAC') {
+    } else if (item.sku === 'CT-SVC-CERT-ILAC') {
       // Owner decision: $307, derive EUR
       proposedUsd = 307;
       const rawEur = 307 / ECB_EURUSD;
@@ -304,8 +304,8 @@ function ladderMarkdown({ rows, monotonicity }) {
     `- **Ceramic 110×85 + 150×100**: same ×1.175 rule from calib.io ceramic anchors.`,
     `- **Ceramic 185×110 + 230×140**: power-law extrapolation €/cm² = ${CERAMIC_FIT.a.toFixed(2)} × area^${CERAMIC_FIT.b.toFixed(4)}`,
     '  fitted through the two anchored ceramic points.',
-    '- **Fixture CT-ACC-A-FIX-14**: owner-set €163 (band €140–180); different construction from calib.io MNTFIX01.',
-    '- **Certificate CT-SVC-X-CERT-ILAC**: owner-set $307 from Calibvision CNAS ≈$260 anchor; EUR derived.',
+    '- **Fixture CT-ACC-M-FIX14**: owner-set €163 (band €140–180); different construction from calib.io MNTFIX01.',
+    '- **Certificate CT-SVC-CERT-ILAC**: owner-set $307 from Calibvision CNAS ≈$260 anchor; EUR derived.',
     '- **USD**: EUR × ECB rate, precise-rounded.',
     '',
     '## Ladder',
