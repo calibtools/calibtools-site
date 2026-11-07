@@ -63,7 +63,7 @@ Pattern area is centred with a white quiet zone ≥ 1 square on all sides; the e
 | | |
 |---|---|
 | Measurement | Every board is measured before it ships (dimensional, flatness, visual) |
-| Files | `.opencv.json`, `.kalibr.yaml` (checkerboard mode), `.ros2.yaml`, `.halcon.descr`, `.dxf` |
+| Files | `.opencv.json`, `.ros2.yaml`, `.halcon.txt` (HALCON point tuple), `.dxf` |
 | Documents | this datasheet, CT-UM-GEN user manual, CT-UM-CHA-P quick start |
 | Lead time | Made to order · ships in 2–3 weeks |
 | Options | Logo print (-L) · hard case (ACC-A-CSE) · custom NRE |

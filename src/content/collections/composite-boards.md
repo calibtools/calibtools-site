@@ -37,7 +37,7 @@ With every composite board you get:
 
 - **Datasheet PDF** — dimensions, tolerances, material
 - **Measured before it ships** — dimensional, flatness and visual check on every board
-- **Config files** — OpenCV JSON, Kalibr YAML, ROS 2 YAML, HALCON .descr
+- **Config files** — OpenCV JSON and ROS 2 YAML from the free generator, Kalibr YAML where Kalibr supports the pattern, HALCON point tuples or a `.descr` for HALCON plates
 
 We generate the config files for your exact board geometry. You can download them from the product page before your board arrives.
 

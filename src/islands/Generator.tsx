@@ -4,7 +4,7 @@ import { checkerboardSvg, type PatternSpec } from '@/lib/patterns';
 import { exportPdf, exportTiledPdf } from '@/lib/exportPdf';
 import { exportPng } from '@/lib/exportPng';
 import { exportDxf } from '@/lib/exportDxf';
-import { kalibrYaml, ros2Yaml, halconDescr, opencvJson } from '@/lib/exportConfig';
+import { kalibrYaml, kalibrSupported, ros2Yaml, halconCode, halconSupported, opencvJson } from '@/lib/exportConfig';
 import { exportZip } from '@/lib/exportZip';
 import { patternSummary } from '@/lib/brand';
 import { computeSetBoards, buildSetManifest, setBoardFilename } from '@/lib/exportSet';
@@ -453,9 +453,9 @@ export default function Generator({ initialSpec, heading = 'Pattern generator' }
                     { name: `${slug}.png`, desc: 'PNG raster (300 dpi)', data: pngBlob },
                     { name: `${slug}.dxf`, desc: 'DXF for CNC/laser fabrication', data: dxf },
                     { name: `${slug}.opencv.json`, desc: 'OpenCV config', data: opencvJson(spec) },
-                    { name: `${slug}.kalibr.yaml`, desc: 'Kalibr config', data: kalibrYaml(spec) },
+                    ...(kalibrSupported(spec) ? [{ name: `${slug}.kalibr.yaml`, desc: 'Kalibr target config', data: kalibrYaml(spec) }] : []),
                     { name: `${slug}.ros2.yaml`, desc: 'ROS 2 camera_calibration config', data: ros2Yaml(spec) },
-                    { name: `${slug}.halcon.descr`, desc: 'HALCON plate description', data: halconDescr(spec) },
+                    ...(halconSupported(spec) ? [{ name: `${slug}.halcon.txt`, desc: 'HALCON calibration object (HDevelop code)', data: halconCode(spec) }] : []),
                   ];
                   const blob = await exportZip({ slug, summary, files });
                   const a = document.createElement('a');
@@ -520,10 +520,12 @@ export default function Generator({ initialSpec, heading = 'Pattern generator' }
           <span className="pt-1.5 text-[13px] font-semibold">Config files</span>
           <div className="flex flex-wrap gap-2 font-mono text-[13px]">
             <button type="button" className="rounded bg-ground-panel px-2.5 py-1.5" onClick={() => download(`${slug}.opencv.json`, opencvJson(spec), 'application/json')}>opencv.json</button>
-            <button type="button" className="rounded bg-ground-panel px-2.5 py-1.5" onClick={() => download(`${slug}.kalibr.yaml`, kalibrYaml(spec), 'text/yaml')}>kalibr.yaml</button>
+            {kalibrSupported(spec) && <button type="button" className="rounded bg-ground-panel px-2.5 py-1.5" onClick={() => download(`${slug}.kalibr.yaml`, kalibrYaml(spec), 'text/yaml')}>kalibr.yaml</button>}
             <button type="button" className="rounded bg-ground-panel px-2.5 py-1.5" onClick={() => download(`${slug}.ros2.yaml`, ros2Yaml(spec), 'text/yaml')}>ros2.yaml</button>
-            <button type="button" className="rounded bg-ground-panel px-2.5 py-1.5" onClick={() => download(`${slug}.halcon.descr`, halconDescr(spec), 'text/plain')}>halcon.descr</button>
+            {halconSupported(spec) && <button type="button" className="rounded bg-ground-panel px-2.5 py-1.5" onClick={() => download(`${slug}.halcon.txt`, halconCode(spec), 'text/plain')}>halcon.txt</button>}
           </div>
+          {spec.type === 'ChArUco' && <p className="m-0 font-sans text-xs text-ink-muted">Kalibr has no ChArUco target model. For camera–IMU calibration with Kalibr, use an <a href="/tools/generator/aprilgrid/">AprilGrid</a>.</p>}
+          {spec.type === 'HALCON-style dots' && <p className="m-0 font-sans text-xs text-ink-muted">This dot grid has no MVTec border or orientation mark, so HALCON's find_caltab will not detect it. For a HALCON plate, create the .descr and pattern with gen_caltab.</p>}
         </div>
       </form>
 

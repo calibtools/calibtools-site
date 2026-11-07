@@ -5,7 +5,7 @@ import { parseFrontMatter, _parseDatasheet, charucoCornerCount, charucoMarkerCou
 import { Doc } from '../ctdoc';
 import { COMPOSITE_SIZES, CERAMIC_SIZES } from '../../lib/boardSizes';
 import { markerForSquare } from '../../lib/boardSizes';
-import { kalibrYaml, ros2Yaml, halconDescr, opencvJson } from '../../lib/exportConfig';
+import { kalibrYaml, ros2Yaml, opencvJson } from '../../lib/exportConfig';
 import type { PatternSpec } from '../../lib/patterns';
 
 // ── Load test data ──

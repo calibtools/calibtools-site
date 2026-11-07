@@ -38,7 +38,7 @@ With every ceramic target you get:
 
 - **Datasheet PDF** — dimensions, tolerances, material
 - **Measured before it ships** — every board is checked against a golden-sample reference
-- **Config files** — OpenCV JSON, Kalibr YAML, ROS 2 YAML, HALCON .descr
+- **Config files** — OpenCV JSON, ROS 2 YAML and HALCON point tuples from the free generator
 
 ## Cleaning & care
 

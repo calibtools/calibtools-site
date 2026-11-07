@@ -8,7 +8,7 @@ import { resolve } from 'node:path';
 import { checkerboardSvg, type PatternSpec } from '../src/lib/patterns';
 import { exportPdf } from '../src/lib/exportPdf';
 import { exportDxf } from '../src/lib/exportDxf';
-import { kalibrYaml, ros2Yaml, halconDescr, opencvJson } from '../src/lib/exportConfig';
+import { kalibrYaml, kalibrSupported, ros2Yaml, halconCode, opencvJson } from '../src/lib/exportConfig';
 import { buildReadme } from '../src/lib/exportZip';
 import { patternSummary } from '../src/lib/brand';
 
@@ -60,14 +60,16 @@ console.log(`  ✓ ${slug}.dxf`);
 writeFileSync(resolve(OUT, `${slug}.opencv.json`), opencvJson(spec));
 console.log(`  ✓ ${slug}.opencv.json`);
 
-writeFileSync(resolve(OUT, `${slug}.kalibr.yaml`), kalibrYaml(spec));
-console.log(`  ✓ ${slug}.kalibr.yaml`);
+if (kalibrSupported(spec)) {
+  writeFileSync(resolve(OUT, `${slug}.kalibr.yaml`), kalibrYaml(spec));
+  console.log(`  ✓ ${slug}.kalibr.yaml`);
+}
 
 writeFileSync(resolve(OUT, `${slug}.ros2.yaml`), ros2Yaml(spec));
 console.log(`  ✓ ${slug}.ros2.yaml`);
 
-writeFileSync(resolve(OUT, `${slug}.halcon.descr`), halconDescr(spec));
-console.log(`  ✓ ${slug}.halcon.descr`);
+writeFileSync(resolve(OUT, `${slug}.halcon.txt`), halconCode(spec));
+console.log(`  ✓ ${slug}.halcon.txt`);
 
 // README.txt
 const summary = patternSummary(spec);
@@ -76,9 +78,9 @@ const files = [
   { name: `${slug}.svg`, desc: 'SVG vector pattern' },
   { name: `${slug}.dxf`, desc: 'DXF for CNC/laser fabrication' },
   { name: `${slug}.opencv.json`, desc: 'OpenCV config' },
-  { name: `${slug}.kalibr.yaml`, desc: 'Kalibr config' },
+  ...(kalibrSupported(spec) ? [{ name: `${slug}.kalibr.yaml`, desc: 'Kalibr config' }] : []),
   { name: `${slug}.ros2.yaml`, desc: 'ROS 2 camera_calibration config' },
-  { name: `${slug}.halcon.descr`, desc: 'HALCON plate description' },
+  { name: `${slug}.halcon.txt`, desc: 'HALCON calibration object (HDevelop code)' },
 ];
 writeFileSync(resolve(OUT, 'README.txt'), buildReadme({ summary, files }));
 console.log('  ✓ README.txt');

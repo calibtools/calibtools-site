@@ -15,7 +15,7 @@ Notes: OpenCV ≥ 4.6 changed the ChArUco marker placement convention for boards
 
 ## Kalibr
 
-For checkerboards: `target_type: 'checkerboard'`, `targetCols`, `targetRows` = inner corners, `rowSpacingMeters`, `colSpacingMeters`. For ChArUco: ChArUco is not native to Kalibr; use AprilGrid targets APR-* for Kalibr.
+For checkerboards: `target_type: 'checkerboard'`, `targetCols`, `targetRows` = inner corners, `rowSpacingMeters`, `colSpacingMeters`. Symmetric circle grids: `target_type: 'circlegrid'` with circle counts. ChArUco is not native to Kalibr, so no Kalibr file is generated for it; use AprilGrid targets APR-* for Kalibr.
 
 ## ROS 2 camera_calibration
 
@@ -23,7 +23,7 @@ For checkerboards: `target_type: 'checkerboard'`, `targetCols`, `targetRows` = i
 
 ## HALCON
 
-Use `create_calib_data` + `set_calib_data_calib_object` with the supplied `.descr` file. Our HAL-* targets follow the HALCON calibration-plate convention (circles with finder frame); CHT/CHA boards are supplied with a generated description for `caltab`-style use where supported — verify with `gen_caltab` output.
+HAL-* targets follow the HALCON calibration-plate convention (circles with finder frame) and come with a `.descr` file: use `create_calib_data`, `set_calib_data_calib_object` with the `.descr`, then `find_calib_object`. CHT/CHA boards are not HALCON plates. The generator's `.halcon.txt` gives their inner corners as a 3D point tuple for `set_calib_data_calib_object`; detect the corners (for ChArUco, with OpenCV) and pass them with `set_calib_data_observ_points`.
 
 ## MATLAB
 

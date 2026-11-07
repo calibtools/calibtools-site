@@ -3,7 +3,7 @@ import { ArrowLeftRight } from '@/lib/icons';
 import { parse, serialize, detectFormat, FORMAT_LABELS, type Format, type CalibConfig } from '@/lib/convert';
 import { markerForSquare } from '@/lib/boardSizes';
 
-const FORMATS: Format[] = ['opencv-json', 'kalibr-yaml', 'ros2-yaml', 'halcon-descr'];
+const FORMATS: Format[] = ['opencv-json', 'kalibr-yaml', 'ros2-yaml', 'halcon-hdev'];
 
 const EXAMPLE = JSON.stringify({
   pattern: 'ChArUco',
@@ -55,7 +55,7 @@ export default function Converter() {
       'opencv-json': '.opencv.json',
       'kalibr-yaml': '.kalibr.yaml',
       'ros2-yaml': '.ros2.yaml',
-      'halcon-descr': '.halcon.descr',
+      'halcon-hdev': '.halcon.txt',
     };
     const a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob([output], { type: 'text/plain' }));
@@ -84,7 +84,7 @@ export default function Converter() {
             id="input"
             className="w-full rounded border border-[#CFCFCF] bg-white p-3 font-mono text-[13px] leading-relaxed"
             rows={14}
-            placeholder="Paste OpenCV JSON, Kalibr YAML, ROS 2 YAML, or HALCON .descr here..."
+            placeholder="Paste OpenCV JSON, Kalibr YAML or ROS 2 YAML here..."
             value={input}
             onChange={(e) => { setInput(e.target.value); doConvert(e.target.value); }}
           />

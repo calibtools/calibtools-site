@@ -1,11 +1,11 @@
 /**
  * Calibration config format converter.
- * Parses: OpenCV JSON, Kalibr YAML, ROS 2 YAML, HALCON .descr
- * Serializes to any of the above.
+ * Parses: OpenCV JSON, Kalibr YAML, ROS 2 YAML.
+ * Serializes to those plus HALCON (HDevelop point tuple, output only).
  * Round-trip error < 1e-9 for numeric values.
  */
 import type { PatternSpec } from './patterns';
-import { kalibrYaml, ros2Yaml, halconDescr } from './exportConfig';
+import { kalibrYaml, ros2Yaml, halconCode } from './exportConfig';
 
 /** Canonical internal representation — a subset of PatternSpec. */
 export interface CalibConfig {
@@ -18,14 +18,16 @@ export interface CalibConfig {
   startId: number;
 }
 
-export type Format = 'opencv-json' | 'kalibr-yaml' | 'ros2-yaml' | 'halcon-descr';
+export type Format = 'opencv-json' | 'kalibr-yaml' | 'ros2-yaml' | 'halcon-hdev';
+
+/** Formats that can be read as input (HALCON is output only). */
+export const INPUT_FORMATS: Format[] = ['opencv-json', 'kalibr-yaml', 'ros2-yaml'];
 
 /** Detect format from raw text. */
 export function detectFormat(text: string): Format | null {
   const trimmed = text.trim();
   if (trimmed.startsWith('{')) return 'opencv-json';
   if (trimmed.includes('target_type:')) return 'kalibr-yaml';
-  if (trimmed.includes('x_marks') || trimmed.includes('cell_width')) return 'halcon-descr';
   if (trimmed.includes('board:') || trimmed.includes('square_size:')) return 'ros2-yaml';
   return null;
 }
@@ -33,12 +35,12 @@ export function detectFormat(text: string): Format | null {
 /** Parse any supported format into canonical CalibConfig. */
 export function parse(text: string, format?: Format): CalibConfig {
   const fmt = format ?? detectFormat(text);
-  if (!fmt) throw new Error('Could not detect format. Paste a valid OpenCV JSON, Kalibr YAML, ROS 2 YAML, or HALCON .descr file.');
+  if (!fmt) throw new Error('Could not detect format. Paste a valid OpenCV JSON, Kalibr YAML or ROS 2 YAML file.');
   switch (fmt) {
     case 'opencv-json': return parseOpencvJson(text);
     case 'kalibr-yaml': return parseKalibrYaml(text);
     case 'ros2-yaml': return parseRos2Yaml(text);
-    case 'halcon-descr': return parseHalconDescr(text);
+    case 'halcon-hdev': throw new Error('HALCON code is an output format only.');
   }
 }
 
@@ -65,8 +67,8 @@ export function serialize(config: CalibConfig, format: Format): string {
       return kalibrYaml(spec);
     case 'ros2-yaml':
       return ros2Yaml(spec);
-    case 'halcon-descr':
-      return halconDescr(spec);
+    case 'halcon-hdev':
+      return halconCode(spec);
   }
 }
 
@@ -92,24 +94,37 @@ function parseOpencvJson(text: string): CalibConfig {
 
 function parseKalibrYaml(text: string): CalibConfig {
   const v = yamlValues(text);
-  const targetType = v['target_type']?.replace(/'/g, '') ?? 'checkerboard';
-  const isApril = targetType === 'aprilgrid';
+  const targetType = v['target_type']?.replace(/['"]/g, '') ?? 'checkerboard';
 
-  const rows = num(v['tagRows'] ?? v['targetRows']);
-  const cols = num(v['tagCols'] ?? v['targetCols']);
-  const spacingM = num(v['tagSize'] ?? v['rowSpacingMeters'] ?? v['colSpacingMeters']);
-  const square = spacingM * 1000;
-
-  let marker = 0;
-  if (v['tagSpacing']) {
-    marker = square * num(v['tagSpacing']);
+  if (targetType === 'aprilgrid') {
+    const square = num(v['tagSize']) * 1000;
+    return {
+      type: 'AprilGrid (Kalibr)',
+      rows: num(v['tagRows']), cols: num(v['tagCols']),
+      square,
+      marker: v['tagSpacing'] ? square * num(v['tagSpacing']) : 0,
+      dict: 'DICT_APRILTAG_36h11',
+      startId: 0,
+    };
   }
-
+  if (targetType === 'circlegrid') {
+    if (/true/i.test(v['asymmetricGrid'] ?? '')) {
+      throw new Error('Asymmetric Kalibr circle grids are not supported by the converter.');
+    }
+    return {
+      type: 'Symmetric circles',
+      rows: num(v['targetRows']), cols: num(v['targetCols']),
+      square: num(v['spacingMeters']) * 1000,
+      marker: 0, dict: 'DICT_6X6_250', startId: 0,
+    };
+  }
+  // checkerboard: targetRows/targetCols are internal corners → squares = +1
   return {
-    type: isApril ? 'AprilGrid (Kalibr)' : 'Checkerboard',
-    rows, cols, square, marker,
-    dict: isApril ? 'DICT_APRILTAG_36h11' : 'DICT_6X6_250',
-    startId: 0,
+    type: 'Checkerboard',
+    rows: num(v['targetRows']) + 1,
+    cols: num(v['targetCols']) + 1,
+    square: num(v['rowSpacingMeters'] ?? v['colSpacingMeters']) * 1000,
+    marker: 0, dict: 'DICT_6X6_250', startId: 0,
   };
 }
 
@@ -141,24 +156,6 @@ function parseRos2Yaml(text: string): CalibConfig {
   };
 }
 
-function parseHalconDescr(text: string): CalibConfig {
-  const v = halconValues(text);
-  const xMarks = num(v['x_marks']);
-  const yMarks = num(v['y_marks']);
-  const cellW = num(v['cell_width']);
-  const square = cellW * 1000;
-
-  return {
-    type: 'Checkerboard',
-    rows: yMarks + 1,
-    cols: xMarks + 1,
-    square,
-    marker: 0,
-    dict: 'DICT_6X6_250',
-    startId: 0,
-  };
-}
-
 // --- Helpers ---
 
 function mapPatternType(s: string): PatternSpec['type'] {
@@ -184,17 +181,6 @@ function yamlValues(text: string): Record<string, string> {
   return result;
 }
 
-/** Extract key value pairs from HALCON descr (space-separated). */
-function halconValues(text: string): Record<string, string> {
-  const result: Record<string, string> = {};
-  for (const line of text.split('\n')) {
-    const trimmed = line.replace(/#.*$/, '').trim();
-    const m = trimmed.match(/^(\w+)\s+(.+)$/);
-    if (m) result[m[1]] = m[2].trim();
-  }
-  return result;
-}
-
 function num(s: string | undefined): number {
   if (!s) return 0;
   return parseFloat(s);
@@ -205,5 +191,5 @@ export const FORMAT_LABELS: Record<Format, string> = {
   'opencv-json': 'OpenCV JSON',
   'kalibr-yaml': 'Kalibr YAML',
   'ros2-yaml': 'ROS 2 YAML',
-  'halcon-descr': 'HALCON .descr',
+  'halcon-hdev': 'HALCON (HDevelop points)',
 };

@@ -386,7 +386,7 @@ function chaCDeliverablesBox(): string {
     ['Board', 'ChArUco ceramic target, selected part number.'],
     ['Packaging', 'Padded case and handling information.'],
     ['Measurement', 'Every unit is measured before it ships.'],
-    ['Files', '<span class="mono">.opencv.json \u00b7 .kalibr.yaml \u00b7 .ros2.yaml<br>.halcon.descr</span> (from the pattern generator)'],
+    ['Files', '<span class="mono">.opencv.json \u00b7 .ros2.yaml \u00b7 .halcon.txt</span> (from the pattern generator)'],
   ]) + '</div>';
   const right = '<div>' + tag('Configuration & service') + kv([
     ['Marking on board', 'Label line with part / pattern / SN / Rev; printed X / Y arrows.'],
@@ -401,8 +401,8 @@ function chaCCompatibilityTable(): string {
     [['Software', 't'], ['Use / caution', 't']],
     [
       ['OpenCV', 'ChArUco board with <span class="mono">DICT_6X6_250</span>; this board follows the OpenCV <span class="mono">\u2265 4.6</span> convention. Do not enable legacy pattern for this board.'],
-      ['Kalibr', 'No native ChArUco target model. The supplied <span class="mono">.kalibr.yaml</span> is a geometry reference and needs integration-specific adaptation.'],
-      ['HALCON', 'Use the supplied descriptor as setup data for the applicable calibration workflow; confirm operator and release compatibility before deployment.'],
+      ['Kalibr', 'No native ChArUco target model, so no Kalibr file is generated. Use an AprilGrid target for Kalibr.'],
+      ['HALCON', 'Not a HALCON plate. Pass the inner corners from <span class="mono">.halcon.txt</span> to <span class="mono">set_calib_data_calib_object</span> and the detected corners to <span class="mono">set_calib_data_observ_points</span>.'],
       ['MATLAB', 'Intended for the Computer Vision Toolbox ChArUco workflow (R2024a or later\u2014confirm release support before use).'],
       ['ROS 2', 'Use a <span class="mono">charuco</span> pattern configuration where supported by the selected <span class="mono">camera_calibration</span> package; confirm package parameters first.'],
     ],
