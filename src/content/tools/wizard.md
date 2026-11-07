@@ -23,18 +23,24 @@ It handles edge cases like fisheye lenses (which favour ChArUco for partial view
 
 **Application** — select your domain: robotics, industrial inspection, automotive/ADAS, drone/aerial, medical imaging, research or other. This narrows the pattern and material options.
 
-**Accuracy** — choose high (< 0.1 px), medium (< 0.5 px) or low (< 1 px). High accuracy steers toward ceramic or glass substrates with tighter feature tolerances.
+**Accuracy** — choose high (< 0.1 px), medium (< 0.5 px) or low (< 1 px). High accuracy steers toward a rigid aluminium composite board instead of paper.
 
 **Camera** — mono, stereo, fisheye or multi-camera. Stereo and multi-camera setups favour ChArUco or AprilGrid because partial views are common.
 
 **Environment** — indoor, outdoor or both. Outdoor use requires materials rated for temperature and UV exposure.
 
-**Toolchain** — OpenCV, ROS, Kalibr, HALCON, MATLAB or other. This affects the recommended pattern type (e.g., AprilGrid for Kalibr, HALCON dots for HALCON).
+**Toolchain** — OpenCV, ROS, Kalibr, HALCON, MATLAB or other. This affects the recommended pattern type (e.g., AprilGrid for Kalibr, a checkerboard for MATLAB and printed HALCON setups).
+
+**Camera setup (optional)** — pick your sensor and enter the focal length and working distance. The wizard then sizes the squares so the board covers about half the field of view. Skip it to get default sizes.
 
 ## Worked example
 
-A stereo rig for industrial inspection at medium accuracy, indoors, using OpenCV: the wizard recommends a ChArUco board, 300 × 200 mm, aluminium composite, DICT_6X6_250. Click "Order this board" to go directly to the product page with the right variant preselected.
+A stereo rig for industrial inspection at medium accuracy, indoors, using OpenCV: the wizard recommends a 7 × 10 ChArUco board with DICT_6X6_250 markers on A3. Add the camera setup to size the squares for your distance, then click "Generate this pattern" to open it in the generator.
 
 ## Related guides
+
+- [Camera calibration with OpenCV](/guides/opencv-camera-calibration/) — the full procedure, step by step
+
+- [FOV calculator](/tools/fov/) — field of view, focal length and board size for your camera
 
 - [Ceramic datasheet](/files/datasheets/CT-DS-CHA-C.pdf) — feature tolerance and flatness for ceramic targets
