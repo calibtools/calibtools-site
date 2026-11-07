@@ -65,7 +65,7 @@ The recommendation uses the stock [ChArUco composite board](/targets/charuco-com
 
 If you are calibrating thermal, near-infrared or LiDAR sensors, the standard patterns still apply for geometry — but the board material matters.
 
-See the [IR-compatible calibration board](/targets/ir-board/) for thermal cameras, [reflectance panels](/targets/reflectance-panel/) for LiDAR intensity, and [resolution charts](/targets/resolution-chart/) for MTF evaluation.
+See the [heated thermal target](/targets/thermal-calibration-target/) and [NIR target](/targets/nir-calibration-target/) for infrared cameras, [reflectance panels](/targets/reflectance-panel/) for LiDAR intensity, and [resolution charts](/targets/resolution-chart/) for MTF evaluation.
 
 ## Related guides
 

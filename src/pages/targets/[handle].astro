@@ -27,6 +27,8 @@ import homeSetImage from '@/assets/products/brand/home-set.webp';
 import { compositeToleranceAtSize, thermalExpansion, FLATNESS_EXPLAINER, ceramicVsCompositeRatio } from '@/lib/specExplainers';
 import pkgOpenImage from '@/assets/products/packaging/CT-PK-M_open.webp';
 import pkgExplodedImage from '@/assets/products/packaging/CT-PK-M_exploded.webp';
+import { compatRows, digitalFiles } from '@/lib/productCompat';
+import { QUOTE_ONLY_HANDLES } from '@/lib/constants';
 
 export async function getStaticPaths() {
   const products = await getProducts();
@@ -49,7 +51,7 @@ const fixturePrice = fixtureProduct?.variants[0]?.price;
 // descriptionHtml no longer rendered — story from product content replaces it
 
 // Quote-only products: no price, "Request a quote" CTA
-const QUOTE_HANDLES = new Set(['reflectance-panel', 'resolution-chart', 'ir-board']);
+const QUOTE_HANDLES = new Set(QUOTE_ONLY_HANDLES);
 const quoteOnly = QUOTE_HANDLES.has(handle!);
 
 // Lead-time eyebrow
@@ -62,6 +64,7 @@ const eyebrow = m.lead_time
 
 // Product content from collection
 const productContent = await getEntry('products', handle!);
+const compat = compatRows(handle!, productContent?.data.compat);
 
 // Summary from product content, fallback to positioning
 const positioning = productData?.positioning || product.description;
@@ -367,7 +370,8 @@ if (handle?.includes('-composite')) compareProduct = allProducts.find((p) => p.h
 else if (handle?.includes('-ceramic')) compareProduct = allProducts.find((p) => p.handle === handle.replace('-ceramic', '-composite')) ?? null;
 
 const collectionHandle = PRODUCT_TO_COLLECTION[handle!] ?? '';
-const collectionTitle = collectionHandle ? collectionHandle.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()) : '';
+const collectionEntry = collectionHandle ? await getEntry('collections', collectionHandle) : undefined;
+const collectionTitle = collectionEntry?.data.title ?? (collectionHandle ? collectionHandle.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()) : '');
 
 // Pairs-with card data
 import { getEntry } from 'astro:content';
@@ -611,7 +615,12 @@ const orderingRows = (productData?.orderingRows ?? []).map((row) => {
             <div class="flex flex-col gap-2 text-[15px]">
               <strong class="text-[13px] uppercase tracking-[0.08em] text-ink-muted">In the box</strong>
               <ul class="m-0 flex flex-col gap-1.5 pl-4 text-[15px]">
-                {isBoardProduct ? (
+                {quoteOnly ? (
+                  <>
+                    <li>Target as specified in your quote</li>
+                    <li>Datasheet with the target geometry</li>
+                  </>
+                ) : isBoardProduct ? (
                   <>
                     <li>Calibration board</li>
                     <li>Datasheet</li>
@@ -634,10 +643,7 @@ const orderingRows = (productData?.orderingRows ?? []).map((row) => {
             <div class="flex flex-col gap-2 text-[15px]">
               <strong class="text-[13px] uppercase tracking-[0.08em] text-ink-muted">Digital files</strong>
               <ul class="m-0 flex flex-col gap-1.5 pl-4 text-[15px]">
-                <li>Datasheet PDF &middot; DXF drawing</li>
-                <li>OpenCV JSON &middot; Kalibr YAML</li>
-                <li>HALCON .descr &middot; ROS 2 YAML</li>
-                <li>Per-feature coordinates CSV</li>
+                {digitalFiles(handle!).map((f) => <li>{f}</li>)}
               </ul>
             </div>
           </div>
@@ -645,6 +651,7 @@ const orderingRows = (productData?.orderingRows ?? []).map((row) => {
       </details>
 
       {/* 3. Compatibility */}
+      {compat.length > 0 && (
       <details class="group" id="compatibility">
         <summary class="flex cursor-pointer list-none items-center justify-between gap-4 py-5 text-[20px] font-semibold [&::-webkit-details-marker]:hidden">
           <span class="flex items-center gap-3"><Plug size={22} stroke-width={1.6} class="text-ink-soft" aria-hidden="true" />Compatibility</span>
@@ -652,13 +659,7 @@ const orderingRows = (productData?.orderingRows ?? []).map((row) => {
         </summary>
         <table class="mb-6 w-full border-collapse text-[14px]">
           <tbody>
-            {([
-              ['OpenCV', '\u2265 4.6 \u00B7 cv::aruco::CharucoBoard'],
-              ['Kalibr', 'YAML config file supplied'],
-              ['HALCON', 'Plate description file supplied'],
-              ['MATLAB', 'Camera Calibrator app'],
-              ['ROS 2', 'camera_calibration package'],
-            ] as [string, string][]).map(([tool, note], i) => (
+            {compat.map(({ tool, note }, i) => (
               <tr class={`border-t border-line last:border-b ${i % 2 === 1 ? 'bg-ground-alt' : ''}`}>
                 <td class="w-[38%] py-2.5 pr-3 font-semibold">{tool}</td>
                 <td class="py-2.5 font-mono text-[14px] text-ink-muted">{note}</td>
@@ -667,6 +668,7 @@ const orderingRows = (productData?.orderingRows ?? []).map((row) => {
           </tbody>
         </table>
       </details>
+      )}
 
       {/* 4. Measurement & certificate */}
       <details class="group" id="inspection">

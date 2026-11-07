@@ -72,8 +72,8 @@ export function fallbackMinEur(handle: string): number {
     'aprilgrid-composite': 'CT-APR-P-',
     'circlegrid-composite': 'CT-CIR-P-',
     'halcon-composite': 'CT-HAL-P-',
-    'mounting-fixture': 'CT-ACC-A-',
-    'certificate-ilac': 'CT-SVC-X-',
+    'mounting-fixture': 'CT-ACC-M-',
+    'certificate-ilac': 'CT-SVC-',
   };
   const prefix = prefixMap[handle];
   if (!prefix) return 0;

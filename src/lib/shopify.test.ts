@@ -350,7 +350,7 @@ describe('fallback behaviour', () => {
   it('getCollections returns fallback collections (no env)', async () => {
     const { getCollections } = await import('./shopify');
     const collections = await getCollections();
-    expect(collections.length).toBe(4);
+    expect(collections.length).toBe(5);
     expect(collections[0].handle).toBe('composite-boards');
   });
 

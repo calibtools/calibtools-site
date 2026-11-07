@@ -5,6 +5,7 @@
  * Falls back to static data when env vars are missing so builds never fail.
  */
 
+import { MULTI_SENSOR_HANDLES } from './constants';
 import { fallbackMinEur } from './prices';
 
 // --- Config ---
@@ -257,13 +258,16 @@ export async function getCollections(): Promise<Collection[]> {
         }
       }
     `);
-    return data.collections.nodes.map((c: any) => ({
+    const api: Collection[] = data.collections.nodes.map((c: any) => ({
       handle: c.handle,
       title: c.title,
       description: c.description,
       image: c.image?.url,
       products: c.products.nodes.map(mapProduct).filter((p: Product) => !WITHDRAWN_HANDLES.includes(p.handle)),
     }));
+    // Collections defined only locally (e.g. quote-only families) are added after Shopify's.
+    const have = new Set(api.map((c) => c.handle));
+    return [...api, ...FALLBACK_COLLECTIONS.filter((c) => !have.has(c.handle))];
   } catch {
     return FALLBACK_COLLECTIONS;
   }
@@ -627,14 +631,36 @@ const FALLBACK_PRODUCTS: Product[] = [
   fb('resolution-chart', 'ISO 12233 Resolution Test Chart',
     'Resolution test chart for imaging system evaluation.',
     [], '/targets/resolution-chart/'),
-  fb('ir-board', 'IR Calibration Target, Thermal & NIR',
-    'Calibration board for thermal and NIR camera systems.',
-    [], '/targets/ir-board/'),
+  fb("lidar-camera-target", "LiDAR-Camera Calibration Target",
+    "Joint target for camera–LiDAR extrinsic calibration.",
+    [], '/targets/lidar-camera-target/'),
+  fb("thermal-calibration-target", "Heated Thermal Calibration Target",
+    "Heated geometric calibration target for LWIR thermal cameras.",
+    [], '/targets/thermal-calibration-target/'),
+  fb("nir-calibration-target", "NIR Calibration Target, 850 / 940 nm",
+    "ChArUco and checkerboard targets with strong contrast at 850 and 940 nm.",
+    [], '/targets/nir-calibration-target/'),
+  fb("depth-camera-target", "Depth & ToF Camera Calibration Targets",
+    "Step blocks and NIR-uniform boards for ToF, structured-light and stereo depth cameras.",
+    [], '/targets/depth-camera-target/'),
+  fb("hand-eye-calibration-kit", "Hand-Eye Calibration Kit",
+    "ChArUco target with robot flange adapter for eye-in-hand and eye-to-hand calibration.",
+    [], '/targets/hand-eye-calibration-kit/'),
+  fb("multi-camera-target", "Multi-Camera Calibration Target",
+    "Multi-face ChArUco target with distinct marker IDs on every face.",
+    [], '/targets/multi-camera-target/'),
+  fb("line-scan-target", "Line-Scan Camera Calibration Target",
+    "Long chrome-on-glass strip targets for line-scan camera alignment and calibration.",
+    [], '/targets/line-scan-target/'),
+  fb("radar-camera-target", "Radar-Camera Calibration Target",
+    "Trihedral reflectors and joint radar-camera targets for automotive sensor fusion.",
+    [], '/targets/radar-camera-target/'),
 ];
 
 const FALLBACK_COLLECTIONS: Collection[] = [
   { handle: 'composite-boards', title: 'Aluminium Composite Targets', description: '200–1200 mm, rigid, matte, outdoor-safe.', products: FALLBACK_PRODUCTS.filter((p) => p.handle.includes('composite')) },
   { handle: 'ceramic-glass', title: 'Ceramic & Glass Targets', description: 'Lithographed, ±2 µm (target).', products: FALLBACK_PRODUCTS.filter((p) => p.handle.includes('ceramic')) },
-  { handle: 'lidar-image-quality', title: 'LiDAR & Image Quality Targets', description: 'Reflectance panels, ISO 12233 charts, IR boards.', products: FALLBACK_PRODUCTS.filter((p) => ['reflectance-panel', 'resolution-chart', 'ir-board'].includes(p.handle)) },
+  { handle: 'lidar-image-quality', title: 'LiDAR & Image Quality Targets', description: 'Reflectance panels and ISO 12233 charts.', products: FALLBACK_PRODUCTS.filter((p) => ['reflectance-panel', 'resolution-chart'].includes(p.handle)) },
+  { handle: 'multi-sensor', title: 'Multi-Sensor & Specialty Targets', description: 'LiDAR, radar, thermal, NIR, depth, hand-eye, multi-camera and line-scan targets.', products: FALLBACK_PRODUCTS.filter((p) => MULTI_SENSOR_HANDLES.includes(p.handle)) },
   { handle: 'mounts-accessories', title: 'Mounts & Accessories', description: 'Fixtures, stands, robot flange, hard cases.', products: FALLBACK_PRODUCTS.filter((p) => p.handle === 'mounting-fixture') },
 ];
