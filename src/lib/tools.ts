@@ -13,7 +13,7 @@ export interface ToolDef {
 }
 
 export const tools: ToolDef[] = [
-  { key: 'generator', href: '/tools/generator/', title: 'Pattern generator', body: 'Checkerboard, ChArUco, AprilGrid, circles. Print-exact PDF plus OpenCV, Kalibr and ROS config files.', cta: 'Generate', live: true },
+  { key: 'generator', href: '/tools/generator/', title: 'Pattern generator', body: 'Checkerboard, ChArUco, AprilGrid, circles, ArUco and AprilTag markers. Print-exact PDF plus OpenCV, Kalibr and ROS config files.', cta: 'Generate', live: true },
   { key: 'fov', href: '/tools/fov/', title: 'FOV & resolution calculator', body: 'Sensor, lens and working distance in — field of view, mm per pixel and target size out.', cta: 'Calculate', live: true },
   { key: 'wizard', href: '/tools/wizard/', title: 'Target selection wizard', body: 'Five questions, one recommendation: pattern, size, material.', cta: 'Start', live: true },
   { key: 'convert', href: '/tools/convert/', title: 'Format converter', body: 'OpenCV ↔ ROS camera_info ↔ Kalibr ↔ HALCON ↔ COLMAP intrinsics.', cta: 'Convert', live: true },

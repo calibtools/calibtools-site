@@ -8,7 +8,7 @@ import { kalibrYaml, ros2Yaml, halconDescr, opencvJson } from '@/lib/exportConfi
 import { exportZip } from '@/lib/exportZip';
 import { patternSummary } from '@/lib/brand';
 import { computeSetBoards, buildSetManifest, setBoardFilename } from '@/lib/exportSet';
-import { PAPERS, computeLayout, fitNotice, reductionNotice, smallestFittingPaper, type Orientation } from '@/lib/pageLayout';
+import { PAPERS, computeLayout, fitNotice, reductionNotice, smallestFittingPaper, patternExtent, type Orientation } from '@/lib/pageLayout';
 import { LEAD_TIME } from '@/lib/claims';
 import { markerForSquare } from '@/lib/boardSizes';
 
@@ -118,7 +118,8 @@ export default function Generator({ initialSpec }: GeneratorProps = {}) {
   const { pw, ph } = layout;
   const svg = useMemo(() => checkerboardSvg(spec, pw, ph, layout), [spec, pw, ph, layout]);
   const set = <K extends keyof PatternSpec>(k: K, v: PatternSpec[K]) => setSpec((s) => ({ ...s, [k]: v }));
-  const boardW = spec.cols * spec.square, boardH = spec.rows * spec.square;
+  const ext = patternExtent(spec);
+  const boardW = Math.round(ext.bw * 10) / 10, boardH = Math.round(ext.bh * 10) / 10;
   const productMatch = PRODUCT_SIZES.find(([pw2,ph2]) =>
     Math.abs(boardW - pw2) <= 2 && Math.abs(boardH - ph2) <= 2
   );
@@ -127,14 +128,15 @@ export default function Generator({ initialSpec }: GeneratorProps = {}) {
   useEffect(() => {
     if (!autoSize) return;
     const isInch = spec.paper === 'Letter' || spec.paper === 'Tabloid';
-    const best = smallestFittingPaper(boardW, boardH, spec.square, isInch);
+    const best = smallestFittingPaper(boardW, boardH, ext.qzBasis, isInch);
     if (best && best !== spec.paper) {
       set('paper', best);
     }
   }, [autoSize, boardW, boardH, spec.scaleBar]);
 
-  const corners = (spec.rows - 1) * (spec.cols - 1);
-  const markers = Math.floor((spec.rows * spec.cols) / 2);
+  const isSheet = spec.type === 'Marker sheet';
+  const corners = isSheet ? 0 : (spec.rows - 1) * (spec.cols - 1);
+  const markers = isSheet ? spec.rows * spec.cols : Math.floor((spec.rows * spec.cols) / 2);
   const fits = layout.fit === 'single';
   const maxSquare = Math.floor(Math.min((pw - 2 * layout.margin) / spec.cols, (ph - 2 * layout.margin - layout.quietZone * 2) / spec.rows) * 10) / 10;
 
@@ -526,9 +528,9 @@ export default function Generator({ initialSpec }: GeneratorProps = {}) {
       <div className="flex min-w-0 flex-1 basis-[520px] flex-col gap-4">
         <div className="flex flex-wrap justify-between gap-3 text-sm text-ink-muted">
           {!compactInfo && (
-            <span>Preview · {spec.paper} {layout.orientation} · {spec.rows} × {spec.cols} {spec.type}, {spec.square} mm squares{layout.usableGrid ? ` · ${layout.usableGrid}` : ''}</span>
+            <span>Preview · {spec.paper} {layout.orientation} · {spec.rows} × {spec.cols} {spec.type}, {isSheet ? `${spec.marker || spec.square} mm markers` : `${spec.square} mm squares`}{layout.usableGrid && !isSheet ? ` · ${layout.usableGrid}` : ''}</span>
           )}
-          <span className="font-mono">Board {boardW} × {boardH} mm <span className="text-ink-soft">({mmToIn(boardW)} × {mmToIn(boardH)} in)</span> · {corners} corners · {markers} markers</span>
+          <span className="font-mono">Board {boardW} × {boardH} mm <span className="text-ink-soft">({mmToIn(boardW)} × {mmToIn(boardH)} in)</span> {isSheet ? '' : ` · ${corners} corners`} · {markers} {markers === 1 ? 'marker' : 'markers'}</span>
           {productMatch && (
             <span className="text-sm font-medium text-green-700">Matches product size {productMatch[0]} × {productMatch[1]} mm</span>
           )}
@@ -571,10 +573,12 @@ export default function Generator({ initialSpec }: GeneratorProps = {}) {
         <div className="flex justify-center overflow-hidden rounded-xl bg-ground-panel p-6 md:p-10">
           <div className="w-full max-w-[560px] overflow-hidden bg-white shadow-[0_12px_40px_rgba(0,0,0,0.12)] [&>svg]:h-auto [&>svg]:w-full" dangerouslySetInnerHTML={{ __html: svg }} />
         </div>
+        {spec.type !== 'Marker sheet' && (
         <div className="card flex flex-wrap items-center justify-between gap-3 bg-ground-alt px-5 py-4">
           <span className="text-[15px]"><strong>Want this exact pattern on a rigid board?</strong> <span className="text-ink-muted">Same geometry, 0.3 mm tolerance, measured before it ships &middot; {LEAD_TIME.toLowerCase()}.</span></span>
           <a href={productCtaUrl(spec)} className="rounded bg-ink px-4 py-2.5 text-sm font-semibold text-white no-underline hover:text-white">Order as composite board</a>
         </div>
+        )}
       </div>
     </section>
   );

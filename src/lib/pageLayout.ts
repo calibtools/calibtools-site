@@ -401,18 +401,32 @@ export function usableGridNotice(
 // Main layout computation
 // ---------------------------------------------------------------------------
 
+/**
+ * Printed extent of a pattern (mm) and the size the quiet zone is based on.
+ * Calibration boards: cols × square by rows × square, quiet zone ≥ one square.
+ * Marker sheets: markers with a 20 % gap between them (see renderMarkerSheet),
+ * so the quiet zone only needs to match that gap, not a whole marker.
+ */
+export function patternExtent(spec: PatternSpec): { bw: number; bh: number; qzBasis: number } {
+  if (spec.type === 'Marker sheet') {
+    const m = spec.marker || spec.square;
+    const gap = m * 0.2;
+    return { bw: spec.cols * (m + gap) - gap, bh: spec.rows * (m + gap) - gap, qzBasis: gap };
+  }
+  return { bw: spec.cols * spec.square, bh: spec.rows * spec.square, qzBasis: spec.square };
+}
+
 export function computeLayout(
   spec: PatternSpec,
   paperW: number,
   paperH: number,
   orientOverride: Orientation = 'auto',
 ): PageLayout {
-  const bw = spec.cols * spec.square;
-  const bh = spec.rows * spec.square;
-  const qz = patternQuietZone(spec.square);
+  const { bw, bh, qzBasis } = patternExtent(spec);
+  const qz = patternQuietZone(qzBasis);
 
   // Orientation (fit-based). 'none' means neither fits → default to portrait for display.
-  const fitOrient = decideOrientation(bw, bh, orientOverride, paperW, paperH, spec.square);
+  const fitOrient = decideOrientation(bw, bh, orientOverride, paperW, paperH, qzBasis);
   const orientation: 'portrait' | 'landscape' = fitOrient === 'none' ? 'portrait' : fitOrient;
   const [pw, ph] = orientPaper(paperW, paperH, orientation);
 
@@ -423,7 +437,7 @@ export function computeLayout(
   const bbH = brandBlockHeight(wmW);
 
   // Check fit
-  const fits = fitOrient !== 'none' && patternFits(bw, bh, pw, ph, spec.square);
+  const fits = fitOrient !== 'none' && patternFits(bw, bh, pw, ph, qzBasis);
   const isInch = paperW < 220 && paperH < 300;
 
   let fit: FitMode = 'single';
@@ -435,7 +449,7 @@ export function computeLayout(
     fit = 'tile';
     tiling = computeTiling(bw, bh, paperW, paperH);
     reducedSpec = computeGridReduction(spec, paperW, paperH);
-    upsizePaper = smallestFittingPaper(bw, bh, spec.square, isInch) ?? undefined;
+    upsizePaper = smallestFittingPaper(bw, bh, qzBasis, isInch) ?? undefined;
   }
 
   // Pattern placement — centred in available window above the brand block.
