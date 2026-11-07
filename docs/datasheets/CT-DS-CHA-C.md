@@ -58,7 +58,7 @@ Start ID 0, row-major, OpenCV ≥ 4.6 placement. Larger ceramic plates (up to 40
 | | |
 |---|---|
 | Measurement | Every board is measured before it ships (features, flatness, visual) |
-| Files | `.opencv.json`, `.kalibr.yaml`, `.ros2.yaml`, `.halcon.descr`, `.dxf`, measured-coordinates CSV |
+| Files | `.opencv.json`, `.kalibr.yaml`, `.ros2.yaml`, `.halcon.descr`, `.dxf` |
 | Lead time | Made to order — 10–15 business days to dispatch |
 | Options | Fixture ACC-A-FIX-14 · custom NRE |
 
