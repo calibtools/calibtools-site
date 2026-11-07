@@ -13,7 +13,7 @@ const jsonLd = toolJsonLd(entry.data.h1, '/tools/generator/charuco/', entry.data
 <Base title={entry.data.seoTitle} section="tools" description={entry.data.seoDescription} jsonLd={jsonLd}>
   <ToolTabs current="generator" />
   <div class="container-x py-7 md:pb-16">
-    <Generator client:load initialSpec={{ type: 'ChArUco', dict: 'DICT_6X6_250' }} />
+    <Generator client:load heading={entry.data.h1} initialSpec={{ type: 'ChArUco', dict: 'DICT_6X6_250' }} />
     <p class="mt-6 text-[15px] text-ink-muted">
       Printing your own pattern has accuracy limits — see <a href="/files/datasheets/CT-DS-CHA-P.pdf" class="text-brand-dark font-medium">feature tolerance and flatness in the datasheet</a>.
       For sub-pixel reprojection error, the <a href="/targets/charuco-composite/" class="text-brand-dark font-medium">ChArUco aluminium composite board</a> or

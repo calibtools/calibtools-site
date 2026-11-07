@@ -41,6 +41,8 @@ function productCtaUrl(spec: PatternSpec): string {
 interface GeneratorProps {
   /** Override the default pattern state for preset landing pages. */
   initialSpec?: Partial<PatternSpec>;
+  /** Page heading (h1); preset pages pass their own, e.g. "ArUco marker generator". */
+  heading?: string;
 }
 
 function mmToIn(mm: number): string {
@@ -50,7 +52,7 @@ function mmToIn(mm: number): string {
 // Product sizes we sell (width x height in mm)
 const PRODUCT_SIZES: [number, number][] = [[200,200],[300,200],[300,300],[400,300],[400,400],[500,300],[500,400]];
 
-export default function Generator({ initialSpec }: GeneratorProps = {}) {
+export default function Generator({ initialSpec, heading = 'Pattern generator' }: GeneratorProps = {}) {
   const defaultSpec: PatternSpec = { type: 'ChArUco', rows: 7, cols: 10, square: 25, marker: markerForSquare(25), dict: 'DICT_6X6_250', paper: 'A4', startId: 0, scaleBar: true };
   const [spec, setSpec] = useState<PatternSpec>({ ...defaultSpec, ...initialSpec });
   const [busy, setBusy] = useState<'pdf' | 'png' | null>(null);
@@ -158,7 +160,7 @@ export default function Generator({ initialSpec }: GeneratorProps = {}) {
   return (
     <section className="flex flex-wrap gap-10">
       <form className="card flex basis-[380px] flex-col gap-5 self-start p-7" onSubmit={(e) => e.preventDefault()}>
-        <h1 className="m-0 flex items-center gap-3 text-[26px] font-extrabold tracking-[-0.02em]"><Grid2X2 size={24} strokeWidth={1.6} className="text-brand" aria-hidden="true" />Pattern generator</h1>
+        <h1 className="m-0 flex items-center gap-3 text-[26px] font-extrabold tracking-[-0.02em]"><Grid2X2 size={24} strokeWidth={1.6} className="text-brand" aria-hidden="true" />{heading}</h1>
         <p className="m-0 text-sm leading-relaxed text-ink-muted">Runs in your browser. Nothing is uploaded.</p>
 
         <label className="flex flex-col gap-2 text-[13px] font-semibold">Pattern
