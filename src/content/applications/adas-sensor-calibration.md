@@ -14,6 +14,7 @@ products:
   - "multi-camera-target"
   - "reflectance-panel"
 links:
+  - { label: "LiDAR–camera extrinsic calibration", href: "/guides/lidar-camera-calibration/" }
   - { label: "Camera calibration with OpenCV", href: "/guides/opencv-camera-calibration/" }
   - { label: "ChArUco vs checkerboard vs AprilGrid", href: "/guides/charuco-vs-checkerboard-vs-aprilgrid/" }
   - { label: "FOV calculator", href: "/tools/fov/" }
