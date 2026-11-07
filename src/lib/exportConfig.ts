@@ -200,6 +200,8 @@ export function opencvJson(s: PatternSpec): string {
     obj.id_range = [range.min, range.max];
   }
   if (s.finderMarkers) obj.marker = true;
+  // OpenCV ≤ 4.5 ChArUco layout: call board.setLegacyPattern(True) in OpenCV ≥ 4.6
+  if (s.legacyLayout && (s.type === 'ChArUco' || s.type === 'ArUco grid')) obj.legacy_pattern = true;
   if (s.radonCheckers) obj.radon = true;
   if (s.invert) obj.inverted = true;
   if (s.showAxes !== false) {
