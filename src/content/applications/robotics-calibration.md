@@ -23,10 +23,10 @@ links:
 selection:
   - { scenario: "Hand-eye, camera on the arm", pattern: "ChArUco, fixed in the cell", size: "200 × 150 to 400 × 300 mm", material: "Ceramic or composite" }
   - { scenario: "Hand-eye, board on the flange", pattern: "ChArUco with flange adapter", size: "200 × 150 to 300 × 200 mm", material: "Ceramic (light, stable)" }
-  - { scenario: "Camera–IMU (Kalibr)", pattern: "AprilGrid 36h11", size: "400 × 300 to 600 × 400 mm", material: "Aluminium composite" }
+  - { scenario: "Camera–IMU (Kalibr)", pattern: "AprilGrid 36h11", size: "400 × 300 to 600 × 400 mm", material: "Aluminum composite" }
   - { scenario: "Multi-camera rig", pattern: "Multi-face ChArUco", size: "300 mm faces", material: "Composite" }
 faq:
-  - { q: "My reprojection error is tiny but the robot still misses by millimetres. Is it the board?", a: "Usually not. Hand-eye accuracy depends on the robot’s own accuracy and on how varied your poses are. Use more poses with large rotations; a rigid, measured board removes the target as a source of error." }
+  - { q: "My reprojection error is tiny but the robot still misses by millimeters. Is it the board?", a: "Usually not. Hand-eye accuracy depends on the robot’s own accuracy and on how varied your poses are. Use more poses with large rotations; a rigid, measured board removes the target as a source of error." }
   - { q: "Which OpenCV version matches your ChArUco boards?", a: "Our boards follow the OpenCV 4.6 and later layout. If your code uses the older layout, set setLegacyPattern(True) or order the legacy layout." }
   - { q: "Where should the board go for eye-to-hand?", a: "On the robot flange or tool, inside the fixed camera’s field of view, mounted rigidly so it cannot move relative to the flange." }
 ---

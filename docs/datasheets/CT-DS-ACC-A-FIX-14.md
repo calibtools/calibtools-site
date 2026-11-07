@@ -16,7 +16,7 @@ Edge clamp that holds any Calib.Tools target on a tripod, light stand or arm wit
 | | |
 |---|---|
 | Part number | CT-ACC-M-FIX14 |
-| Material | Anodised aluminium 6061, black; TPU soft jaws (Shore 70A) |
+| Material | Anodised aluminum 6061, black; TPU soft jaws (Shore 70A) |
 | Jaw opening | 2 – 16 mm (covers 3 mm ceramic to 15 mm honeycomb) |
 | Jaw width | 120 mm |
 | Thread | ¼″-20 UNC, 7 mm deep; 3/8″-16 adapter bushing included |
@@ -31,7 +31,7 @@ Edge clamp that holds any Calib.Tools target on a tripod, light stand or arm wit
 - Open the jaws with the thumb screw; insert the board edge fully to the stop (≥ 15 mm engagement).
 - Tighten until the soft jaws compress slightly — hand-tight. Do not use tools on the thumb screw with ceramic or glass.
 - Mount to the tripod head via ¼″-20; use the bushing for 3/8″ heads. Lock the head before releasing the board.
-- Centre the clamp on the edge. For boards ≥ 600 mm, use two fixtures on a cross-bar or support the lower edge.
+- Center the clamp on the edge. For boards ≥ 600 mm, use two fixtures on a cross-bar or support the lower edge.
 - Check: push the board top gently — no rotation in the jaws. If it rotates, re-seat deeper, do not over-tighten.
 
 Do not clamp across the pattern face. Do not use as a carrying handle for ceramic or glass. Replacement jaws are available on request.

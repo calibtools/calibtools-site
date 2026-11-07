@@ -74,14 +74,14 @@ console.log('[placeholders] Generated public/og/default.png (1200×630)');
 // --- 3. Per-product OG images ---
 
 const productHandles = [
-  { handle: 'checkerboard-composite', title: 'Checkerboard Calibration Target, Aluminium Composite' },
-  { handle: 'charuco-composite', title: 'ChArUco Calibration Target, Aluminium Composite' },
+  { handle: 'checkerboard-composite', title: 'Checkerboard Calibration Target, Aluminum Composite' },
+  { handle: 'charuco-composite', title: 'ChArUco Calibration Target, Aluminum Composite' },
   { handle: 'charuco-ceramic', title: 'ChArUco Calibration Target, Alumina Ceramic' },
   { handle: 'mounting-fixture', title: 'Target Mounting Fixture, ¼″-20' },
   { handle: 'certificate-ilac', title: 'Calibration certificate' },
-  { handle: 'aprilgrid-composite', title: 'AprilGrid Calibration Target, Aluminium Composite' },
-  { handle: 'circlegrid-composite', title: 'Circle Grid Calibration Target, Aluminium Composite' },
-  { handle: 'halcon-composite', title: 'HALCON Calibration Plate, Aluminium Composite' },
+  { handle: 'aprilgrid-composite', title: 'AprilGrid Calibration Target, Aluminum Composite' },
+  { handle: 'circlegrid-composite', title: 'Circle Grid Calibration Target, Aluminum Composite' },
+  { handle: 'halcon-composite', title: 'HALCON Calibration Plate, Aluminum Composite' },
   { handle: 'reflectance-panel', title: 'LiDAR Reflectance Panel, Lambertian' },
   { handle: 'resolution-chart', title: 'ISO 12233 Resolution Test Chart' },
   { handle: "lidar-camera-target", title: "LiDAR-Camera Calibration Target" },

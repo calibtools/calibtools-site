@@ -401,7 +401,7 @@ interface Props {
   from: string;
   /** Remote image URL (Shopify CDN). */
   image?: string;
-  /** Local optimised image (from import.meta.glob). */
+  /** Local optimized image (from import.meta.glob). */
   localImage?: ImageMetadata;
   placeholder?: string;
   /** Small tag shown instead of price (e.g. "In development"). */

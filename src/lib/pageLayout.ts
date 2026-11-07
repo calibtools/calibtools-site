@@ -269,7 +269,7 @@ export function patternFits(
 /**
  * Compute tiling layout for a pattern that doesn't fit on one sheet.
  * Window per sheet = page − 2·MARGIN horizontally, page − 2·MARGIN − BRAND_BLOCK_HEIGHT vertically.
- * Neighbouring windows overlap TILE_OVERLAP.
+ * Neighboring windows overlap TILE_OVERLAP.
  * The quiet zone applies only at the pattern's outer boundary.
  * Compute sheets for both orientations and return the one with fewer sheets
  * (ties → fewer seams crossing the pattern).
@@ -452,7 +452,7 @@ export function computeLayout(
     upsizePaper = smallestFittingPaper(bw, bh, qzBasis, isInch) ?? undefined;
   }
 
-  // Pattern placement — centred in available window above the brand block.
+  // Pattern placement — centered in available window above the brand block.
   // Vertical: PAGE_MARGIN, qz, [pattern], qz, bbH, PAGE_MARGIN
   const patternWindowTop = PAGE_MARGIN + qz;
   const patternWindowBottom = ph - PAGE_MARGIN - bbH - qz;

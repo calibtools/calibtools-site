@@ -19,7 +19,7 @@ faq:
 
 ## What it does
 
-The FOV calculator takes your camera sensor, lens focal length and working distance and computes the horizontal and vertical field of view in degrees, the coverage area in millimetres, and the ground sample distance (mm per pixel).
+The FOV calculator takes your camera sensor, lens focal length and working distance and computes the horizontal and vertical field of view in degrees, the coverage area in millimeters, and the ground sample distance (mm per pixel).
 
 It works the other way too: enter the field you need to see and it returns the focal length. It then recommends a stock ChArUco board for that field and shows how many pixels land on each square and marker bit.
 
@@ -27,13 +27,13 @@ It works the other way too: enter the field you need to see and it returns the f
 
 **Sensor preset** — choose your camera from the dropdown. Common machine vision sensors (IMX174, IMX264, IMX252 and others) are included with the correct sensor dimensions and resolution. Select "Custom" to enter values manually.
 
-**Sensor width / height** — physical sensor dimensions in millimetres. These come from the camera datasheet, not the pixel count.
+**Sensor width / height** — physical sensor dimensions in millimeters. These come from the camera datasheet, not the pixel count.
 
 **Resolution** — image width and height in pixels. Used to calculate ground sample distance.
 
-**Focal length** — lens focal length in millimetres. For zoom lenses, enter the focal length at the working zoom position.
+**Focal length** — lens focal length in millimeters. For zoom lenses, enter the focal length at the working zoom position.
 
-**Working distance** — distance from the lens to the target in millimetres. This is the primary variable: moving the camera further increases coverage but reduces resolution.
+**Working distance** — distance from the lens to the target in millimeters. This is the primary variable: moving the camera further increases coverage but reduces resolution.
 
 **Lens finder** — enter the width (and optionally height) you need to see at the working distance. The calculator returns the focal length; pick the nearest stock lens at or below it.
 

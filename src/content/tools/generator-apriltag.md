@@ -17,7 +17,7 @@ faq:
 
 ## What it does
 
-Generate AprilTag fiducial markers for robot localisation, drone landing pads and camera pose estimation. Print one tag or a sheet of consecutive IDs, at exact size in millimetres, as PDF, SVG or PNG.
+Generate AprilTag fiducial markers for robot localization, drone landing pads and camera pose estimation. Print one tag or a sheet of consecutive IDs, at exact size in millimeters, as PDF, SVG or PNG.
 
 ## How to use it
 
@@ -30,7 +30,7 @@ Generate AprilTag fiducial markers for robot localisation, drone landing pads an
 
 4. **Rows and columns**: 1 × 1 for a single tag, more for a sheet.
 
-5. **Marker size**: the black square edge in millimetres, the value you pass to the detector as the tag size.
+5. **Marker size**: the black square edge in millimeters, the value you pass to the detector as the tag size.
 
 6. **Download** the PDF and print at 100 % (no "fit to page"). Check the 100 mm scale bar with a ruler.
 

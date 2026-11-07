@@ -117,7 +117,7 @@ describe('exportPdf', () => {
     expect(doc.getProducer()).toBe('Calib.Tools pdf-lib');
   });
 
-  it('content stream contains X-axis red and Y-axis green colour operators', async () => {
+  it('content stream contains X-axis red and Y-axis green color operators', async () => {
     const pako = await import('pako');
     const { PDFName, PDFRawStream, PDFArray } = await import('pdf-lib');
     const bytes = await exportPdf({ spec: { ...base, showAxes: true }, pw: 210, ph: 297, fontBytes });

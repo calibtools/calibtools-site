@@ -19,7 +19,7 @@ For checkerboards: `target_type: 'checkerboard'`, `targetCols`, `targetRows` = i
 
 ## ROS 2 camera_calibration
 
-`--size` is inner corners (cols-1 × rows-1); `--square` in metres. ChArUco: `--pattern charuco --charuco_marker_size 0.018 --aruco_dict 6x6_250`.
+`--size` is inner corners (cols-1 × rows-1); `--square` in meters. ChArUco: `--pattern charuco --charuco_marker_size 0.018 --aruco_dict 6x6_250`.
 
 ## HALCON
 

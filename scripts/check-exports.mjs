@@ -130,14 +130,14 @@ async function run() {
   if (pdfDoc.getProducer() !== 'Calib.Tools pdf-lib') errors.push('PDF: wrong producer');
   if (!pdfDoc.getCreator()?.includes('calib.tools')) errors.push('PDF: creator missing "calib.tools"');
 
-  // X-axis colour: E60012 = rgb(0.9019..., 0, 0.0706...)
+  // X-axis color: E60012 = rgb(0.9019..., 0, 0.0706...)
   if (!pdfContent.includes('0.9019607843137255 0 0.07058823529411765 rg')) {
-    errors.push('PDF: missing X-axis red colour operator (0.9019... 0 0.0706... rg)');
+    errors.push('PDF: missing X-axis red color operator (0.9019... 0 0.0706... rg)');
   }
 
-  // Y-axis colour: 1BA55A = rgb(0.1059..., 0.6471..., 0.3529...)
+  // Y-axis color: 1BA55A = rgb(0.1059..., 0.6471..., 0.3529...)
   if (!pdfContent.includes('0.10588235294117647 0.6470588235294118 0.35294117647058826 rg')) {
-    errors.push('PDF: missing Y-axis green colour operator (0.1059... 0.6471... 0.3529... rg)');
+    errors.push('PDF: missing Y-axis green color operator (0.1059... 0.6471... 0.3529... rg)');
   }
 
   // Wordmark path data: the first letter C path contains "383" as a coordinate
@@ -145,7 +145,7 @@ async function run() {
     errors.push('PDF: missing wordmark path data (coordinate 383 from letter C)');
   }
 
-  // Red dot colour (same as X-axis) — already checked above
+  // Red dot color (same as X-axis) — already checked above
 
   // Text is drawn with embedded subset fonts — glyph IDs, not plaintext.
   // Provenance and print note are verified via the vitest suite (exportPdf.test.ts).
@@ -172,10 +172,10 @@ async function run() {
   // Print note <text>
   if (!svg.includes('not measured')) errors.push('SVG: missing print accuracy note');
 
-  // XY axes group with correct colours
+  // XY axes group with correct colors
   if (!svg.includes('id="calibtools-axes"')) errors.push('SVG: missing axes group');
-  if (!svg.includes('#E60012')) errors.push('SVG: missing X-axis red colour #E60012');
-  if (!svg.includes('#1BA55A')) errors.push('SVG: missing Y-axis green colour #1BA55A');
+  if (!svg.includes('#E60012')) errors.push('SVG: missing X-axis red color #E60012');
+  if (!svg.includes('#1BA55A')) errors.push('SVG: missing Y-axis green color #1BA55A');
 
   // Embedded font
   if (!svg.includes('@font-face') || !svg.includes("font-family:'Geist Mono'")) {
@@ -306,10 +306,10 @@ async function run() {
     if (fillCount < 10) {
       errors.push(`Tiled PDF: expected many filled shapes (pattern + crop marks), found ${fillCount} 'f' operators`);
     }
-    // Verify colour operators (rg) exist — means pattern and crop marks are drawn
+    // Verify color operators (rg) exist — means pattern and crop marks are drawn
     const rgCount = (allTiledText.match(/\brg\b/g) || []).length;
     if (rgCount < 10) {
-      errors.push(`Tiled PDF: expected many colour operators, found ${rgCount} 'rg' operators`);
+      errors.push(`Tiled PDF: expected many color operators, found ${rgCount} 'rg' operators`);
     }
   }
   // Check title mentions "tiled"
@@ -332,7 +332,7 @@ async function run() {
   }
 
   console.log('[check-exports] OK — T1 exports pass all brand + layout checks.');
-  console.log('  PDF: metadata ✓, axes colours ✓, wordmark path ✓, quiet zone ✓, margins ✓');
+  console.log('  PDF: metadata ✓, axes colors ✓, wordmark path ✓, quiet zone ✓, margins ✓');
   console.log('  Tiled PDF: 2 pages ✓, crop marks ✓, metadata ✓');
   console.log('  SVG: provenance ✓, wordmark ✓, axes bbox ✓, brand bbox ✓, print note ✓, font ✓, quiet zone ✓');
   console.log('  DXF: provenance ✓, wordmark ✓, print note ✓');

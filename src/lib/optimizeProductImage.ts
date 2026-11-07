@@ -1,5 +1,5 @@
 /**
- * Build-time helper: generate optimised image variants for a product image.
+ * Build-time helper: generate optimized image variants for a product image.
  *
  * Called from .astro page frontmatter.  Uses Astro's `getImage()` to produce
  * AVIF, WebP and JPEG at the specified widths.  Returns a structure the React
@@ -17,7 +17,7 @@ export interface OptimizedSource {
 }
 
 export interface OptimizedImage {
-  /** Optimised <source> elements (avif, webp). */
+  /** Optimized <source> elements (avif, webp). */
   sources: OptimizedSource[];
   /** Fallback <img> src (JPEG at largest width). */
   src: string;
@@ -29,7 +29,7 @@ export interface OptimizedImage {
 }
 
 /**
- * Generate optimised variants of a single image.
+ * Generate optimized variants of a single image.
  *
  * @param image  Astro ImageMetadata (from a static import)
  * @param alt    Alt text

@@ -6,11 +6,11 @@ description: "Fixtures that hold your board square and still."
 sellingPoints:
   - "Holds your board square and still, so your captures repeat session to session"
   - "Standard ¼″-20 thread — fits your tripod, lab post or clamp"
-color: grey
+color: gray
 pairsWith: []
 specsTable:
   - { label: "Fixture thread", value: "¼″-20 UNC" }
-  - { label: "Fixture material", value: "Anodised aluminium" }
+  - { label: "Fixture material", value: "Anodized aluminum" }
 brandNote: "A good board on a wobbly mount still gives you a bad calibration. Start with something that holds still."
 ---
 
@@ -28,7 +28,7 @@ Each accessory comes with its datasheet.
 
 ## Cleaning & care
 
-- Wipe the fixture with a dry cloth. The anodised finish resists fingerprints and light corrosion.
+- Wipe the fixture with a dry cloth. The anodized finish resists fingerprints and light corrosion.
 - Store it somewhere dry.
 
 ## FAQ

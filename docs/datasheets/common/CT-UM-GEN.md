@@ -66,7 +66,7 @@ The free pattern generator produces files that describe each layout's exact geom
 | `*.halcon.txt` | HALCON calibration object as a 3D point tuple (checkerboard, ChArUco); HAL-* plates come with a `.descr` file |
 | `*.dxf` | Board outline and mounting features for fixture design |
 
-Units are millimetres unless stated. The files encode the as-designed geometry. For most camera calibrations the as-designed values are correct to use.
+Units are millimeters unless stated. The files encode the as-designed geometry. For most camera calibrations the as-designed values are correct to use.
 
 ## 7. Cleaning
 
@@ -92,4 +92,4 @@ hello@calib.tools · we reply within one business day. Include the serial number
 
 ## 12. Disposal
 
-Composite boards: aluminium/polyethylene composite, recycle as mixed metal/plastic per local rules. Ceramic and glass: inert waste. Packaging: cardboard, recyclable.
+Composite boards: aluminum/polyethylene composite, recycle as mixed metal/plastic per local rules. Ceramic and glass: inert waste. Packaging: cardboard, recyclable.

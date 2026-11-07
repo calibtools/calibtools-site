@@ -18,7 +18,7 @@ links:
   - { label: "Pattern generator", href: "/tools/generator/" }
   - { label: "Request a quote", href: "/quote/" }
 selection:
-  - { scenario: "HALCON-based cell", pattern: "HALCON calibration plate", size: "200 × 150 to 400 × 300 mm", material: "Aluminium composite" }
+  - { scenario: "HALCON-based cell", pattern: "HALCON calibration plate", size: "200 × 150 to 400 × 300 mm", material: "Aluminum composite" }
   - { scenario: "OpenCV / ROS-based cell", pattern: "ChArUco", size: "110 × 85 to 230 × 140 mm", material: "Alumina ceramic" }
   - { scenario: "Hand-eye in the cell", pattern: "ChArUco with flange adapter", size: "200 × 150 mm", material: "Ceramic" }
   - { scenario: "2D measurement station", pattern: "Circle grid", size: "Sized to the field", material: "Composite" }

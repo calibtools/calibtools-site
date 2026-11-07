@@ -43,13 +43,13 @@ function outlineStampSvg() {
   // Arc radius = middle of ring band
   const arcR = (r + rInner) / 2;
 
-  // Top arc text: "CALIB.TOOLS" — centred at top (−90° in SVG y-down)
+  // Top arc text: "CALIB.TOOLS" — centered at top (−90° in SVG y-down)
   paths.push(arcTextToPath('CALIB.TOOLS', geistMedium, 3.2, arcR, -90, false));
 
-  // Bottom arc text: "DIMENSIONAL INSPECTION" — centred at bottom (+90° in SVG y-down)
+  // Bottom arc text: "DIMENSIONAL INSPECTION" — centered at bottom (+90° in SVG y-down)
   paths.push(arcTextToPath('DIMENSIONAL INSPECTION', geistMedium, 2.8, arcR, 90, true));
 
-  // Centre "INSPECTED" — Geist Pixel, y = −3 mm (above centre in SVG y-down)
+  // Center "INSPECTED" — Geist Pixel, y = −3 mm (above center in SVG y-down)
   paths.push(textToPath('INSPECTED', geistPixel, 4, 0, -3, 'middle'));
 
   // SN placeholder — y = +1 mm
@@ -132,7 +132,7 @@ function textToPath(text, font, fontSize, x, y, anchor) {
 /**
  * Render text along a circular arc in SVG coordinates (y-down).
  *
- * @param centreAngleDeg  Centre of arc in SVG degrees.
+ * @param centreAngleDeg  Center of arc in SVG degrees.
  *   -90 = top (12 o'clock), +90 = bottom (6 o'clock).
  * @param flip  If true, letters stand upright at the bottom of the circle.
  */

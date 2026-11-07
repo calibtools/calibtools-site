@@ -19,9 +19,9 @@ links:
   - { label: "Pattern generator", href: "/tools/generator/" }
   - { label: "Request a quote", href: "/quote/" }
 selection:
-  - { scenario: "Front camera static calibration", pattern: "Checkerboard or ChArUco", size: "Up to 1200 × 800 mm on request", material: "Aluminium composite" }
-  - { scenario: "Surround-view cameras", pattern: "ChArUco panels, one per camera", size: "600 × 400 to 800 × 600 mm", material: "Aluminium composite" }
-  - { scenario: "LiDAR alignment", pattern: "Markers + cut-out holes", size: "600 × 400 mm and up", material: "Aluminium honeycomb" }
+  - { scenario: "Front camera static calibration", pattern: "Checkerboard or ChArUco", size: "Up to 1200 × 800 mm on request", material: "Aluminum composite" }
+  - { scenario: "Surround-view cameras", pattern: "ChArUco panels, one per camera", size: "600 × 400 to 800 × 600 mm", material: "Aluminum composite" }
+  - { scenario: "LiDAR alignment", pattern: "Markers + cut-out holes", size: "600 × 400 mm and up", material: "Aluminum honeycomb" }
   - { scenario: "Radar alignment", pattern: "Trihedral reflector", size: "100–150 mm", material: "Metal" }
 faq:
   - { q: "Can you make one-piece boards larger than 800 × 600 mm?", a: "Yes, on request up to 1200 × 800 mm as one piece. Larger formats are quoted per project." }

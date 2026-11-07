@@ -1,5 +1,5 @@
 ---
-seoTitle: "ChArUco board for OpenCV, aluminium"
+seoTitle: "ChArUco board for OpenCV, aluminum"
 seoDescription: "A rigid ChArUco calibration board you can push half out of frame and still detect: every corner carries a marker ID. For OpenCV stereo and multi-camera rigs."
 summary: "See every corner, even at the frame edge — for your OpenCV stereo and multi-camera rigs"
 decideSpecs:

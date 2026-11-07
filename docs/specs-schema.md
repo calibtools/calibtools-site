@@ -6,13 +6,13 @@ Namespace: `specs`. All keys live under `specs.*` in Shopify product metafields.
 
 | Key                | Shopify type                  | Unit / format      | Vocabulary / notes                                                              | Required |
 |--------------------|-------------------------------|--------------------|---------------------------------------------------------------------------------|----------|
-| `material`         | `single_line_text_field`      | —                  | `Aluminium/LDPE composite`, `Alumina ceramic`, `Borosilicate glass`, `Aluminium` | yes      |
-| `thickness_mm`     | `number_integer`              | mm (implicit)      | Whole millimetres                                                                | yes      |
+| `material`         | `single_line_text_field`      | —                  | `Aluminum/LDPE composite`, `Alumina ceramic`, `Borosilicate glass`, `Aluminum` | yes      |
+| `thickness_mm`     | `number_integer`              | mm (implicit)      | Whole millimeters                                                                | yes      |
 | `size_mm`          | `single_line_text_field`      | `W × H` mm        | Use ` × ` (thin space + ×) between dims                                         | no       |
 | `pattern`          | `single_line_text_field`      | —                  | `Checkerboard`, `ChArUco`, `AprilGrid`, `Circles`                                | no       |
 | `squares`          | `single_line_text_field`      | `R × C`           | Rows × Columns, e.g. `7 × 10`                                                   | no       |
-| `square_size_mm`   | `number_integer`              | mm (implicit)      | Whole millimetres                                                                | no       |
-| `marker_size_mm`   | `number_integer`              | mm (implicit)      | Whole millimetres; only for ChArUco / AprilGrid                                  | no       |
+| `square_size_mm`   | `number_integer`              | mm (implicit)      | Whole millimeters                                                                | no       |
+| `marker_size_mm`   | `number_integer`              | mm (implicit)      | Whole millimeters; only for ChArUco / AprilGrid                                  | no       |
 | `dictionary`       | `single_line_text_field`      | —                  | OpenCV enum name, e.g. `DICT_6X6_250`, `DICT_4X4_50`, `AprilTag 36h11`          | no       |
 | `start_id`         | `number_integer`              | —                  | First marker ID in the board                                                     | no       |
 | `feature_tolerance`| `single_line_text_field`      | free text          | e.g. `±0.3 mm + 0.2 mm/m`, `±2 µm`                                              | yes      |
@@ -21,7 +21,7 @@ Namespace: `specs`. All keys live under `specs.*` in Shopify product metafields.
 | `operating_temp`   | `single_line_text_field`      | free text          | e.g. `−50 to +80 °C`                                                             | no       |
 | `weight_g`         | `number_integer`              | g (implicit)       | Whole grams                                                                      | no       |
 | `finish`           | `single_line_text_field`      | —                  | e.g. `UV-printed; matte`, `Lithographed blue chrome`                              | no       |
-| `corner_radius_mm` | `number_integer`              | mm (implicit)      | Whole millimetres                                                                | no       |
+| `corner_radius_mm` | `number_integer`              | mm (implicit)      | Whole millimeters                                                                | no       |
 | `lead_time`        | `single_line_text_field`      | —                  | `In stock · ships in 1–2 days`, `Made to order · 3–4 weeks`                      | yes      |
 | `files_included`   | `single_line_text_field`      | comma-separated    | e.g. `Inspection report, datasheet PDF, DXF, OpenCV JSON, Kalibr YAML`           | yes      |
 | `datasheet_url`    | `url`                         | full URL           | Link to the datasheet PDF (public CDN)                                            | warn     |

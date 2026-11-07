@@ -25,7 +25,7 @@ The PDF prints at 1:1 with a 100 mm scale bar, so you can check the printed size
 
 ## How to use it
 
-Set the grid in squares (7 × 10 is a good default), the square and marker sizes in millimetres, and the ArUco dictionary. A marker about 70–75 % of the square works well.
+Set the grid in squares (7 × 10 is a good default), the square and marker sizes in millimeters, and the ArUco dictionary. A marker about 70–75 % of the square works well.
 
 Download the PDF and print at 100 % ("actual size"). Measure the scale bar and one square, then use the measured square size in your code.
 
@@ -33,7 +33,7 @@ Not sure how big the board should be? The [FOV calculator](/tools/fov/) recommen
 
 ## Files you get
 
-- **PDF, SVG, PNG and DXF** — the pattern at 1:1 in millimetres.
+- **PDF, SVG, PNG and DXF** — the pattern at 1:1 in millimeters.
 
 - **opencv.json** — rows, columns, square and marker size, dictionary and start ID for `cv2.aruco.CharucoBoard`.
 
@@ -50,7 +50,7 @@ OpenCV 4.7 and later, Python. Columns come first in the board size:
 ```python
 import cv2
 d = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_6X6_250)
-# (cols, rows), square and marker size in metres
+# (cols, rows), square and marker size in meters
 board = cv2.aruco.CharucoBoard((10, 7), 0.025, 0.018, d)
 ```
 
@@ -72,7 +72,7 @@ Boards from this generator are free to use for any purpose: internal, educationa
 
 A printed sheet is fine for a first test. Paper stretches with humidity and does not stay flat, and office printers scale slightly.
 
-For repeatable sub-pixel results a rigid, measured board is worth it. See the [ChArUco aluminium composite board](/targets/charuco-composite/) and the [ChArUco ceramic target](/targets/charuco-ceramic/).
+For repeatable sub-pixel results a rigid, measured board is worth it. See the [ChArUco aluminum composite board](/targets/charuco-composite/) and the [ChArUco ceramic target](/targets/charuco-ceramic/).
 
 ## Related guides
 

@@ -37,7 +37,7 @@ Per-board measured coordinates are planned for production boards and are not sup
 
 ## 5. Temperature
 
-Thermal expansion is ≈ 7 µm per metre per °C — negligible for camera calibration, but allow the plate to equilibrate 30 min if it came from a cold room when working at the ±2 µm level.
+Thermal expansion is ≈ 7 µm per meter per °C — negligible for camera calibration, but allow the plate to equilibrate 30 min if it came from a cold room when working at the ±2 µm level.
 
 ## 6. Re-inspection
 

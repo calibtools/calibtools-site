@@ -1,6 +1,6 @@
 ---
 code: CT-DS-CIR-P
-title: Circle Grid Calibration Target, Aluminium Composite
+title: Circle Grid Calibration Target, Aluminum Composite
 type: datasheet
 rev: A
 date: 2026-10-29
@@ -35,7 +35,7 @@ Circle grids use filled dot centroids rather than corner intersections. Centroid
 
 Spacing is centre-to-centre pitch. Asymmetric boards use a half-pitch row offset; pass `CALIB_CB_ASYMMETRIC_GRID` to `cv::findCirclesGrid`. Other grid sizes or circle dimensions: custom order (CUS).
 
-Pattern area is centred with a white quiet zone ≥ 1 circle pitch on all sides; the edge strip with part number, serial and 100 mm scale bar sits outside the quiet zone.
+Pattern area is centered with a white quiet zone ≥ 1 circle pitch on all sides; the edge strip with part number, serial and 100 mm scale bar sits outside the quiet zone.
 
 ## Specifications
 
@@ -43,7 +43,7 @@ Pattern area is centred with a white quiet zone ≥ 1 circle pitch on all sides;
 
 | | |
 |---|---|
-| Feature position tolerance | ±0.3 mm + 0.2 mm/m (any circle centre to nominal grid, at 20 °C) |
+| Feature position tolerance | ±0.3 mm + 0.2 mm/m (any circle center to nominal grid, at 20 °C) |
 | Circle pitch, mean | ±0.05 mm |
 | Circularity | ≤ 0.05 mm radial deviation |
 | Edge radius | R6 mm |
@@ -52,10 +52,10 @@ Pattern area is centred with a white quiet zone ≥ 1 circle pitch on all sides;
 
 | | |
 |---|---|
-| Substrate | Aluminium / LDPE / aluminium composite, 6 mm |
+| Substrate | Aluminum / LDPE / aluminum composite, 6 mm |
 | Weight | 6.6 kg/m² (300 × 200: ≈ 0.4 kg · 800 × 600: ≈ 3.2 kg) |
 | Pattern | Direct UV print, matte, black on white; optical density ≥ 1.6 |
-| Flatness | ≤ 0.5 mm per metre, board supported on three points |
+| Flatness | ≤ 0.5 mm per meter, board supported on three points |
 | Mounting | 4 × M4 threaded inserts on the rear (300 × 200 and larger); ¼″ fixture CT-ACC-M-FIX14 clamps any size |
 
 ### Environment

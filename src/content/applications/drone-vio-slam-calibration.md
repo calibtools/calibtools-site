@@ -18,10 +18,10 @@ links:
   - { label: "FOV calculator", href: "/tools/fov/" }
   - { label: "Camera calibration with OpenCV", href: "/guides/opencv-camera-calibration/" }
 selection:
-  - { scenario: "Camera–IMU with Kalibr", pattern: "AprilGrid 36h11", size: "400 × 300 to 600 × 400 mm", material: "Aluminium composite" }
-  - { scenario: "Fisheye or wide stereo", pattern: "AprilGrid or ChArUco", size: "600 × 400 mm", material: "Aluminium composite" }
+  - { scenario: "Camera–IMU with Kalibr", pattern: "AprilGrid 36h11", size: "400 × 300 to 600 × 400 mm", material: "Aluminum composite" }
+  - { scenario: "Fisheye or wide stereo", pattern: "AprilGrid or ChArUco", size: "600 × 400 mm", material: "Aluminum composite" }
   - { scenario: "Thermal camera on the drone", pattern: "Heated checkerboard or circles", size: "Built to size", material: "Heated panel" }
-  - { scenario: "Small indoor drones", pattern: "AprilGrid", size: "200 × 150 to 300 × 200 mm", material: "Aluminium composite" }
+  - { scenario: "Small indoor drones", pattern: "AprilGrid", size: "200 × 150 to 300 × 200 mm", material: "Aluminum composite" }
 faq:
   - { q: "Why does Kalibr fail with my printed AprilGrid?", a: "A common cause is a print that is not exactly to scale or not flat, so tagSize and tagSpacing no longer match the grid. Measure the printed tag, or use a rigid board made to the stated size." }
   - { q: "Which tag spacing should I use?", a: "Kalibr expresses spacing as a ratio of the tag size; 0.3 is a common choice and what our AprilGrid boards use." }

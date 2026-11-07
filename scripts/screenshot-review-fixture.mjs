@@ -69,7 +69,7 @@ async function main() {
         <span class="font-mono text-xs text-ink-muted">15 Sep 2026</span>
       </div>
       <h4 class="m-0 text-[16px] font-semibold">Excellent flatness for multi-camera rigs</h4>
-      <p class="m-0 text-[15px] leading-relaxed text-ink-muted">Used this board for a six-camera automotive rig. Corner detection was consistent across all views. The aluminium composite substrate is rigid enough that we no longer need to clamp the board to a flat surface.</p>
+      <p class="m-0 text-[15px] leading-relaxed text-ink-muted">Used this board for a six-camera automotive rig. Corner detection was consistent across all views. The aluminum composite substrate is rigid enough that we no longer need to clamp the board to a flat surface.</p>
       <div class="flex flex-wrap items-center gap-2 pt-1 text-xs text-ink-muted">
         <span class="font-semibold text-ink">Alex Chen</span>
         <span>· Perception Lab, Acme Robotics</span>

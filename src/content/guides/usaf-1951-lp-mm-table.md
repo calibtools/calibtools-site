@@ -1,6 +1,6 @@
 ---
 title: "USAF 1951 resolution chart: lp/mm table"
-description: "Line pairs per millimetre and line width for every group and element of the USAF 1951 target, how to read the chart, and how to convert to sensor resolution."
+description: "Line pairs per millimeter and line width for every group and element of the USAF 1951 target, how to read the chart, and how to convert to sensor resolution."
 date: 2026-11-07
 updated: 2026-11-07
 readingTime: "5 min"
@@ -10,9 +10,9 @@ products: ["resolution-chart"]
 sampleFiles: []
 faq:
   - q: "How do I calculate lp/mm from group and element?"
-    a: "Resolution in line pairs per millimetre is 2 to the power of (group + (element − 1) / 6). Group 2, element 3 is 2^(2 + 2/6) = 5.04 lp/mm."
+    a: "Resolution in line pairs per millimeter is 2 to the power of (group + (element − 1) / 6). Group 2, element 3 is 2^(2 + 2/6) = 5.04 lp/mm."
   - q: "What is the line width for an element?"
-    a: "One line pair is one dark bar plus one light space, so the width of one bar is 1 / (2 × lp/mm) millimetres. At 5.04 lp/mm a bar is about 99 µm wide."
+    a: "One line pair is one dark bar plus one light space, so the width of one bar is 1 / (2 × lp/mm) millimeters. At 5.04 lp/mm a bar is about 99 µm wide."
   - q: "Do the values apply on the sensor or on the chart?"
     a: "The table gives the resolution on the chart itself. To get the resolution at the sensor, multiply by the inverse of the magnification; to compare with pixel size, use the Nyquist limit of 1 / (2 × pixel pitch)."
   - q: "Is a USAF chart enough to measure MTF?"
@@ -35,7 +35,7 @@ From one element to the next, the spatial frequency rises by the sixth root of 2
 
 - **Line length:** each bar is five times as long as it is wide.
 
-## Line pairs per millimetre (lp/mm)
+## Line pairs per millimeter (lp/mm)
 
 | Element | Group -2 | Group -1 | Group 0 | Group 1 | Group 2 | Group 3 |
 |---|---|---|---|---|---|---|
@@ -57,7 +57,7 @@ From one element to the next, the spatial frequency rises by the sixth root of 2
 
 ## Line width (µm)
 
-Width of one bar or one space, in micrometres.
+Width of one bar or one space, in micrometers.
 
 | Element | Group -2 | Group -1 | Group 0 | Group 1 | Group 2 | Group 3 |
 |---|---|---|---|---|---|---|
@@ -81,7 +81,7 @@ Width of one bar or one space, in micrometres.
 
 Image the chart in focus and evenly lit. Start at the large groups and move to smaller ones. The limit is the smallest element where you can still see all three bars as separate, in both the horizontal and the vertical set.
 
-Check the centre and the corners of the field: lenses usually resolve less at the edge. If horizontal and vertical bars stop at different elements, the lens may have astigmatism or the sensor may be sampling unevenly.
+Check the center and the corners of the field: lenses usually resolve less at the edge. If horizontal and vertical bars stop at different elements, the lens may have astigmatism or the sensor may be sampling unevenly.
 
 ## From chart to sensor
 

@@ -585,14 +585,14 @@ function fb(handle: string, title: string, desc: string, opts: Product['options'
 }
 
 const FALLBACK_PRODUCTS: Product[] = [
-  fb('checkerboard-composite', 'Checkerboard Calibration Target, Aluminium Composite',
-    'Aluminium composite, fine or coarse pattern.',
+  fb('checkerboard-composite', 'Checkerboard Calibration Target, Aluminum Composite',
+    'Aluminum composite, fine or coarse pattern.',
     [
       { name: 'Size', values: ['200 × 150', '300 × 200', '400 × 300', '600 × 400', '800 × 600'] },
       { name: 'Pattern', values: ['7×10, 25 mm', '9×6, 30 mm', '5×8, 40 mm'] },
     ], '/targets/checkerboard-composite/'),
-  fb('charuco-composite', 'ChArUco Calibration Target, Aluminium Composite',
-    'Aluminium composite, UV-printed matte pattern, 6 mm thick.',
+  fb('charuco-composite', 'ChArUco Calibration Target, Aluminum Composite',
+    'Aluminum composite, UV-printed matte pattern, 6 mm thick.',
     [
       { name: 'Size', values: ['200 × 150', '300 × 200', '400 × 300', '600 × 400', '800 × 600'] },
       { name: 'Dictionary', values: ['DICT_6X6_250', 'DICT_5X5_100', 'DICT_4X4_50', 'AprilTag 36h11'] },
@@ -604,24 +604,24 @@ const FALLBACK_PRODUCTS: Product[] = [
       { name: 'Dictionary', values: ['DICT_6X6_250', 'DICT_5X5_100'] },
     ], '/targets/charuco-ceramic/'),
   fb('mounting-fixture', 'Target Mounting Fixture, ¼″-20',
-    '¼″ thread, aluminium, fits all boards.',
+    '¼″ thread, aluminum, fits all boards.',
     [], '/targets/mounting-fixture/'),
   fb('certificate-ilac', 'ILAC calibration certificate',
     'ILAC-recognised dimensional calibration certificate.',
     [], '/targets/certificate-ilac/'),
-  fb('aprilgrid-composite', 'AprilGrid Calibration Target, Aluminium Composite',
-    'Aluminium composite, AprilTag 36h11, for Kalibr camera–IMU calibration.',
+  fb('aprilgrid-composite', 'AprilGrid Calibration Target, Aluminum Composite',
+    'Aluminum composite, AprilTag 36h11, for Kalibr camera–IMU calibration.',
     [
       { name: 'Size', values: ['200 × 150', '300 × 200', '400 × 300', '600 × 400', '800 × 600'] },
     ], '/targets/aprilgrid-composite/'),
-  fb('circlegrid-composite', 'Circle Grid Calibration Target, Aluminium Composite',
-    'Aluminium composite, symmetric or asymmetric circle grid.',
+  fb('circlegrid-composite', 'Circle Grid Calibration Target, Aluminum Composite',
+    'Aluminum composite, symmetric or asymmetric circle grid.',
     [
       { name: 'Size', values: ['200 × 150', '300 × 200', '400 × 300', '600 × 400', '800 × 600'] },
       { name: 'Layout', values: ['Symmetric', 'Asymmetric'] },
     ], '/targets/circlegrid-composite/'),
-  fb('halcon-composite', 'HALCON Calibration Plate, Aluminium Composite',
-    'Aluminium composite, MVTec HALCON mark layout.',
+  fb('halcon-composite', 'HALCON Calibration Plate, Aluminum Composite',
+    'Aluminum composite, MVTec HALCON mark layout.',
     [
       { name: 'Size', values: ['200 × 150', '300 × 200', '400 × 300', '600 × 400', '800 × 600'] },
     ], '/targets/halcon-composite/'),
@@ -658,7 +658,7 @@ const FALLBACK_PRODUCTS: Product[] = [
 ];
 
 const FALLBACK_COLLECTIONS: Collection[] = [
-  { handle: 'composite-boards', title: 'Aluminium Composite Targets', description: '200–1200 mm, rigid, matte, outdoor-safe.', products: FALLBACK_PRODUCTS.filter((p) => p.handle.includes('composite')) },
+  { handle: 'composite-boards', title: 'Aluminum Composite Targets', description: '200–1200 mm, rigid, matte, outdoor-safe.', products: FALLBACK_PRODUCTS.filter((p) => p.handle.includes('composite')) },
   { handle: 'ceramic-glass', title: 'Ceramic & Glass Targets', description: 'Lithographed, ±2 µm (target).', products: FALLBACK_PRODUCTS.filter((p) => p.handle.includes('ceramic')) },
   { handle: 'lidar-image-quality', title: 'LiDAR & Image Quality Targets', description: 'Reflectance panels and ISO 12233 charts.', products: FALLBACK_PRODUCTS.filter((p) => ['reflectance-panel', 'resolution-chart'].includes(p.handle)) },
   { handle: 'multi-sensor', title: 'Multi-Sensor & Specialty Targets', description: 'LiDAR, radar, thermal, NIR, depth, hand-eye, multi-camera and line-scan targets.', products: FALLBACK_PRODUCTS.filter((p) => MULTI_SENSOR_HANDLES.includes(p.handle)) },

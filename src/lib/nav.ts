@@ -111,7 +111,7 @@ export const footerGroups: FooterGroup[] = [
     items: [
       { label: 'All targets', href: '/targets/' },
       { label: 'Targets by application', href: '/applications/' },
-      { label: 'Aluminium Composite Targets', href: '/targets/collection/composite-boards/' },
+      { label: 'Aluminum Composite Targets', href: '/targets/collection/composite-boards/' },
       { label: 'Ceramic & Glass Targets', href: '/targets/collection/ceramic-glass/' },
       { label: 'LiDAR & Image Quality Targets', href: '/targets/collection/lidar-image-quality/' },
       { label: 'Multi-Sensor & Specialty Targets', href: '/targets/collection/multi-sensor/' },

@@ -35,7 +35,7 @@ This guide walks through the whole job in OpenCV with Python: choosing and sizin
 
 - **Pose per image** — rotation and translation of the board in each view, plus the RMS reprojection error over all views.
 
-With `K` and the distortion coefficients you can undistort images, measure in millimetres, estimate object poses with `solvePnP`, and feed stereo calibration.
+With `K` and the distortion coefficients you can undistort images, measure in millimeters, estimate object poses with `solvePnP`, and feed stereo calibration.
 
 ## 1. Choose a pattern
 
@@ -55,7 +55,7 @@ Generate the pattern with the free [ChArUco generator](/tools/generator/charuco/
 
 Use the **measured** square size in your code. Glue the print to something flat and stiff; a bent target adds error that no amount of images will remove.
 
-For repeatable results, especially below 0.2 px, use a rigid board made to known dimensions, such as an [aluminium composite](/targets/charuco-composite/) or [ceramic](/targets/charuco-ceramic/) ChArUco target.
+For repeatable results, especially below 0.2 px, use a rigid board made to known dimensions, such as an [aluminum composite](/targets/charuco-composite/) or [ceramic](/targets/charuco-ceramic/) ChArUco target.
 
 ## 4. Capture good images
 
@@ -69,7 +69,7 @@ The images decide the result. Before you start, fix the camera settings you will
 
 Then take 15 to 30 views and vary them deliberately:
 
-- Move the board into all four image corners and along the edges, not only the centre.
+- Move the board into all four image corners and along the edges, not only the center.
 
 - Tilt it up to about 45° around both axes. Tilt is what pins down the focal length.
 
@@ -79,7 +79,7 @@ Then take 15 to 30 views and vary them deliberately:
 
 ## 5. Detect the corners
 
-For a **ChArUco** board (OpenCV 4.7 and later), set up the board with the same geometry you printed. The board size is (columns, rows) in squares; sizes are in metres or millimetres, as long as you stay consistent:
+For a **ChArUco** board (OpenCV 4.7 and later), set up the board with the same geometry you printed. The board size is (columns, rows) in squares; sizes are in meters or millimeters, as long as you stay consistent:
 
 ```python
 import glob
@@ -150,7 +150,7 @@ Then run a few sanity checks:
 
 - **A few views much worse than the rest** — usually blur or a bad detection. Remove them and calibrate again.
 
-- **Principal point** — `cx`, `cy` should sit near the image centre, typically within a few percent of the width.
+- **Principal point** — `cx`, `cy` should sit near the image center, typically within a few percent of the width.
 
 - **fx and fy** — nearly equal for square pixels.
 

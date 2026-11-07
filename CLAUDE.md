@@ -2,13 +2,13 @@
 
 Marketing + tools site for calib.tools. Astro 5 (static) + Tailwind + React islands.
 Shop (cart, checkout, tax) lives on Shopify at shop.calib.tools; this site renders
-catalogue pages from the Storefront API and links into the cart.
+catalog pages from the Storefront API and links into the cart.
 
 ## What matters most
 - Every pattern tool must be geometrically identical to what OpenCV expects.
   Geometry lives ONLY in `src/lib/patterns.ts` (to become `packages/core`). Never
   reimplement coordinates, IDs or dictionary bits inside a component or page.
-- Printed output is 1:1 in millimetres. SVG/PDF use mm units with a 100 mm scale bar.
+- Printed output is 1:1 in millimeters. SVG/PDF use mm units with a 100 mm scale bar.
   Any change to `src/lib/patterns.ts` or PDF export needs a test and `/verify-pdf`.
 - Tools run entirely in the browser. No upload of images or calibration files, ever.
 - Design direction A (see docs/design.md): red #E60012 / dark red #B3000E on white,
@@ -24,6 +24,7 @@ catalogue pages from the Storefront API and links into the cart.
 ## Conventions
 - No personal names anywhere: not on the site, in copy, metadata, structured data, PDFs, review replies or docs. Sign as "Calib.Tools" or "Calib.Tools Engineering"; use role mailboxes (hello@, support@ …), never a personal address.
 - Brand in prose = Calib.Tools; domain/URLs/logo stay lowercase calib.tools.
+- Spelling: US English (millimeters, aluminum, color, center, optimize, catalog). Code identifiers, API fields, URL slugs and quoted third-party text are left as they are.
 - Tool metadata lives in `src/lib/tools.ts` (single source of truth for live/coming-soon status).
 - Units: mm internally; px only for screen rendering.
 - Coordinates: OpenCV (origin top-left, x right, y down). Corner order = cv.findChessboardCorners.

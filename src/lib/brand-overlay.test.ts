@@ -116,7 +116,7 @@ describe('family-set board ID ranges', () => {
   });
 });
 
-describe('colour correction', () => {
+describe('color correction', () => {
   it('mobile hero board-face mean channels are within ±3 after correction', () => {
     // Run a quick Python check on the output WebP
     const result = execSync(

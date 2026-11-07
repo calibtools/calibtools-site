@@ -45,7 +45,7 @@ export interface Review {
   consent?: true;
   /** Relationship between reviewer and Calib.Tools (required for imported reviews). */
   materialConnection?: MaterialConnection;
-  /** Reviewer's organisation (optional, imported only). */
+  /** Reviewer's organization (optional, imported only). */
   reviewerOrg?: string;
   /** ISO-2 country code (optional, imported only). */
   country?: string;

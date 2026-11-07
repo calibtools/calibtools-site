@@ -2,7 +2,7 @@
  * Calib.Tools customer-document system.
  *
  * TypeScript port of ctdoc.py — faithful reproduction of every CSS rule,
- * component function, and layout behaviour.
+ * component function, and layout behavior.
  *
  * Usage
  * -----
@@ -25,7 +25,7 @@ import {
 } from './geometry';
 import { CONTACT_LINE } from '../lib/reportConfig';
 
-// ----------------------------------------------------------------- brand colours (brand guidelines p. 05)
+// ----------------------------------------------------------------- brand colors (brand guidelines p. 05)
 export const BLACK = '#000000';
 export const WHITE = '#FFFFFF';
 export const RED = '#E60012';
@@ -41,7 +41,7 @@ export const PAPER: Record<string, [number, number]> = {
   A4: [210.0, 297.0],
   Letter: [215.9, 279.4],
 };
-export const CONTENT_W = 178.0; // mm, identical on both papers (centred)
+export const CONTENT_W = 178.0; // mm, identical on both papers (centered)
 export const HDR_TOP = 10.0;
 export const BODY_TOP = 21.0;
 export const BODY_BOTTOM = 16.0;
@@ -463,7 +463,7 @@ export function stamp_svg(
   rotate: number = STAMP_ROTATION,
 ): string {
   const ink = STAMP_INK;
-  const R = 160; // centre in SVG coords (viewBox 320×320)
+  const R = 160; // center in SVG coords (viewBox 320×320)
   const top = STAMP_TOP_TEXT;
   const bottom = STAMP_BOTTOM_TEXT;
 
@@ -608,7 +608,10 @@ export class Doc {
     fs.mkdirSync(path.dirname(outBase), { recursive: true });
 
     const report: Record<string, Array<{ page: number; over_mm: number; over_w_mm: number; free_mm: number }>> = {};
-    const browser = await chromium.launch();
+    // CT_CHROMIUM_PATH lets a machine without the Playwright download use a system Chrome.
+    const browser = await chromium.launch(
+      process.env.CT_CHROMIUM_PATH ? { executablePath: process.env.CT_CHROMIUM_PATH } : {},
+    );
 
     for (const paper of papers) {
       const [W, H] = PAPER[paper];

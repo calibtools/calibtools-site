@@ -30,14 +30,14 @@ SVGs have non-standard viewBoxes (negative origins). Size only with CSS `height`
 - Around the C.T icon: clear space = 0.25 × icon diameter D.
 - Minimum rendered widths: lockup 140 px, compact wordmark 90 px, icon 16 px.
 
-## Colour — red accent rule
+## Color — red accent rule
 
 Red `#E60012` is used **only as an accent** — roughly 1 % of any layout: the square point, the X-axis arrow,
-CTA buttons, and small highlights. It is never used as a background fill, full-width stripe, body-text colour,
+CTA buttons, and small highlights. It is never used as a background fill, full-width stripe, body-text color,
 or large typographic element. On the home page only the two CTA buttons may use red as a background.
 Source: `06-colours/colours.json` in the brand kit.
 
-### Colour token usage by surface
+### Color token usage by surface
 
 | Token | Hex | Use |
 |---|---|---|
@@ -78,32 +78,32 @@ Manifest: `/site.webmanifest` (standalone, references `android-chrome-*.png` and
 
 ### Deliberate additions outside the brand kit
 
-- **Geist Pixel Square** — used only for the inspection stamp centre word and rare display accents.
+- **Geist Pixel Square** — used only for the inspection stamp center word and rare display accents.
   Never for body text, UI elements, or headings.
-- **Dark-theme red text `#FF3B47`** — see Colour section above.
+- **Dark-theme red text `#FF3B47`** — see Color section above.
 
 ### Label line on product images
 
 The label at the bottom of each target image uses: compact wordmark outline
 (`05-product-marking/laser-wordmark-compact-mono.svg`) scaled so its cap height = 1 % of board height,
-followed by Geist Mono at 0.86 × that cap height, colour Grey 80 `#333333` at 100 % opacity,
+followed by Geist Mono at 0.86 × that cap height, color Gray 80 `#333333` at 100 % opacity,
 three-space gaps between fields: wordmark, part number, pattern summary, serial + revision.
 
 > **Note:** the kit's own label-line example (`label-line-example.pdf`) still shows the superseded
 > part number `300240-2500`. The site's `scripts/brand-overlay.py` config block is the source of truth
 > for current part numbers.
 
-## Grey tokens
+## Gray tokens
 
 Kit names (from `calibtools-tokens.css`) are exposed as `--ct-grey-*` CSS custom properties in `global.css`:
 
 | Kit name | Hex | Tailwind token | Role |
 |---|---|---|---|
-| Grey 80 | `#333333` | `ink-muted` | Body text, product label lines |
-| Grey 60 | `#666666` | `ink-soft` | Secondary text, dimension lines |
-| Grey 30 | `#B3B3B3` | `line-soft` | Rules, borders, disabled UI |
-| Grey 10 | `#E6E6E6` | `line` | Panels, table stripes |
-| Grey 05 | `#F2F2F2` | `ground-alt` | Page tints, photo backdrops |
+| Gray 80 | `#333333` | `ink-muted` | Body text, product label lines |
+| Gray 60 | `#666666` | `ink-soft` | Secondary text, dimension lines |
+| Gray 30 | `#B3B3B3` | `line-soft` | Rules, borders, disabled UI |
+| Gray 10 | `#E6E6E6` | `line` | Panels, table stripes |
+| Gray 05 | `#F2F2F2` | `ground-alt` | Page tints, photo backdrops |
 
 ## Claims (src/lib/claims.ts)
 

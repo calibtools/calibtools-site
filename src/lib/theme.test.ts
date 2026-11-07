@@ -51,14 +51,14 @@ print('OK')
     expect(result.trim()).toBe('OK');
   });
 
-  it('favicon-32x32.png centre pixel is opaque', () => {
+  it('favicon-32x32.png center pixel is opaque', () => {
     const result = execSync(
       `python3 -c "
 from PIL import Image
 img = Image.open('public/favicon-32x32.png').convert('RGBA')
 w, h = img.size
 c = img.getpixel((w//2, h//2))
-assert c[3] == 255, f'Centre alpha {c[3]} != 255'
+assert c[3] == 255, f'Center alpha {c[3]} != 255'
 print('OK')
 "`,
       { encoding: 'utf-8', cwd: new URL('../..', import.meta.url).pathname },
@@ -84,7 +84,7 @@ describe('light theme tokens', () => {
   });
 });
 
-describe('brand colour consistency', () => {
+describe('brand color consistency', () => {
   it('no #E60113 remains in src/ or public/', () => {
     const result = execSync(
       'grep -r "#E60113" src/ public/ --include="*.svg" --include="*.astro" --include="*.tsx" --include="*.css" --include="*.mjs" | grep -v "theme.test.ts" || true',

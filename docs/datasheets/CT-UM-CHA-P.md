@@ -1,6 +1,6 @@
 ---
 code: CT-UM-CHA-P
-title: ChArUco Calibration Target, Aluminium Composite — Quick start
+title: ChArUco Calibration Target, Aluminum Composite — Quick start
 type: manual
 rev: A
 date: 2026-10-24
@@ -15,7 +15,7 @@ Printed in the edge strip: `DICT_6X6_250`, `DICT_5X5_100`, `DICT_4X4_50` or `Apr
 
 ## 2. Three things ChArUco lets you do that a plain checkerboard does not
 
-- **Push the board into the image corners.** Partial views are fine; every detected marker identifies its neighbouring corners. Lens distortion is constrained best at the image edges, so use this.
+- **Push the board into the image corners.** Partial views are fine; every detected marker identifies its neighboring corners. Lens distortion is constrained best at the image edges, so use this.
 - **Calibrate multi-camera rigs with partial overlap.** Cameras that see different parts of the same board still share a common coordinate frame.
 - **Skip the "full board visible" check** that fails so many checkerboard images.
 
@@ -29,7 +29,7 @@ Printed in the edge strip: `DICT_6X6_250`, `DICT_5X5_100`, `DICT_4X4_50` or `Apr
 
 ## 4. OpenCV in five lines
 
-Units: if you pass mm here, your extrinsics come out in mm. Pass metres for ROS conventions.
+Units: if you pass mm here, your extrinsics come out in mm. Pass meters for ROS conventions.
 
 ## 5. Common problems
 

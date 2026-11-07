@@ -28,7 +28,7 @@ function read(rel: string): string {
 describe('returns.astro copy', () => {
   const src = read('src/pages/returns.astro');
   it('has the approved h1', () => expect(src).toContain('Returns &amp; refunds'));
-  it('mentions RA workflow', () => expect(src).toContain('return authorisation (RA) number'));
+  it('mentions RA workflow', () => expect(src).toContain('return authorization (RA) number'));
   it('mentions packing instructions', () => expect(src).toContain('pattern facing the top foam'));
 });
 

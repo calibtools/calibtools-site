@@ -6,13 +6,13 @@
 import { idRange } from './idRange';
 
 // ---------------------------------------------------------------------------
-// Colour constants
+// Color constants
 // ---------------------------------------------------------------------------
 
 export const BRAND_RED = '#E60012';
 export const BRAND_INK = '#1A1A1A';
 
-/** pdf-lib colour triplets (0–1 range) */
+/** pdf-lib color triplets (0–1 range) */
 export const BRAND_RED_RGB = { r: 230 / 255, g: 0, b: 18 / 255 } as const;
 export const BRAND_INK_RGB = { r: 26 / 255, g: 26 / 255, b: 26 / 255 } as const;
 
@@ -23,6 +23,18 @@ export const BRAND_INK_RGB = { r: 26 / 255, g: 26 / 255, b: 26 / 255 } as const;
 export const BRAND_URL = 'calib.tools';
 export const BRAND_NAME = 'Calib.Tools';
 export const BRAND_EMAIL = 'hello@calib.tools';
+
+// ---------------------------------------------------------------------------
+// Vision, mission, one-liner (verbatim; the only place these sentences live).
+// TAGLINE lives in ./claims.ts.
+// ---------------------------------------------------------------------------
+
+export const VISION =
+  'A world where every machine that sees knows exactly what its pixels mean in the physical world.';
+export const MISSION =
+  'We make the physical references that turn pixels into millimeters — targets, files and measurement data — and we publish exactly how each file maps to each object, so any engineer can check it. The tools stay free.';
+export const ONE_LINER =
+  'Calib.Tools builds the bridge between digital measurement and the physical world: calibration targets whose files, geometry and data agree.';
 
 // ---------------------------------------------------------------------------
 // Pattern summary

@@ -1,6 +1,6 @@
 ---
 code: CT-UM-CHT-P
-title: Checkerboard Calibration Target, Aluminium Composite — Quick start
+title: Checkerboard Calibration Target, Aluminum Composite — Quick start
 type: manual
 rev: A
 date: 2026-10-24
@@ -20,7 +20,7 @@ Detectors want inner corners, not squares. A 7 × 10 board has **6 × 9** inner 
 ## 3. Capture checklist
 
 - 15–25 images; board filling 30–70 % of the frame.
-- Tilt ±30–45° both axes; move the board to all regions of the image across the set (centre, edges, corners) while keeping it fully visible.
+- Tilt ±30–45° both axes; move the board to all regions of the image across the set (center, edges, corners) while keeping it fully visible.
 - Vary distance 2×. Keep focus sharp.
 - Avoid glare: matte print tolerates most lighting, but a light behind the camera reflecting off a tilted board still washes out contrast.
 

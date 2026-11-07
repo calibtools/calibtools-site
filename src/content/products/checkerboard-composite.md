@@ -1,5 +1,5 @@
 ---
-seoTitle: "Checkerboard calibration target, aluminium"
+seoTitle: "Checkerboard calibration target, aluminum"
 seoDescription: "A rigid checkerboard calibration target every toolchain reads. When the whole board fits in your frame, it gives you the most accurate corners. 200–800 mm."
 summary: "The classic checkerboard — your sharpest corners when the whole board is in view"
 decideSpecs:

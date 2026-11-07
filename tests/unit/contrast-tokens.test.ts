@@ -4,7 +4,7 @@ import { describe, it, expect } from 'vitest';
  * CONTRAST-1 guard: WCAG 2.1 contrast ratio for every brand-on-surface pair.
  *
  * Computes relative luminance per WCAG 2.1 and verifies that every
- * (text colour, surface) pair marked as "on" meets 4.5:1.
+ * (text color, surface) pair marked as "on" meets 4.5:1.
  */
 
 /** Parse "R G B" triplet or hex to [r, g, b] in 0–255. */
@@ -31,7 +31,7 @@ function luminance([r, g, b]: [number, number, number]): number {
   return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
 }
 
-/** WCAG contrast ratio between two colours. */
+/** WCAG contrast ratio between two colors. */
 function contrastRatio(a: [number, number, number], b: [number, number, number]): number {
   const la = luminance(a);
   const lb = luminance(b);

@@ -197,16 +197,16 @@ describe('CT-DS PDF title matches markdown source', () => {
       // Extract page-1 text with pdftotext
       const pdfPath = `${outBase}.pdf`;
       const text = execFileSync('pdftotext', ['-f', '1', '-l', '1', pdfPath, '-'], { encoding: 'utf-8' });
-      const normalised = text.replace(/\s+/g, ' ').trim();
+      const normalized = text.replace(/\s+/g, ' ').trim();
 
       // Read the expected title from the markdown source
       const mdPath = resolve(process.cwd(), `docs/datasheets/${code}.md`);
       const md = readFileSync(mdPath, 'utf-8');
       const { meta } = parseFrontMatter(md);
 
-      // Title may wrap across lines in pdftotext output — normalise both
+      // Title may wrap across lines in pdftotext output — normalize both
       const expectedWords = meta.title.replace(/\s+/g, ' ').trim();
-      expect(normalised).toContain(expectedWords);
+      expect(normalized).toContain(expectedWords);
     });
   }
 });

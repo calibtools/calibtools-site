@@ -21,7 +21,7 @@ import {
 import { getArUcoDict, decodeMarkerBits } from './dicts/dicts';
 import type { PageLayout } from './pageLayout';
 
-/** Conversion factor: millimetres → PDF points. */
+/** Conversion factor: millimeters → PDF points. */
 export const MM = 72 / 25.4;
 
 export interface PdfExportOptions {

@@ -28,7 +28,7 @@ export interface DatasheetEntry {
   material: string;
   pages: number;
   url: string;
-  /** Product name from the datasheet markdown frontmatter (e.g. "ChArUco Calibration Target, Aluminium Composite"). */
+  /** Product name from the datasheet markdown frontmatter (e.g. "ChArUco Calibration Target, Aluminum Composite"). */
   name: string;
 }
 

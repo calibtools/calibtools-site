@@ -1,19 +1,19 @@
 ---
-seoDescription: "Rigid aluminium composite boards with a matte UV-printed pattern — the board most of your robotics and vision work needs. 200–800 mm, larger on request."
-title: "Aluminium Composite Targets"
-description: "Rigid aluminium composite, matte UV print. Built for your bench and the field."
+seoDescription: "Rigid aluminum composite boards with a matte UV-printed pattern — the board most of your robotics and vision work needs. 200–800 mm, larger on request."
+title: "Aluminum Composite Targets"
+description: "Rigid aluminum composite, matte UV print. Built for your bench and the field."
 sellingPoints:
-  - "Flat, light and tough: a matte pattern UV-printed on rigid aluminium composite"
+  - "Flat, light and tough: a matte pattern UV-printed on rigid aluminum composite"
   - "Measured before it ships, with config files for OpenCV, Kalibr, ROS 2 and HALCON"
 color: brand
 pairsWith:
   - mounting-fixture
 specsTable:
-  - { label: "Substrate", value: "Aluminium / LDPE / aluminium composite" }
+  - { label: "Substrate", value: "Aluminum / LDPE / aluminum composite" }
   - { label: "Thickness", value: "6 mm" }
   - { label: "Print", value: "Direct UV print, matte, black on white" }
   - { label: "Feature tolerance", value: "±0.3 mm + 0.2 mm/m (at 20 °C)" }
-  - { label: "Flatness", value: "≤ 0.5 mm per metre (three-point support)" }
+  - { label: "Flatness", value: "≤ 0.5 mm per meter (three-point support)" }
   - { label: "Operating temperature", value: "−50 to +80 °C" }
   - { label: "Weight", value: "6.6 kg/m² (300 × 200: ≈ 0.4 kg)" }
 brandNote: "We make the board we would want on our own bench: flat, measured, and printed with its own parameters, so nobody has to guess them later."
@@ -21,7 +21,7 @@ brandNote: "We make the board we would want on our own bench: flat, measured, an
 
 ## Overview
 
-This is the board most of your calibration work needs. The aluminium composite stays flat when the lab warms up, and it survives being carried to the robot cell, the test track or the field.
+This is the board most of your calibration work needs. The aluminum composite stays flat when the lab warms up, and it survives being carried to the robot cell, the test track or the field.
 
 We UV-print the pattern to ±0.3 mm + 0.2 mm/m (any corner to nominal, at 20 °C). That covers most robotics and machine-vision jobs. Every board is measured before it ships.
 
