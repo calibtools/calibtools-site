@@ -11,6 +11,10 @@ products:
   - "charuco-composite"
   - "checkerboard-composite"
   - "charuco-ceramic"
+  - "color-chart"
+  - "grayscale-oecf-chart"
+  - "focus-siemens-star-chart"
+  - "resolution-targets-glass"
 links:
   - { label: "USAF 1951 lp/mm table", href: "/guides/usaf-1951-lp-mm-table/" }
   - { label: "FOV calculator", href: "/tools/fov/" }

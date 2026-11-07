@@ -13,6 +13,9 @@ products:
   - "checkerboard-composite"
   - "line-scan-target"
   - "resolution-chart"
+  - "grid-distortion-target"
+  - "resolution-targets-glass"
+  - "backlit-target"
 links:
   - { label: "FOV calculator", href: "/tools/fov/" }
   - { label: "Format converter", href: "/tools/convert/" }

@@ -10,6 +10,7 @@ products:
   - "thermal-calibration-target"
   - "nir-calibration-target"
   - "depth-camera-target"
+  - "backlit-target"
 links:
   - { label: "Camera calibration with OpenCV", href: "/guides/opencv-camera-calibration/" }
   - { label: "FOV calculator", href: "/tools/fov/" }

@@ -13,6 +13,7 @@ products:
   - "radar-camera-target"
   - "multi-camera-target"
   - "mounting-fixture"
+  - "backlit-target"
 links:
   - { label: "LiDAR–camera extrinsic calibration", href: "/guides/lidar-camera-calibration/" }
   - { label: "FOV calculator", href: "/tools/fov/" }

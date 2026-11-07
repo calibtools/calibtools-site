@@ -10,6 +10,9 @@ products:
   - "charuco-ceramic"
   - "resolution-chart"
   - "line-scan-target"
+  - "resolution-targets-glass"
+  - "grid-distortion-target"
+  - "focus-siemens-star-chart"
 links:
   - { label: "USAF 1951 lp/mm table", href: "/guides/usaf-1951-lp-mm-table/" }
   - { label: "FOV calculator", href: "/tools/fov/" }
