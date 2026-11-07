@@ -14,6 +14,7 @@ products:
   - "multi-camera-target"
   - "mounting-fixture"
 links:
+  - { label: "LiDAR–camera extrinsic calibration", href: "/guides/lidar-camera-calibration/" }
   - { label: "FOV calculator", href: "/tools/fov/" }
   - { label: "Pattern generator", href: "/tools/generator/" }
   - { label: "Request a quote", href: "/quote/" }
