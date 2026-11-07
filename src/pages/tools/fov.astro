@@ -13,7 +13,7 @@ const jsonLd = toolJsonLd(entry.data.h1, '/tools/fov/', entry.data.seoDescriptio
 <Base title={entry.data.seoTitle} section="tools" description={entry.data.seoDescription} jsonLd={jsonLd}>
   <ToolTabs current="fov" />
   <div class="container-x py-7 md:pb-16">
-    <FovCalculator client:load />
+    <FovCalculator client:load heading={entry.data.h1} />
   </div>
   <ToolContent Content={Content} faq={entry.data.faq} />
 </Base>
