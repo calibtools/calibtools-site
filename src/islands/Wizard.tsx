@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { SENSOR_PRESETS } from '@/lib/fov';
 import { ListChecks } from '@/lib/icons';
 import {
   recommend, MATERIALS,
@@ -6,7 +7,8 @@ import {
   type CameraType, type Environment, type ToolChain, type Recommendation,
 } from '@/lib/wizard';
 
-const STEPS = ['Application', 'Accuracy', 'Camera', 'Environment', 'Toolchain', 'Result'] as const;
+const STEPS = ['Application', 'Accuracy', 'Camera', 'Environment', 'Toolchain', 'Setup', 'Result'] as const;
+const PRESET_NAMES = Object.keys(SENSOR_PRESETS).filter((n) => n !== 'Custom');
 
 const APPLICATIONS: { value: Application; label: string; desc: string }[] = [
   { value: 'robotics', label: 'Robotics', desc: 'Robot arm, mobile robot, manipulation' },
@@ -50,6 +52,12 @@ export default function Wizard() {
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Partial<WizardAnswers>>({});
   const [result, setResult] = useState<Recommendation | null>(null);
+
+  const finish = (next: Partial<WizardAnswers>) => {
+    setAnswers(next);
+    setResult(recommend(next as WizardAnswers));
+    setStep(STEPS.length - 1);
+  };
 
   const set = <K extends keyof WizardAnswers>(key: K, value: WizardAnswers[K]) => {
     const next = { ...answers, [key]: value };
@@ -97,6 +105,12 @@ export default function Wizard() {
         {step === 4 && (
           <StepCard title="What calibration toolchain?" options={TOOLCHAINS} onSelect={(v) => set('toolchain', v)} />
         )}
+        {step === 5 && (
+          <SetupStep
+            onUse={(sensorW, sensorH, focal, distance) => finish({ ...answers, sensorW, sensorH, focal, distance })}
+            onSkip={() => finish({ ...answers, sensorW: undefined, sensorH: undefined, focal: undefined, distance: undefined })}
+          />
+        )}
         {step === STEPS.length - 1 && result && (
           <ResultView result={result} onRestart={restart} />
         )}
@@ -106,6 +120,44 @@ export default function Wizard() {
         )}
       </div>
     </section>
+  );
+}
+
+function SetupStep({ onUse, onSkip }: {
+  onUse: (sensorW: number, sensorH: number, focal: number, distance: number) => void;
+  onSkip: () => void;
+}) {
+  const [preset, setPreset] = useState('2/3" (IMX174)');
+  const [focal, setFocal] = useState(12);
+  const [distance, setDistance] = useState(500);
+  const p = SENSOR_PRESETS[preset];
+  const valid = focal > 0 && distance > 0 && p && p[0] > 0;
+  const field = 'w-full rounded border border-line bg-white px-3 py-[11px] text-[15px]';
+  return (
+    <div>
+      <h2 className="m-0 mb-1 text-lg font-bold">Camera setup (optional)</h2>
+      <p className="m-0 mb-4 text-sm text-ink-muted">Add your sensor, lens and working distance to size the squares for your setup.</p>
+      <div className="flex flex-col gap-3">
+        <label className="flex flex-col gap-2 text-[13px] font-semibold">Sensor
+          <select className={field} value={preset} onChange={(e) => setPreset(e.target.value)}>
+            {PRESET_NAMES.map((n) => <option key={n}>{n}</option>)}
+          </select>
+        </label>
+        <div className="grid grid-cols-2 gap-3">
+          <label className="flex flex-col gap-2 text-[13px] font-semibold">Focal length (mm)
+            <input className={field} type="number" min={1} step={0.5} value={focal} onChange={(e) => setFocal(+e.target.value)} />
+          </label>
+          <label className="flex flex-col gap-2 text-[13px] font-semibold">Working distance (mm)
+            <input className={field} type="number" min={1} value={distance} onChange={(e) => setDistance(+e.target.value)} />
+          </label>
+        </div>
+      </div>
+      <div className="mt-5 flex flex-wrap gap-3">
+        <button type="button" className="min-h-[44px] rounded bg-brand px-5 py-3 text-sm font-semibold text-white disabled:opacity-50" disabled={!valid} onClick={() => onUse(p[0], p[1], focal, distance)}>Use my setup</button>
+        <button type="button" className="min-h-[44px] rounded border border-ink px-5 py-3 text-sm font-medium" onClick={onSkip}>Skip</button>
+      </div>
+      <p className="m-0 mt-3 text-xs text-ink-muted">Sensor not listed? The <a href="/tools/fov/">FOV calculator</a> takes any sensor size.</p>
+    </div>
   );
 }
 
@@ -169,6 +221,7 @@ function ResultView({ result, onRestart }: { result: Recommendation; onRestart: 
           Start over
         </button>
       </div>
+      <p className="m-0 mt-4 text-sm text-ink-muted">To check board size, field of view and pixels per square for your camera, use the <a href="/tools/fov/">FOV calculator</a>.</p>
     </div>
   );
 }

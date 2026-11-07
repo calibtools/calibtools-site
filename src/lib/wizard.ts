@@ -63,10 +63,9 @@ export function recommend(a: WizardAnswers): Recommendation {
     cols = 6;
     reasoning.push('Kalibr works best with AprilGrid targets and the 36h11 tag family.');
   } else if (a.toolchain === 'halcon') {
-    pattern = 'HALCON-style dots';
-    rows = 7;
-    cols = 11;
-    reasoning.push('HALCON expects its own dot pattern format for find_caltab.');
+    pattern = 'Checkerboard';
+    reasoning.push('HALCON\u2019s plate finder only detects MVTec circle plates (frame and orientation mark), so a generated dot grid will not be found. For a printed pattern, use a checkerboard with the HALCON point-tuple export.');
+    reasoning.push('For production, use a HALCON calibration plate, which comes with its .descr file.');
   } else if (a.toolchain === 'opencv' || a.toolchain === 'ros') {
     pattern = 'ChArUco';
     reasoning.push('ChArUco boards give sub-pixel corner accuracy and work with partial occlusion.');
@@ -135,6 +134,6 @@ export function recommend(a: WizardAnswers): Recommendation {
 export const MATERIALS: Record<Material, { label: string; description: string }> = {
   paper: { label: 'Printed paper', description: 'Tape to a flat surface. Replace when worn.' },
   acrylic: { label: 'Acrylic / foam board', description: 'Lightweight, flat, and moisture-resistant.' },
-  aluminum: { label: 'Aluminum composite', description: 'Best flatness (±0.1 mm) and durability. Ships ready to use.' },
-  glass: { label: 'Glass plate', description: 'Laboratory-grade flatness. Fragile but precise.' },
+  aluminum: { label: 'Aluminum composite', description: 'Rigid and durable, flat to ≤ 0.5 mm per metre (see datasheet). Ships ready to use.' },
+  glass: { label: 'Glass plate', description: 'Very flat and dimensionally stable. Fragile.' },
 };

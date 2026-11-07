@@ -5,7 +5,7 @@ import { breadcrumbLd } from '@/lib/seo';
 const guides = (await getCollection('guides')).filter((g) => !g.data.draft).sort((a, b) => b.data.updated.valueOf() - a.data.updated.valueOf());
 const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: 'Guides' }]);
 ---
-<Base title="Calibration guides" section="guides" description="Practical guides to choosing and using camera calibration targets: substrates, pattern types, printing limits, and how to judge a calibration result." jsonLd={bcLd}>
+<Base title="Calibration guides" section="guides" description="Practical guides to camera calibration: OpenCV step by step, choosing a pattern, running several boards in one rig, and reading a USAF 1951 resolution chart." jsonLd={bcLd}>
   <section class="container-x flex flex-col gap-8 py-[var(--section-y)]">
     <span class="eyebrow">Knowledge base</span>
     <h1 class="h-display m-0 text-[36px] md:text-[48px]">Where calibration starts.</h1>
@@ -18,7 +18,7 @@ const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: 'Guides' }]);
             <span class="mt-1 text-[13px] font-mono text-ink-soft">{g.data.keyRule}</span>
           )}
           <span class="spec mt-1 text-xs text-ink-soft">
-            {g.data.updated.toISOString().slice(0, 10)} &middot; {g.data.readingTime ?? '5 min read'}
+            {g.data.updated.toISOString().slice(0, 10)} &middot; {g.data.readingTime ? `${g.data.readingTime} read` : '5 min read'}
           </span>
         </a>
       ))}

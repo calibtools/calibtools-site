@@ -21,9 +21,10 @@ describe('recommend', () => {
     expect(r.dict).toBe('DICT_APRILTAG_36h11');
   });
 
-  it('halcon toolchain → HALCON-style dots', () => {
+  it('halcon toolchain → checkerboard (generated dots are not HALCON plates)', () => {
     const r = recommend({ ...base, toolchain: 'halcon' });
-    expect(r.pattern).toBe('HALCON-style dots');
+    expect(r.pattern).toBe('Checkerboard');
+    expect(r.reasoning.some((s) => s.includes('HALCON calibration plate'))).toBe(true);
   });
 
   it('matlab toolchain → Checkerboard', () => {
