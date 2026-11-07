@@ -1,9 +1,9 @@
 ---
-seoDescription: "Reflectance panels and ISO 12233 resolution charts for your LiDAR intensity and image-quality tests. Each one built to your setup — ask for a quote."
+seoDescription: "Reflectance panels, ISO 12233 and color charts, gray-scale, Siemens star, USAF and glass metrology targets for LiDAR and image-quality tests. Ask for a quote."
 title: "LiDAR & Image Quality Targets"
-description: "Reflectance panels and ISO 12233 charts for your LiDAR and imaging tests."
+description: "Reflectance panels, test charts and glass metrology targets for your LiDAR and imaging tests."
 sellingPoints:
-  - "Reflectance panels and resolution charts for your LiDAR and image-quality testing"
+  - "Reflectance panels, test charts and glass metrology targets for LiDAR and image-quality testing"
   - "Built to your test setup: wavelength band, size, reflectance and mounting"
 color: amber
 pairsWith:
@@ -19,7 +19,15 @@ brandNote: "Tell us what you're testing. We would rather build the right target 
 
 These targets are for testing your sensors beyond geometric calibration.
 
-You'll find [reflectance panels](/targets/reflectance-panel/) for LiDAR intensity calibration and [ISO 12233 resolution charts](/targets/resolution-chart/) for MTF and SFR.
+- [Reflectance panels](/targets/reflectance-panel/) for LiDAR intensity calibration at 905 and 1550 nm.
+
+- [ISO 12233 and eSFR charts](/targets/resolution-chart/) for MTF and SFR, and [Siemens star and focus charts](/targets/focus-siemens-star-chart/) for lens alignment.
+
+- [24-patch color charts](/targets/color-chart/) and [gray-scale / OECF charts](/targets/grayscale-oecf-chart/) with measured patch data for ISP tuning.
+
+- [USAF 1951, Ronchi and glass scale targets](/targets/resolution-targets-glass/) and [grid distortion targets](/targets/grid-distortion-target/) for lens benches and measuring microscopes.
+
+- [Backlit targets](/targets/backlit-target/) for cameras that never get good front lighting.
 
 Targets for thermal, NIR, radar and multi-sensor setups are in [Multi-Sensor & Specialty Targets](/targets/collection/multi-sensor/).
 

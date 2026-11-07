@@ -5,7 +5,7 @@
  * Falls back to static data when env vars are missing so builds never fail.
  */
 
-import { MULTI_SENSOR_HANDLES } from './constants';
+import { MULTI_SENSOR_HANDLES, IMAGE_QUALITY_HANDLES } from './constants';
 import { fallbackMinEur } from './prices';
 
 // --- Config ---
@@ -631,6 +631,24 @@ const FALLBACK_PRODUCTS: Product[] = [
   fb('resolution-chart', 'ISO 12233 Resolution Test Chart',
     'Resolution test chart for imaging system evaluation.',
     [], '/targets/resolution-chart/'),
+  fb('color-chart', '24-Patch Color Chart',
+    'Measured-patch color chart for ISP tuning and camera module tests.',
+    [], '/targets/color-chart/'),
+  fb('grayscale-oecf-chart', 'Gray Scale and OECF Chart',
+    'Neutral step charts with measured densities for OECF, dynamic range and noise tests.',
+    [], '/targets/grayscale-oecf-chart/'),
+  fb('focus-siemens-star-chart', 'Siemens Star and Focus Chart',
+    'Siemens stars and focus charts, chrome on glass or printed A3.',
+    [], '/targets/focus-siemens-star-chart/'),
+  fb('resolution-targets-glass', 'USAF 1951, Ronchi and Glass Scale Targets',
+    'Chrome-on-glass resolution, scale and microscopy targets.',
+    [], '/targets/resolution-targets-glass/'),
+  fb('grid-distortion-target', 'Grid Distortion Target, Chrome on Glass',
+    'Cross-grid and dot-grid targets for lens distortion mapping.',
+    [], '/targets/grid-distortion-target/'),
+  fb('backlit-target', 'Backlit Calibration Target',
+    'Glass patterns over a uniform white or 850/940 nm LED backlight.',
+    [], '/targets/backlit-target/'),
   fb("lidar-camera-target", "LiDAR-Camera Calibration Target",
     "Joint target for camera–LiDAR extrinsic calibration.",
     [], '/targets/lidar-camera-target/'),
@@ -660,7 +678,7 @@ const FALLBACK_PRODUCTS: Product[] = [
 const FALLBACK_COLLECTIONS: Collection[] = [
   { handle: 'composite-boards', title: 'Aluminum Composite Targets', description: '200–1200 mm, rigid, matte, outdoor-safe.', products: FALLBACK_PRODUCTS.filter((p) => p.handle.includes('composite')) },
   { handle: 'ceramic-glass', title: 'Ceramic & Glass Targets', description: 'Lithographed, ±2 µm (target).', products: FALLBACK_PRODUCTS.filter((p) => p.handle.includes('ceramic')) },
-  { handle: 'lidar-image-quality', title: 'LiDAR & Image Quality Targets', description: 'Reflectance panels and ISO 12233 charts.', products: FALLBACK_PRODUCTS.filter((p) => ['reflectance-panel', 'resolution-chart'].includes(p.handle)) },
+  { handle: 'lidar-image-quality', title: 'LiDAR & Image Quality Targets', description: 'Reflectance panels, test charts and glass metrology targets.', products: FALLBACK_PRODUCTS.filter((p) => IMAGE_QUALITY_HANDLES.includes(p.handle)) },
   { handle: 'multi-sensor', title: 'Multi-Sensor & Specialty Targets', description: 'LiDAR, radar, thermal, NIR, depth, hand-eye, multi-camera and line-scan targets.', products: FALLBACK_PRODUCTS.filter((p) => MULTI_SENSOR_HANDLES.includes(p.handle)) },
   { handle: 'mounts-accessories', title: 'Mounts & Accessories', description: 'Fixtures, stands, robot flange, hard cases.', products: FALLBACK_PRODUCTS.filter((p) => p.handle === 'mounting-fixture') },
 ];

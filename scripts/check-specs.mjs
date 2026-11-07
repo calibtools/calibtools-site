@@ -24,7 +24,7 @@ if (process.env.SKIP_SPECS_CHECK === '1') {
 
 const WITHDRAWN = new Set(['certificate-ilac']);
 const ACCESSORIES = new Set(['mounting-fixture']);
-const QUOTE_ONLY = new Set(['reflectance-panel', 'resolution-chart', "lidar-camera-target", "thermal-calibration-target", "nir-calibration-target", "depth-camera-target", "hand-eye-calibration-kit", "multi-camera-target", "line-scan-target", "radar-camera-target"]);
+const QUOTE_ONLY = new Set(['reflectance-panel', 'resolution-chart', 'color-chart', 'grayscale-oecf-chart', 'focus-siemens-star-chart', 'resolution-targets-glass', 'grid-distortion-target', 'backlit-target', "lidar-camera-target", "thermal-calibration-target", "nir-calibration-target", "depth-camera-target", "hand-eye-calibration-kit", "multi-camera-target", "line-scan-target", "radar-camera-target"]);
 
 // --- Label map: metafield key → possible rendered labels ---
 // Datasheet-sourced spec tables may use different labels than the metafield key.

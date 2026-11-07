@@ -22,6 +22,12 @@ export const PRODUCT_TO_COLLECTION: Record<string, string> = {
   'charuco-ceramic': 'ceramic-glass',
   'reflectance-panel': 'lidar-image-quality',
   'resolution-chart': 'lidar-image-quality',
+  'color-chart': 'lidar-image-quality',
+  'grayscale-oecf-chart': 'lidar-image-quality',
+  'focus-siemens-star-chart': 'lidar-image-quality',
+  'resolution-targets-glass': 'lidar-image-quality',
+  'grid-distortion-target': 'lidar-image-quality',
+  'backlit-target': 'lidar-image-quality',
   "lidar-camera-target": 'multi-sensor',
   "thermal-calibration-target": 'multi-sensor',
   "nir-calibration-target": 'multi-sensor',
@@ -45,5 +51,8 @@ export const COLLECTION_SIBLINGS = [
 /** Quote-only product families defined locally (no Shopify variants yet). */
 export const MULTI_SENSOR_HANDLES: string[] = ["lidar-camera-target", "thermal-calibration-target", "nir-calibration-target", "depth-camera-target", "hand-eye-calibration-kit", "multi-camera-target", "line-scan-target", "radar-camera-target"];
 
+/** Quote-only image-quality and metrology families defined locally (no Shopify variants yet). */
+export const IMAGE_QUALITY_HANDLES: string[] = ['reflectance-panel', 'resolution-chart', 'color-chart', 'grayscale-oecf-chart', 'focus-siemens-star-chart', 'resolution-targets-glass', 'grid-distortion-target', 'backlit-target'];
+
 /** Products sold on quote only: no cart, "Request a quote" CTA. */
-export const QUOTE_ONLY_HANDLES: string[] = ['reflectance-panel', 'resolution-chart', ...MULTI_SENSOR_HANDLES];
+export const QUOTE_ONLY_HANDLES: string[] = [...IMAGE_QUALITY_HANDLES, ...MULTI_SENSOR_HANDLES];
