@@ -1,4 +1,5 @@
 ---
+seoTitle: "Ceramic ChArUco calibration target"
 seoDescription: "Chrome lithographed on 3 mm alumina ceramic, ±2 µm target feature accuracy. For your calibrations where a printed board is too coarse. Matte, front-lit."
 summary: "Lithographed ceramic ChArUco — for when your target can't be the error budget"
 decideSpecs:
