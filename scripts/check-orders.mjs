@@ -15,7 +15,7 @@
  *   the property name does NOT start with underscore (_). Our properties
  *   "start_id" and "id_range" will appear by default.
  *
- *   To customise the packing slip template:
+ *   To customize the packing slip template:
  *   Settings → Shipping and delivery → Packing slips → Edit template
  *
  *   The Liquid template accesses properties via:
@@ -148,4 +148,4 @@ const withProps = orders.filter((o) =>
 
 console.log(`[check-orders] ${withProps.length}/${orders.length} orders have board-set properties.`);
 console.log('\nPacking slip: properties appear automatically unless prefixed with _.');
-console.log('Customise at: Settings → Shipping and delivery → Packing slips → Edit template.\n');
+console.log('Customize at: Settings → Shipping and delivery → Packing slips → Edit template.\n');

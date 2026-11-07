@@ -1,5 +1,5 @@
 /**
- * Pattern geometry — v0. Units: millimetres. Origin top-left, x right, y down (OpenCV convention).
+ * Pattern geometry — v0. Units: millimeters. Origin top-left, x right, y down (OpenCV convention).
  * This file is the seed of packages/core; keep it free of DOM and framework code.
  */
 import { svgOpen, svgClose, scaleBarSvg, axesSvg, cornerIdBadgeSvg, brandFooterSvg } from './svgLayers';
@@ -45,7 +45,7 @@ export interface PatternSpec {
 
   // Axes options (Step 7b)
   showAxes?: boolean;        // default true — draw coordinate-frame axes
-  monochromeAxes?: boolean;  // solid/dashed instead of coloured (for ceramic/glass)
+  monochromeAxes?: boolean;  // solid/dashed instead of colored (for ceramic/glass)
 
   // Corner ID badge (Step B5)
   showCornerBadge?: boolean;  // corner ID badge when startId ≠ 0 (default true)
@@ -65,7 +65,7 @@ export function innerCorners(rows: number, cols: number, square: number): Array<
 import type { PageLayout } from './pageLayout';
 
 /**
- * SVG of the pattern centred on a page of pw×ph mm, 1 user unit = 1 mm.
+ * SVG of the pattern centered on a page of pw×ph mm, 1 user unit = 1 mm.
  * If a PageLayout is provided, its geometry (orientation, ox/oy, brand, axes) is used.
  */
 export function checkerboardSvg(s: PatternSpec, pw: number, ph: number, layout?: PageLayout): string {

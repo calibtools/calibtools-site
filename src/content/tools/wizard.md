@@ -23,7 +23,7 @@ It handles edge cases like fisheye lenses (which favour ChArUco for partial view
 
 **Application** — select your domain: robotics, industrial inspection, automotive/ADAS, drone/aerial, medical imaging, research or other. This narrows the pattern and material options.
 
-**Accuracy** — choose high (< 0.1 px), medium (< 0.5 px) or low (< 1 px). High accuracy steers toward a rigid aluminium composite board instead of paper.
+**Accuracy** — choose high (< 0.1 px), medium (< 0.5 px) or low (< 1 px). High accuracy steers toward a rigid aluminum composite board instead of paper.
 
 **Camera** — mono, stereo, fisheye or multi-camera. Stereo and multi-camera setups favour ChArUco or AprilGrid because partial views are common.
 

@@ -5,7 +5,7 @@
  * One-time conversion: parse the bracket-framed wordmark SVG (outlined paths + rects)
  * and output a TypeScript data file with polyline vertices for DXF embedding.
  *
- * Cubic Bézier curves are linearised with adaptive subdivision (chord tolerance 0.5 units
+ * Cubic Bézier curves are linearized with adaptive subdivision (chord tolerance 0.5 units
  * in the SVG coordinate space — well under 0.01 mm at export scale).
  *
  * Usage: node scripts/svg-to-dxf-polylines.mjs

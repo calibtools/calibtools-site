@@ -40,7 +40,7 @@ describe('axesSvg', () => {
     expect(axesSvg(ctx)).toContain('calibtools-axes');
   });
 
-  it('monochrome mode uses #000 instead of colours and dashed Y', () => {
+  it('monochrome mode uses #000 instead of colors and dashed Y', () => {
     const svg = axesSvg(makeCtx({ monochromeAxes: true }));
     expect(svg).not.toContain('#E60012');
     expect(svg).not.toContain('#1BA55A');

@@ -38,7 +38,7 @@ const collections_ = defineCollection({
     seoTitle: z.string().min(25).max(60).optional(),
     seoDescription: z.string().min(120).max(160).optional(),
     sellingPoints: z.array(z.string()).length(2),
-    color: z.enum(['brand', 'slate-blue', 'amber', 'grey']),
+    color: z.enum(['brand', 'slate-blue', 'amber', 'gray']),
     pairsWith: z.array(z.string()).default([]),
     specsTable: z.array(z.object({ label: z.string(), value: z.string() })).default([]),
     brandNote: z.string().optional(),

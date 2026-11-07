@@ -38,7 +38,7 @@ const COMPAT: Record<FamilyKey, CompatRow[]> = {
     { tool: 'OpenCV', note: 'findCirclesGrid (symmetric and asymmetric)' },
     { tool: 'Kalibr', note: 'circlegrid target (symmetric grids)' },
     { tool: 'MATLAB', note: 'detectCircleGridPoints' },
-    { tool: 'HALCON', note: 'Circle centres as a point tuple for set_calib_data_calib_object' },
+    { tool: 'HALCON', note: 'Circle centers as a point tuple for set_calib_data_calib_object' },
   ],
   halcon: [
     { tool: 'HALCON', note: 'find_calib_object with the supplied .descr file' },

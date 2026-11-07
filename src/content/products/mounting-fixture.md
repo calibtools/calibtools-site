@@ -1,5 +1,5 @@
 ---
-seoDescription: "Clamp any Calib.Tools board, composite or ceramic, onto your tripod or lab post. Aluminium fixture with a ¼″-20 thread and soft jaws from 2 to 16 mm."
+seoDescription: "Clamp any Calib.Tools board, composite or ceramic, onto your tripod or lab post. Aluminum fixture with a ¼″-20 thread and soft jaws from 2 to 16 mm."
 summary: "¼″ fixture that clamps any of our boards onto your tripod or lab post"
 decideSpecs:
   - "Material"

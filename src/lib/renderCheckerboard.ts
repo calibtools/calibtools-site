@@ -10,7 +10,7 @@ import type { PatternSpec } from './patterns';
  * Options (via PatternSpec):
  * - `invert`: swap which squares are black ((r+c)%2 !== 0 instead of === 0)
  * - `radonCheckers`: add rx/ry corner radius (0.15 × square) for Radon/Deltille style
- * - `finderMarkers`: draw 3 grey circles at top-left, bottom-left, top-right corners
+ * - `finderMarkers`: draw 3 gray circles at top-left, bottom-left, top-right corners
  *   (OpenCV CALIB_CB_MARKER flag for findChessboardCornersSB)
  */
 export function renderCheckerboardSvg(s: PatternSpec, ox: number, oy: number): string {

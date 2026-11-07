@@ -119,7 +119,7 @@ test.describe('lightbox: mobile (390)', () => {
   });
 });
 
-test.describe('hero image behaviour', () => {
+test.describe('hero image behavior', () => {
   test('all images have cursor-zoom-in on the hero area', async ({ page }) => {
     await page.goto(PRODUCT_URL);
     const cursor = await page.locator('[data-hero-trigger]').evaluate(

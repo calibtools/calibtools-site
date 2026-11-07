@@ -4,7 +4,7 @@
 
 **Goal:** Every downloadable file the site generates carries a Calib.Tools brand block (logo mark + wordmark + info text), placed where it cannot interfere with pattern detection.
 
-**Architecture:** A single `src/lib/brand.ts` module owns all brand constants (logo SVG paths, colours, text builders). Export modules (PDF, SVG, PNG, DXF, config, zip) import from it. Static Geist TTF fonts are extracted from the `geist` npm package into `src/assets/fonts/` for pdf-lib embedding. OG image generation and placeholders are refactored to use `brand.ts` instead of inline duplicates.
+**Architecture:** A single `src/lib/brand.ts` module owns all brand constants (logo SVG paths, colors, text builders). Export modules (PDF, SVG, PNG, DXF, config, zip) import from it. Static Geist TTF fonts are extracted from the `geist` npm package into `src/assets/fonts/` for pdf-lib embedding. OG image generation and placeholders are refactored to use `brand.ts` instead of inline duplicates.
 
 **Tech Stack:** pdf-lib (PDF), @resvg/resvg-js (PNG raster in build scripts), jszip (zip bundling), vitest (tests). Astro 5, React 19, TypeScript, pnpm.
 
@@ -14,7 +14,7 @@
 
 | Action | Path | Responsibility |
 |--------|------|---------------|
-| Create | `src/lib/brand.ts` | All brand constants, logo SVG path data, colour tokens, `brandLine()`, `patternSummary()` |
+| Create | `src/lib/brand.ts` | All brand constants, logo SVG path data, color tokens, `brandLine()`, `patternSummary()` |
 | Create | `src/lib/brand.test.ts` | Unit tests for brand module |
 | Create | `src/assets/fonts/Geist-Regular.ttf` | Static font for pdf-lib body text |
 | Create | `src/assets/fonts/Geist-SemiBold.ttf` | Static font for pdf-lib headings |
@@ -128,7 +128,7 @@ describe('brand constants', () => {
     expect(BRAND_URL).toBe('calib.tools');
   });
 
-  it('LOGO_CELLS is a 3×3 grid (9 cells) with correct colours', () => {
+  it('LOGO_CELLS is a 3×3 grid (9 cells) with correct colors', () => {
     expect(LOGO_CELLS).toHaveLength(9);
     // Even indices (0,2,4,6,8) = red, odd (1,3,5,7) = ink
     LOGO_CELLS.forEach((cell, i) => {
@@ -196,7 +196,7 @@ Expected: FAIL — module `./brand` does not exist.
 Create `src/lib/brand.ts`:
 ```typescript
 /**
- * Brand constants — single source of truth for the Calib.Tools logo, colours,
+ * Brand constants — single source of truth for the Calib.Tools logo, colors,
  * wordmark, and info-block text across all export formats.
  *
  * Logo: 3×3 grid of squares. Even cells (0,2,4,6,8) = red #E60012,
@@ -220,7 +220,7 @@ export interface LogoCell {
   fill: string;
 }
 
-/** The 9 cells of the 3×3 logo mark with their fill colours. */
+/** The 9 cells of the 3×3 logo mark with their fill colors. */
 export const LOGO_CELLS: readonly LogoCell[] = Array.from({ length: 9 }, (_, i) => ({
   col: i % 3,
   row: Math.floor(i / 3),
@@ -296,7 +296,7 @@ Expected: All pass.
 git add src/lib/brand.ts src/lib/brand.test.ts
 git commit -m "feat: add src/lib/brand.ts — single source of brand constants
 
-Logo mark, wordmark, colours, patternSummary(), brandLine().
+Logo mark, wordmark, colors, patternSummary(), brandLine().
 All export modules will import from here."
 ```
 
@@ -310,7 +310,7 @@ All export modules will import from here."
 
 The footer must be placed ≥ 1.5 squares below the pattern, never overlapping the 100 mm scale bar. It contains:
 - **Left:** Logo mark (6 mm total) + wordmark "calib.tools" (Geist SemiBold, 4 mm cap height)
-- **Centre:** Pattern summary in GeistMono 2.4 mm
+- **Center:** Pattern summary in GeistMono 2.4 mm
 - **Right:** "calib.tools · {date}" in Geist Regular
 
 Constraints: No filled square in footer > one logo cell (≤ 2 mm). Logo mark ≥ 2 squares from nearest pattern square.
@@ -398,7 +398,7 @@ import {
   patternSummary,
 } from './brand';
 
-/** Conversion factor: millimetres → PDF points. */
+/** Conversion factor: millimeters → PDF points. */
 export const MM = 72 / 25.4;
 
 export interface PdfExportOptions {
@@ -543,7 +543,7 @@ export async function exportPdf({ spec, pw, ph }: PdfExportOptions): Promise<Uin
     // ".tools" in red
     page.drawText('.tools', { x: wmPx + calibW, y: wmPy, size: wordmarkSize, font: f.semiBold, color: rgb(BRAND_RED_RGB.r, BRAND_RED_RGB.g, BRAND_RED_RGB.b) });
 
-    // Centre: pattern summary
+    // Center: pattern summary
     const summary = patternSummary(spec);
     const boardSize = `${bw} × ${bh} mm`;
     const centreText = `${summary} · ${boardSize}`;
@@ -664,7 +664,7 @@ git add src/lib/exportPdf.ts src/lib/exportPdf.test.ts
 git commit -m "feat: add brand footer strip and metadata to generator PDF
 
 Footer placed ≥ 2 squares below pattern: logo mark (6mm) + wordmark,
-centred pattern summary, right-aligned date. Logo cells ≤ 2mm.
+centered pattern summary, right-aligned date. Logo cells ≤ 2mm.
 PDF metadata: Title, Author, Subject, Keywords, Producer.
 Uses Geist static TTFs via pdf-lib embedFont with subset."
 ```
@@ -780,7 +780,7 @@ After the scale bar block and before `parts.push('</svg>')`, add the brand group
     // Simplified geometric letterforms at small size
     parts.push(`<path d="M${wmX} ${wmY - 0.2}h0" fill="none" data-wordmark="outlined" aria-hidden="true"/>`);
 
-    // Centre: pattern summary
+    // Center: pattern summary
     const summary = patternSummary(s);
     const centreText = `${summary} · ${bw} × ${bh} mm`;
     parts.push(`<text x="${pw / 2}" y="${wmY}" font-family="'Geist Mono', 'JetBrains Mono', monospace" font-size="2.4" fill="#4A4A4A" text-anchor="middle">${centreText}</text>`);
@@ -1263,7 +1263,7 @@ describe('buildReadme', () => {
     expect(readme).toContain('pattern.png');
   });
 
-  it('contains licence sentence', () => {
+  it('contains license sentence', () => {
     const readme = buildReadme({ summary: 'ChArUco 7×10', files });
     expect(readme).toContain('free to use');
     expect(readme).toContain('Geist fonts © Vercel, SIL OFL 1.1');
@@ -1382,7 +1382,7 @@ git add src/lib/exportZip.ts src/lib/exportZip.test.ts src/islands/Generator.tsx
 git commit -m "feat: add zip bundling with README.txt for download-all
 
 All 8 file types in one zip. README.txt has brand line, file list,
-licence, product link. Filename: {slug}-calibtools.zip."
+license, product link. Filename: {slug}-calibtools.zip."
 ```
 
 ---
@@ -1392,7 +1392,7 @@ licence, product link. Filename: {slug}-calibtools.zip."
 **Files:**
 - Modify: `scripts/generate-placeholders.mjs`
 
-Replace the inline logo grid, colours, and wordmark text in the OG image generation and inspection report PDF with imports from `brand.ts`. The placeholder script runs in Node at build time.
+Replace the inline logo grid, colors, and wordmark text in the OG image generation and inspection report PDF with imports from `brand.ts`. The placeholder script runs in Node at build time.
 
 - [ ] **Step 1: Refactor OG image logo grid to use brand constants**
 
@@ -1421,7 +1421,7 @@ import {
 Replace:
 - The inline `logoGrid` with `logoSvgPaths({ x: 460, y: 220, cellSize: 18, gap: 2 }).join('\n    ')`
 - The hardcoded `#E60012` and `#1A1A1A` with `BRAND_RED` and `BRAND_INK`
-- The wordmark text colours with brand constants
+- The wordmark text colors with brand constants
 - The inspection report header with logo + wordmark + Geist fonts (using the static TTFs)
 - The footer with `calib.tools · hello@calib.tools · Munich, Germany · page n/N`
 
@@ -1461,7 +1461,7 @@ git commit -m "refactor: placeholders use brand.ts, Geist fonts
 
 OG images and inspection report PDF now import from src/lib/brand.ts.
 Switched from Helvetica to Geist static TTFs. Script converted to .ts
-(tsx). Single source of logo geometry and brand colours."
+(tsx). Single source of logo geometry and brand colors."
 ```
 
 ---

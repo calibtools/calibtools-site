@@ -482,7 +482,7 @@ export default function ImageGallery({
     );
   }
 
-  // --- Local optimised images (primary path) ---
+  // --- Local optimized images (primary path) ---
   const localImages = images!;
   const current = localImages[selected] ?? localImages[0];
 

@@ -936,7 +936,7 @@ export interface PatternSpec {
 
   // Step 7b: Axes
   showAxes?: boolean;        // default true, draw coordinate-frame axes
-  monochromeAxes?: boolean;  // solid/dashed lines instead of coloured
+  monochromeAxes?: boolean;  // solid/dashed lines instead of colored
 }
 ```
 
@@ -1043,7 +1043,7 @@ OpenCV `findChessboardCornersSB` with `CALIB_CB_MARKER` looks for 3 circular fin
 - Top-right corner square (row=0, col=cols-1) 
 - Bottom-left corner square (row=rows-1, col=0)
 
-Each is a circle centred in that square, diameter ≈ 0.5 × square size.
+Each is a circle centered in that square, diameter ≈ 0.5 × square size.
 
 Update `renderCheckerboardSvg()`:
 
@@ -1851,7 +1851,7 @@ const productMatch = PRODUCT_SIZES.find(([pw,ph]) =>
 
 - [ ] **Step 3: Add inch display helper and compact info toggle**
 
-In the info line, show mm with inches in grey:
+In the info line, show mm with inches in gray:
 
 ```typescript
 function mmToIn(mm: number): string {
@@ -1897,7 +1897,7 @@ git commit -m "feat: Generator UI — auto board size, inch display, compact inf
 
 All pattern parameters round-trip through the URL query string.
 Auto board size picks the smallest standard page that fits.
-Inches shown in grey beside mm. Compact info hides parameter line.
+Inches shown in gray beside mm. Compact info hides parameter line.
 Added A2/A1/A0/Tabloid paper sizes."
 ```
 
@@ -1981,7 +1981,7 @@ describe('axes SVG', () => {
     expect(axesSvg(noAxes)).toBe('');
   });
 
-  it('monochrome mode uses solid/dashed lines without colour', () => {
+  it('monochrome mode uses solid/dashed lines without color', () => {
     const mono: SvgContext = { ...ctx, spec: { ...base, monochromeAxes: true } };
     const svg = axesSvg(mono);
     expect(svg).toContain('stroke-dasharray');

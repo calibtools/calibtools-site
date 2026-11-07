@@ -1,8 +1,8 @@
 /**
- * Product image catalogue — build-time module.
+ * Product image catalog — build-time module.
  *
  * Reads src/assets/products/images.json and returns typed image entries
- * for a given product handle.  If a handle has no images in the catalogue,
+ * for a given product handle.  If a handle has no images in the catalog,
  * callers fall back to the existing render pipeline (placeholder SVG).
  *
  * Validation runs at import time so a bad images.json breaks `astro build`
@@ -47,7 +47,7 @@ function validateCatalog(): void {
 
   if (errors.length > 0) {
     throw new Error(
-      `Product image catalogue validation failed:\n${errors.join('\n')}`,
+      `Product image catalog validation failed:\n${errors.join('\n')}`,
     );
   }
 }
@@ -58,7 +58,7 @@ validateCatalog();
 // Lookup
 // ---------------------------------------------------------------------------
 
-/** All catalogue images grouped by handle, preserving images.json order. */
+/** All catalog images grouped by handle, preserving images.json order. */
 const byHandle = new Map<string, ProductImage[]>();
 for (const entry of catalog) {
   let list = byHandle.get(entry.handle);
@@ -71,7 +71,7 @@ for (const entry of catalog) {
 
 /**
  * Return product images for `handle` in images.json order.
- * Returns an empty array when the handle has no catalogue images
+ * Returns an empty array when the handle has no catalog images
  * (caller should fall back to the render pipeline).
  */
 export function getProductImages(handle: string): ProductImage[] {
@@ -79,11 +79,11 @@ export function getProductImages(handle: string): ProductImage[] {
 }
 
 /**
- * All handles that have at least one catalogue image.
+ * All handles that have at least one catalog image.
  */
 export function handlesWithImages(): string[] {
   return [...byHandle.keys()];
 }
 
-/** The full validated catalogue (for tests / build scripts). */
+/** The full validated catalog (for tests / build scripts). */
 export { catalog as allProductImages };

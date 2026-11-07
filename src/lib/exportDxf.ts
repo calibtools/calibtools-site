@@ -1,6 +1,6 @@
 /**
  * DXF R12 (ASCII) export for calibration patterns.
- * Units: millimetres (INSUNITS=4). Y-up coordinate system (DXF convention).
+ * Units: millimeters (INSUNITS=4). Y-up coordinate system (DXF convention).
  * Pattern geometry on layer "0"; brand elements on layer "CALIBTOOLS_BRAND".
  */
 import type { PatternSpec } from './patterns';

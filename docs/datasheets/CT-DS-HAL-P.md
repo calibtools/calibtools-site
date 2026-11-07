@@ -1,6 +1,6 @@
 ---
 code: CT-DS-HAL-P
-title: HALCON Calibration Plate, Aluminium Composite
+title: HALCON Calibration Plate, Aluminum Composite
 type: datasheet
 rev: A
 date: 2026-10-29
@@ -23,7 +23,7 @@ MVTec HALCON calibration plate. A central reference circle is surrounded by smal
 
 Mark grid is (rows × cols) including the central reference mark. Total marks = rows × cols. A `.descr` description file for HALCON is supplied with every board; it encodes the exact mark positions and diameters as measured during inspection. Other grid sizes: custom order (CUS).
 
-Pattern area is centred with a white quiet zone ≥ 1 mark pitch on all sides; the edge strip with part number, serial and 100 mm scale bar sits outside the quiet zone.
+Pattern area is centered with a white quiet zone ≥ 1 mark pitch on all sides; the edge strip with part number, serial and 100 mm scale bar sits outside the quiet zone.
 
 ## Specifications
 
@@ -31,7 +31,7 @@ Pattern area is centred with a white quiet zone ≥ 1 mark pitch on all sides; t
 
 | | |
 |---|---|
-| Feature position tolerance | ±0.3 mm + 0.2 mm/m (any mark centre to nominal grid, at 20 °C) |
+| Feature position tolerance | ±0.3 mm + 0.2 mm/m (any mark center to nominal grid, at 20 °C) |
 | Mark pitch, mean | ±0.05 mm |
 | Circularity | ≤ 0.05 mm radial deviation |
 | Edge radius | R6 mm |
@@ -40,10 +40,10 @@ Pattern area is centred with a white quiet zone ≥ 1 mark pitch on all sides; t
 
 | | |
 |---|---|
-| Substrate | Aluminium / LDPE / aluminium composite, 6 mm |
+| Substrate | Aluminum / LDPE / aluminum composite, 6 mm |
 | Weight | 6.6 kg/m² (300 × 200: ≈ 0.4 kg · 800 × 600: ≈ 3.2 kg) |
 | Pattern | Direct UV print, matte, black on white; optical density ≥ 1.6 |
-| Flatness | ≤ 0.5 mm per metre, board supported on three points |
+| Flatness | ≤ 0.5 mm per meter, board supported on three points |
 | Mounting | 4 × M4 threaded inserts on the rear (300 × 200 and larger); ¼″ fixture CT-ACC-M-FIX14 clamps any size |
 
 ### Environment

@@ -37,11 +37,11 @@ export const faqGroups: FaqGroup[] = [
     items: [
       {
         question: 'What tolerances can I expect?',
-        answer: `Aluminium composite: ${COMPOSITE_TOLERANCE} feature position at 20\u00A0\u00B0C, flatness ${COMPOSITE_FLATNESS}. Ceramic: ${CERAMIC_ACCURACY} is our target, and we\u2019ll publish the measurement method with the first production boards. Each datasheet lists the full spec.`,
+        answer: `Aluminum composite: ${COMPOSITE_TOLERANCE} feature position at 20\u00A0\u00B0C, flatness ${COMPOSITE_FLATNESS}. Ceramic: ${CERAMIC_ACCURACY} is our target, and we\u2019ll publish the measurement method with the first production boards. Each datasheet lists the full spec.`,
       },
       {
         question: 'Composite or ceramic \u2014 which do I need?',
-        answer: `Composite is light, rigid and affordable in large sizes \u2014 good for robotics, camera\u2013lidar and lab work at a few tenths of a millimetre. Ceramic is for small fields of view and sub-pixel work: it barely moves with temperature (${CERAMIC_CTE_UM_PER_M_K} vs ${COMPOSITE_CTE_UM_PER_M_K}\u00A0\u00B5m/(m\u00B7K)) and stays flatter.`,
+        answer: `Composite is light, rigid and affordable in large sizes \u2014 good for robotics, camera\u2013lidar and lab work at a few tenths of a millimeter. Ceramic is for small fields of view and sub-pixel work: it barely moves with temperature (${CERAMIC_CTE_UM_PER_M_K} vs ${COMPOSITE_CTE_UM_PER_M_K}\u00A0\u00B5m/(m\u00B7K)) and stays flatter.`,
       },
       {
         question: 'Is it compatible with OpenCV?',

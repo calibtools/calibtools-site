@@ -136,7 +136,7 @@ const SHOPIFY_VARIANTS = {
   'CHA-C-185X110': { shopifySkus: ['CT-CHA-C-185X110-D6', 'CT-CHA-C-185X110-D5'], oldUsd: 239 },
   'CHA-C-230X140': { shopifySkus: ['CT-CHA-C-230X140-D6', 'CT-CHA-C-230X140-D5'], oldUsd: 299 },
 
-  // AprilGrid composite — 1 variant per size (SKU = catalogue SKU)
+  // AprilGrid composite — 1 variant per size (SKU = catalog SKU)
   'APR-P-200X150': { shopifySkus: ['CT-APR-P-200X150-T36'], oldUsd: null },
   'APR-P-300X200': { shopifySkus: ['CT-APR-P-300X200-T36'], oldUsd: null },
   'APR-P-400X300': { shopifySkus: ['CT-APR-P-400X300-T36'], oldUsd: null },
@@ -166,9 +166,9 @@ const SHOPIFY_VARIANTS = {
   'CT-SVC-CERT-ILAC': { shopifySkus: ['CT-SVC-CERT-ILAC'], oldUsd: 149 },
 };
 
-// ── Catalogue ───────────────────────────────────────────────────────────
+// ── Catalog ───────────────────────────────────────────────────────────
 
-const CATALOGUE = [
+const CATALOG = [
   // Checkerboard composite — anchor: calib.io checkerboard Alu/LDPE
   { sku: 'CT-CHT-P-200X150', sizeKey: 'CHT-P-200X150', handle: 'checkerboard-composite', family: 'CHT-P', widthMm: 200, heightMm: 150, anchorEur: 103, anchorSource: 'calib.io CHT200150 Alu/LDPE', note: '' },
   { sku: 'CT-CHT-P-300X200', sizeKey: 'CHT-P-300X200', handle: 'checkerboard-composite', family: 'CHT-P', widthMm: 300, heightMm: 200, anchorEur: 108, anchorSource: 'calib.io CHT300200 Alu/LDPE', note: '' },
@@ -229,7 +229,7 @@ const CATALOGUE = [
 
 function generateLadder() {
   const rows = [];
-  for (const item of CATALOGUE) {
+  for (const item of CATALOG) {
     let proposedEur, proposedUsd, pctAbove;
     const sv = SHOPIFY_VARIANTS[item.sizeKey];
 
@@ -376,9 +376,9 @@ const PRODUCT_TITLES = {
   'halcon-composite': 'HALCON calibration plate',
 };
 const PRODUCT_STORIES = {
-  'aprilgrid-composite': '<p>AprilGrid composite board for Kalibr camera-IMU calibration. AprilTag 36h11 markers on rigid aluminium composite.</p>',
-  'circlegrid-composite': '<p>Symmetric and asymmetric circle grid targets on rigid aluminium composite. For OpenCV and HALCON workflows.</p>',
-  'halcon-composite': '<p>HALCON calibration plate with MVTec mark layout on rigid aluminium composite. Ships with .descr description file.</p>',
+  'aprilgrid-composite': '<p>AprilGrid composite board for Kalibr camera-IMU calibration. AprilTag 36h11 markers on rigid aluminum composite.</p>',
+  'circlegrid-composite': '<p>Symmetric and asymmetric circle grid targets on rigid aluminum composite. For OpenCV and HALCON workflows.</p>',
+  'halcon-composite': '<p>HALCON calibration plate with MVTec mark layout on rigid aluminum composite. Ships with .descr description file.</p>',
 };
 const PRODUCT_TAGS = {
   'aprilgrid-composite': 'composite, aprilgrid, kalibr',

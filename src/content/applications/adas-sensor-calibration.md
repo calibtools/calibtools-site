@@ -20,8 +20,8 @@ links:
   - { label: "FOV calculator", href: "/tools/fov/" }
   - { label: "ChArUco generator", href: "/tools/generator/charuco/" }
 selection:
-  - { scenario: "Wide-angle or fisheye camera intrinsics", pattern: "ChArUco (partial views)", size: "600 × 400 to 800 × 600 mm", material: "Aluminium composite" }
-  - { scenario: "Camera–LiDAR extrinsics", pattern: "Markers + cut-out holes", size: "600 × 400 mm and up", material: "Aluminium honeycomb" }
+  - { scenario: "Wide-angle or fisheye camera intrinsics", pattern: "ChArUco (partial views)", size: "600 × 400 to 800 × 600 mm", material: "Aluminum composite" }
+  - { scenario: "Camera–LiDAR extrinsics", pattern: "Markers + cut-out holes", size: "600 × 400 mm and up", material: "Aluminum honeycomb" }
   - { scenario: "Radar–camera extrinsics", pattern: "Trihedral reflector in a marker frame", size: "100–150 mm reflector", material: "Metal + composite" }
   - { scenario: "In-cabin DMS / OMS camera", pattern: "ChArUco, NIR-dark pattern", size: "300 × 200 to 600 × 400 mm", material: "Composite, NIR print" }
 faq:

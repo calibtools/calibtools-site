@@ -19,7 +19,7 @@
 @media (min-width: 768px)  { :root { --section-y: 64px; } }
 @media (min-width: 1280px) { :root { --section-y: 80px; } }
 
-/* --- Theme colour tokens (RGB triplets for Tailwind alpha support) --- */
+/* --- Theme color tokens (RGB triplets for Tailwind alpha support) --- */
 :root {
   --color-ground: 255 255 255;
   --color-ground-alt: 242 242 242;
@@ -53,7 +53,7 @@
   --color-brand-tint: rgba(230, 0, 18, 0.16);
 }
 
-/* --- Brand-kit colour aliases (from calibtools-tokens.css) --- */
+/* --- Brand-kit color aliases (from calibtools-tokens.css) --- */
 :root {
   --ct-black: #000000;
   --ct-red: #E60012;
@@ -130,7 +130,7 @@
   /* Size — single height on the 4 px grid */
   .btn-md { @apply btn h-10 text-[14px] px-5; }
 
-  /* Variants — colour only, no sizing */
+  /* Variants — color only, no sizing */
   .btn-primary { @apply bg-brand text-white hover:bg-brand-dark hover:text-white; }
   .btn-secondary { @apply border border-ink bg-ground text-ink hover:text-ink hover:bg-ground-panel; }
   .btn-ghost { @apply bg-transparent text-ink hover:text-brand hover:underline underline-offset-4; }

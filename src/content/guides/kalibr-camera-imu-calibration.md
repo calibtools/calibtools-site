@@ -37,13 +37,13 @@ This guide walks through the inputs, the recording, the run and the checks, with
 
 ## 1. Set up the target file
 
-Kalibr reads the grid from a small YAML file. `tagSize` is the black outer edge of one tag in metres and `tagSpacing` is the gap between tags as a fraction of the tag size:
+Kalibr reads the grid from a small YAML file. `tagSize` is the black outer edge of one tag in meters and `tagSpacing` is the gap between tags as a fraction of the tag size:
 
 ```yaml
 target_type: 'aprilgrid'
 tagCols: 6
 tagRows: 6
-tagSize: 0.030        # metres, outer edge of the black square
+tagSize: 0.030        # meters, outer edge of the black square
 tagSpacing: 0.3       # gap / tagSize
 ```
 
@@ -130,7 +130,7 @@ rosrun kalibr kalibr_calibrate_imu_camera \
   --target aprilgrid.yaml
 ```
 
-Time offset estimation is on by default; add `--no-time-calibration` only if the clocks are hardware-synchronised and you want to lock the offset to zero. Use `--bag-from-to 5 110` to trim the pick-up and put-down seconds if they made it into the bag.
+Time offset estimation is on by default; add `--no-time-calibration` only if the clocks are hardware-synchronized and you want to lock the offset to zero. Use `--bag-from-to 5 110` to trim the pick-up and put-down seconds if they made it into the bag.
 
 The run takes a few minutes and writes three files next to the bag:
 
@@ -166,7 +166,7 @@ Open the report and check, in this order:
 
 4. **The time offset.** A few milliseconds is normal on USB cameras. Tens of milliseconds, or a value that changes a lot between two recordings, points at the timestamp problem from step 4.
 
-Run the calibration twice on two separate recordings. If the two `T_cam_imu` results agree within a few millimetres and a few tenths of a degree, you have a usable calibration. If they do not, the recording, not the solver, is what to improve.
+Run the calibration twice on two separate recordings. If the two `T_cam_imu` results agree within a few millimeters and a few tenths of a degree, you have a usable calibration. If they do not, the recording, not the solver, is what to improve.
 
 ## 7. Use it in your VIO stack
 
@@ -190,9 +190,9 @@ Repeat the calibration after any change to the mount, lens focus or driver, and 
 
 | Symptom | Likely cause | Fix |
 |---|---|---|
-| Optimisation diverges or produces NaN | IMU noise values far too small, or a shock in the data | Inflate the noise parameters; trim start and end with `--bag-from-to` |
+| Optimization diverges or produces NaN | IMU noise values far too small, or a shock in the data | Inflate the noise parameters; trim start and end with `--bag-from-to` |
 | Large time offset, differs between runs | Timestamps assigned on arrival, or batched IMU samples | Use driver timestamps from one clock; check the dt histogram |
-| Predicted and measured curves lag | Wrong time offset, or `--no-time-calibration` with unsynchronised clocks | Enable time calibration |
+| Predicted and measured curves lag | Wrong time offset, or `--no-time-calibration` with unsynchronized clocks | Enable time calibration |
 | Rotation fine, translation uncertain | Not enough translation, or translation without rotation | Add moves that combine rotation and translation along all axes |
 | Few target detections | Motion blur, dim light, grid too small in the frame | Shorter exposure, more light, move closer or use a larger grid |
 | Pose flips during the sequence | Symmetric target (checkerboard or circle grid) | Use an AprilGrid |

@@ -42,7 +42,7 @@ describe('getProductImages', () => {
     expect(images).toEqual([]);
   });
 
-  it('returns empty array for a real product handle with no catalogue images', () => {
+  it('returns empty array for a real product handle with no catalog images', () => {
     // If there were a product with no images, it should return empty.
     // Test the fallback path.
     const images = getProductImages('some-future-product-without-images');
@@ -56,7 +56,7 @@ describe('getProductImages', () => {
 });
 
 describe('handlesWithImages', () => {
-  it('returns all handles that have catalogue images', () => {
+  it('returns all handles that have catalog images', () => {
     const handles = handlesWithImages();
     expect(handles).toContain('checkerboard-composite');
     expect(handles).toContain('charuco-composite');
@@ -122,7 +122,7 @@ describe('images.json validation', () => {
   });
 
   it('rejects an invalid kind value', () => {
-    // This tests the validation logic indirectly — the catalogue was validated
+    // This tests the validation logic indirectly — the catalog was validated
     // at import time.  If we got here, all entries are valid.
     // We just double-check with a manual assertion:
     const badKind = 'screenshot' as ImageKind;

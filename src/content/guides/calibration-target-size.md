@@ -21,7 +21,7 @@ faq:
     a: "Only through pixels: larger squares at the same fill mean fewer corners, not better ones. Flatness is the other side: a larger board is harder to keep flat, which is why big boards use rigid substrates."
 ---
 
-The right size for a calibration target is set by your camera, lens and working distance, not by the target catalogue. This guide gives the rule, the reasoning, and the numbers from a controlled test, so you can pick a board in a few minutes.
+The right size for a calibration target is set by your camera, lens and working distance, not by the target catalog. This guide gives the rule, the reasoning, and the numbers from a controlled test, so you can pick a board in a few minutes.
 
 ## The rule
 
@@ -49,7 +49,7 @@ A few more runs from the same setup:
 
 - **Same fill, more corners.** A 28 × 18 board at 42 px per square gave 0.24 px maximum undistortion error; a 14 × 9 board of the same physical size at 83 px per square gave 1.4 px. Denser patterns win.
 
-- **Small board close vs large board far.** A 200 × 150 mm board at 60 % fill matched the 600 × 400 mm board at 60 % fill. Size in millimetres did not matter; share of the frame did.
+- **Small board close vs large board far.** A 200 × 150 mm board at 60 % fill matched the 600 × 400 mm board at 60 % fill. Size in millimeters did not matter; share of the frame did.
 
 - **Tilt.** With the same board at 60 % fill but tilts limited to 10°, focal error rose from 0.06 % to 0.34 % and the corner error from 1.4 px to 9 px. Fill does not substitute for angles.
 
@@ -64,7 +64,7 @@ coverage width  = sensor width  × distance / focal length
 coverage height = sensor height × distance / focal length
 ```
 
-For a 2/3″ sensor (8.8 × 6.6 mm) with a 12 mm lens at 800 mm, that is 587 × 440 mm. The [FOV calculator](/tools/fov/) does this from a sensor list and also reports pixels per millimetre, which you need for step 3.
+For a 2/3″ sensor (8.8 × 6.6 mm) with a 12 mm lens at 800 mm, that is 587 × 440 mm. The [FOV calculator](/tools/fov/) does this from a sensor list and also reports pixels per millimeter, which you need for step 3.
 
 Use the distance at which the camera will actually work. Calibrating at a different distance means a different focus, and a lens's intrinsics change with focus.
 
@@ -86,13 +86,13 @@ Multiply the coverage long side by 0.6 and pick the nearest board. Rounding **do
 
 For the 587 mm coverage above, 0.6 × 587 = 352 mm, so the [300 × 200 composite board](/targets/charuco-composite/) is the pick, with the 400 × 300 as the alternative if you can move it a little further away.
 
-Ceramic boards are for small fields of view and for when position accuracy below a few micrometres matters; see [composite, ceramic or glass](/guides/composite-ceramic-or-glass/).
+Ceramic boards are for small fields of view and for when position accuracy below a few micrometers matters; see [composite, ceramic or glass](/guides/composite-ceramic-or-glass/).
 
 For fields wider than about 1.3 m, use two or more boards with distinct marker IDs instead of one huge panel; the [multi-board guide](/guides/multi-board-marker-ids/) covers the setup.
 
 ## Step 3: check the pixels
 
-At the working distance, pixels per millimetre is `image width / coverage width`. Multiply by the square size:
+At the working distance, pixels per millimeter is `image width / coverage width`. Multiply by the square size:
 
 - **Square ≥ 25 px.** Below that, corner refinement loses accuracy and detections become unstable at tilt. 30 to 40 px is comfortable.
 

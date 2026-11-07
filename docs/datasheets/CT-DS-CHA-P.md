@@ -1,6 +1,6 @@
 ---
 code: CT-DS-CHA-P
-title: ChArUco Calibration Target, Aluminium Composite
+title: ChArUco Calibration Target, Aluminum Composite
 type: datasheet
 rev: A
 date: 2026-10-24
@@ -23,7 +23,7 @@ ChArUco combines a checkerboard with ArUco markers in the white squares. Markers
 
 `{DICT}`: `D6` = DICT_6X6_250 (default, most robust) · `D5` = DICT_5X5_100 · `D4` = DICT_4X4_50 (decodes at lower resolution, fewer unique IDs) · `T36` = AprilTag 36h11. Start ID 0, row-major over white squares, OpenCV ≥ 4.6 placement convention (`legacy_pattern: false`). Other grids, dictionaries or start IDs: custom order (CUS).
 
-Pattern area is centred with a white quiet zone ≥ 1 square on all sides; the edge strip with part number, serial and 100 mm scale bar sits outside the quiet zone.
+Pattern area is centered with a white quiet zone ≥ 1 square on all sides; the edge strip with part number, serial and 100 mm scale bar sits outside the quiet zone.
 
 ## Specifications
 
@@ -41,10 +41,10 @@ Pattern area is centred with a white quiet zone ≥ 1 square on all sides; the e
 
 | | |
 |---|---|
-| Substrate | Aluminium / LDPE / aluminium composite, 6 mm |
+| Substrate | Aluminum / LDPE / aluminum composite, 6 mm |
 | Weight | 6.6 kg/m² (300 × 200: ≈ 0.4 kg · 800 × 600: ≈ 3.2 kg) |
 | Pattern | Direct UV print, matte, black on white; optical density ≥ 1.6 |
-| Flatness | ≤ 0.5 mm per metre, board supported on three points |
+| Flatness | ≤ 0.5 mm per meter, board supported on three points |
 | Rigidity (E·J) | ≈ 3800 kN·cm²/m |
 | Mounting | 4 × M4 threaded inserts on the rear (300 × 200 and larger); ¼″ fixture CT-ACC-M-FIX14 clamps any size |
 

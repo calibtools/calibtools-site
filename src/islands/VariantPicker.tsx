@@ -46,9 +46,9 @@ export default function VariantPicker({ product, fixtureVariantId, fixturePrice,
     for (const opt of product.options) {
       const qVal = params.get(opt.name.toLowerCase());
       if (qVal) {
-        // Find matching option value (case-insensitive, × / x normalised)
-        const normalise = (s: string) => s.toLowerCase().replace(/×/g, 'x').replace(/\s+/g, '');
-        const match = opt.values.find((v) => normalise(v) === normalise(qVal));
+        // Find matching option value (case-insensitive, × / x normalized)
+        const normalize = (s: string) => s.toLowerCase().replace(/×/g, 'x').replace(/\s+/g, '');
+        const match = opt.values.find((v) => normalize(v) === normalize(qVal));
         if (match) initSelections[opt.name] = match;
       }
     }

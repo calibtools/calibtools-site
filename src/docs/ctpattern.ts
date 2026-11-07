@@ -2,7 +2,7 @@
  * Vector renderings of Calib.Tools boards (exact ArUco bits from dictionary JSON)
  * for customer documents.
  *
- * All coordinates are millimetres on the board: origin of the SVG = top-left corner
+ * All coordinates are millimeters on the board: origin of the SVG = top-left corner
  * of the board. Pattern rule (OpenCV >= 4.6 layout): black square top-left,
  * (r + c) even = black, ArUco markers in the white squares, IDs row-major from
  * start_id. ChArUco corner id = r * (cols - 1) + c at pattern coordinates
@@ -14,7 +14,7 @@
 
 import { getArUcoDict, decodeMarkerBits } from '../lib/dicts/dicts';
 
-// ── Brand / drawing colours ──────────────────────────────────────────────────
+// ── Brand / drawing colors ──────────────────────────────────────────────────
 export const RED = '#E60012';
 export const GREEN = '#00A651';
 export const INK = '#282828';
@@ -123,7 +123,7 @@ export function arrow(
   y0: number,
   x1: number,
   y1: number,
-  colour: string,
+  color: string,
   w: number,
   head: number,
 ): string {
@@ -135,8 +135,8 @@ export function arrow(
   const rx = bx - head * 0.45 * Math.sin(ang);
   const ry = by + head * 0.45 * Math.cos(ang);
   return (
-    `<line x1="${x0}" y1="${y0}" x2="${bx.toFixed(3)}" y2="${by.toFixed(3)}" stroke="${colour}" stroke-width="${w}"/>` +
-    `<path d="M${x1} ${y1}L${lx.toFixed(3)} ${ly.toFixed(3)}L${rx.toFixed(3)} ${ry.toFixed(3)}Z" fill="${colour}"/>`
+    `<line x1="${x0}" y1="${y0}" x2="${bx.toFixed(3)}" y2="${by.toFixed(3)}" stroke="${color}" stroke-width="${w}"/>` +
+    `<path d="M${x1} ${y1}L${lx.toFixed(3)} ${ly.toFixed(3)}L${rx.toFixed(3)} ${ry.toFixed(3)}Z" fill="${color}"/>`
   );
 }
 
@@ -169,7 +169,7 @@ export function axes(
 // ── Label line ───────────────────────────────────────────────────────────────
 
 /**
- * Board label line (compact wordmark + Geist Mono, one colour) scaled to
+ * Board label line (compact wordmark + Geist Mono, one color) scaled to
  * `width` mm, left edge at x.
  *
  * Simplified port: renders "CALIB.TOOLS" as Geist Bold text and the remainder
@@ -180,7 +180,7 @@ export function label_line_frag(
   x: number,
   y_centre: number,
   width: number,
-  colour = G80,
+  color = G80,
 ): { svg: string; height: number } {
   if (!line.startsWith('CALIB.TOOLS')) {
     throw new Error('Label must start with "CALIB.TOOLS"');
@@ -196,12 +196,12 @@ export function label_line_frag(
   const fs = 10;
   const s = width / totalNatural; // uniform scale
 
-  const brandSvg = `<text x="0" y="${fs * 0.36}" font-family="Geist" font-weight="700" font-size="${fs}" fill="${colour}">${brandText}</text>`;
+  const brandSvg = `<text x="0" y="${fs * 0.36}" font-family="Geist" font-weight="700" font-size="${fs}" fill="${color}">${brandText}</text>`;
   const afterSvg = after
-    ? `<text x="${brandWidth + gap}" y="${fs * 0.36}" font-family="Geist Mono" font-size="${fs}" fill="${colour}">${after}</text>`
+    ? `<text x="${brandWidth + gap}" y="${fs * 0.36}" font-family="Geist Mono" font-size="${fs}" fill="${color}">${after}</text>`
     : '';
 
-  const ty = y_centre - s * fs * 0.36; // vertical centre
+  const ty = y_centre - s * fs * 0.36; // vertical center
   const svg = `<g transform="translate(${(x).toFixed(4)} ${ty.toFixed(4)}) scale(${s.toFixed(6)})">${brandSvg}${afterSvg}</g>`;
   const height = s * fs;
   return { svg, height };
@@ -241,7 +241,7 @@ export interface BoardSvgOpts {
 /**
  * Return an SVG string of the board.
  *
- * mode 'print' = true black/white; 'map' = pattern faded to greys for annotated
+ * mode 'print' = true black/white; 'map' = pattern faded to grays for annotated
  * feature maps.
  *
  * vectors: { corner_id: [dx_um, dy_um] } drawn from the nominal corner, magnified

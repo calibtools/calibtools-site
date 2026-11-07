@@ -12,7 +12,7 @@ faq:
   - q: "How many robot poses do I need for hand-eye calibration?"
     a: "Two motions with non-parallel rotation axes is the mathematical minimum. In practice, 15 to 25 poses with large rotations around different axes give a stable result; more poses that only translate add little."
   - q: "Which calibrateHandEye method should I use?"
-    a: "Run Park and Tsai and compare. They should agree to a fraction of a degree and a few millimetres; if they do not, the problem is the data, not the method. Daniilidis and Andreff can fail on some data sets and return NaN."
+    a: "Run Park and Tsai and compare. They should agree to a fraction of a degree and a few millimeters; if they do not, the problem is the data, not the method. Daniilidis and Andreff can fail on some data sets and return NaN."
   - q: "Can I use calibrateHandEye for a fixed camera (eye-to-hand)?"
     a: "Yes. Mount the target on the gripper and pass the inverse robot pose (base-to-gripper) in place of gripper-to-base. The function then returns the camera pose in the robot base frame."
   - q: "Does cv2.calibrateHandEye exist in OpenCV 5?"
@@ -69,7 +69,7 @@ If you teach the poses by hand, teach them once and save them. You will want to 
 
 ## 3. Record the data
 
-At each pose, save the image and the robot pose together. Most controllers report the flange pose as position plus orientation, in millimetres and either Euler angles or a quaternion. Convert to a 4 × 4 matrix, and settle the units first: everything in metres or everything in millimetres.
+At each pose, save the image and the robot pose together. Most controllers report the flange pose as position plus orientation, in millimeters and either Euler angles or a quaternion. Convert to a 4 × 4 matrix, and settle the units first: everything in meters or everything in millimeters.
 
 Euler angles are the usual source of trouble. Check the controller manual for the axis order and whether angles are intrinsic or extrinsic, then confirm with a known move: rotate about one joint and verify that the matrix you build rotates the same way.
 
@@ -80,7 +80,7 @@ import numpy as np
 from scipy.spatial.transform import Rotation
 
 def pose_matrix(xyz_mm, rpy_deg, order="xyz"):
-    """Controller pose -> 4x4 T_gripper2base in metres. Check `order` against your manual."""
+    """Controller pose -> 4x4 T_gripper2base in meters. Check `order` against your manual."""
     T = np.eye(4)
     T[:3, :3] = Rotation.from_euler(order, rpy_deg, degrees=True).as_matrix()
     T[:3, 3] = np.asarray(xyz_mm, float) / 1000.0
@@ -100,7 +100,7 @@ dist = fs.getNode("dist").mat()
 fs.release()
 
 d = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_6X6_250)
-board = cv2.aruco.CharucoBoard((10, 7), 0.025, 0.018, d)  # (cols, rows), square, marker, metres
+board = cv2.aruco.CharucoBoard((10, 7), 0.025, 0.018, d)  # (cols, rows), square, marker, meters
 detector = cv2.aruco.CharucoDetector(board)
 ```
 
@@ -173,7 +173,7 @@ Both paths above were run on synthetic images rendered through the real ChArUco 
 
 The solver always returns a matrix. Three checks tell you whether to trust it.
 
-**Compare methods.** Run `CALIB_HAND_EYE_PARK` and `CALIB_HAND_EYE_TSAI` on the same data. With good data they agree to about 0.1° and a couple of millimetres. If they disagree by centimetres, go back to the data: a pose with the wrong sign, a swapped Euler order, or units mixed between millimetres and metres.
+**Compare methods.** Run `CALIB_HAND_EYE_PARK` and `CALIB_HAND_EYE_TSAI` on the same data. With good data they agree to about 0.1° and a couple of millimeters. If they disagree by centimeters, go back to the data: a pose with the wrong sign, a swapped Euler order, or units mixed between millimeters and meters.
 
 **Check the target is fixed.** For eye-in-hand, the target pose in the base frame should be the same at every robot pose. Compute it for each pose and look at the spread:
 
@@ -221,7 +221,7 @@ HALCON users have the same workflow in `calibrate_hand_eye` with a point-based c
 
 | Symptom | Likely cause | Fix |
 |---|---|---|
-| Methods disagree by centimetres | Wrong Euler order, sign or units in the robot pose | Build one pose by hand from a known move and compare |
+| Methods disagree by centimeters | Wrong Euler order, sign or units in the robot pose | Build one pose by hand from a known move and compare |
 | Translation off, rotation fine | Robot pose and image not taken at the same instant | Wait for the robot to settle; trigger both together |
 | Result changes a lot when one pose is dropped | Too few distinct rotations | Add poses rotated about other axes |
 | `NaN` in the result | Andreff or Daniilidis on an ill-conditioned set | Use Park or Tsai; check the motions are not all about one axis |

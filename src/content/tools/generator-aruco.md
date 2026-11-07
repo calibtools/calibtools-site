@@ -19,7 +19,7 @@ faq:
 
 ## What it does
 
-Generate ArUco fiducial markers for OpenCV pose estimation, robot localisation and AR. Print one large marker or a sheet of consecutive IDs, at exact size in millimetres, as PDF, SVG or PNG.
+Generate ArUco fiducial markers for OpenCV pose estimation, robot localization and AR. Print one large marker or a sheet of consecutive IDs, at exact size in millimeters, as PDF, SVG or PNG.
 
 ## How to use it
 
@@ -30,7 +30,7 @@ Generate ArUco fiducial markers for OpenCV pose estimation, robot localisation a
 
 3. **Rows and columns**: 1 × 1 for a single marker, more for a sheet.
 
-4. **Marker size**: the black square edge in millimetres. This is the marker length you use for pose estimation with `solvePnP`.
+4. **Marker size**: the black square edge in millimeters. This is the marker length you use for pose estimation with `solvePnP`.
 
 5. **Download** the PDF and print at 100 % (no "fit to page"). Check the 100 mm scale bar with a ruler.
 
@@ -56,7 +56,7 @@ detector = cv2.aruco.ArucoDetector(dictionary, cv2.aruco.DetectorParameters())
 corners, ids, rejected = detector.detectMarkers(gray)
 ```
 
-For pose, use the printed marker size in metres or millimetres consistently in `solvePnP`.
+For pose, use the printed marker size in meters or millimeters consistently in `solvePnP`.
 
 ## Free for commercial use
 

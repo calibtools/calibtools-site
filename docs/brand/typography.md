@@ -57,9 +57,9 @@ Pixel is an accent typeface. Misuse makes the page feel like a retro game.
 
 A `Geist Fallback` @font-face face is defined on local Arial with metric overrides
 (`size-adjust: 99.6%`, `ascent-override: 97.5%`, `descent-override: 24.0%`,
-`line-gap-override: 0%`) to minimise CLS while the variable WOFF2 loads.
+`line-gap-override: 0%`) to minimize CLS while the variable WOFF2 loads.
 
-## Licence
+## License
 
 All three Geist families are released by Vercel under the SIL Open Font License 1.1.
-The licence file is at `public/fonts/OFL.txt`.
+The license file is at `public/fonts/OFL.txt`.

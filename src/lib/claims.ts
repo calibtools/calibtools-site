@@ -30,7 +30,7 @@ export const INCOTERM = 'DAP' as const;
 /** Return window from delivery date (calendar days). */
 export const RETURN_WINDOW_DAYS = 30;
 
-/** Return-authorisation number validity (calendar days). */
+/** Return-authorization number validity (calendar days). */
 export const RA_VALID_DAYS = 14;
 
 /** Late-return restocking window (prose). */
@@ -53,11 +53,11 @@ export const SHIP_COUNTRY_COUNT = 41;
 /** Ceramic feature accuracy (lithography on alumina). */
 export const CERAMIC_ACCURACY = '\u00B12 \u00B5m';
 
-/** Composite feature tolerance (UV flatbed on aluminium composite). */
+/** Composite feature tolerance (UV flatbed on aluminum composite). */
 export const COMPOSITE_TOLERANCE = '\u00B10.3 mm + 0.2 mm/m';
 
 /** Composite flatness specification. */
-export const COMPOSITE_FLATNESS = '\u22640.5 mm per metre (three-point support)';
+export const COMPOSITE_FLATNESS = '\u22640.5 mm per meter (three-point support)';
 
 /** Ceramic flatness specification. */
 export const CERAMIC_FLATNESS = '\u226420 \u00B5m over the pattern area';

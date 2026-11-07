@@ -1,5 +1,5 @@
 ---
-seoDescription: "Diffuse Lambertian panels at 10, 50 and 90 % reflectance, so you can normalise LiDAR intensity across range and angle. Built to your setup — ask for a quote."
+seoDescription: "Diffuse Lambertian panels at 10, 50 and 90 % reflectance, so you can normalize LiDAR intensity across range and angle. Built to your setup — ask for a quote."
 summary: "Lambertian reflectance panels for your LiDAR intensity calibration"
 decideSpecs:
   - "Reflectance"

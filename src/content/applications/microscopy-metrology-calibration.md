@@ -5,7 +5,7 @@ seoDescription: "Calibration targets for microscopy and precision metrology: sma
 code: "MICRO"
 order: 8
 audience: "For vision-measuring-machine builders, microscope vision and semiconductor and electronics inspection."
-summary: "At high magnification, the question is how many micrometres a pixel covers and how sharp the system is. Both need precise references."
+summary: "At high magnification, the question is how many micrometers a pixel covers and how sharp the system is. Both need precise references."
 products:
   - "charuco-ceramic"
   - "resolution-chart"
@@ -35,6 +35,6 @@ faq:
 
 ## Common problems
 
-Engineers at this scale often start with a ruler or an inkjet grid and find the uncertainty is larger than the features they want to measure. A reference made by lithography on ceramic or glass gives known feature positions at the micrometre level.
+Engineers at this scale often start with a ruler or an inkjet grid and find the uncertainty is larger than the features they want to measure. A reference made by lithography on ceramic or glass gives known feature positions at the micrometer level.
 
-Reading resolution targets is another frequent question; our USAF 1951 table lists line pairs per millimetre and line width for every element.
+Reading resolution targets is another frequent question; our USAF 1951 table lists line pairs per millimeter and line width for every element.

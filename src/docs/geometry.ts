@@ -12,4 +12,4 @@ export const STAMP_TEXT_RADIUS = (STAMP_R_OUTER + STAMP_R_INNER) / 2; // ≈ 15.
 export const STAMP_TOP_TEXT = 'CALIB.TOOLS';
 export const STAMP_BOTTOM_TEXT = 'DIMENSIONAL INSPECTION';
 export const STAMP_ROTATION = -6; // degrees
-export const STAMP_INK = '#333333'; // Grey 80
+export const STAMP_INK = '#333333'; // Gray 80

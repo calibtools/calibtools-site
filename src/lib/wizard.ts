@@ -134,6 +134,6 @@ export function recommend(a: WizardAnswers): Recommendation {
 export const MATERIALS: Record<Material, { label: string; description: string }> = {
   paper: { label: 'Printed paper', description: 'Tape to a flat surface. Replace when worn.' },
   acrylic: { label: 'Acrylic / foam board', description: 'Lightweight, flat, and moisture-resistant.' },
-  aluminum: { label: 'Aluminum composite', description: 'Rigid and durable, flat to ≤ 0.5 mm per metre (see datasheet). Ships ready to use.' },
+  aluminum: { label: 'Aluminum composite', description: 'Rigid and durable, flat to ≤ 0.5 mm per meter (see datasheet). Ships ready to use.' },
   glass: { label: 'Glass plate', description: 'Very flat and dimensionally stable. Fragile.' },
 };

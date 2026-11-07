@@ -221,7 +221,7 @@ async function main() {
   for (const row of rows) {
     const exists = await handleExists(row.handle);
     if (!exists) {
-      row.errors.push(`product_handle "${row.handle}" not found in Storefront catalogue`);
+      row.errors.push(`product_handle "${row.handle}" not found in Storefront catalog`);
     }
   }
 

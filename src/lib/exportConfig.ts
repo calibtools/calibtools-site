@@ -95,11 +95,11 @@ export function ros2Yaml(s: PatternSpec): string {
     `  type: ${s.type === 'Checkerboard' ? 'chessboard' : s.type === 'ChArUco' ? 'charuco' : 'chessboard'}`,
     `  rows: ${innerRows}`,
     `  cols: ${innerCols}`,
-    `  square_size: ${(s.square / 1000).toFixed(6)}  # metres`,
+    `  square_size: ${(s.square / 1000).toFixed(6)}  # meters`,
   ];
 
   if (s.type === 'ChArUco' || s.type === 'ArUco grid') {
-    lines.push(`  marker_size: ${(s.marker / 1000).toFixed(6)}  # metres`);
+    lines.push(`  marker_size: ${(s.marker / 1000).toFixed(6)}  # meters`);
     lines.push(`  dictionary: ${s.dict}`);
     lines.push(`  start_id: ${s.startId}`);
   }
@@ -132,7 +132,7 @@ export function halconSupported(s: PatternSpec): boolean {
  * set_calib_data_observ_points.
  * Ref: https://www.mvtec.com/doc/halcon/2311/en/set_calib_data_calib_object.html
  *
- * Points are the inner corners in metres, row-major (innerCorners() order,
+ * Points are the inner corners in meters, row-major (innerCorners() order,
  * = cv.findChessboardCorners order = ChArUco corner IDs), origin at the
  * top-left square corner, x right, y down, z = 0.
  */
@@ -151,7 +151,7 @@ export function halconCode(s: PatternSpec): string {
   const lines = [
     header,
     `* HALCON calibration object: ${s.rows - 1} x ${s.cols - 1} inner corners, ${s.square} mm squares (${pts.length} points).`,
-    '* Units: metres. Origin: top-left square corner, x right, y down, z = 0.',
+    '* Units: meters. Origin: top-left square corner, x right, y down, z = 0.',
     s.type === 'ChArUco'
       ? '* Point order = OpenCV ChArUco corner IDs (row-major). Detect corners with OpenCV, then pass them in this order.'
       : '* Point order = cv.findChessboardCorners (row-major).',

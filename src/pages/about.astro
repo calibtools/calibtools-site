@@ -2,18 +2,29 @@
 import Base from '@/layouts/Base.astro';
 import { breadcrumbLd } from '@/lib/seo';
 import { INSPECTION_CLAIM, CONTACT_EMAIL } from '@/lib/claims';
+import { VISION, MISSION, ONE_LINER } from '@/lib/brand';
 const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: 'About' }]);
 ---
-<Base title="About Calib.Tools" description="Calib.Tools makes calibration targets with published specs, measures every board before it ships and builds free tools for the setup around it." jsonLd={bcLd}>
+<Base title="About Calib.Tools" description={ONE_LINER} jsonLd={bcLd}>
   <div class="container-x py-10 md:py-16">
     <div class="prose-calib mx-auto flex max-w-[720px] flex-col gap-8">
       <h1 class="h-display m-0 text-[32px] md:text-[40px]">About Calib.Tools</h1>
 
-      <p>Calib.Tools&trade; makes camera calibration targets you can trust without measuring them yourself &mdash; and the free tools to use them well.</p>
+      <p>{ONE_LINER}</p>
+
+      <section class="flex flex-col gap-3">
+        <h2>Our vision</h2>
+        <p>{VISION}</p>
+      </section>
+
+      <section class="flex flex-col gap-3">
+        <h2>Our mission</h2>
+        <p>{MISSION}</p>
+      </section>
 
       <section class="flex flex-col gap-3">
         <h2>What we make</h2>
-        <p>ChArUco, checkerboard, AprilGrid, circle grid and HALCON targets on aluminium composite and ceramic, from palm-sized boards for microscope optics to 800&nbsp;&times;&nbsp;600&nbsp;mm boards for robot cells. Every pattern follows OpenCV conventions, and every target has a datasheet with its real tolerances.</p>
+        <p>ChArUco, checkerboard, AprilGrid, circle grid and HALCON targets on aluminum composite and ceramic, from palm-sized boards for microscope optics to 800&nbsp;&times;&nbsp;600&nbsp;mm boards for robot cells. Every pattern follows OpenCV conventions, and every target has a datasheet with its real tolerances.</p>
       </section>
 
       <section class="flex flex-col gap-3">

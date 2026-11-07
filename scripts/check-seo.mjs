@@ -251,7 +251,7 @@ for (const file of htmlFiles) {
         const vals = Array.isArray(ld.variesBy) ? ld.variesBy : [ld.variesBy];
         for (const v of vals) {
           if (!VALID_VARIES.has(v)) {
-            errors.push({ file: rel, rule: 'jsonld-varies-by', detail: `variesBy "${v}" is not a recognised schema.org property` });
+            errors.push({ file: rel, rule: 'jsonld-varies-by', detail: `variesBy "${v}" is not a recognized schema.org property` });
           }
         }
       }

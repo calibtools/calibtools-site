@@ -36,7 +36,7 @@ describe('board_svg', () => {
     expect(svg).toMatch(/<path d="M[\d.]+/);
   });
 
-  it('uses grey fills in map mode', () => {
+  it('uses gray fills in map mode', () => {
     const svg = board_svg({
       W: 200,
       H: 150,
@@ -53,7 +53,7 @@ describe('board_svg', () => {
 });
 
 describe('axes', () => {
-  it('contains red and green colours', () => {
+  it('contains red and green colors', () => {
     const svg = axes(4.5, 4.5, 6.5, 0.6);
     expect(svg).toContain(RED);    // #E60012
     expect(svg).toContain(GREEN);  // #00A651

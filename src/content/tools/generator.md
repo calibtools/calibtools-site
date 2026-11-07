@@ -4,7 +4,7 @@ seoDescription: "Generate print-exact calibration patterns as PDF, SVG, PNG, DXF
 h1: "Pattern generator"
 faq:
   - q: "Is the PDF output dimensionally accurate?"
-    a: "Yes. The PDF is rendered in millimetre units at 1:1 scale. Print without fit-to-page scaling and verify with the 100 mm scale bar."
+    a: "Yes. The PDF is rendered in millimeter units at 1:1 scale. Print without fit-to-page scaling and verify with the 100 mm scale bar."
   - q: "Which ArUco dictionaries are supported?"
     a: "DICT_4X4_50, DICT_5X5_100, DICT_6X6_250, DICT_7X7_1000, DICT_ARUCO_ORIGINAL, DICT_ARUCO_MIP_36h12 and DICT_APRILTAG_36h11. These match the constants in cv::aruco. For single markers, see the ArUco and AprilTag generators."
   - q: "Can I use the generated pattern commercially?"
@@ -34,7 +34,7 @@ Config files are generated for OpenCV JSON and ROS 2 YAML, Kalibr YAML for the p
 
 **Rows and Columns** — set the internal grid dimensions. A 7 × 10 board means 7 rows and 10 columns of squares.
 
-**Square size and Marker size** — enter the dimensions in millimetres. Marker size must be smaller than square size for ChArUco boards. These values go directly into your calibration config.
+**Square size and Marker size** — enter the dimensions in millimeters. Marker size must be smaller than square size for ChArUco boards. These values go directly into your calibration config.
 
 **Dictionary** — choose the ArUco dictionary. DICT_6X6_250 is the default and works for most setups. Use DICT_APRILTAG_36h11 for AprilGrid boards.
 

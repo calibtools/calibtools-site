@@ -62,7 +62,7 @@ test.describe('product page: mounting-fixture (3 images)', () => {
 // ---------------------------------------------------------------------------
 
 test.describe('product page without local images: render fallback', () => {
-  test('product pages with no catalogue images show placeholder or Shopify image', async ({
+  test('product pages with no catalog images show placeholder or Shopify image', async ({
     page,
   }) => {
     // All current products have local images, so we check that

@@ -1,6 +1,6 @@
 ---
 code: CT-DS-CHT-P
-title: Checkerboard Calibration Target, Aluminium Composite
+title: Checkerboard Calibration Target, Aluminum Composite
 type: datasheet
 rev: A
 date: 2026-10-24
@@ -38,10 +38,10 @@ Inner corners = (rows − 1) × (cols − 1). Odd × even square counts are used
 
 | | |
 |---|---|
-| Substrate | Aluminium / LDPE / aluminium composite, 6 mm |
+| Substrate | Aluminum / LDPE / aluminum composite, 6 mm |
 | Weight | 6.6 kg/m² |
 | Pattern | Direct UV print, matte, black on white; optical density ≥ 1.6 |
-| Flatness | ≤ 0.5 mm per metre, three-point support |
+| Flatness | ≤ 0.5 mm per meter, three-point support |
 | Mounting | 4 × M4 rear inserts (300 × 200 and larger); ¼″ fixture CT-ACC-M-FIX14 |
 
 ### Environment

@@ -33,7 +33,7 @@ export const FAMILIES = {
   IQC: 'Image-quality chart',
   RES: 'Resolution / metrology',
   SPH: 'Sphere / ball bar',
-  TCP: 'Robot TCP artefact',
+  TCP: 'Robot TCP artifact',
   ACC: 'Accessory',
   KIT: 'Kit',
   SVC: 'Service',
@@ -49,13 +49,13 @@ export type Family = keyof typeof FAMILIES;
 
 /** Single-letter material codes. I, O and Q are never used (confusable with 1 / 0). */
 export const MATERIALS = {
-  P: 'Aluminium composite',
+  P: 'Aluminum composite',
   C: 'Alumina ceramic',
   G: 'Soda-lime glass',
   W: 'Opal (white) glass',
   F: 'Fused silica',
-  K: 'Carbon fibre',
-  H: 'Aluminium honeycomb',
+  K: 'Carbon fiber',
+  H: 'Aluminum honeycomb',
   M: 'Metal',
   L: 'Film',
   T: 'Film laminated on glass / ceramic',

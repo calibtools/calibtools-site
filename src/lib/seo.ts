@@ -2,6 +2,9 @@
  * SEO utilities: breadcrumb JSON-LD helper and Organization structured data.
  */
 
+import { ONE_LINER } from './brand';
+import { TAGLINE } from './claims';
+
 const SITE_URL = 'https://calib.tools';
 
 export interface BreadcrumbItem {
@@ -68,6 +71,8 @@ export const ORGANIZATION_LD: Record<string, any> = {
   '@type': 'Organization',
   name: 'Calib.Tools',
   url: SITE_URL,
+  description: ONE_LINER,
+  slogan: TAGLINE,
   logo: `${SITE_URL}/android-chrome-512x512.png`,
   sameAs: ['https://github.com/calibtools'],
   contactPoint: {

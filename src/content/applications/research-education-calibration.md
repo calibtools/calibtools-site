@@ -18,8 +18,8 @@ links:
   - { label: "Detection check", href: "/tools/check/" }
 selection:
   - { scenario: "First experiments", pattern: "Printed ChArUco from the generator", size: "A4 / A3", material: "Paper on a flat board" }
-  - { scenario: "Repeatable lab results", pattern: "ChArUco or checkerboard", size: "300 × 200 mm", material: "Aluminium composite" }
-  - { scenario: "Camera–IMU (Kalibr)", pattern: "AprilGrid", size: "400 × 300 mm", material: "Aluminium composite" }
+  - { scenario: "Repeatable lab results", pattern: "ChArUco or checkerboard", size: "300 × 200 mm", material: "Aluminum composite" }
+  - { scenario: "Camera–IMU (Kalibr)", pattern: "AprilGrid", size: "400 × 300 mm", material: "Aluminum composite" }
   - { scenario: "Small-scale precision work", pattern: "ChArUco", size: "110 × 85 to 230 × 140 mm", material: "Alumina ceramic" }
 faq:
   - { q: "Why does findChessboardCorners never find my board?", a: "Common causes: the pattern size is given in squares instead of inner corners, the board has no white border, or it is too small or blurred in the image. Our OpenCV guide covers each case." }

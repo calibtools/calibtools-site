@@ -22,7 +22,7 @@ describe('buildReadme', () => {
     expect(readme).toContain('pattern.png');
   });
 
-  it('contains licence sentence with Geist font credit', () => {
+  it('contains license sentence with Geist font credit', () => {
     const readme = buildReadme({ summary: 'ChArUco 7×10', files });
     expect(readme).toContain('free to use');
     expect(readme).toContain('Geist fonts © Vercel, SIL OFL 1.1');

@@ -14,8 +14,8 @@ Measured from `dist/` after build (`scripts/measure-text-blocks.mjs`).
 | /targets/charuco-composite/ | `<p>` | 328 | component literal | How reviews work: Reviews come from customers we invite after delivery and from... |
 | /targets/checkerboard-composite/ | `<p>` | 328 | component literal | How reviews work: Reviews come from customers we invite after delivery and from... |
 | /targets/collection/ceramic-glass/ | `<p>` | 435 | component literal | White alumina ceramic with matte blue chrome pattern, lithographed in a cleanroo... |
-| /targets/collection/composite-boards/ | `<p>` | 520 | component literal | ChArUco pattern (checkerboard with embedded ArUco markers) on aluminium/LDPE com... |
-| /targets/collection/composite-boards/ | `<p>` | 459 | component literal | Aluminium/LDPE composite, 6 mm. UV-printed matte pattern. Feature tolerance 0.3... |
+| /targets/collection/composite-boards/ | `<p>` | 520 | component literal | ChArUco pattern (checkerboard with embedded ArUco markers) on aluminum/LDPE com... |
+| /targets/collection/composite-boards/ | `<p>` | 459 | component literal | Aluminum/LDPE composite, 6 mm. UV-printed matte pattern. Feature tolerance 0.3... |
 | /targets/mounting-fixture/ | `<p>` | 328 | component literal | How reviews work: Reviews come from customers we invite after delivery and from... |
 | /tools/capture/ | `<p>` | 313 | component literal | Mount a ChArUco board on a flat surface. Start the camera, capture "Center" at r... |
 | /tools/check/ | `<p>` | 340 | component literal | The detection check loads OpenCV.js in your browser and runs the appropriate cor... |
@@ -28,12 +28,12 @@ Measured from `dist/` after build (`scripts/measure-text-blocks.mjs`).
 ### charuco-composite
 
 Full Shopify description:
-> ChArUco pattern (checkerboard with embedded ArUco markers) on aluminium/LDPE composite, 6 mm. UV-printed matte finish. Feature tolerance 0.3 mm + 0.2 mm/m. Operating range -50 C to +80 C, outdoor use up to 3 years. Each board ships with an inspection report, datasheet, DXF outline and pattern files for OpenCV, Kalibr and HALCON. [Spec table: Substrate, Feature tolerance, Thermal expansion, Operating range, Mounting]
+> ChArUco pattern (checkerboard with embedded ArUco markers) on aluminum/LDPE composite, 6 mm. UV-printed matte finish. Feature tolerance 0.3 mm + 0.2 mm/m. Operating range -50 C to +80 C, outdoor use up to 3 years. Each board ships with an inspection report, datasheet, DXF outline and pattern files for OpenCV, Kalibr and HALCON. [Spec table: Substrate, Feature tolerance, Thermal expansion, Operating range, Mounting]
 
 | Statement | Datasheet field | Tag |
 |---|---|---|
 | ChArUco pattern (checkerboard with embedded ArUco markers) | — | **story** (what it is) |
-| on aluminium/LDPE composite, 6 mm | CT-DS-CHA-P Physical > Substrate | spec |
+| on aluminum/LDPE composite, 6 mm | CT-DS-CHA-P Physical > Substrate | spec |
 | UV-printed matte finish | CT-DS-CHA-P Physical > Pattern | spec |
 | Feature tolerance 0.3 mm + 0.2 mm/m | CT-DS-CHA-P Geometry > Feature position tolerance | spec |
 | Operating range -50 C to +80 C | CT-DS-CHA-P Environment > Operating temperature | spec |
@@ -63,11 +63,11 @@ Full Shopify description:
 ### checkerboard-composite
 
 Full Shopify description:
-> Aluminium/LDPE composite, 6 mm. UV-printed matte pattern. Feature tolerance 0.3 mm + 0.2 mm/m. Operating range -50 C to +80 C, outdoor use up to 3 years. Each board ships with an inspection report, datasheet, DXF outline and pattern files for OpenCV, Kalibr and HALCON. [Spec table same as charuco-composite]
+> Aluminum/LDPE composite, 6 mm. UV-printed matte pattern. Feature tolerance 0.3 mm + 0.2 mm/m. Operating range -50 C to +80 C, outdoor use up to 3 years. Each board ships with an inspection report, datasheet, DXF outline and pattern files for OpenCV, Kalibr and HALCON. [Spec table same as charuco-composite]
 
 | Statement | Datasheet field | Tag |
 |---|---|---|
-| Aluminium/LDPE composite, 6 mm | CT-DS-CHT-P Physical > Substrate | spec |
+| Aluminum/LDPE composite, 6 mm | CT-DS-CHT-P Physical > Substrate | spec |
 | UV-printed matte pattern | CT-DS-CHT-P Physical > Pattern | spec |
 | Feature tolerance 0.3 mm + 0.2 mm/m | CT-DS-CHT-P Geometry > Feature position tolerance | spec |
 | Operating range -50 C to +80 C | CT-DS-CHT-P Environment > Operating temperature | spec |

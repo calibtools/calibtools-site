@@ -1,5 +1,5 @@
 ---
-seoTitle: "Kalibr AprilGrid target, aluminium"
+seoTitle: "Kalibr AprilGrid target, aluminum"
 seoDescription: "The AprilGrid your Kalibr camera–IMU calibration expects: an AprilTag 36h11 in every cell, made to the stated tag size. Kalibr YAML from our free generator."
 summary: "AprilGrid for your Kalibr camera–IMU and multi-sensor calibration"
 decideSpecs:

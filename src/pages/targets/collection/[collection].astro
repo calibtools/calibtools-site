@@ -58,12 +58,12 @@ const pairedProducts = pairsWith
   .map((h) => allProducts.find((p) => p.handle === h))
   .filter(Boolean);
 
-// Collection colour class mapping
+// Collection color class mapping
 const colorClasses: Record<string, string> = {
   brand: 'bg-collection-brand text-white',
   'slate-blue': 'bg-collection-slate-blue text-white',
   amber: 'bg-collection-amber text-white',
-  grey: 'bg-collection-grey text-white',
+  gray: 'bg-collection-grey text-white',
 };
 const pillClass = colorClasses[collectionColor] ?? colorClasses.brand;
 
@@ -165,7 +165,7 @@ const breadcrumbLd = {
     <div class="flex flex-col gap-8 lg:flex-row lg:gap-12">
       {/* Left column */}
       <div class="flex flex-col gap-5 flex-1 min-w-0">
-        {/* Colour pill + H1 */}
+        {/* Color pill + H1 */}
         <div class="flex items-center gap-3">
           <span class={`badge ${pillClass}`}>{collection.title}</span>
         </div>

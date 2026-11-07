@@ -71,7 +71,7 @@ describe('ros2Yaml', () => {
     expect(y).toContain('type: charuco');
   });
 
-  it('square_size is in metres', () => {
+  it('square_size is in meters', () => {
     const y = ros2Yaml(checker);
     expect(y).toContain('square_size: 0.025000');
   });
@@ -90,7 +90,7 @@ describe('halconCode', () => {
     expect(() => halconCode({ ...checker, type: 'Symmetric circles' })).toThrow();
   });
 
-  it('X/Y tuples are the inner corners in metres, innerCorners() order', () => {
+  it('X/Y tuples are the inner corners in meters, innerCorners() order', () => {
     const code = halconCode(charuco);
     const X = tuple(code, 'X');
     const Y = tuple(code, 'Y');

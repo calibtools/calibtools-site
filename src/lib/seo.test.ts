@@ -56,7 +56,7 @@ describe('autoBreadcrumbLd', () => {
   });
 
   it('generates breadcrumbs for a nested page', () => {
-    const ld = autoBreadcrumbLd('/targets/collection/composite-boards/', 'Aluminium Composite Targets');
+    const ld = autoBreadcrumbLd('/targets/collection/composite-boards/', 'Aluminum Composite Targets');
     expect(ld).not.toBeNull();
     expect(ld!.itemListElement).toHaveLength(4);
   });

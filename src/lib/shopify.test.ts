@@ -78,16 +78,16 @@ describe('sanitizeHtml', () => {
   });
 
   it('preserves normal HTML', () => {
-    const html = '<h2>Specs</h2><table><tr><td>Material</td><td>Aluminium</td></tr></table>';
+    const html = '<h2>Specs</h2><table><tr><td>Material</td><td>Aluminum</td></tr></table>';
     expect(sanitizeHtml(html)).toBe(html);
   });
 });
 
 describe('extractSpecsFromHtml', () => {
   it('extracts table rows', () => {
-    const html = '<table><tr><td>Substrate</td><td>Aluminium</td></tr><tr><td>Tolerance</td><td>0.3 mm</td></tr></table>';
+    const html = '<table><tr><td>Substrate</td><td>Aluminum</td></tr><tr><td>Tolerance</td><td>0.3 mm</td></tr></table>';
     const specs = extractSpecsFromHtml(html);
-    expect(specs).toEqual([['Substrate', 'Aluminium'], ['Tolerance', '0.3 mm']]);
+    expect(specs).toEqual([['Substrate', 'Aluminum'], ['Tolerance', '0.3 mm']]);
   });
 
   it('returns null when no table', () => {
@@ -337,7 +337,7 @@ describe('dictMarkerCount overflow', () => {
   });
 });
 
-describe('fallback behaviour', () => {
+describe('fallback behavior', () => {
   it('getProducts returns fallback products (no env)', async () => {
     // import.meta.env won't have real values in test
     const { getProducts } = await import('./shopify');

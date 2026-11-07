@@ -46,10 +46,10 @@ Gap after fix: **0 px** (panel hit-area is contiguous with trigger via `pt-1` br
 2. **220 ms close timer:** `pointerleave` on the disclosure starts a 220 ms timer; re-entering cancels it.
 3. **120 ms intent delay:** Switching to another trigger while one is open waits 120 ms to confirm intent.
 4. **Menu-aim:** `shouldKeepOpen(prev, curr, panelRect)` ray-casts the pointer velocity vector against the panel rect. If the user is aiming at the open panel, the switch is suppressed.
-5. **`(hover: none)` guard:** All pointer-hover handlers are gated behind `matchMedia('(hover: hover)')`. Click and keyboard behaviour unchanged.
+5. **`(hover: none)` guard:** All pointer-hover handlers are gated behind `matchMedia('(hover: hover)')`. Click and keyboard behavior unchanged.
 
 ## Root causes
 
 1. **4 px dead zone** between trigger and panel. The `[data-nav-disclosure]` wrapper's bottom edge is flush with the trigger button, but the panel floats 4 px below via `mt-1`. Moving downward into the panel means leaving the disclosure wrapper for 4 px.
 2. **0 ms close delay.** Any exit from the disclosure wrapper instantly hides the panel, even if the pointer is heading straight for it.
-3. **No menu-aim.** Switching triggers is instant on mouseenter, so a diagonal move toward a panel can accidentally activate a neighbouring trigger.
+3. **No menu-aim.** Switching triggers is instant on mouseenter, so a diagonal move toward a panel can accidentally activate a neighboring trigger.

@@ -15,7 +15,7 @@ faq:
     a: "Yes. The error is averaged over the corners that were detected. If no corners reached the frame edges, or if the model has more parameters than the views constrain, the fit is good where it was measured and wrong everywhere else."
   - q: "Should I use the rational or thin-prism distortion model?"
     a: "Only if your views cover the edges densely and the five-parameter model leaves a visible radial trend in the residuals. In our test the extra terms left RMS unchanged and made the error at the frame corners twenty times worse."
-  - q: "How do I convert reprojection error to millimetres?"
+  - q: "How do I convert reprojection error to millimeters?"
     a: "Multiply by the pixel size at the working distance (coverage width divided by image width). 0.2 px at 0.3 mm per pixel is 0.06 mm. That is the precision of a single corner, not the accuracy of a measurement that spans the frame."
   - q: "Why is my RMS lower with fewer images?"
     a: "Fewer views are easier to fit, so RMS drops while the model gets less reliable. Judge a calibration by its stability across views and by a check against the truth, never by RMS alone."
@@ -111,7 +111,7 @@ Drop flagged views and calibrate again. If the RMS barely moves but the flagged 
 
 ## Check 2: error by image radius
 
-Distortion models are radial. When the model is too simple, or the views did not reach the edges, the residuals grow with distance from the image centre even though the average stays small. Bin the per-corner residuals by radius:
+Distortion models are radial. When the model is too simple, or the views did not reach the edges, the residuals grow with distance from the image center even though the average stays small. Bin the per-corner residuals by radius:
 
 ```python
 pts, errs = [], []
@@ -144,7 +144,7 @@ Neither check above sees the parts of the image that never held a corner. For th
 
 This is the number to report. RMS tells you the fit was consistent; the verification tells you it was right.
 
-## Converting to millimetres
+## Converting to millimeters
 
 Pixel size on the object is coverage width divided by image width, which the [FOV calculator](/tools/fov/) reports. At 0.3 mm per pixel, an RMS of 0.2 px is 0.06 mm per corner.
 
@@ -155,7 +155,7 @@ That is single-corner precision. A measurement across the frame depends on how w
 | Symptom | Likely cause | Fix |
 |---|---|---|
 | RMS fine, straight lines bend after undistortion | Board never reached the edges | More views at edges and corners; see the [target size guide](/guides/calibration-target-size/) |
-| RMS fine, distances off by a constant factor | Wrong square size in the board definition | Measure the printed board; set `squareLength` in metres or millimetres consistently |
+| RMS fine, distances off by a constant factor | Wrong square size in the board definition | Measure the printed board; set `squareLength` in meters or millimeters consistently |
 | One view at 3× the others | Motion blur, moved board, reflection, ID mis-read | Drop it and recalibrate |
 | Residual grows with radius | Model too simple or no edge coverage | Edge views first; add k3 only if the trend remains |
 | RMS drops when adding rational terms, verification gets worse | Over-parameterised | Return to the five-parameter model |
