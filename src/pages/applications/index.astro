@@ -1,0 +1,22 @@
+---
+import Base from '@/layouts/Base.astro';
+import { getCollection } from 'astro:content';
+import { breadcrumbLd } from '@/lib/seo';
+const apps = (await getCollection('applications')).sort((a, b) => a.data.order - b.data.order);
+const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: 'Applications' }]);
+---
+<Base title="Calibration targets by application" section="applications" description="Calibration targets by application: ADAS and vehicle end-of-line, robotics, drones, machine vision, 3D vision, microscopy, camera testing, thermal and research." jsonLd={bcLd}>
+  <section class="container-x flex flex-col gap-8 py-[var(--section-y)]">
+    <span class="eyebrow">Applications</span>
+    <h1 class="h-display m-0 text-[36px] md:text-[48px]">Targets by application.</h1>
+    <p class="m-0 max-w-[760px] text-lg leading-relaxed text-ink-muted">What each field needs to calibrate, the problems engineers run into, and which targets and free tools fit.</p>
+    <div class="grid grid-cols-1 border-t border-line md:grid-cols-2 md:gap-x-10">
+      {apps.map((a) => (
+        <a href={`/applications/${a.slug}/`} class="flex flex-col gap-1 border-b border-line py-5 text-ink no-underline hover:text-ink">
+          <span class="text-lg font-semibold">{a.data.title}</span>
+          <span class="text-[15px] text-ink-muted">{a.data.audience}</span>
+        </a>
+      ))}
+    </div>
+  </section>
+</Base>

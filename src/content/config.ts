@@ -60,4 +60,23 @@ const products = defineCollection({
   }),
 });
 
-export const collections = { guides, tools, collections: collections_, products };
+
+const applications = defineCollection({
+  type: 'content',
+  schema: z.object({
+    title: z.string(),
+    seoTitle: z.string().min(25).max(45),
+    seoDescription: z.string().min(120).max(160),
+    code: z.string(),
+    order: z.number(),
+    audience: z.string(),
+    summary: z.string().max(220),
+    products: z.array(z.string()).min(2),
+    links: z.array(z.object({ label: z.string(), href: z.string() })).default([]),
+    selection: z.array(z.object({ scenario: z.string(), pattern: z.string(), size: z.string(), material: z.string() })).min(3),
+    faq: z.array(z.object({ q: z.string(), a: z.string() })).min(3),
+  }),
+});
+
+export const collections = {
+  applications, guides, tools, collections: collections_, products };
