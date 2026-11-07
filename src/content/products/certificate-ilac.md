@@ -4,7 +4,7 @@ summary: "Accredited dimensional calibration certificate from an ISO/IEC 17025 l
 decideSpecs:
   - "Lead time"
   - "Options"
-  - "Inspection report"
+  - "Accredited lab"
 chips:
   - "ISO/IEC 17025"
   - "ILAC MRA"

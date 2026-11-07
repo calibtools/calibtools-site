@@ -62,7 +62,7 @@ Pattern area is centred with a white quiet zone ≥ 1 square on all sides; the e
 
 | | |
 |---|---|
-| Inspection report | CT-IR-<serial>, per board, dimensional + flatness + visual |
+| Measurement | Every board is measured before it ships (dimensional, flatness, visual) |
 | Files | `.opencv.json`, `.kalibr.yaml` (checkerboard mode), `.ros2.yaml`, `.halcon.descr`, `.dxf` |
 | Documents | this datasheet, CT-UM-GEN user manual, CT-UM-CHA-P quick start |
 | Lead time | Made to order · ships in 2–3 weeks |

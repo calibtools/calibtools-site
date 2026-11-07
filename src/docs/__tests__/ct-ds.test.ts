@@ -123,7 +123,7 @@ describe('parseDatasheet', () => {
   it('parses CHA-C deliverables from spec subsection', () => {
     const ds = _parseDatasheet(CHA_C_MD);
     expect(ds.deliverables).not.toBeNull();
-    expect(ds.deliverables!.some((r) => r[0].includes('Inspection report'))).toBe(true);
+    expect(ds.deliverables!.some((r) => r[0].includes('Measurement'))).toBe(true);
   });
 });
 

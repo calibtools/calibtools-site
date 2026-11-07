@@ -385,8 +385,8 @@ function chaCDeliverablesBox(): string {
   const left = '<div>' + tag('In the box') + kv([
     ['Board', 'ChArUco ceramic target, selected part number.'],
     ['Packaging', 'Padded case and handling information.'],
-    ['Report', 'Inspection report and measured CSV for each serialised unit.'],
-    ['Files', '<span class="mono">.opencv.json \u00b7 .kalibr.yaml \u00b7 .ros2.yaml<br>.halcon.descr \u00b7 .dxf \u00b7 measured CSV</span>'],
+    ['Measurement', 'Every unit is measured before it ships.'],
+    ['Files', '<span class="mono">.opencv.json \u00b7 .kalibr.yaml \u00b7 .ros2.yaml<br>.halcon.descr</span> (from the pattern generator)'],
   ]) + '</div>';
   const right = '<div>' + tag('Configuration & service') + kv([
     ['Marking on board', 'Label line with part / pattern / SN / Rev; printed X / Y arrows.'],
@@ -504,7 +504,6 @@ function genericRevisionTable(revHistory: DSParsed['revisionHistory']): string {
 
 function buildChaC(ds: DSParsed, watermark?: string): Doc {
   const FILE_URL = 'https://calib.tools/files/CT-DS-CHA-C';
-  const DXF_URL = 'https://calib.tools/files/CT-DWG-CHA-C-185110.dxf';
 
   const d = new Doc(
     'CT-DS-CHA-C', ds.meta.rev, ds.meta.date,
@@ -527,7 +526,7 @@ function buildChaC(ds: DSParsed, watermark?: string): Doc {
 
   // Page 2
   const page2 =
-    p('Unless stated otherwise, dimensions are nominal at <span class="mono">20 \u00b0C</span>. Specifications apply to the product family; per-unit results are issued in the inspection report.', 'small')
+    p('Unless stated otherwise, dimensions are nominal at <span class="mono">20 \u00b0C</span>. Specifications apply to the product family.', 'small')
     + chaCSpecTables();
   d.addPage(page2);
 
@@ -539,13 +538,13 @@ function buildChaC(ds: DSParsed, watermark?: string): Doc {
     + chaCCompatibilityTable()
     + section(5, 'Drawing', '185 \u00d7 110 mm reference variant')
     + `<div style="display:grid;grid-template-columns:140mm 1fr;gap:7mm;align-items:end">${chaCDrawingSvg()}`
-    + `<div class="small" style="padding-bottom:5mm"><div class="tag" style="margin-bottom:1mm">DXF download</div>`
-    + `<div class="mono black" style="font-size:7.5pt;overflow-wrap:anywhere">${DXF_URL.replace('https://', '')}</div>`
-    + `<div class="muted" style="margin-top:1.5mm">Drawing reference only; use the released DXF for fixture design.</div></div></div>`;
+    + `<div class="small" style="padding-bottom:5mm"><div class="tag" style="margin-bottom:1mm">DXF</div>`
+    + `<div class="black" style="font-size:7.5pt">Available on request: hello@calib.tools</div>`
+    + `<div class="muted" style="margin-top:1.5mm">Drawing reference only; request the DXF for fixture design.</div></div></div>`;
   d.addPage(page3);
 
   // Page 4
-  const disclaimer = 'Values are nominal unless stated as measured; per-unit values are in the inspection report CT-IR-&lt;SN&gt;.';
+  const disclaimer = 'Values are nominal unless stated as measured.';
   const compRows: string[][] = [
     ['RoHS', 'RoHS-compliant materials.'],
     ['HS code', '<span class="mono">9031 80</span>'],
@@ -646,7 +645,7 @@ function buildGenericBoardDS(ds: DSParsed, watermark?: string): Doc {
     page3 += section(secN, 'Revision history') + genericRevisionTable(ds.revisionHistory);
     secN++;
   }
-  const disclaimer = 'Values are nominal unless stated as measured; per-unit values are in the inspection report.';
+  const disclaimer = 'Values are nominal unless stated as measured.';
   page3 += section(secN, 'Disclaimer') + p(disclaimer, 'statement');
   page3 += `<div class="push" style="display:flex;justify-content:space-between;align-items:flex-end;border-top:.25mm solid #b3b3b3;padding-top:4mm">`;
   page3 += `<div class="small muted" style="max-width:94mm">Product configuration, lead time and regulatory statements remain subject to the confirmations identified in this datasheet.</div>`;
