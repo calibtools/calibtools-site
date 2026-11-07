@@ -60,7 +60,7 @@ Pattern area is centred with a white quiet zone ≥ 1 mark pitch on all sides; t
 
 | | |
 |---|---|
-| Inspection report | CT-IR-<serial>, per board, dimensional + flatness + visual |
+| Measurement | Every board is measured before it ships (dimensional, flatness, visual) |
 | Files | `.halcon.descr`, `.opencv.json`, `.dxf` |
 | Documents | this datasheet, CT-UM-GEN user manual |
 | Lead time | Made to order · ships in 2–3 weeks |

@@ -33,7 +33,7 @@ The chrome is low-gloss but not matte. Place lights at 30–45° to the plate an
 
 ## 4. Using the measured coordinates
 
-Your inspection report includes a CSV of measured corner and marker-corner coordinates (mm, board frame, origin at the top-left outer corner, X right, Y down — OpenCV convention). For metrology-grade calibration, load these as the object points instead of the ideal grid. Then build `objectPoints` for each image from the detected corner IDs. For ordinary camera calibration the ideal grid (JSON) is sufficient.
+Per-board measured coordinates are planned for production boards and are not supplied yet. When available, they will come as a CSV of corner and marker-corner coordinates (mm, board frame, origin at the top-left outer corner, X right, Y down — OpenCV convention) to load as object points instead of the ideal grid. For ordinary camera calibration the ideal grid (JSON) is sufficient.
 
 ## 5. Temperature
 

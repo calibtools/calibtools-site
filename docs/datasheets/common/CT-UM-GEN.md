@@ -12,9 +12,8 @@ This manual covers all Calib.Tools planar calibration targets (composite, cerami
 ## 1. What is in the box
 
 - The calibration target, in a rigid carton with corner protection (wooden crate for boards over 600 mm)
-- Inspection report (CT-IR-…) for this serial number, printed and as PDF via the QR code on the report
 - Quick-start card
-- Pattern files are not printed: download them from the product page or `calib.tools/targets/<handle>/` → Downloads (OpenCV JSON, Kalibr YAML, ROS 2 YAML, HALCON description, DXF outline)
+- Pattern files are not printed: generate them for your exact layout with the free pattern generator at `calib.tools/tools/generator/` (OpenCV JSON, Kalibr YAML, ROS 2 YAML, HALCON description); a DXF outline is available on request
 
 Check the board on arrival: no dents on edges, no delamination, print intact. Report transport damage within 7 days with photos of the carton and board.
 
@@ -22,7 +21,7 @@ Check the board on arrival: no dents on edges, no delamination, print intact. Re
 
 Every target carries an edge strip with: brand · full part number (e.g. `CT-CHA-P-300200-6X6`) · pattern summary (rows × columns · square / marker size · dictionary · start ID) · serial number (`YYWW-NNNNN`) · datasheet revision · a 100 mm scale bar.
 
-The serial number links the board to its inspection report. Quote it in any support request.
+Quote the serial number in any support request.
 
 ## 3. Handling
 
@@ -67,7 +66,7 @@ Each target ships with files that describe its exact geometry:
 | `*.halcon.descr` | HALCON calibration plate description |
 | `*.dxf` | Board outline and mounting features for fixture design |
 
-Units are millimetres unless stated. The files encode the as-designed geometry; the inspection report states the as-measured deviation. For most camera calibrations the as-designed values are correct to use; for metrology-grade work on ceramic/glass targets, use the per-feature coordinates supplied with the certificate.
+Units are millimetres unless stated. The files encode the as-designed geometry. For most camera calibrations the as-designed values are correct to use.
 
 ## 7. Cleaning
 
@@ -81,7 +80,7 @@ Store flat, pattern up, in the original carton or a hard case (ACC-A-CSE-…), a
 
 ## 9. Re-inspection and calibration certificates
 
-Each board ships with an inspection report from our factory inspection against a DAkkS-calibrated reference. Re-inspection (SVC-X-RECAL) is recommended every 24 months for composite boards in regular use or after any suspected impact; ceramic and glass targets are dimensionally stable and need re-inspection only if damaged. An ILAC-MRA certificate issued by a CNAS-accredited laboratory is available as an add-on (SVC-X-CERT-ILAC); see its service description.
+Every board is measured before it ships. Re-inspection is recommended every 24 months for composite boards in regular use or after any suspected impact; ceramic and glass targets are dimensionally stable and need re-inspection only if damaged. For regulated environments, contact us about third-party calibration certificates; lead time depends on the accredited lab.
 
 ## 10. Warranty and returns
 
