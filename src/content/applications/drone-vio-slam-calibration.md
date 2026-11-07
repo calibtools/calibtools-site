@@ -12,6 +12,7 @@ products:
   - "thermal-calibration-target"
   - "multi-camera-target"
 links:
+  - { label: "Kalibr camera–IMU calibration", href: "/guides/kalibr-camera-imu-calibration/" }
   - { label: "AprilGrid generator", href: "/tools/generator/aprilgrid/" }
   - { label: "AprilTag generator", href: "/tools/generator/apriltag/" }
   - { label: "FOV calculator", href: "/tools/fov/" }

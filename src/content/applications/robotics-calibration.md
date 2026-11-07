@@ -16,6 +16,7 @@ products:
 links:
   - { label: "Camera calibration with OpenCV", href: "/guides/opencv-camera-calibration/" }
   - { label: "Hand-eye calibration in OpenCV", href: "/guides/hand-eye-calibration-opencv/" }
+  - { label: "Kalibr camera–IMU calibration", href: "/guides/kalibr-camera-imu-calibration/" }
   - { label: "ArUco marker generator", href: "/tools/generator/aruco/" }
   - { label: "AprilTag generator", href: "/tools/generator/apriltag/" }
   - { label: "Multiple boards in one rig", href: "/guides/multi-board-marker-ids/" }
