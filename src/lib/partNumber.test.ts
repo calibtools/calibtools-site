@@ -15,6 +15,7 @@ describe('partNumber.parse', () => {
     'CT-CIR-G-200X150-SYM-NEG',
     'CT-LDR-M-300X300-R50-905',
     'CT-IQC-L-A3-ESFR',
+    'CT-IQC-L-A3-NOIS',
     'CT-RES-G-L300-SCL',
     'CT-ACC-M-FIX14',
     'CT-SVC-CERT-ILAC',

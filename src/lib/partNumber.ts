@@ -76,7 +76,7 @@ export const VARIANTS: Partial<Record<Family, RegExp>> = {
   LDR: /^(R\d{1,2}|STP\d|FUS)$/,
   IRT: /^(N850|N940|LWIR|TOF)$/,
   LUM: /^(BL|IR)$/,
-  IQC: /^(ESFR|SFR|SFRP|SFRN2|SFRN4|COLR|FOCS|GRY11)$/,
+  IQC: /^(ESFR|SFR|SFRP|SFRN2|SFRN4|COLR|FOCS|GRY11|NOIS)$/,
   RES: /^(USAF|SCL|CON|MLT|RON|STAR)$/,
   SPH: /^(BAL|BAR)$/,
   TCP: /^[A-Z0-9]{2,4}$/,
