@@ -1,6 +1,6 @@
 ---
-seoTitle: "AprilGrid Target, Aluminium Composite"
-seoDescription: "The AprilGrid your Kalibr camera–IMU calibration expects: an AprilTag 36h11 in every cell, Kalibr YAML supplied. Rigid aluminium composite, 200–800 mm."
+seoTitle: "Kalibr AprilGrid target, aluminium"
+seoDescription: "The AprilGrid your Kalibr camera–IMU calibration expects: an AprilTag 36h11 in every cell, made to the stated tag size. Kalibr YAML from our free generator."
 summary: "AprilGrid for your Kalibr camera–IMU and multi-sensor calibration"
 decideSpecs:
   - "Feature position tolerance"

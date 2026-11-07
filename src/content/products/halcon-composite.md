@@ -1,5 +1,5 @@
 ---
-seoTitle: "HALCON Plate, Aluminium Composite"
+seoTitle: "HALCON calibration plate, aluminium"
 seoDescription: "A HALCON calibration plate with the MVTec mark layout, shipped with the matching .descr file so find_caltab works straight away. Composite, 200–800 mm."
 summary: "HALCON plate with the MVTec mark layout and a matching .descr file for your line"
 decideSpecs:

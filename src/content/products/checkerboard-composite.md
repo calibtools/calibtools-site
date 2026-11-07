@@ -1,6 +1,6 @@
 ---
-seoTitle: "Checkerboard Target, Aluminium Composite"
-seoDescription: "The pattern every calibration toolchain reads. When the whole board fits in your frame, a checkerboard gives you the most accurate corners. 200–800 mm."
+seoTitle: "Checkerboard calibration target, aluminium"
+seoDescription: "A rigid checkerboard calibration target every toolchain reads. When the whole board fits in your frame, it gives you the most accurate corners. 200–800 mm."
 summary: "The classic checkerboard — your sharpest corners when the whole board is in view"
 decideSpecs:
   - "Feature position tolerance"
