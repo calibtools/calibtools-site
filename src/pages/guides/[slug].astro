@@ -81,7 +81,7 @@ const faqLd = d.faq.length > 0
 
 const jsonLdItems = [articleLd, breadcrumbLd, ...(faqLd ? [faqLd] : [])];
 ---
-<Base title={d.title} description={d.description} section="guides" jsonLd={jsonLdItems} ogType="article" noindex={d.draft}>
+<Base title={d.title} description={d.description} section="guides" jsonLd={jsonLdItems} ogType="article" ogImage={ogImage} noindex={d.draft}>
   <section class="container-x flex flex-wrap justify-center gap-14 py-[var(--section-y)]">
     <article class="prose-calib flex min-w-0 flex-1 basis-[560px] max-w-[720px] flex-col gap-5">
       {/* Breadcrumb */}

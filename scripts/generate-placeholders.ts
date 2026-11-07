@@ -7,7 +7,7 @@
  * Run as part of prebuild via tsx.
  */
 
-import { writeFileSync, mkdirSync, readFileSync } from 'node:fs';
+import { writeFileSync, mkdirSync, readFileSync, readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { Resvg } from '@resvg/resvg-js';
 import {
@@ -115,4 +115,29 @@ for (const { handle, title } of productHandles) {
   const productResvg = new Resvg(productOgSvg, { fitTo: { mode: 'width', value: 1200 } });
   writeFileSync(outPath, productResvg.render().asPng());
   console.log(`[placeholders] Generated public/og/${handle}.png`);
+}
+
+// --- 4. Per-guide OG images (title from frontmatter; Article JSON-LD links /og/<slug>.png) ---
+
+
+const guidesDir = resolve('src/content/guides');
+for (const file of readdirSync(guidesDir).filter((f) => f.endsWith('.md')).sort()) {
+  const slug = file.replace(/\.md$/, '');
+  const src = readFileSync(resolve(guidesDir, file), 'utf-8');
+  const m = src.match(/^title:\s*"([^"]+)"/m);
+  if (!m) continue;
+  const title = m[1].replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  const guideOgSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#FFFFFF"/>
+  <g opacity="0.5">
+    ${patternRects.join('\n    ')}
+  </g>
+  ${ogWordmark}
+  <text x="600" y="340" font-family="'Geist', system-ui, sans-serif" font-size="${title.length > 42 ? 24 : 28}" font-weight="700" fill="${BRAND_INK}" text-anchor="middle">${title}</text>
+  <text x="600" y="380" font-family="'Geist', system-ui, sans-serif" font-size="18" fill="#6B6B6B" text-anchor="middle">Calibration guide</text>
+  <text x="600" y="580" font-family="monospace" font-size="16" fill="#9A9A9A" text-anchor="middle">${BRAND_URL}</text>
+</svg>`;
+  const guideResvg = new Resvg(guideOgSvg, { fitTo: { mode: 'width', value: 1200 } });
+  writeFileSync(resolve(ROOT, `og/${slug}.png`), guideResvg.render().asPng());
+  console.log(`[placeholders] Generated public/og/${slug}.png (guide)`);
 }
