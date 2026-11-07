@@ -13,7 +13,7 @@ const jsonLd = toolJsonLd(entry.data.h1, '/tools/generator/checkerboard/', entry
 <Base title={entry.data.seoTitle} section="tools" description={entry.data.seoDescription} jsonLd={jsonLd}>
   <ToolTabs current="generator" />
   <div class="container-x py-7 md:pb-16">
-    <Generator client:load initialSpec={{ type: 'Checkerboard', rows: 9, cols: 6, square: 30 }} />
+    <Generator client:load heading={entry.data.h1} initialSpec={{ type: 'Checkerboard', rows: 9, cols: 6, square: 30 }} />
     <p class="mt-6 text-[15px] text-ink-muted">
       Printing your own pattern has accuracy limits — see <a href="/files/datasheets/CT-DS-CHT-P.pdf" class="text-brand-dark font-medium">feature tolerance and flatness in the datasheet</a>.
       For the highest corner accuracy, the <a href="/targets/checkerboard-composite/" class="text-brand-dark font-medium">checkerboard aluminium composite board</a> is UV-printed with ±0.3 mm tolerances and is measured before it ships.
