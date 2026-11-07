@@ -38,7 +38,7 @@ describe('tool content files', () => {
 });
 
 describe('preset content files', () => {
-  const PRESETS = ['generator-charuco', 'generator-checkerboard', 'generator-aprilgrid', 'generator-circles'];
+  const PRESETS = ['generator-charuco', 'generator-checkerboard', 'generator-aprilgrid', 'generator-circles', 'generator-aruco', 'generator-apriltag'];
 
   it('all preset files exist', () => {
     const files = readdirSync(TOOLS_DIR).filter((f) => f.endsWith('.md'));

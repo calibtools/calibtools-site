@@ -3,6 +3,7 @@ import {
   PAPERS,
   PAGE_MARGIN,
   computeLayout,
+  patternExtent,
   computeTiling,
   computeGridReduction,
   smallestFittingPaper,
@@ -367,5 +368,26 @@ describe('quiet zone enforcement', () => {
     const layout = computeLayout(s, a4W, a4H, 'portrait');
     expect(layout.axes.originX).toBeGreaterThanOrEqual(PAGE_MARGIN);
     expect(layout.axes.originY).toBeGreaterThanOrEqual(PAGE_MARGIN);
+  });
+});
+
+describe('marker sheet layout', () => {
+  const sheet = { type: 'Marker sheet', rows: 1, cols: 1, square: 120, marker: 100, dict: 'DICT_6X6_250', paper: 'A4', startId: 0, scaleBar: true } as const;
+
+  it('uses the marker extent, not cols × square', () => {
+    const e = patternExtent(sheet as any);
+    expect(e.bw).toBeCloseTo(100, 6);
+    expect(e.bh).toBeCloseTo(100, 6);
+  });
+
+  it('fits a single 100 mm marker on A4 without tiling', () => {
+    const l = computeLayout(sheet as any, 210, 297);
+    expect(l.fit).toBe('single');
+  });
+
+  it('measures a 2 × 3 sheet with 20 % gaps between markers', () => {
+    const e = patternExtent({ ...sheet, rows: 2, cols: 3, marker: 40 } as any);
+    expect(e.bw).toBeCloseTo(3 * 48 - 8, 6);
+    expect(e.bh).toBeCloseTo(2 * 48 - 8, 6);
   });
 });
