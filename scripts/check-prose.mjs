@@ -134,12 +134,16 @@ for (const file of proseFiles) {
     }
   } else {
     let inFrontmatter = false;
+    let inFence = false;
     let block = '';
     let blockStart = 0;
     for (let i = 0; i < lines.length; i++) {
       const ln = lines[i];
       if (i === 0 && ln.trim() === '---') { inFrontmatter = true; continue; }
       if (inFrontmatter) { if (ln.trim() === '---') inFrontmatter = false; continue; }
+      // Fenced code blocks are code, not prose: skip them entirely.
+      if (ln.trim().startsWith('```')) { inFence = !inFence; block = ''; continue; }
+      if (inFence) continue;
       if (ln.trim() === '') {
         if (block.trim()) {
           const text = block.replace(/\s+/g, ' ').trim();
