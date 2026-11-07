@@ -9,7 +9,7 @@ family: CIR
 material: P
 ---
 
-Circle grids use filled dot centroids rather than corner intersections. Centroid detection is more robust under defocus, low contrast and oblique viewing angles. Available in symmetric layout (grid of evenly spaced dots) and asymmetric layout (staggered rows for unambiguous orientation without additional markers). Both variants are supported by OpenCV (`cv::findCirclesGrid`) and HALCON.
+Circle grids use filled dot centroids rather than corner intersections. Centroid detection is more robust under defocus, low contrast and oblique viewing angles. Available in symmetric layout (grid of evenly spaced dots) and asymmetric layout (staggered rows for unambiguous orientation without additional markers). Both variants are supported by OpenCV (`cv::findCirclesGrid`). In HALCON, use them as a point-based calibration object; HALCON's own plate finder detects only HAL-* plates.
 
 ## Ordering
 
@@ -73,7 +73,7 @@ Pattern area is centred with a white quiet zone ≥ 1 circle pitch on all sides;
 | | |
 |---|---|
 | Measurement | Every board is measured before it ships (dimensional, flatness, visual) |
-| Files | `.opencv.json`, `.halcon.descr`, `.dxf` |
+| Files | `.opencv.json`, `.kalibr.yaml` (symmetric only), `.dxf` |
 | Documents | this datasheet, CT-UM-GEN user manual |
 | Lead time | Made to order · ships in 2–3 weeks |
 | Options | Logo print (-L) · hard case (ACC-A-CSE) · custom NRE |

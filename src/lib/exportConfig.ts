@@ -5,6 +5,7 @@
 import type { PatternSpec } from './patterns';
 import { BRAND_NAME, SITE_URL, patternSummary, provenanceLine } from './exportBrand';
 import { idRange } from './idRange';
+import { innerCorners } from './patterns';
 
 function brandHeader(s: PatternSpec, commentChar = '#'): string {
   const summary = patternSummary(s);
@@ -16,20 +17,38 @@ function brandHeader(s: PatternSpec, commentChar = '#'): string {
   ].join('\n');
 }
 
+/** Pattern types Kalibr can use directly (aprilgrid, checkerboard, symmetric circlegrid). */
+export function kalibrSupported(s: PatternSpec): boolean {
+  if (s.type === 'Checkerboard' || s.type === 'AprilGrid (Kalibr)') return true;
+  if (s.type === 'Symmetric circles') {
+    const sx = s.circleSpacingX ?? s.square;
+    const sy = s.circleSpacingY ?? s.square;
+    return sx === sy;
+  }
+  return false;
+}
+
 /**
  * Kalibr (ethz-asl) YAML target config.
  * Format: https://github.com/ethz-asl/kalibr/wiki/calibration-targets
  *
- * Kalibr uses (rows-1)×(cols-1) for checkerboard inner corners,
- * and rows×cols for the grid of squares in aprilgrid/checkerboard.
+ * checkerboard: targetRows/targetCols = number of INTERNAL corners
+ *               (rows-1 × cols-1 for a rows×cols grid of squares).
+ * aprilgrid:    tagRows/tagCols = number of tags.
+ * circlegrid:   targetRows/targetCols = number of circles.
+ *
+ * Kalibr has no ChArUco, ArUco or HALCON target model; those throw.
  */
 export function kalibrYaml(s: PatternSpec): string {
+  if (!kalibrSupported(s)) {
+    throw new Error(`Kalibr has no target model for ${s.type}. Use an AprilGrid, checkerboard or symmetric circle grid.`);
+  }
   const lines: string[] = [brandHeader(s), ''];
 
   if (s.type === 'Checkerboard') {
     lines.push('target_type: \'checkerboard\'');
-    lines.push(`targetRows: ${s.rows}`);
-    lines.push(`targetCols: ${s.cols}`);
+    lines.push(`targetRows: ${s.rows - 1}   # internal corners`);
+    lines.push(`targetCols: ${s.cols - 1}   # internal corners`);
     lines.push(`rowSpacingMeters: ${(s.square / 1000).toFixed(6)}`);
     lines.push(`colSpacingMeters: ${(s.square / 1000).toFixed(6)}`);
   } else if (s.type === 'AprilGrid (Kalibr)') {
@@ -41,12 +60,11 @@ export function kalibrYaml(s: PatternSpec): string {
     if (s.aprilFamily) lines.push(`# tagFamily: ${s.aprilFamily}`);
     if (s.borderBits) lines.push(`# borderBits: ${s.borderBits}`);
   } else {
-    // ChArUco and others: use checkerboard representation
-    lines.push('target_type: \'checkerboard\'');
-    lines.push(`targetRows: ${s.rows}`);
-    lines.push(`targetCols: ${s.cols}`);
-    lines.push(`rowSpacingMeters: ${(s.square / 1000).toFixed(6)}`);
-    lines.push(`colSpacingMeters: ${(s.square / 1000).toFixed(6)}`);
+    lines.push('target_type: \'circlegrid\'');
+    lines.push(`targetRows: ${s.rows}   # circles`);
+    lines.push(`targetCols: ${s.cols}   # circles`);
+    lines.push(`spacingMeters: ${((s.circleSpacingX ?? s.square) / 1000).toFixed(6)}`);
+    lines.push('asymmetricGrid: False');
   }
 
   const range = idRange(s);
@@ -99,56 +117,62 @@ export function ros2Yaml(s: PatternSpec): string {
   return lines.join('\n') + '\n';
 }
 
+/** Pattern types exported as a HALCON point-based calibration object. */
+export function halconSupported(s: PatternSpec): boolean {
+  return s.type === 'Checkerboard' || s.type === 'ChArUco';
+}
+
 /**
- * HALCON calibration plate description file.
- * Format: https://www.mvtec.com/doc/halcon/latest/en/create_caltab.html
+ * HALCON calibration object as HDevelop code.
  *
- * HALCON uses a specific .descr format with plate dimensions and mark positions.
+ * HALCON's .descr / .cpd files only describe MVTec circle-mark plates
+ * (gen_caltab / create_caltab). For checkerboards and ChArUco boards HALCON
+ * takes the 3D points directly: set_calib_data_calib_object(CalibDataID, 0,
+ * [X1..Xn, Y1..Yn, Z1..Zn]), with image points supplied through
+ * set_calib_data_observ_points.
+ * Ref: https://www.mvtec.com/doc/halcon/2311/en/set_calib_data_calib_object.html
+ *
+ * Points are the inner corners in metres, row-major (innerCorners() order,
+ * = cv.findChessboardCorners order = ChArUco corner IDs), origin at the
+ * top-left square corner, x right, y down, z = 0.
  */
-export function halconDescr(s: PatternSpec): string {
-  const bw = s.cols * s.square;
-  const bh = s.rows * s.square;
-  const lines: string[] = [
-    brandHeader(s),
-    `# HALCON Calibration Plate Description`,
-    `# Plate dimensions in metres`,
-    ``,
-    `# calibration plate description, version 2`,
-    ``,
-    `# number of marks in x- and y-direction`,
-    `x_marks ${s.cols - 1}`,
-    `y_marks ${s.rows - 1}`,
-    ``,
-    `# width and height of a cell [m]`,
-    `cell_width  ${(s.square / 1000).toFixed(6)}`,
-    `cell_height ${(s.square / 1000).toFixed(6)}`,
-    ``,
-    `# plate size [m]`,
-    `plate_width  ${(bw / 1000).toFixed(6)}`,
-    `plate_height ${(bh / 1000).toFixed(6)}`,
-    ``,
-    `# mark positions (row col) — inner corners, row-major`,
+export function halconCode(s: PatternSpec): string {
+  if (!halconSupported(s)) {
+    throw new Error(`HALCON point export supports checkerboard and ChArUco only, not ${s.type}.`);
+  }
+  const pts = innerCorners(s.rows, s.cols, s.square);
+  const fmt = (v: number) => (v / 1000).toFixed(6);
+  const chunk = (vals: string[]) => {
+    const out: string[] = [];
+    for (let i = 0; i < vals.length; i += 10) out.push('      ' + vals.slice(i, i + 10).join(', '));
+    return out.join(',\n');
+  };
+  const header = brandHeader(s, '*');
+  const lines = [
+    header,
+    `* HALCON calibration object: ${s.rows - 1} x ${s.cols - 1} inner corners, ${s.square} mm squares (${pts.length} points).`,
+    '* Units: metres. Origin: top-left square corner, x right, y down, z = 0.',
+    s.type === 'ChArUco'
+      ? '* Point order = OpenCV ChArUco corner IDs (row-major). Detect corners with OpenCV, then pass them in this order.'
+      : '* Point order = cv.findChessboardCorners (row-major).',
+    '* find_calib_object only finds MVTec circle plates; supply image points with set_calib_data_observ_points.',
+    '',
+    'X := [',
+    chunk(pts.map(([x]) => fmt(x))),
+    '     ]',
+    'Y := [',
+    chunk(pts.map(([, y]) => fmt(y))),
+    '     ]',
+    'tuple_gen_const (|X|, 0.0, Z)',
+    '',
+    "create_calib_data ('calibration_object', 1, 1, CalibDataID)",
+    '* set_calib_data_cam_param (CalibDataID, 0, [], StartCamParam)',
+    'set_calib_data_calib_object (CalibDataID, 0, [X, Y, Z])',
+    '* For each image: set_calib_data_observ_points (CalibDataID, 0, 0, PoseIdx, Rows, Cols, \'all\', StartPose)',
+    '* calibrate_cameras (CalibDataID, Error)',
+    '',
   ];
-
-  const range = idRange(s);
-  if (range) {
-    lines.push(`# id_range: ${range.min}-${range.max} (${range.count} markers)`);
-    lines.push('');
-  }
-
-  for (let r = 0; r < s.rows - 1; r++) {
-    for (let c = 0; c < s.cols - 1; c++) {
-      lines.push(`${r} ${c}`);
-    }
-  }
-
-  if (s.finderMarkers) {
-    lines.push('');
-    lines.push(`# Note: 3 circular finder markers at corners (OpenCV CALIB_CB_MARKER)`);
-  }
-
-  lines.push('');
-  return lines.join('\n') + '\n';
+  return lines.join('\n');
 }
 
 /**

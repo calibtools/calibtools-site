@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { kalibrYaml, ros2Yaml, halconDescr, opencvJson } from './exportConfig';
+import { kalibrYaml, kalibrSupported, ros2Yaml, halconCode, halconSupported, opencvJson } from './exportConfig';
+import { innerCorners } from './patterns';
 import type { PatternSpec } from './patterns';
 import { markerForSquare } from './boardSizes';
 
@@ -15,9 +16,27 @@ describe('kalibrYaml', () => {
   it('checkerboard uses target_type checkerboard', () => {
     const y = kalibrYaml(checker);
     expect(y).toContain("target_type: 'checkerboard'");
-    expect(y).toContain('targetRows: 7');
-    expect(y).toContain('targetCols: 10');
+    // Kalibr counts INTERNAL corners: 7×10 squares → 6×9 corners
+    expect(y).toMatch(/targetRows: 6\b/);
+    expect(y).toMatch(/targetCols: 9\b/);
     expect(y).toContain('rowSpacingMeters: 0.025000');
+  });
+
+  it('symmetric circle grid uses target_type circlegrid with circle counts', () => {
+    const y = kalibrYaml({ ...checker, type: 'Symmetric circles', rows: 6, cols: 8, square: 20 });
+    expect(y).toContain("target_type: 'circlegrid'");
+    expect(y).toMatch(/targetRows: 6\b/);
+    expect(y).toMatch(/targetCols: 8\b/);
+    expect(y).toContain('spacingMeters: 0.020000');
+    expect(y).toContain('asymmetricGrid: False');
+  });
+
+  it('is not offered for ChArUco, ArUco grid or HALCON-style dots', () => {
+    expect(kalibrSupported(charuco)).toBe(false);
+    expect(kalibrSupported({ ...checker, type: 'ArUco grid' })).toBe(false);
+    expect(kalibrSupported({ ...checker, type: 'HALCON-style dots' })).toBe(false);
+    expect(kalibrSupported({ ...checker, type: 'Asymmetric circles' })).toBe(false);
+    expect(() => kalibrYaml(charuco)).toThrow(/no target model/);
   });
 
   it('aprilgrid uses target_type aprilgrid with tagSpacing', () => {
@@ -58,32 +77,37 @@ describe('ros2Yaml', () => {
   });
 });
 
-describe('halconDescr', () => {
-  it('has correct mark counts (inner corners)', () => {
-    const d = halconDescr(checker);
-    expect(d).toContain('x_marks 9');
-    expect(d).toContain('y_marks 6');
+describe('halconCode', () => {
+  const tuple = (code: string, name: string) => {
+    const m = code.match(new RegExp(`^${name} := \\[([\\s\\S]*?)\\]`, 'm'));
+    return m ? m[1].split(',').map((v) => parseFloat(v)) : [];
+  };
+
+  it('only supports checkerboard and ChArUco', () => {
+    expect(halconSupported(checker)).toBe(true);
+    expect(halconSupported(charuco)).toBe(true);
+    expect(halconSupported({ ...checker, type: 'HALCON-style dots' })).toBe(false);
+    expect(() => halconCode({ ...checker, type: 'Symmetric circles' })).toThrow();
   });
 
-  it('cell dimensions in metres', () => {
-    const d = halconDescr(checker);
-    expect(d).toContain('cell_width  0.025000');
-    expect(d).toContain('cell_height 0.025000');
+  it('X/Y tuples are the inner corners in metres, innerCorners() order', () => {
+    const code = halconCode(charuco);
+    const X = tuple(code, 'X');
+    const Y = tuple(code, 'Y');
+    const ref = innerCorners(7, 10, 25);
+    expect(X).toHaveLength(54);
+    expect(Y).toHaveLength(54);
+    ref.forEach(([x, y], i) => {
+      expect(X[i]).toBeCloseTo(x / 1000, 9);
+      expect(Y[i]).toBeCloseTo(y / 1000, 9);
+    });
   });
 
-  it('plate size is full board in metres', () => {
-    const d = halconDescr(checker);
-    expect(d).toContain('plate_width  0.250000');
-    expect(d).toContain('plate_height 0.175000');
-  });
-
-  it('lists all inner corner positions', () => {
-    const d = halconDescr(checker);
-    // 6 rows × 9 cols = 54 inner corners
-    const posLines = d.split('\n').filter((l) => /^\d+ \d+$/.test(l));
-    expect(posLines).toHaveLength(54);
-    expect(posLines[0]).toBe('0 0');
-    expect(posLines[posLines.length - 1]).toBe('5 8');
+  it('uses the point-tuple form of set_calib_data_calib_object', () => {
+    const code = halconCode(checker);
+    expect(code).toContain("create_calib_data ('calibration_object', 1, 1, CalibDataID)");
+    expect(code).toContain('set_calib_data_calib_object (CalibDataID, 0, [X, Y, Z])');
+    expect(code).toContain('tuple_gen_const (|X|, 0.0, Z)');
   });
 });
 
@@ -115,17 +139,10 @@ describe('config brand headers', () => {
     expect(dataLines.some(l => l.includes('square_size:'))).toBe(true);
   });
 
-  it('halconDescr has 3-line brand header at top', () => {
-    const d = halconDescr(checker);
-    const lines = d.split('\n');
-    expect(lines[0]).toMatch(/^# Checkerboard/);
-    expect(lines[1]).toMatch(/^# Generated with calib\.tools/);
-  });
-
-  it('halconDescr still has all inner corner positions', () => {
-    const d = halconDescr(checker);
-    const posLines = d.split('\n').filter(l => /^\d+ \d+$/.test(l));
-    expect(posLines).toHaveLength(54);
+  it('halconCode has a brand header in HDevelop comments', () => {
+    const lines = halconCode(checker).split('\n');
+    expect(lines[0]).toMatch(/^\* Checkerboard/);
+    expect(lines[1]).toMatch(/^\* Generated with calib\.tools/);
   });
 });
 
@@ -169,9 +186,8 @@ describe('id_range in configs', () => {
     expect(y).toContain('id_range');
   });
 
-  it('halconDescr includes id range comment for ChArUco', () => {
-    const d = halconDescr(charuco);
-    expect(d).toContain('id_range');
+  it('halconCode explains the ChArUco corner order', () => {
+    expect(halconCode(charuco)).toContain('ChArUco corner IDs');
   });
 });
 

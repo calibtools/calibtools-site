@@ -35,8 +35,8 @@ describe('detectFormat', () => {
     expect(detectFormat('board:\n  type: chessboard\n  rows: 6\n  cols: 9\n  square_size: 0.025000')).toBe('ros2-yaml');
   });
 
-  it('detects HALCON descr', () => {
-    expect(detectFormat('x_marks 9\ny_marks 6\ncell_width 0.025000')).toBe('halcon-descr');
+  it('does not treat HALCON text as an input format', () => {
+    expect(detectFormat('x_marks 9\ny_marks 6\ncell_width 0.025000')).toBeNull();
   });
 
   it('returns null for unknown', () => {
@@ -88,26 +88,41 @@ describe('parse → serialize round-trip', () => {
     expect(Math.abs(back.marker - canonical.marker)).toBeLessThan(1e-6);
   });
 
-  it('HALCON descr round-trips', () => {
-    const checkerConfig: CalibConfig = { ...canonical, type: 'Checkerboard', marker: 0 };
-    const descr = serialize(checkerConfig, 'halcon-descr');
-    const back = parse(descr, 'halcon-descr');
-    expect(back.rows).toBe(checkerConfig.rows);
-    expect(back.cols).toBe(checkerConfig.cols);
-    expect(Math.abs(back.square - checkerConfig.square)).toBeLessThan(1e-6);
+  it('Kalibr checkerboard: targetRows are internal corners', () => {
+    const back = parse("target_type: 'checkerboard'\ntargetRows: 6\ntargetCols: 9\nrowSpacingMeters: 0.025\ncolSpacingMeters: 0.025", 'kalibr-yaml');
+    expect(back.rows).toBe(7);
+    expect(back.cols).toBe(10);
+  });
+
+  it('Kalibr circlegrid round-trips', () => {
+    const circ: CalibConfig = { ...canonical, type: 'Symmetric circles', rows: 6, cols: 8, square: 20, marker: 0 };
+    const back = parse(serialize(circ, 'kalibr-yaml'), 'kalibr-yaml');
+    expect(back.type).toBe('Symmetric circles');
+    expect(back.rows).toBe(6);
+    expect(back.cols).toBe(8);
+    expect(Math.abs(back.square - 20)).toBeLessThan(1e-6);
+  });
+
+  it('HALCON is output only', () => {
+    const code = serialize({ ...canonical, type: 'Checkerboard', marker: 0 }, 'halcon-hdev');
+    expect(code).toContain('set_calib_data_calib_object');
+    expect(() => parse(code, 'halcon-hdev')).toThrow(/output format only/);
   });
 });
 
 describe('cross-format conversion', () => {
-  it('OpenCV JSON → Kalibr YAML → OpenCV JSON preserves values', () => {
-    const kalibr = convert(opencvJson, 'kalibr-yaml', 'opencv-json');
-    expect(kalibr).toContain('targetRows: 7');
+  it('OpenCV JSON (ChArUco) → Kalibr YAML is refused: Kalibr has no ChArUco model', () => {
+    expect(() => convert(opencvJson, 'kalibr-yaml', 'opencv-json')).toThrow(/no target model/);
+  });
 
-    // Kalibr doesn't preserve ChArUco type, but dimensions survive
-    const backConfig = parse(kalibr, 'kalibr-yaml');
-    expect(backConfig.rows).toBe(7);
-    expect(backConfig.cols).toBe(10);
-    expect(Math.abs(backConfig.square - 25)).toBeLessThan(1e-6);
+  it('OpenCV JSON (checkerboard) → Kalibr YAML → back preserves values', () => {
+    const json = JSON.stringify({ pattern: 'Checkerboard', rows: 7, cols: 10, square_mm: 25 });
+    const kalibr = convert(json, 'kalibr-yaml', 'opencv-json');
+    expect(kalibr).toMatch(/targetRows: 6\b/);
+    const back = parse(kalibr, 'kalibr-yaml');
+    expect(back.rows).toBe(7);
+    expect(back.cols).toBe(10);
+    expect(Math.abs(back.square - 25)).toBeLessThan(1e-6);
   });
 
   it('OpenCV JSON → ROS 2 YAML → OpenCV JSON preserves values', () => {
@@ -119,11 +134,9 @@ describe('cross-format conversion', () => {
     expect(Math.abs(back.marker - 18)).toBeLessThan(1e-6);
   });
 
-  it('OpenCV JSON → HALCON → OpenCV JSON preserves grid dimensions', () => {
-    const halcon = convert(opencvJson, 'halcon-descr', 'opencv-json');
-    const back = parse(halcon, 'halcon-descr');
-    expect(back.rows).toBe(7);
-    expect(back.cols).toBe(10);
-    expect(Math.abs(back.square - 25)).toBeLessThan(1e-6);
+  it('OpenCV JSON (ChArUco) → HALCON lists 54 corner points', () => {
+    const halcon = convert(opencvJson, 'halcon-hdev', 'opencv-json');
+    const xs = halcon.match(/^X := \[([\s\S]*?)\]/m)![1].split(',');
+    expect(xs).toHaveLength(54);
   });
 });

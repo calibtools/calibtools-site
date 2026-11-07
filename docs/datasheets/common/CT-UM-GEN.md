@@ -56,14 +56,14 @@ Target-specific notes (which pattern, which dictionary, partial views) are in ea
 
 ## 6. Using the pattern files
 
-Each target ships with files that describe its exact geometry:
+The free pattern generator produces files that describe each layout's exact geometry:
 
 | File | Use |
 |---|---|
 | `*.opencv.json` | Board definition for `cv.aruco.CharucoBoard` / `cv.findChessboardCorners` parameters (rows, cols, square size, marker size, dictionary, start ID) |
-| `*.kalibr.yaml` | Kalibr target file (`target_type`, `tagCols`, `tagRows`, `tagSize`, `tagSpacing` or checkerboard equivalents) |
+| `*.kalibr.yaml` | Kalibr target file for AprilGrid, checkerboard (inner corners) and symmetric circle grids; Kalibr has no ChArUco model |
 | `*.ros2.yaml` | Parameters for `camera_calibration` (ROS 2) |
-| `*.halcon.descr` | HALCON calibration plate description |
+| `*.halcon.txt` | HALCON calibration object as a 3D point tuple (checkerboard, ChArUco); HAL-* plates come with a `.descr` file |
 | `*.dxf` | Board outline and mounting features for fixture design |
 
 Units are millimetres unless stated. The files encode the as-designed geometry. For most camera calibrations the as-designed values are correct to use.

@@ -7,7 +7,7 @@ import DownloadPicker from '@/islands/DownloadPicker';
 import MobileBottomCluster from '@/islands/MobileBottomCluster';
 import ProductCard from '@/components/ProductCard.astro';
 import { getProducts, getProductByHandle } from '@/lib/shopify';
-import { kalibrYaml, ros2Yaml, halconDescr } from '@/lib/exportConfig';
+import { kalibrYaml, kalibrSupported, ros2Yaml, halconCode, halconSupported } from '@/lib/exportConfig';
 import { checkerboardSvg, type PatternSpec } from '@/lib/patterns';
 import { getProductFaq } from '@/lib/faq';
 import { findDatasheetUrl } from '@/lib/datasheetManifest';
@@ -167,9 +167,9 @@ if (hasPatternData) {
     const slug = `${handle}-${rows}x${cols}-${square}mm`;
     configFiles = [
       { name: `${slug}.opencv.json`, content: JSON.stringify({ pattern: patternType, rows, cols, square_mm: square, marker_mm: marker, dictionary: dict, start_id: Number(m.start_id ?? 0), generator: 'Calib.Tools' }, null, 2), mime: 'application/json' },
-      { name: `${slug}.kalibr.yaml`, content: kalibrYaml(spec), mime: 'text/yaml' },
+      ...(kalibrSupported(spec) ? [{ name: `${slug}.kalibr.yaml`, content: kalibrYaml(spec), mime: 'text/yaml' }] : []),
       { name: `${slug}.ros2.yaml`, content: ros2Yaml(spec), mime: 'text/yaml' },
-      { name: `${slug}.halcon.descr`, content: halconDescr(spec), mime: 'text/plain' },
+      ...(halconSupported(spec) ? [{ name: `${slug}.halcon.txt`, content: halconCode(spec), mime: 'text/plain' }] : []),
     ];
   }
 }
