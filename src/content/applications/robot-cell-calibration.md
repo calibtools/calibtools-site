@@ -13,6 +13,7 @@ products:
   - "circlegrid-composite"
   - "mounting-fixture"
 links:
+  - { label: "Hand-eye calibration in OpenCV", href: "/guides/hand-eye-calibration-opencv/" }
   - { label: "Format converter", href: "/tools/convert/" }
   - { label: "Pattern generator", href: "/tools/generator/" }
   - { label: "Request a quote", href: "/quote/" }
