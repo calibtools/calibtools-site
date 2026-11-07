@@ -98,6 +98,7 @@ export const supportDropdown: NavItem[] = [
 export const headerGroups: NavGroup[] = [
   { key: 'targets', label: 'Targets', columns: targetsMega },
   { key: 'tools', label: 'Tools', items: toolsDropdown },
+  { key: 'applications', label: 'Applications', href: '/applications/' },
   { key: 'guides', label: 'Guides', href: '/guides/' },
   { key: 'support', label: 'Support', items: supportDropdown },
 ];
@@ -109,6 +110,7 @@ export const footerGroups: FooterGroup[] = [
     heading: 'Targets',
     items: [
       { label: 'All targets', href: '/targets/' },
+      { label: 'Targets by application', href: '/applications/' },
       { label: 'Aluminium Composite Targets', href: '/targets/collection/composite-boards/' },
       { label: 'Ceramic & Glass Targets', href: '/targets/collection/ceramic-glass/' },
       { label: 'LiDAR & Image Quality Targets', href: '/targets/collection/lidar-image-quality/' },

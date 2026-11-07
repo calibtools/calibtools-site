@@ -1,0 +1,116 @@
+---
+import Base from '@/layouts/Base.astro';
+import ProductCard from '@/components/ProductCard.astro';
+import { getCollection, getEntry } from 'astro:content';
+import { getProducts } from '@/lib/shopify';
+
+export async function getStaticPaths() {
+  const apps = await getCollection('applications');
+  return apps.map((a) => ({ params: { slug: a.slug }, props: { entry: a } }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await entry.render();
+const d = entry.data;
+
+const allProducts = await getProducts();
+const products = d.products
+  .map((h: string) => allProducts.find((p) => p.handle === h))
+  .filter((p): p is NonNullable<typeof p> => Boolean(p));
+const cardData = new Map<string, { summary?: string; chips?: string[] }>();
+for (const p of products) {
+  const pc = await getEntry('products', p.handle);
+  cardData.set(p.handle, { summary: pc?.data.summary, chips: pc?.data.chips });
+}
+
+const siteUrl = 'https://calib.tools';
+const url = `${siteUrl}/applications/${entry.slug}/`;
+const jsonLd = [
+  {
+    '@context': 'https://schema.org', '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: siteUrl },
+      { '@type': 'ListItem', position: 2, name: 'Applications', item: `${siteUrl}/applications/` },
+      { '@type': 'ListItem', position: 3, name: d.title, item: url },
+    ],
+  },
+  {
+    '@context': 'https://schema.org', '@type': 'FAQPage',
+    mainEntity: d.faq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+  },
+];
+---
+<Base title={d.seoTitle} description={d.seoDescription} section="applications" jsonLd={jsonLd}>
+  <nav class="container-x flex flex-wrap gap-x-2 gap-y-1 pt-5 text-sm text-ink-soft" aria-label="Breadcrumb">
+    <a href="/" class="text-ink-soft no-underline min-h-[44px] md:min-h-[24px] flex items-center">Home</a><span class="flex items-center">/</span>
+    <a href="/applications/" class="text-ink-soft no-underline min-h-[44px] md:min-h-[24px] flex items-center">Applications</a><span class="flex items-center">/</span>
+    <span class="text-ink min-h-[44px] md:min-h-[24px] flex items-center">{d.title}</span>
+  </nav>
+
+  <section class="container-x flex flex-col gap-4 pt-6 pb-8">
+    <span class="eyebrow">Applications</span>
+    <h1 class="h-display m-0 max-w-[900px] text-[32px] md:text-[44px]">{d.title}</h1>
+    <p class="m-0 max-w-[760px] text-lg leading-relaxed text-ink-muted">{d.summary}</p>
+    <p class="m-0 text-[15px] font-semibold text-ink">{d.audience}</p>
+  </section>
+
+  <div class="container-x flex flex-wrap gap-12 pb-16">
+    <article class="prose-calib flex min-w-0 flex-1 basis-[560px] max-w-[760px] flex-col gap-5">
+      <Content />
+
+      <h2 id="selection">Which target for which job</h2>
+      <p>Starting points for each job. Your sensors, lens and working distance decide the final size: the <a href="/tools/fov/">FOV calculator</a> gives you a first estimate.</p>
+      <table>
+        <thead><tr><th>Job</th><th>Pattern</th><th>Size</th><th>Material</th></tr></thead>
+        <tbody>
+          {d.selection.map((r) => (
+            <tr><td>{r.scenario}</td><td>{r.pattern}</td><td>{r.size}</td><td>{r.material}</td></tr>
+          ))}
+        </tbody>
+      </table>
+
+      <div class="flex flex-col gap-4 border-t border-line pt-6">
+        <h2 class="m-0 text-[24px] font-semibold" id="faq">Frequently asked questions</h2>
+        <div class="flex flex-col divide-y divide-line">
+          {d.faq.map((item) => (
+            <details class="group py-3">
+              <summary class="flex cursor-pointer list-none items-center justify-between gap-4 min-h-[44px] md:min-h-[24px] text-[15px] font-semibold [&::-webkit-details-marker]:hidden">
+                {item.q}
+                <span class="shrink-0 text-ink-soft transition-transform group-open:rotate-45">+</span>
+              </summary>
+              <p class="mt-2 text-[15px] leading-relaxed text-ink-muted">{item.a}</p>
+            </details>
+          ))}
+        </div>
+      </div>
+    </article>
+
+    <aside class="flex w-full flex-col gap-6 md:w-[320px] md:shrink-0">
+      <div class="flex flex-col gap-3">
+        <span class="text-[13px] font-bold uppercase tracking-[0.06em] text-ink-soft">Free tools and guides</span>
+        <ul class="m-0 flex list-none flex-col gap-1 p-0">
+          {d.links.map((l) => (
+            <li><a href={l.href} class="inline-flex min-h-[44px] items-center text-[15px] font-medium md:min-h-[24px]">{l.label}</a></li>
+          ))}
+        </ul>
+      </div>
+      <div class="card flex flex-col gap-3 bg-ground-alt p-5">
+        <strong class="text-[16px]">Not sure which target fits?</strong>
+        <span class="text-[14px] text-ink-muted">Tell us your sensors, lens and working distance. We reply within one business day.</span>
+        <a href="/quote/" class="btn-md btn-primary text-center no-underline">Request a quote</a>
+      </div>
+    </aside>
+  </div>
+
+  <section class="container-x flex flex-col gap-4 border-t border-line pt-8 pb-16">
+    <h2 class="m-0 text-[24px] font-semibold">Targets for this application</h2>
+    <div class="grid grid-cols-2 gap-4 md:grid-cols-3">
+      {products.map((p) => {
+        const cd = cardData.get(p.handle);
+        return (
+          <ProductCard href={p.url} title={p.title} summary={cd?.summary} sub={p.description} from={p.priceFrom} image={p.image} placeholder={p.title} chips={cd?.chips} />
+        );
+      })}
+    </div>
+  </section>
+</Base>

@@ -36,6 +36,7 @@ const SEGMENT_NAMES: Record<string, string> = {
   collection: 'Collections',
   generator: 'Pattern generator',
   files: 'Files',
+  applications: 'Applications',
 };
 
 /**
