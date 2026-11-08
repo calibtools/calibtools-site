@@ -26,15 +26,19 @@ import Base from '@/layouts/Base.astro';
       <form id="q-form" action="/api/quote" method="POST" class="flex flex-col gap-4">
         <div class="flex flex-col gap-1.5">
           <label for="q-name" class="label">Name</label>
-          <input id="q-name" name="name" type="text" required class="input" />
+          <input id="q-name" name="name" type="text" required autocomplete="name" class="input" />
+          <p id="q-name-err" class="m-0 hidden text-sm text-brand"></p>
         </div>
         <div class="flex flex-col gap-1.5">
-          <label for="q-company" class="label">Company</label>
-          <input id="q-company" name="company" type="text" required class="input" />
+          <label for="q-company" class="label">Company or institution</label>
+          <input id="q-company" name="company" type="text" required autocomplete="organization" class="input" />
+          <p id="q-company-err" class="m-0 hidden text-sm text-brand"></p>
         </div>
         <div class="flex flex-col gap-1.5">
           <label for="q-email" class="label">Work email</label>
-          <input id="q-email" name="email" type="email" required class="input" />
+          <input id="q-email" name="email" type="email" required autocomplete="email" class="input" aria-describedby="q-email-hint" />
+          <p id="q-email-hint" class="m-0 text-[13px] text-ink-muted">Company or university address; free mailboxes (Gmail, Outlook, QQ …) are not accepted.</p>
+          <p id="q-email-err" class="m-0 hidden text-sm text-brand"></p>
         </div>
         <div class="flex flex-col gap-1.5">
           <label for="q-product" class="label">Product / SKU</label>
@@ -52,12 +56,71 @@ import Base from '@/layouts/Base.astro';
         {/* Honeypot */}
         <input type="text" name="website" tabindex={-1} autocomplete="off" class="absolute -left-[9999px] h-0 w-0 overflow-hidden" aria-hidden="true" />
 
-        <button type="submit" class="btn-md btn-primary mt-2">Send quote request</button>
+        {/* Cloudflare human check (rendered when a site key is configured) */}
+        <div id="q-turnstile" class="min-h-0"></div>
+        <p id="q-form-err" class="m-0 hidden text-sm text-brand"></p>
+
+        <button id="q-submit" type="submit" class="btn-md btn-primary mt-2">Send quote request</button>
         <p class="m-0 text-sm text-ink-muted">We reply within one business day. You can also email <a href="mailto:hello@calib.tools">hello@calib.tools</a> directly.</p>
       </form>
     </div>
   </div>
   <script>
+    import { checkWorkEmail, WORK_EMAIL_MESSAGE } from '@/lib/workEmail';
+    import { mountTurnstile, TURNSTILE_SITE_KEY } from '@/lib/turnstileClient';
+
+    const form = document.getElementById('q-form') as HTMLFormElement;
+    const showErr = (field: string, msg: string) => {
+      const el = document.getElementById(`q-${field}-err`) ?? document.getElementById('q-form-err')!;
+      el.textContent = msg; el.classList.toggle('hidden', !msg);
+    };
+    const clearErrs = () => ['name', 'company', 'email', 'form'].forEach((f) => showErr(f, ''));
+
+    // Instant work-email feedback
+    const emailInput = document.getElementById('q-email') as HTMLInputElement;
+    emailInput.addEventListener('blur', () => {
+      if (!emailInput.value.trim()) return showErr('email', '');
+      const r = checkWorkEmail(emailInput.value);
+      showErr('email', r.ok ? '' : WORK_EMAIL_MESSAGE[r.reason]);
+    });
+
+    // Human check
+    let token = '';
+    let resetCheck = () => {};
+    const box = document.getElementById('q-turnstile')!;
+    if (TURNSTILE_SITE_KEY) {
+      box.classList.add('min-h-[65px]');
+      mountTurnstile(box, (t) => { token = t; }).then((r) => { resetCheck = r; });
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      clearErrs();
+      const r = checkWorkEmail(emailInput.value);
+      if (!r.ok) { showErr('email', WORK_EMAIL_MESSAGE[r.reason]); emailInput.focus(); return; }
+      if (TURNSTILE_SITE_KEY && !token) { showErr('form', 'Please complete the human check.'); return; }
+      const fd = new FormData(form);
+      if (token) fd.set('cf-turnstile-response', token);
+      const btn = document.getElementById('q-submit') as HTMLButtonElement;
+      btn.disabled = true;
+      try {
+        const res = await fetch('/api/quote', { method: 'POST', body: fd, headers: { Accept: 'application/json' } });
+        const data = await res.json().catch(() => ({ ok: false, message: 'Something went wrong. Please email hello@calib.tools.' }));
+        if (data.ok) {
+          document.getElementById('q-sent')!.classList.replace('hidden', 'flex');
+          form.classList.replace('flex', 'hidden');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+          showErr(data.field && data.field !== 'turnstile' ? data.field : 'form', data.message ?? 'Something went wrong.');
+          resetCheck(); token = '';
+        }
+      } catch {
+        showErr('form', 'Network error. Please try again, or email hello@calib.tools.');
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
     const qp = new URLSearchParams(location.search);
     if (qp.get('sent') === '1') {
       document.getElementById('q-sent')!.classList.replace('hidden', 'flex');

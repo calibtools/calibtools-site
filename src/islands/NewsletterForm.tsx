@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import TurnstileBox from './TurnstileBox';
 
 /**
  * Newsletter signup form.
@@ -8,6 +9,8 @@ import { useState, useRef } from 'react';
 export default function NewsletterForm() {
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<'idle' | 'busy' | 'success' | 'error'>('idle');
+  const [turnstile, setTurnstile] = useState('');
+  const [resetKey, setResetKey] = useState(0);
   const [message, setMessage] = useState('');
   const honeypotRef = useRef<HTMLInputElement>(null);
 
@@ -27,9 +30,10 @@ export default function NewsletterForm() {
       const res = await fetch('/api/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: trimmed, honeypot: honeypotRef.current?.value ?? '' }),
+        body: JSON.stringify({ email: trimmed, honeypot: honeypotRef.current?.value ?? '', turnstile }),
       });
       const data = await res.json();
+      setResetKey((k) => k + 1);
 
       if (data.ok) {
         setStatus('success');
@@ -84,6 +88,8 @@ export default function NewsletterForm() {
         className="absolute -left-[9999px] h-0 w-0 overflow-hidden"
         aria-hidden="true"
       />
+
+      <TurnstileBox onToken={setTurnstile} resetKey={resetKey} />
 
       {message && (
         <p className={`m-0 text-sm ${status === 'success' ? 'text-green-700' : 'text-brand'}`}>

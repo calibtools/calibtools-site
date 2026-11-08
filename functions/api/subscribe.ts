@@ -14,6 +14,7 @@
  */
 
 import { adminFetch } from '../../src/lib/shopifyAdmin';
+import { verifyTurnstile } from '../../src/lib/turnstile';
 
 interface Env {
   SHOPIFY_CLIENT_ID?: string;
@@ -21,6 +22,7 @@ interface Env {
   SHOPIFY_STORE_DOMAIN?: string;
   QUOTES?: KVNamespace;
   WEBHOOKS?: KVNamespace;
+  TURNSTILE_SECRET_KEY?: string;
 }
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -30,7 +32,7 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
   const json = (type: string, body: Record<string, any>, status = 200) =>
     new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });
 
-  let body: { email?: string; honeypot?: string; tag?: string };
+  let body: { email?: string; honeypot?: string; tag?: string; turnstile?: string };
   try {
     body = await ctx.request.json();
   } catch {
@@ -47,6 +49,10 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
 
   // Rate limit by IP
   const ip = ctx.request.headers.get('CF-Connecting-IP') ?? 'unknown';
+
+  // Human check (Cloudflare Turnstile)
+  const human = await verifyTurnstile(String(body.turnstile ?? ''), ctx.env.TURNSTILE_SECRET_KEY, ip);
+  if (!human.ok) return json('error', { ok: false, message: human.message }, 403);
   if (ctx.env.QUOTES) {
     const rateKey = `sub-rate-${ip}-${Math.floor(Date.now() / 3_600_000)}`;
     const count = Number(await ctx.env.QUOTES.get(rateKey) ?? '0');

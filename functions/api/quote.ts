@@ -14,9 +14,14 @@
  * - (Optional) DMARC: TXT _dmarc.calib.tools → v=DMARC1; p=none; rua=mailto:hello@calib.tools
  */
 
+import { checkWorkEmail, hasMailServer, WORK_EMAIL_MESSAGE } from '../../src/lib/workEmail';
+import { verifyTurnstile, TURNSTILE_FIELD } from '../../src/lib/turnstile';
+
 interface Env {
   RESEND_API_KEY?: string;
   QUOTES?: KVNamespace;
+  /** Cloudflare Turnstile secret; human check is enforced once this is set. */
+  TURNSTILE_SECRET_KEY?: string;
 }
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -31,12 +36,17 @@ export function cleanPatternPath(raw: string): string {
 }
 const RATE_LIMIT = 10; // per hour per IP
 
-function validate(fields: Record<string, string>): string | null {
-  if (!fields.name) return 'Name is required.';
-  if (!fields.email) return 'Email is required.';
-  if (!EMAIL_RE.test(fields.email)) return 'Invalid email address.';
+type FieldError = { field: string; message: string };
+
+function validate(fields: Record<string, string>): FieldError | null {
+  if (!fields.name) return { field: 'name', message: 'Please enter your name.' };
+  if (!fields.company) return { field: 'company', message: 'Please enter your company or institution.' };
+  if (!fields.email) return { field: 'email', message: 'Please enter your work email.' };
+  if (!EMAIL_RE.test(fields.email)) return { field: 'email', message: WORK_EMAIL_MESSAGE.invalid };
+  const work = checkWorkEmail(fields.email);
+  if (!work.ok) return { field: 'email', message: WORK_EMAIL_MESSAGE[work.reason] };
   for (const [key, val] of Object.entries(fields)) {
-    if (val.length > MAX_LEN) return `${key} exceeds ${MAX_LEN} characters.`;
+    if (val.length > MAX_LEN) return { field: key, message: `${key} exceeds ${MAX_LEN} characters.` };
   }
   return null;
 }
@@ -59,10 +69,22 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
   };
   const patternPath = cleanPatternPath(String(formData.get('pattern') ?? ''));
 
+  const wantsJson = (ctx.request.headers.get('Accept') ?? '').includes('application/json');
+  const fail = (status: number, field: string, message: string) =>
+    wantsJson
+      ? new Response(JSON.stringify({ ok: false, field, message }), { status, headers: { 'Content-Type': 'application/json' } })
+      : new Response(message, { status });
+
   const error = validate(fields);
-  if (error) {
-    return new Response(error, { status: 400 });
-  }
+  if (error) return fail(400, error.field, error.message);
+
+  // Human check (Cloudflare Turnstile)
+  const ipForCheck = ctx.request.headers.get('CF-Connecting-IP') ?? '';
+  const human = await verifyTurnstile(String(formData.get(TURNSTILE_FIELD) ?? ''), ctx.env.TURNSTILE_SECRET_KEY, ipForCheck);
+  if (!human.ok) return fail(403, 'turnstile', human.message);
+
+  // The email domain has to accept mail
+  if (!(await hasMailServer(fields.email.split('@')[1]))) return fail(400, 'email', WORK_EMAIL_MESSAGE.nomx);
 
   // Rate limit by IP using KV (skip if KV not bound)
   const ip = ctx.request.headers.get('CF-Connecting-IP') ?? 'unknown';
@@ -70,7 +92,7 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
     const rateKey = `rate-${ip}-${Math.floor(Date.now() / 3_600_000)}`;
     const count = Number(await ctx.env.QUOTES.get(rateKey) ?? '0');
     if (count >= RATE_LIMIT) {
-      return new Response('Too many requests. Please try again later.', { status: 429 });
+      return fail(429, 'form', 'Too many requests. Please try again later.');
     }
     await ctx.env.QUOTES.put(rateKey, String(count + 1), { expirationTtl: 3600 });
   }

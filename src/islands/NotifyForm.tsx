@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import TurnstileBox from './TurnstileBox';
 
 interface Props {
   handle: string;
@@ -7,6 +8,8 @@ interface Props {
 export default function NotifyForm({ handle }: Props) {
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<'idle' | 'busy' | 'success' | 'error'>('idle');
+  const [turnstile, setTurnstile] = useState('');
+  const [resetKey, setResetKey] = useState(0);
   const [message, setMessage] = useState('');
   const honeypotRef = useRef<HTMLInputElement>(null);
 
@@ -28,10 +31,12 @@ export default function NotifyForm({ handle }: Props) {
           email: trimmed,
           honeypot: honeypotRef.current?.value ?? '',
           tag: `revision:${handle}`,
+          turnstile,
         }),
       });
 
       const data = await res.json();
+      setResetKey((k) => k + 1);
       if (data.ok) {
         setStatus('success');
         setMessage('You\u2019ll be notified when the datasheet is updated.');
@@ -83,6 +88,7 @@ export default function NotifyForm({ handle }: Props) {
           {status === 'busy' ? 'Subscribing…' : 'Notify me'}
         </button>
       </div>
+      <TurnstileBox onToken={setTurnstile} resetKey={resetKey} />
       {status === 'error' && message && (
         <p className="m-0 text-sm text-brand">{message}</p>
       )}
