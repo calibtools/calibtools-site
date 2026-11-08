@@ -116,6 +116,21 @@ describe('outlined SVGs', () => {
     expect(svg).toContain('32mm');
   });
 
+  it('outlined brand SVGs have no NaN coordinates and keep every arc glyph', () => {
+    // opentype.js toPathData() writes "NaN" for coordinates that round to 0 and the
+    // glyph silently disappears. The committed stamp was also stale (still said MUNICH).
+    for (const p of [STAMP_SVG_PATH, MARK_SVG_PATH]) {
+      if (!existsSync(p)) continue;
+      expect(readFileSync(p, 'utf-8')).not.toMatch(/NaN/);
+    }
+    if (!existsSync(STAMP_SVG_PATH)) return;
+    const stamp = readFileSync(STAMP_SVG_PATH, 'utf-8');
+    // Arc glyphs carry a rotate() transform: CALIB.TOOLS (11) + DIMENSIONAL INSPECTION without the space (21).
+    const arcGlyphs = (stamp.match(/transform="translate\([^)]*\) rotate\(/g) ?? []).length;
+    expect(arcGlyphs).toBe(32);
+    expect(stamp).not.toMatch(/MUNICH/i);
+  });
+
   it('product-mark-inspected.svg contains no <text> elements', () => {
     if (!existsSync(MARK_SVG_PATH)) return;
     const svg = readFileSync(MARK_SVG_PATH, 'utf-8');

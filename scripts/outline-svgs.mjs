@@ -30,7 +30,9 @@ const BRAND_RED = '#E60012';
 function outlineStampSvg() {
   const D = 32;
   const r = D / 2;
-  const rInner = r - 1.8;
+  // Ring band must hold the arc text: Geist Medium cap height ≈ 0.71 em,
+  // so a 3.2 mm top line needs ≈ 2.3 mm plus clearance to both rings.
+  const rInner = r - 4.0;
   const ringOuterW = 0.4;
   const ringInnerW = 0.25;
 
@@ -40,23 +42,32 @@ function outlineStampSvg() {
   paths.push(`<circle cx="0" cy="0" r="${r}" fill="none" stroke="${BRAND_RED}" stroke-width="${ringOuterW}"/>`);
   paths.push(`<circle cx="0" cy="0" r="${rInner}" fill="none" stroke="${BRAND_RED}" stroke-width="${ringInnerW}"/>`);
 
-  // Arc radius = middle of ring band
-  const arcR = (r + rInner) / 2;
+  // Baseline radii: the top line reads outward from its baseline, so the
+  // baseline sits just outside the inner ring; the bottom line is flipped
+  // (letters stand on their feet) so its baseline sits just inside the outer ring.
+  const capRatio = 0.71;
+  const topSize = 3.2;
+  const bottomSize = 2.8;
+  const clearance = 0.75;
+  const arcRTop = rInner + ringInnerW / 2 + clearance;
+  const arcRBottom = r - ringOuterW / 2 - clearance;
+  if (arcRTop + topSize * capRatio > r - ringOuterW / 2 - 0.5) throw new Error('stamp: top arc text does not fit the ring band');
+  if (arcRBottom - bottomSize * capRatio < rInner + ringInnerW / 2 + 0.5) throw new Error('stamp: bottom arc text does not fit the ring band');
 
   // Top arc text: "CALIB.TOOLS" — centered at top (−90° in SVG y-down)
-  paths.push(arcTextToPath('CALIB.TOOLS', geistMedium, 3.2, arcR, -90, false));
+  paths.push(arcTextToPath('CALIB.TOOLS', geistMedium, topSize, arcRTop, -90, false));
 
   // Bottom arc text: "DIMENSIONAL INSPECTION" — centered at bottom (+90° in SVG y-down)
-  paths.push(arcTextToPath('DIMENSIONAL INSPECTION', geistMedium, 2.8, arcR, 90, true));
+  paths.push(arcTextToPath('DIMENSIONAL INSPECTION', geistMedium, bottomSize, arcRBottom, 90, true));
 
-  // Center "INSPECTED" — Geist Pixel, y = −3 mm (above center in SVG y-down)
-  paths.push(textToPath('INSPECTED', geistPixel, 4, 0, -3, 'middle'));
+  // Center "INSPECTED" — Geist Pixel, y = −2.6 mm; 3.4 mm keeps it clear of the 12 mm inner ring
+  paths.push(textToPath('INSPECTED', geistPixel, 3.4, 0, -2.6, 'middle'));
 
   // SN placeholder — y = +1 mm
-  paths.push(textToPath('SN ______', geistMono, 2.2, 0, 1, 'middle'));
+  paths.push(textToPath('SN ______', geistMono, 2.2, 0, 1.2, 'middle'));
 
   // Date placeholder — y = +3.5 mm
-  paths.push(textToPath('DATE ______ ___', geistMono, 1.8, 0, 3.5, 'middle'));
+  paths.push(textToPath('DATE ______ ___', geistMono, 1.8, 0, 3.8, 'middle'));
 
   const viewBox = `${-r - 1} ${-r - 1} ${D + 2} ${D + 2}`;
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}" width="${D}mm" height="${D}mm">
@@ -102,8 +113,27 @@ function fitFontSize(text, font, idealSize, maxWidth) {
   return idealSize * (maxWidth / textWidth);
 }
 
+
+/**
+ * Serialize an opentype Path to SVG path data without opentype's toPathData():
+ * that method emits "NaN" for coordinates that round to 0 (e.g. a glyph placed
+ * at baseline y = 0), which silently drops the glyph. Same fix as scripts/factory-artwork.ts.
+ */
+function pathData(p) {
+  const n = (v) => (Math.abs(v) < 0.0005 ? '0' : v.toFixed(3));
+  return p.commands.map((c) => {
+    switch (c.type) {
+      case 'M': return `M${n(c.x)} ${n(c.y)}`;
+      case 'L': return `L${n(c.x)} ${n(c.y)}`;
+      case 'Q': return `Q${n(c.x1)} ${n(c.y1)} ${n(c.x)} ${n(c.y)}`;
+      case 'C': return `C${n(c.x1)} ${n(c.y1)} ${n(c.x2)} ${n(c.y2)} ${n(c.x)} ${n(c.y)}`;
+      default: return 'Z';
+    }
+  }).join('');
+}
+
 // ---------------------------------------------------------------------------
-// Text to SVG path helpers — uses getPath().toPathData() for correct y-flip
+// Text to SVG path helpers — uses getPath() for correct y-flip, pathData() to serialize
 // ---------------------------------------------------------------------------
 
 /**
@@ -124,7 +154,7 @@ function textToPath(text, font, fontSize, x, y, anchor) {
 
   // Use font.getPath which handles y-flip correctly for SVG
   const path = font.getPath(text, startX, y, fontSize);
-  const d = path.toPathData(3);
+  const d = pathData(path);
   if (!d) return '';
   return `<path d="${d}" fill="${BRAND_RED}"/>`;
 }
@@ -178,7 +208,7 @@ function arcTextToPath(text, font, fontSize, radius, centreAngleDeg, flip) {
     // Get glyph path at origin with correct y-flip via getPath
     const glyph = font.charToGlyph(chars[i]);
     const glyphPath = glyph.getPath(-charWidths[i] / 2, 0, fontSize);
-    const d = glyphPath.toPathData(3);
+    const d = pathData(glyphPath);
     if (!d) { curAngle += dir * (charWidths[i] + spaceAdv) / radius; continue; }
 
     allPaths += `<path d="${d}" fill="${BRAND_RED}" transform="translate(${cx.toFixed(3)},${cy.toFixed(3)}) rotate(${rotDeg.toFixed(2)})"/>`;
@@ -219,7 +249,8 @@ console.log('[outline-svgs] All SVGs verified: no <text> elements.');
 
 async function svgToPdf(svgContent, pdfPath, widthMm, heightMm) {
   const { chromium } = await import('@playwright/test');
-  const browser = await chromium.launch();
+  // CT_CHROMIUM_PATH lets environments without Playwright's own download use a system Chrome (same hook as src/docs/ctdoc.ts).
+  const browser = await chromium.launch(process.env.CT_CHROMIUM_PATH ? { executablePath: process.env.CT_CHROMIUM_PATH } : {});
   const page = await browser.newPage();
   await page.setContent(`<!DOCTYPE html><html><body style="margin:0;padding:0;overflow:hidden">${svgContent.replace(/width="[^"]*"/, `width="${widthMm}mm"`).replace(/height="[^"]*"/, `height="${heightMm}mm"`)}</body></html>`);
   await page.pdf({
