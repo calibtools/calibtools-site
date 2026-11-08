@@ -9,10 +9,12 @@ The new system has four marks, each in positive (light bg) and negative (dark bg
 
 | Mark | File in `public/brand/` | Use |
 |---|---|---|
-| Horizontal lockup | `lockup-light.svg` / `lockup-dark.svg` | Desktop header nav (h 40 px) |
-| C.T icon | `icon-light.svg` / `icon-dark.svg` | Mobile header (h 48 px), app icon, favicon source |
-| Wordmark framed | `wordmark-framed-light.svg` / `wordmark-framed-dark.svg` | Footer (h 28 px), documents |
-| Wordmark compact | `wordmark-compact-light.svg` / `wordmark-compact-dark.svg` | Product label lines, inline |
+| Wordmark framed | `wordmark-framed-light.svg` (brand kit `calibtools-wordmark-framed-positive.svg`) / `wordmark-framed-dark.svg` (`calibtools-wordmark-framed-negative.svg`) | **The only logo in the site header and footer**, desktop and mobile. Positive on light grounds, negative on dark grounds; red dot in both. Header h 40 px desktop / 32 px mobile, footer h 24 px. Also documents |
+| C.T icon | `/favicon.svg` (brand kit `calibtools-icon-positive.svg`) and the favicon/app-icon PNGs derived from it | **Favicon only.** Not used in the header, footer or page content |
+| Wordmark compact | `wordmark-compact-light.svg` / `wordmark-compact-dark.svg` | Product label lines on boards and print exports, inline |
+| Horizontal lockup | `lockup-light.svg` / `lockup-dark.svg` | Retired from the site (2026-11-08); kept in the kit for third-party listings only if asked |
+
+Never use the mono-black or mono-white framed wordmark on the site: the dot stays red.
 
 SVGs have non-standard viewBoxes (negative origins). Size only with CSS `height`; never set both `width` and `height`.
 
@@ -21,14 +23,14 @@ SVGs have non-standard viewBoxes (negative origins). Size only with CSS `height`
 | Context | Mark |
 |---|---|
 | **Exports and print** (tool exports, datasheets, all customer documents) | Framed wordmark at \u2265 25 mm; where the brand block must be narrower, the compact wordmark at \u2265 20 mm |
-| **Screen — desktop** (site header, marketing pages) | Horizontal lockup |
-| **Screen — mobile** (header, app icons, social) | C.T icon |
+| **Screen — header and footer** (desktop and mobile) | Framed wordmark, positive or negative |
+| **Browser tab, bookmarks, home-screen icon** | C.T icon (favicon set) |
 
 ### Clear-space rules
 
 - Around lockups/wordmarks: clear space = cap-height H of the word "CALIB" in that mark.
 - Around the C.T icon: clear space = 0.25 × icon diameter D.
-- Minimum rendered widths: lockup 140 px, compact wordmark 90 px, icon 16 px.
+- Minimum rendered widths: framed wordmark 120 px, compact wordmark 90 px, icon 16 px (favicon).
 
 ## Color — red accent rule
 
