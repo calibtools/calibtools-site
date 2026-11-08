@@ -11,6 +11,7 @@
  */
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+// @ts-expect-error opentype.js ships no types
 import opentype from 'opentype.js';
 import { chromium } from '@playwright/test';
 import { parse } from '../src/lib/partNumber';
@@ -53,21 +54,23 @@ const whiteSquares = Math.floor((spec.rows * spec.cols) / 2);
 // Fonts → outlined paths
 // ---------------------------------------------------------------------------
 const FONT_DIR = resolve('src/assets/fonts');
-const mono = opentype.parse(readFileSync(resolve(FONT_DIR, 'GeistMono-Regular.ttf')).buffer);
-const sans = opentype.parse(readFileSync(resolve(FONT_DIR, 'Geist-Regular.ttf')).buffer);
-const sansBold = opentype.parse(readFileSync(resolve(FONT_DIR, 'Geist-SemiBold.ttf')).buffer);
+const mono: Font = opentype.parse(readFileSync(resolve(FONT_DIR, 'GeistMono-Regular.ttf')).buffer);
+const sans: Font = opentype.parse(readFileSync(resolve(FONT_DIR, 'Geist-Regular.ttf')).buffer);
+const sansBold: Font = opentype.parse(readFileSync(resolve(FONT_DIR, 'Geist-SemiBold.ttf')).buffer);
 
-function textWidth(text: string, font: opentype.Font, sizeMm: number): number {
+type Font = { unitsPerEm: number; getAdvanceWidth(t: string, size: number): number; getPath(t: string, x: number, y: number, size: number): FontPath };
+type FontPath = { commands: Array<{ type: string; x: number; y: number; x1: number; y1: number; x2: number; y2: number }> };
+function textWidth(text: string, font: Font, sizeMm: number): number {
   return font.getAdvanceWidth(text, sizeMm);
 }
-function text(textStr: string, font: opentype.Font, sizeMm: number, x: number, y: number, fill = '#333333', anchor: 'start' | 'middle' | 'end' = 'start'): string {
+function text(textStr: string, font: Font, sizeMm: number, x: number, y: number, fill = '#333333', anchor: 'start' | 'middle' | 'end' = 'start'): string {
   const w = textWidth(textStr, font, sizeMm);
   const sx = anchor === 'middle' ? x - w / 2 : anchor === 'end' ? x - w : x;
   const d = pathData(font.getPath(textStr, sx, y, sizeMm));
   return d ? `<path d="${d}" fill="${fill}"/>` : '';
 }
 /** opentype's toPathData() emits NaN for coordinates that round to 0; serialize the commands ourselves. */
-function pathData(p: opentype.Path): string {
+function pathData(p: FontPath): string {
   const n = (v: number) => (Math.abs(v) < 0.0005 ? '0' : v.toFixed(3));
   return p.commands.map((c) => {
     switch (c.type) {
