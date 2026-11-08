@@ -10,6 +10,7 @@ import {
   visualTable,
   coordsPreview,
   parsePartNumber,
+  methodParagraph,
   type IRData,
   type IRMeasurements,
   type Coord,
@@ -62,7 +63,7 @@ const SAMPLE_MEAS: IRMeasurements = {
   ],
   traceability: {
     instrument_cert: 'OCMM-01 \u00b7 certificate K-2026-03-0141 \u00b7 valid to 2027-03',
-    reference: 'Golden sample GS-CHA-C-185110-6X6 \u00b7 DAkkS certificate [number] \u00b7 valid to [date]',
+    reference: 'Golden sample GS-C-CR-A-01 (process unit PU-C-CR-A) \u00b7 DAkkS calibration certificate [number] \u00b7 valid to [date]',
     retention: 'Raw data retained for 10 years under this serial number.',
   },
   coordinates: { file: 'CT-CSV-000311.csv', n: 66, max_id: 33, max_um: 1.4, rms_um: 0.6 },
@@ -211,5 +212,29 @@ describe('buildCSV', () => {
     } finally {
       rmSync(tmp, { recursive: true });
     }
+  });
+});
+
+// ── method paragraph (golden sample per process unit, 2026-11-06) ──
+
+describe('methodParagraph', () => {
+  it('names the process-unit golden sample, not one per part number', () => {
+    const t = methodParagraph(SAMPLE_DATA, SAMPLE_MEAS, false);
+    expect(t).toContain('GS-C-CR-A-01');
+    expect(t).toContain('PU-C-CR-A');
+    expect(t).not.toContain('GS-CHA');
+    expect(t).toMatch(/checked against golden sample/);
+    expect(t).toContain('66 ChArUco corners were measured');
+    expect(t).toContain('ambient 20.4');
+  });
+
+  it('uses future tense while pending', () => {
+    const t = methodParagraph(SAMPLE_DATA, null, true);
+    expect(t).toContain('will be measured');
+    expect(t).not.toContain('ambient');
+  });
+
+  it('throws for a part number without a defined process unit', () => {
+    expect(() => methodParagraph({ ...SAMPLE_DATA, part_number: 'CT-DEP-M-100X100-ST3' }, SAMPLE_MEAS, false)).toThrow(/process unit/);
   });
 });

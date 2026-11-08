@@ -37,7 +37,7 @@ The table above covers the ceramic substrate. You'll find the geometry of each t
 With every ceramic target you get:
 
 - **Datasheet PDF** — dimensions, tolerances, material
-- **Measured before it ships** — every board is checked against a golden-sample reference
+- **Measured before it ships** — every board is measured against a golden-sample reference for its material and process
 - **Config files** — OpenCV JSON, ROS 2 YAML and HALCON point tuples from the free generator
 
 ## Cleaning & care
