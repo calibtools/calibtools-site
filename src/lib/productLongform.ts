@@ -40,3 +40,8 @@ export function skuTitleFor(partNumber: string, skus: SkuNote[] | undefined): st
   const key = skuAnchor(partNumber);
   return skus?.find((s) => skuAnchor(s.partNumber) === key)?.title;
 }
+
+/** Site-internal `href: "/..."` values in frontmatter (relatedTargets, relatedGuides, links). */
+export function extractFrontmatterHrefs(frontmatter: string): string[] {
+  return [...frontmatter.matchAll(/href:\s*"?(\/[^"\s,}]*)/g)].map((m) => m[1].split('#')[0]);
+}

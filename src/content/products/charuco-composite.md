@@ -22,6 +22,18 @@ skus:
     title: "ChArUco 9 × 14, 40 mm squares, 600 × 400 mm, 104 corners"
   - partNumber: "CT-CHA-P-800X600"
     title: "ChArUco 11 × 15, 50 mm squares, 800 × 600 mm, 140 corners"
+relatedTargets:
+  - { label: "Checkerboard, aluminum", href: "/targets/checkerboard-composite/", note: "The simplest pattern, when the whole board stays in view." }
+  - { label: "AprilGrid, aluminum", href: "/targets/aprilgrid-composite/", note: "The board Kalibr expects for camera-IMU calibration." }
+  - { label: "Circle grid, aluminum", href: "/targets/circlegrid-composite/", note: "Symmetric and asymmetric circle patterns." }
+  - { label: "HALCON plate, aluminum", href: "/targets/halcon-composite/", note: "For HALCON camera calibration." }
+  - { label: "ChArUco, ceramic", href: "/targets/charuco-ceramic/", note: "The same pattern with a tighter tolerance." }
+  - { label: "Multi-camera target", href: "/targets/multi-camera-target/", note: "Several boards with separate ID ranges." }
+relatedGuides:
+  - { label: "How big should your target be?", href: "/guides/calibration-target-size/", note: "The 60 % fill rule and pixels per square." }
+  - { label: "OpenCV camera calibration", href: "/guides/opencv-camera-calibration/", note: "Load the board file and run the calibration." }
+  - { label: "Hand-eye calibration with OpenCV", href: "/guides/hand-eye-calibration-opencv/", note: "Camera on a robot arm, step by step." }
+  - { label: "Multi-board marker IDs", href: "/guides/multi-board-marker-ids/", note: "Several boards in one scene." }
 ---
 
 ## How a ChArUco board works
@@ -99,12 +111,3 @@ The [detection check](/tools/check/) shows what the detector finds in a photo, a
 ## Care and storage
 
 Clean with water or isopropyl alcohol up to 70 % and a soft cloth. Store the board dry between −20 and +60 °C, flat or standing on its long edge.
-
-## Related targets
-
-- [Checkerboard, aluminum](/targets/checkerboard-composite/): the simplest pattern, when the whole board stays in view.
-- [AprilGrid, aluminum](/targets/aprilgrid-composite/): the board Kalibr expects for camera-IMU calibration.
-- [Circle grid, aluminum](/targets/circlegrid-composite/): symmetric and asymmetric circle patterns.
-- [HALCON calibration plate, aluminum](/targets/halcon-composite/): for HALCON camera calibration.
-- [ChArUco, ceramic](/targets/charuco-ceramic/): the same pattern with a tighter tolerance.
-- [Multi-camera target](/targets/multi-camera-target/): several boards with separate ID ranges.

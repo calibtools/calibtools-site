@@ -59,6 +59,9 @@ const products = defineCollection({
     compat: z.array(z.object({ tool: z.string(), note: z.string() })).optional(),
     /** One-line description per part number, shown in the ordering table (long-form pages). */
     skus: z.array(z.object({ partNumber: z.string(), title: z.string().max(90) })).default([]),
+    /** Right-column lists on long-form pages (desktop aside, after the article on mobile). */
+    relatedTargets: z.array(z.object({ label: z.string(), href: z.string(), note: z.string().max(80) })).default([]),
+    relatedGuides: z.array(z.object({ label: z.string(), href: z.string(), note: z.string().max(80) })).default([]),
   }),
 });
 
