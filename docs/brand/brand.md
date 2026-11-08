@@ -9,12 +9,14 @@ The new system has four marks, each in positive (light bg) and negative (dark bg
 
 | Mark | File in `public/brand/` | Use |
 |---|---|---|
-| Wordmark framed | `wordmark-framed-light.svg` (brand kit `calibtools-wordmark-framed-positive.svg`) / `wordmark-framed-dark.svg` (`calibtools-wordmark-framed-negative.svg`) | **The only logo in the site header and footer**, desktop and mobile. Positive on light grounds, negative on dark grounds; red dot in both. Header h 40 px desktop / 32 px mobile, footer h 24 px. Also documents |
+| Wordmark framed | `wordmark-framed-light.svg` (brand kit `calibtools-wordmark-framed-positive.svg`) / `wordmark-framed-dark.svg` (`calibtools-wordmark-framed-negative.svg`); on the site the **™ versions** `wordmark-framed-light-tm.svg` / `wordmark-framed-dark-tm.svg` | **The only logo in the site header and footer**, desktop and mobile. Positive on light grounds, negative on dark grounds; red dot in both; always with ™. Header h 40 px desktop / 32 px mobile, footer h 28 px. Also documents |
 | C.T icon | `/favicon.svg` (brand kit `calibtools-icon-positive.svg`) and the favicon/app-icon PNGs derived from it | **Favicon only.** Not used in the header, footer or page content |
 | Wordmark compact | `wordmark-compact-light.svg` / `wordmark-compact-dark.svg` | Product label lines on boards and print exports, inline |
 | Horizontal lockup | `lockup-light.svg` / `lockup-dark.svg` | Retired from the site (2026-11-08); kept in the kit for third-party listings only if asked |
 
 Never use the mono-black or mono-white framed wordmark on the site: the dot stays red.
+
+**™**: the site logo carries ™ (Geist SemiBold, outlined, letter color, cap height 36 % of the wordmark cap height, top-aligned with the frame, right of the top-right bracket). The `-tm` files are generated from the brand-kit originals by `pnpm exec tsx scripts/brand-tm.ts`; the originals stay untouched. Switch to ® only after the registration is granted.
 
 SVGs have non-standard viewBoxes (negative origins). Size only with CSS `height`; never set both `width` and `height`.
 
