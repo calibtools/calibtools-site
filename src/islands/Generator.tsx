@@ -4,6 +4,7 @@ import { checkerboardSvg, type PatternSpec } from '@/lib/patterns';
 import { exportPdf, exportTiledPdf } from '@/lib/exportPdf';
 import { exportPng } from '@/lib/exportPng';
 import { exportDxf } from '@/lib/exportDxf';
+import { matchCatalog, productUrlFor, specFromEntry, quoteSummary } from '@/lib/catalogPatterns';
 import { kalibrYaml, kalibrSupported, ros2Yaml, halconCode, halconSupported, opencvJson } from '@/lib/exportConfig';
 import { exportZip } from '@/lib/exportZip';
 import { patternSummary } from '@/lib/brand';
@@ -25,19 +26,6 @@ const DICTS = [
 ];
 // PAPERS imported from pageLayout.ts
 
-/** Build a product URL with query params to preselect the variant. */
-function productCtaUrl(spec: PatternSpec): string {
-  const isCharuco = spec.type === 'ChArUco' || spec.type === 'ArUco grid';
-  const handle = isCharuco ? 'charuco-composite' : 'checkerboard-composite';
-  const params = new URLSearchParams();
-  // Map board dimensions to the closest available size
-  const bw = spec.cols * spec.square;
-  const bh = spec.rows * spec.square;
-  params.set('size', `${bw}x${bh}`);
-  if (isCharuco && spec.dict) params.set('dictionary', spec.dict);
-  return `/targets/${handle}/?${params.toString()}`;
-}
-
 interface GeneratorProps {
   /** Override the default pattern state for preset landing pages. */
   initialSpec?: Partial<PatternSpec>;
@@ -48,9 +36,6 @@ interface GeneratorProps {
 function mmToIn(mm: number): string {
   return (mm / 25.4).toFixed(2);
 }
-
-// Product sizes we sell (width x height in mm)
-const PRODUCT_SIZES: [number, number][] = [[200,200],[300,200],[300,300],[400,300],[400,400],[500,300],[500,400]];
 
 export default function Generator({ initialSpec, heading = 'Pattern generator' }: GeneratorProps = {}) {
   const defaultSpec: PatternSpec = { type: 'ChArUco', rows: 7, cols: 10, square: 25, marker: markerForSquare(25), dict: 'DICT_6X6_250', paper: 'A4', startId: 0, scaleBar: true };
@@ -122,9 +107,15 @@ export default function Generator({ initialSpec, heading = 'Pattern generator' }
   const set = <K extends keyof PatternSpec>(k: K, v: PatternSpec[K]) => setSpec((s) => ({ ...s, [k]: v }));
   const ext = patternExtent(spec);
   const boardW = Math.round(ext.bw * 10) / 10, boardH = Math.round(ext.bh * 10) / 10;
-  const productMatch = PRODUCT_SIZES.find(([pw2,ph2]) =>
-    Math.abs(boardW - pw2) <= 2 && Math.abs(boardH - ph2) <= 2
-  );
+  const catalog = useMemo(() => matchCatalog(spec), [spec]);
+  /** Quote request prefilled with this exact pattern (parameters only, no files). */
+  const requestQuote = () => {
+    const q = new URLSearchParams();
+    q.set('summary', quoteSummary(spec));
+    q.set('pattern', `${window.location.pathname}${window.location.search}`);
+    if (boardCount > 1) q.set('boards', String(boardCount));
+    window.location.href = `/quote/?${q.toString()}`;
+  };
 
   // Auto-size paper: pick smallest standard page that fits (orientation-aware)
   useEffect(() => {
@@ -535,8 +526,8 @@ export default function Generator({ initialSpec, heading = 'Pattern generator' }
             <span>Preview · {spec.paper} {layout.orientation} · {spec.rows} × {spec.cols} {spec.type}, {isSheet ? `${spec.marker || spec.square} mm markers` : `${spec.square} mm squares`}{layout.usableGrid && !isSheet ? ` · ${layout.usableGrid}` : ''}</span>
           )}
           <span className="font-mono">Board {boardW} × {boardH} mm <span className="text-ink-soft">({mmToIn(boardW)} × {mmToIn(boardH)} in)</span> {isSheet ? '' : ` · ${corners} corners`} · {markers} {markers === 1 ? 'marker' : 'markers'}</span>
-          {productMatch && (
-            <span className="text-sm font-medium text-green-700">Matches product size {productMatch[0]} × {productMatch[1]} mm</span>
+          {catalog.exact && (
+            <span className="text-sm font-medium text-green-700">Matches stock target {catalog.exact.partNumber}</span>
           )}
         </div>
         {!fits && (
@@ -577,11 +568,24 @@ export default function Generator({ initialSpec, heading = 'Pattern generator' }
         <div className="flex justify-center overflow-hidden rounded-xl bg-ground-panel p-6 md:p-10">
           <div className="w-full max-w-[560px] overflow-hidden bg-white shadow-[0_12px_40px_rgba(0,0,0,0.12)] [&>svg]:h-auto [&>svg]:w-full" dangerouslySetInnerHTML={{ __html: svg }} />
         </div>
-        {spec.type !== 'Marker sheet' && (
-        <div className="card flex flex-wrap items-center justify-between gap-3 bg-ground-alt px-5 py-4">
-          <span className="text-[15px]"><strong>Want this exact pattern on a rigid board?</strong> <span className="text-ink-muted">Same geometry, 0.3 mm tolerance, measured before it ships &middot; {LEAD_TIME.toLowerCase()}.</span></span>
-          <a href={productCtaUrl(spec)} className="rounded bg-ink px-4 py-2.5 text-sm font-semibold text-white no-underline hover:text-white">Order as composite board</a>
-        </div>
+        {catalog.exact ? (
+          <div className="card flex flex-wrap items-center justify-between gap-3 bg-ground-alt px-5 py-4">
+            <span className="text-[15px]"><strong>This pattern is a stock target: <span className="font-mono">{catalog.exact.partNumber}</span>.</strong> <span className="text-ink-muted">Same geometry on a rigid board, measured before it ships &middot; {LEAD_TIME.toLowerCase()}.</span></span>
+            <a href={productUrlFor(catalog.exact)} className="rounded bg-ink px-4 py-2.5 text-sm font-semibold text-white no-underline hover:text-white">Order {catalog.exact.partNumber}</a>
+          </div>
+        ) : (
+          <div className="card flex flex-col gap-3 bg-ground-alt px-5 py-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <span className="text-[15px]"><strong>Want this exact pattern on a rigid board?</strong> <span className="text-ink-muted">We make it to order; your parameters go with the request, so nothing needs retyping.</span></span>
+              <button type="button" onClick={requestQuote} className="rounded bg-ink px-4 py-2.5 text-sm font-semibold text-white">Request a quote for this pattern</button>
+            </div>
+            {catalog.closest && (
+              <p className="m-0 text-[13px] text-ink-muted">
+                Closest stock target: <span className="font-mono text-ink">{catalog.closest.partNumber}</span> ({quoteSummary({ ...spec, ...specFromEntry(catalog.closest) } as PatternSpec)}).{' '}
+                <button type="button" className="font-semibold underline min-h-[44px] md:min-h-[24px] inline-flex items-center" onClick={() => setSpec((s) => ({ ...s, ...specFromEntry(catalog.closest!) }))}>Use these parameters</button>
+              </p>
+            )}
+          </div>
         )}
       </div>
     </section>

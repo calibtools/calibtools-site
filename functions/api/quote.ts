@@ -21,6 +21,14 @@ interface Env {
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MAX_LEN = 500;
+const MAX_PATTERN_LEN = 1500;
+
+/** Generator link sent with a quote request: a calib.tools generator path, nothing else. */
+export function cleanPatternPath(raw: string): string {
+  const v = raw.trim();
+  if (!v || v.length > MAX_PATTERN_LEN) return '';
+  return /^\/tools\/generator(\/[a-z-]+)?\/?\?[A-Za-z0-9_.~%=&+-]*$/.test(v) ? v : '';
+}
 const RATE_LIMIT = 10; // per hour per IP
 
 function validate(fields: Record<string, string>): string | null {
@@ -47,7 +55,9 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
     email: String(formData.get('email') ?? '').trim(),
     product: String(formData.get('product') ?? '').trim(),
     message: String(formData.get('message') ?? '').trim(),
+    source_page: String(formData.get('source_page') ?? '').trim().slice(0, 200),
   };
+  const patternPath = cleanPatternPath(String(formData.get('pattern') ?? ''));
 
   const error = validate(fields);
   if (error) {
@@ -65,7 +75,8 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
     await ctx.env.QUOTES.put(rateKey, String(count + 1), { expirationTtl: 3600 });
   }
 
-  const { name, company, email, product, message } = fields;
+  const { name, company, email, product, message, source_page } = fields;
+  const patternUrl = patternPath ? `https://calib.tools${patternPath}` : '';
 
   const subject = `Quote request — ${company || '(no company)'} — ${product || '(no product)'}`;
   const body = [
@@ -74,6 +85,8 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
     `Email: ${email}`,
     `Product: ${product}`,
     `Message:\n${message}`,
+    ...(patternUrl ? ['', `Pattern (opens the exact pattern in the generator):\n${patternUrl}`] : []),
+    ...(source_page ? ['', `Sent from: ${source_page}`] : []),
   ].join('\n');
 
   let emailSent = false;
@@ -108,7 +121,7 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
       const key = `quote-${Date.now()}-${crypto.randomUUID().slice(0, 8)}`;
       await ctx.env.QUOTES.put(
         key,
-        JSON.stringify({ name, company, email, product, message, ts: new Date().toISOString() }),
+        JSON.stringify({ name, company, email, product, message, pattern: patternUrl, source_page, ts: new Date().toISOString() }),
       );
       kvSaved = true;
     } catch {

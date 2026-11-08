@@ -461,6 +461,15 @@ const quickLinks = hasLongform
         <span class="badge bg-ink text-white inline-flex items-center gap-1.5"><FileCheckIcon size={14} stroke-width={1.6} aria-hidden="true" />Measured before it ships</span>
       </div>
 
+      {/* Arrived from the generator with a matching stock target */}
+      <p id="from-generator" class="hidden m-0 rounded border border-line bg-ground-alt px-4 py-3 text-sm">The options below are preselected to match the pattern you made in the generator.</p>
+      <script>
+        if (new URLSearchParams(location.search).get('from') === 'generator') {
+          const el = document.getElementById('from-generator');
+          el?.classList.remove('hidden');
+        }
+      </script>
+
       {/* h1 */}
       <h1 class="h-display m-0 text-[28px] leading-[1.1] md:text-[36px]">{product.title}</h1>
 
