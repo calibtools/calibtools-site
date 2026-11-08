@@ -10,10 +10,13 @@
  * - CF_DEPLOY_HOOK: deploy hook URL
  */
 
+import { verifyTurnstile, TURNSTILE_FIELD } from '../../src/lib/turnstile';
+
 interface Env {
   REVIEWS?: KVNamespace;
   REVIEW_HMAC_SECRET?: string;
   CF_DEPLOY_HOOK?: string;
+  TURNSTILE_SECRET_KEY?: string;
 }
 
 export const onRequestGet: PagesFunction<Env> = async (ctx) => {
@@ -48,6 +51,8 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
   }
 
   const formData = await ctx.request.formData();
+  const human = await verifyTurnstile(String(formData.get(TURNSTILE_FIELD) ?? ''), ctx.env.TURNSTILE_SECRET_KEY, ctx.request.headers.get('CF-Connecting-IP') ?? '');
+  if (!human.ok) return Response.json({ ok: false, message: human.message }, { status: 403 });
   const token = String(formData.get('token') ?? '');
   const stars = Number(formData.get('stars') ?? 0);
   const title = String(formData.get('title') ?? '').trim();

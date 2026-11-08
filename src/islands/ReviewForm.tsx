@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Star } from '@/lib/icons';
+import TurnstileBox from './TurnstileBox';
 
 interface Props {
   token: string;
@@ -7,6 +8,8 @@ interface Props {
 
 export default function ReviewForm({ token: tokenProp }: Props) {
   const [stars, setStars] = useState(0);
+  const [turnstile, setTurnstile] = useState('');
+  const [resetKey, setResetKey] = useState(0);
   const [hoverStars, setHoverStars] = useState(0);
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
@@ -75,6 +78,7 @@ export default function ReviewForm({ token: tokenProp }: Props) {
     formData.append('software', software);
     formData.append('displayName', displayName);
     formData.append('companyType', companyType);
+    formData.append('cf-turnstile-response', turnstile);
     for (const photo of photos) {
       formData.append('photos', photo);
     }
@@ -82,6 +86,7 @@ export default function ReviewForm({ token: tokenProp }: Props) {
     try {
       const res = await fetch('/api/review', { method: 'POST', body: formData });
       const data = await res.json();
+      setResetKey((k) => k + 1);
       if (data.ok) {
         setStatus('success');
       } else {
@@ -207,6 +212,8 @@ export default function ReviewForm({ token: tokenProp }: Props) {
           <span className="text-xs text-ink-muted">{photos.length} photo{photos.length !== 1 ? 's' : ''} selected</span>
         )}
       </fieldset>
+
+      <TurnstileBox onToken={setTurnstile} resetKey={resetKey} />
 
       {errorMsg && <p className="m-0 text-sm text-brand">{errorMsg}</p>}
 

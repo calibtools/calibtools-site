@@ -7,12 +7,12 @@ const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: 'Privacy policy' 
 /** Build-time date for "Last updated" line. */
 const lastUpdated = new Date().toISOString().slice(0, 10);
 ---
-<Base title="Privacy policy" description="No tracking cookies, no ads, no third-party scripts. Exactly what we store when you browse, use the free tools, request a quote, order or review." jsonLd={bcLd}>
+<Base title="Privacy policy" description="No tracking cookies, no ads; one human check on forms. Exactly what we store when you browse, use the free tools, request a quote, order or review." jsonLd={bcLd}>
   <div class="container-x py-10 md:py-16">
     <div class="prose-calib mx-auto flex max-w-[720px] flex-col gap-5">
       <h1 class="h-display m-0 text-[32px] md:text-[40px]">Privacy policy</h1>
 
-      <p><strong>In short:</strong> we don&rsquo;t track you, set no advertising or analytics cookies and load no third-party scripts. We only keep what we need to answer you, ship your order and run the site.</p>
+      <p><strong>In short:</strong> we don&rsquo;t track you, set no advertising or analytics cookies and load no third-party scripts except Cloudflare&rsquo;s human check on forms. We only keep what we need to answer you, ship your order and run the site.</p>
 
       <h2>Who is responsible</h2>
       <p>
@@ -31,7 +31,12 @@ const lastUpdated = new Date().toISOString().slice(0, 10);
       <p>Everything you enter in the generator, calculators and image checks stays in your browser. Images you check are not uploaded.</p>
 
       <h2>Quote requests</h2>
-      <p>When you send the quote form, we receive your name, company, email, product and message by email (sent through Resend) and keep a copy in our Cloudflare storage so no request is lost. Your IP address is used for one hour to limit spam. We use this only to answer and follow up on your request.</p>
+      <p>When you send the quote form, we receive your name, company, work email, product, message and, if you came from the generator, the link to your pattern. It arrives by email (sent through Resend) and a copy is kept in our Cloudflare storage so no request is lost.</p>
+      <p>Your IP address is used for one hour to limit spam. We use all of this only to answer and follow up on your request.</p>
+      <p>To check that a work address can receive mail, our server looks up the mail server of its domain (not the address itself) through Cloudflare DNS.</p>
+
+      <h2>Human check on forms</h2>
+      <p>The quote, newsletter and review forms use Cloudflare Turnstile to tell people from bots. Turnstile runs a short check in your browser and sends the result to Cloudflare; it does not use advertising cookies. See <a href="https://www.cloudflare.com/turnstile-privacy-policy/" target="_blank" rel="noopener">Cloudflare&rsquo;s Turnstile privacy notice</a>.</p>
 
       <h2>Orders</h2>
       <p>Checkout runs on Shopify. Shopify processes your name, address, email and payment details to take payment and ship your order; we never see your full card number. We share your address with the carrier that delivers it. See <a href="https://www.shopify.com/legal/privacy" target="_blank" rel="noopener">Shopify&rsquo;s privacy policy</a>.</p>
