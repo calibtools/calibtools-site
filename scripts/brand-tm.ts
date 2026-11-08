@@ -8,6 +8,7 @@
  */
 import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+// @ts-expect-error opentype.js ships no types
 import opentype from 'opentype.js';
 
 type Cmd = { type: string; x?: number; y?: number; x1?: number; y1?: number; x2?: number; y2?: number };
