@@ -4,7 +4,7 @@
  */
 
 /** Footer copyright line (no location). */
-export const FOOTER_LINE = '\u00A9 2026 Calib.Tools\u2122';
+export const FOOTER_LINE = '\u00A9 2026 Calib.Tools. All rights reserved.';
 
 /** Production lead-time as a human phrase (for prose interpolation). */
 export const LEAD_TIME_WEEKS = '2\u20133 weeks';

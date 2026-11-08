@@ -11,14 +11,23 @@ describe('header and footer logo', () => {
     it(`${file} references only the framed wordmark`, () => {
       const srcs = imgSrcs(read(file));
       expect(srcs.length).toBeGreaterThan(0);
-      for (const s of srcs) expect(['/brand/wordmark-framed-light.svg', '/brand/wordmark-framed-dark.svg']).toContain(s);
+      for (const s of srcs) expect(['/brand/wordmark-framed-light-tm.svg', '/brand/wordmark-framed-dark-tm.svg']).toContain(s);
     });
   }
 
   it('framed wordmarks keep the red dot', () => {
-    for (const f of ['public/brand/wordmark-framed-light.svg', 'public/brand/wordmark-framed-dark.svg']) {
+    for (const f of ['public/brand/wordmark-framed-light.svg', 'public/brand/wordmark-framed-dark.svg', 'public/brand/wordmark-framed-light-tm.svg', 'public/brand/wordmark-framed-dark-tm.svg']) {
       expect(read(f)).toMatch(/<rect x="3340\.00" y="-196\.00" width="196\.00" height="196\.00" fill="#E60012"\/>/);
     }
+  });
+
+  it('the logo files used on the site carry the ™ in the letter color, with no NaN', () => {
+    const light = read('public/brand/wordmark-framed-light-tm.svg');
+    const dark = read('public/brand/wordmark-framed-dark-tm.svg');
+    expect(light).toContain('with TM'); expect(dark).toContain('with TM');
+    expect(light).toMatch(/<path d="[^"]+" fill="#000000"\/><\/svg>$/);
+    expect(dark).toMatch(/<path d="[^"]+" fill="#FFFFFF"\/><\/svg>$/);
+    expect(light + dark).not.toMatch(/NaN/);
   });
 
   it('light is the positive mark (black), dark the negative (white)', () => {
