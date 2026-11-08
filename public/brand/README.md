@@ -23,3 +23,6 @@
 ## Regeneration
 
 Run `node scripts/outline-svgs.mjs` to regenerate SVGs and PDFs from the source fonts in `src/assets/fonts/`.
+Without Playwright's own Chromium download, set `CT_CHROMIUM_PATH` to a system Chrome (e.g. `CT_CHROMIUM_PATH=/usr/bin/google-chrome`).
+
+Ring band: outer ring r 16 mm, inner ring r 12 mm. The top line (CALIB.TOOLS, 3.2 mm) and the bottom line (DIMENSIONAL INSPECTION, 2.8 mm) both sit inside the band with ≥ 0.5 mm clearance to each ring; the script throws if a size change breaks that.
