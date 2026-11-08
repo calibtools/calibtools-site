@@ -4,6 +4,7 @@
  * Port of build_ir.py — field-for-field identical output.
  */
 
+import { processUnitFor } from '../../lib/processUnit';
 import {
   Doc,
   esc,
@@ -152,6 +153,30 @@ export function parsePartNumber(pn: string): Omit<
 }
 
 // ──────────────────────────────────────────────── block builders
+
+/**
+ * Method paragraph. The instrument is checked against the golden sample of the
+ * board's process unit (material × process × grade), shared across patterns and
+ * sizes — not one golden sample per part number (decision 2026-11-06).
+ */
+export function methodParagraph(data: IRData, meas: IRMeasurements | null, pending: boolean): string {
+  const pu = processUnitFor(data.part_number);
+  if (!pu) throw new Error(`No process unit defined for ${data.part_number}`);
+  const verb = pending ? 'will be measured' : 'were measured';
+  const instrumentId = meas?.instrument?.id ?? 'OCMM-01';
+  const instrumentType = meas?.instrument?.type ?? 'optical CMM';
+  const flatnessPoints = meas?.flatness_points ?? 25;
+  const Uk2 = meas?.U_k2_um ?? 1.5;
+  const refC = meas?.ref_c ?? 20;
+  return (
+    `All ${data.corners} ChArUco corners ${verb} on ${instrumentType} (${instrumentId}), checked against golden sample ` +
+    `${pu.goldenSample} (process unit ${pu.id}: ${pu.label.toLowerCase()}; DAkkS-calibrated, certificate [number]); ` +
+    `flatness ${pending ? 'will be' : 'was'} measured at ${flatnessPoints} points. ` +
+    `Expanded uncertainty U = ${Uk2} \u00b5m (k = 2), combining golden-sample certificate and comparison uncertainties. ` +
+    `Results corrected to ${refC} \u00b0C reference` +
+    (pending || !meas ? '.' : `; ambient ${meas.ambient_c} \u00b0C.`)
+  );
+}
 
 export function identBlock(data: IRData): string {
   const patternDesc = `ChArUco ${data.rows} \u00d7 ${data.cols} \u00b7 ${data.sq} / ${data.marker} mm<br>${data.dict_name}`;
@@ -478,20 +503,7 @@ export async function buildIR(opts: {
     `<div><div class="tag" style="margin-bottom:1.2mm">Inspection</div>${inspectionBlock(data, meas, pending)}</div></div>${res}`;
 
   // ── method paragraph ──
-  const verb = pending ? 'will be measured' : 'were measured';
-  const instrumentId = meas?.instrument?.id ?? 'OCMM-01';
-  const flatnessPoints = meas?.flatness_points ?? 25;
-  const Uk2 = meas?.U_k2_um ?? 1.5;
-  const refC = meas?.ref_c ?? 20;
-  const instrumentType = meas?.instrument?.type ?? 'optical CMM';
-  const gsName = `GS-${data.part_number.replace('CT-', '')}`;
-  const methodText =
-    `All ${data.corners} ChArUco corners ${verb} by comparison against golden sample ${gsName} ` +
-    `(DAkkS-calibrated, certificate [number]) on ${instrumentType} (${instrumentId}); ` +
-    `flatness ${pending ? 'will be' : 'was'} measured at ${flatnessPoints} points. ` +
-    `Expanded uncertainty U = ${Uk2} \u00b5m (k = 2), combining golden-sample certificate and comparison uncertainties. ` +
-    `Results corrected to ${refC} \u00b0C reference` +
-    (pending ? '.' : `; ambient ${meas!.ambient_c} \u00b0C.`);
+  const methodText = methodParagraph(data, meas, pending);
 
   // ── page 1 ──
   const page1 =

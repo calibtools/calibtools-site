@@ -40,7 +40,7 @@ const SAMPLE_MEAS: IRMeasurements = {
   ],
   traceability: {
     instrument_cert: 'OCMM-01 \u00b7 certificate K-2026-03-0141 \u00b7 valid to 2027-03',
-    reference: 'Golden sample GS-CHA-C-185110-6X6 \u00b7 DAkkS certificate [number] \u00b7 valid to [date]',
+    reference: 'Golden sample GS-C-CR-A-01 (process unit PU-C-CR-A) \u00b7 DAkkS calibration certificate [number] \u00b7 valid to [date]',
     retention: 'Raw data retained for 10 years under this serial number.',
   },
   coordinates: { file: 'CT-CSV-000311.csv', n: 66, max_id: 33, max_um: 1.4, rms_um: 0.6 },
