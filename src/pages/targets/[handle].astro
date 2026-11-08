@@ -15,7 +15,7 @@ import { WARRANTY_TEXT, COMPLIANCE, PRODUCT_TO_COLLECTION } from '@/lib/constant
 import { getProductImages } from '@/lib/product-images';
 import { getImageMetadata } from '@/lib/productImageImports';
 import { optimizeProductImage } from '@/lib/optimizeProductImage';
-import { Ruler, Package, Plug, CircleDot, Truck, HelpCircle, Plus, Download, Wand2, Columns2, MessageSquare, ArrowRight, ArrowUp, Clock, FileCheck as FileCheckIcon } from 'lucide-astro';
+import { Ruler, Package, Plug, CircleDot, Truck, HelpCircle, Plus, Download, Wand2, Columns2, MessageSquare, ArrowRight, ArrowUp, Clock, ChevronDown, FileCheck as FileCheckIcon } from 'lucide-astro';
 import { getProductData } from '@/lib/productData';
 import ReviewsSection from '@/islands/ReviewsSection';
 import { LEAD_TIME } from '@/lib/claims';
@@ -404,11 +404,14 @@ const longform = productContent ? await productContent.render() : null;
 const LongformContent = longform?.Content;
 const hasLongform = !!longform && longform.headings.some((h) => h.depth === 2);
 const skuNotes = productContent?.data.skus ?? [];
+const relatedTargets = productContent?.data.relatedTargets ?? [];
+const relatedGuides = productContent?.data.relatedGuides ?? [];
 const hasSkuTitles = orderingRows.some((r) => skuTitleFor(r.partNumber, skuNotes));
 const quickLinks = hasLongform
   ? [
       ...(orderingRows.length > 0 ? [{ href: '#sizes', text: 'Sizes and part numbers' }] : []),
       ...longform!.headings.filter((h) => h.depth === 2).map((h) => ({ href: `#${h.slug}`, text: h.text })),
+      ...(relatedTargets.length + relatedGuides.length > 0 ? [{ href: '#related', text: 'Related targets' }] : []),
       ...(specGroups.length > 0 ? [{ href: '#specifications', text: 'Specifications' }] : []),
       ...(faqItems.length > 0 ? [{ href: '#faq', text: 'FAQ' }] : []),
     ]
@@ -513,15 +516,28 @@ const quickLinks = hasLongform
     </div>
   )}
 
-  {/* ── On this page ── */}
+  {/* ── On this page: collapsed on mobile, open grid on desktop ── */}
   {quickLinks.length > 0 && (
     <nav class="container-x pb-8 md:pb-12" aria-label="On this page">
-      <h2 class="m-0 pb-3 font-mono text-[12px] uppercase tracking-[0.16em] text-brand-dark">On this page</h2>
-      <ul class="m-0 grid list-none grid-cols-1 gap-x-8 gap-y-1 p-0 sm:grid-cols-2 lg:grid-cols-3">
-        {quickLinks.map((l) => (
-          <li><a href={l.href} class="flex min-h-[32px] items-center text-[15px] text-ink no-underline hover:text-brand-dark">{l.text}</a></li>
-        ))}
-      </ul>
+      <details class="group border-b border-line md:hidden">
+        <summary class="flex min-h-[48px] cursor-pointer list-none items-center justify-between font-mono text-[12px] uppercase tracking-[0.16em] text-brand-dark [&::-webkit-details-marker]:hidden">
+          On this page · {quickLinks.length} sections
+          <ChevronDown size={20} stroke-width={2} class="text-ink transition-transform group-open:rotate-180" aria-hidden="true" />
+        </summary>
+        <ol class="m-0 list-none p-0 pb-3">
+          {quickLinks.map((l, i) => (
+            <li><a href={l.href} class="flex min-h-[40px] items-center gap-3 text-[15px] text-ink no-underline"><span class="font-mono text-[12px] text-brand-dark">{String(i + 1).padStart(2, '0')}</span>{l.text}</a></li>
+          ))}
+        </ol>
+      </details>
+      <div class="hidden md:block">
+        <h2 class="m-0 pb-3 font-mono text-[12px] uppercase tracking-[0.16em] text-brand-dark">On this page</h2>
+        <ol class="m-0 grid list-none grid-cols-2 gap-x-8 gap-y-1 p-0 lg:grid-cols-3">
+          {quickLinks.map((l, i) => (
+            <li><a href={l.href} class="flex min-h-[32px] items-center gap-3 text-[15px] text-ink no-underline hover:text-brand-dark"><span class="font-mono text-[12px] text-brand-dark">{String(i + 1).padStart(2, '0')}</span>{l.text}</a></li>
+          ))}
+        </ol>
+      </div>
     </nav>
   )}
 
@@ -529,7 +545,24 @@ const quickLinks = hasLongform
   {orderingRows.length > 0 && (
     <section id="sizes" class="container-x flex scroll-mt-24 flex-col gap-5 pb-12 md:pb-16">
       <h2 class="h-display m-0 text-[20px] md:text-2xl">Sizes and part numbers</h2>
-      <div class="overflow-x-auto -mx-5 px-5 md:mx-0 md:px-0">
+      {/* Mobile: one card per size */}
+      <ul class="m-0 flex list-none flex-col p-0 md:hidden">
+        {orderingRows.map((row) => (
+          <li
+            id={`m-${skuAnchor(row.partNumber)}`}
+            class="flex items-start justify-between gap-4 border-t border-line py-4 last:border-b"
+            data-select-size={row.size.split(/\s*[×x]\s*/)[0]?.trim()}
+          >
+            <div class="flex min-w-0 flex-col gap-1">
+              <span class="font-mono text-[13px] font-semibold text-brand-dark">{row.partNumber}</span>
+              {skuTitleFor(row.partNumber, skuNotes) && <span class="text-[14px] text-ink">{skuTitleFor(row.partNumber, skuNotes)}</span>}
+              <span class="text-[13px] text-ink-soft">{row.size} · {row.squares} · {row.squareMarker}</span>
+            </div>
+            {row.price && <span class="shrink-0 font-mono text-[14px] font-semibold">{row.price}</span>}
+          </li>
+        ))}
+      </ul>
+      <div class="hidden overflow-x-auto md:block">
         <table class={`w-full ${hasSkuTitles ? "min-w-[900px]" : "min-w-[640px]"} border-collapse text-[14px]`}>
           <thead>
             <tr class="border-b border-line bg-ground-alt text-left text-[12px] font-semibold uppercase tracking-wider text-ink-muted">
@@ -571,12 +604,48 @@ const quickLinks = hasLongform
     </section>
   )}
 
-  {/* ── Long-form product content (markdown body) ── */}
+  {/* Part-number links (#CT-…) point at table rows; on mobile the table is hidden, so jump to the matching card. */}
+  <script>
+    function jumpToCard() {
+      const id = decodeURIComponent(location.hash.slice(1));
+      if (!id.startsWith('CT-')) return;
+      const row = document.getElementById(id);
+      const card = document.getElementById(`m-${id}`);
+      if (!card || (row && row.offsetParent !== null)) return;
+      document.querySelectorAll('[data-sku-hit]').forEach((el) => { el.classList.remove('bg-brand/10'); el.removeAttribute('data-sku-hit'); });
+      card.classList.add('bg-brand/10');
+      card.setAttribute('data-sku-hit', '');
+      card.scrollIntoView({ block: 'center' });
+    }
+    window.addEventListener('hashchange', jumpToCard);
+    jumpToCard();
+  </script>
+
+  {/* ── Long-form product content: article + related column (after the article on mobile) ── */}
   {hasLongform && LongformContent && (
-    <section id="overview" class="container-x pb-12 md:pb-16">
-      <article class="prose-calib flex max-w-[760px] flex-col gap-5 [&_h2]:scroll-mt-24">
+    <section id="overview" class="container-x flex flex-wrap items-start gap-x-20 gap-y-12 pb-12 md:pb-16">
+      <article class="prose-calib flex min-w-0 max-w-[760px] flex-1 basis-[560px] flex-col gap-5 [&_h2]:scroll-mt-24">
         <LongformContent />
       </article>
+      {(relatedTargets.length > 0 || relatedGuides.length > 0) && (
+        <aside id="related" class="flex w-full scroll-mt-24 flex-col gap-8 lg:w-[360px] lg:shrink-0">
+          {[{ title: 'Related targets', items: relatedTargets }, { title: 'Guides', items: relatedGuides }].filter((g) => g.items.length > 0).map((g) => (
+            <div>
+              <h2 class="m-0 pb-1 font-mono text-[12px] uppercase tracking-[0.16em] text-brand-dark">{g.title}</h2>
+              <ul class="m-0 list-none p-0">
+                {g.items.map((it) => (
+                  <li class="border-b border-line">
+                    <a href={it.href} class="flex flex-col gap-1 py-3.5 no-underline">
+                      <span class="text-[16px] font-medium text-brand-dark">{it.label} →</span>
+                      <span class="text-[13px] text-ink-muted">{it.note}</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </aside>
+      )}
     </section>
   )}
 

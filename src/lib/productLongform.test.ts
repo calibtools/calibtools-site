@@ -7,6 +7,7 @@ import {
   skuTitleFor,
   bodyWordCount,
   splitFrontmatter,
+  extractFrontmatterHrefs,
 } from './productLongform';
 import { tools } from './tools';
 
@@ -48,6 +49,11 @@ describe('productLongform helpers', () => {
     expect(skuTitleFor('CT-CHA-P-200X150-{DICT}', skus)).toBeUndefined();
   });
 
+  it('extracts internal hrefs from frontmatter lists', () => {
+    const fm = 'relatedTargets:\n  - { label: "A", href: "/targets/a/", note: "x" }\n  - { label: "B", href: "https://e.com/", note: "y" }';
+    expect(extractFrontmatterHrefs(fm)).toEqual(['/targets/a/']);
+  });
+
   it('counts words in the body only', () => {
     expect(bodyWordCount('---\na: b c d\n---\none two\n\nthree')).toBe(3);
   });
@@ -58,10 +64,11 @@ describe('product long-form content', () => {
 
   for (const slug of files) {
     const raw = readFileSync(resolve(CONTENT, 'products', `${slug}.md`), 'utf-8');
-    const { body } = splitFrontmatter(raw);
+    const { body, frontmatter } = splitFrontmatter(raw);
 
-    it(`${slug}: every internal link in the body points to a page that exists`, () => {
-      const broken = extractInternalLinks(body).filter((h) => !valid.has(h.split('#')[0]));
+    it(`${slug}: every internal link in the body and related lists points to a page that exists`, () => {
+      const all = [...extractInternalLinks(body), ...extractFrontmatterHrefs(frontmatter)];
+      const broken = all.filter((h) => !valid.has(h.split('#')[0]));
       expect(broken).toEqual([]);
     });
 
@@ -79,10 +86,12 @@ describe('product long-form content', () => {
 
   it('charuco-composite (pilot) has a rich body that links out to related products', () => {
     const raw = readFileSync(resolve(CONTENT, 'products/charuco-composite.md'), 'utf-8');
-    const { body } = splitFrontmatter(raw);
+    const { body, frontmatter } = splitFrontmatter(raw);
     expect(bodyWordCount(raw)).toBeGreaterThanOrEqual(700);
     const productLinks = new Set(
-      extractInternalLinks(body).filter((h) => h.startsWith('/targets/') && h !== '/targets/charuco-composite/'),
+      [...extractInternalLinks(body), ...extractFrontmatterHrefs(frontmatter)].filter(
+        (h) => h.startsWith('/targets/') && h !== '/targets/charuco-composite/',
+      ),
     );
     expect(productLinks.size).toBeGreaterThanOrEqual(6);
     // Each size is described in prose and linked to its row in the ordering table
