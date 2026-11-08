@@ -57,6 +57,8 @@ const products = defineCollection({
     story: z.string().optional(),
     inTheBox: z.array(z.string()).optional(),
     compat: z.array(z.object({ tool: z.string(), note: z.string() })).optional(),
+    /** One-line description per part number, shown in the ordering table (long-form pages). */
+    skus: z.array(z.object({ partNumber: z.string(), title: z.string().max(90) })).default([]),
   }),
 });
 

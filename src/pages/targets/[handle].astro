@@ -29,6 +29,7 @@ import pkgOpenImage from '@/assets/products/packaging/CT-PK-M_open.webp';
 import pkgExplodedImage from '@/assets/products/packaging/CT-PK-M_exploded.webp';
 import { compatRows, digitalFiles } from '@/lib/productCompat';
 import { QUOTE_ONLY_HANDLES } from '@/lib/constants';
+import { skuAnchor, skuTitleFor } from '@/lib/productLongform';
 
 export async function getStaticPaths() {
   const products = await getProducts();
@@ -397,6 +398,21 @@ const orderingRows = (productData?.orderingRows ?? []).map((row) => {
     product.variants.find((v) => v.sku && base(row.partNumber) === base(v.sku));
   return { ...row, price: matchedVariant?.price ?? '' };
 });
+
+// Long-form body (markdown) and on-page links
+const longform = productContent ? await productContent.render() : null;
+const LongformContent = longform?.Content;
+const hasLongform = !!longform && longform.headings.some((h) => h.depth === 2);
+const skuNotes = productContent?.data.skus ?? [];
+const hasSkuTitles = orderingRows.some((r) => skuTitleFor(r.partNumber, skuNotes));
+const quickLinks = hasLongform
+  ? [
+      ...(orderingRows.length > 0 ? [{ href: '#sizes', text: 'Sizes and part numbers' }] : []),
+      ...longform!.headings.filter((h) => h.depth === 2).map((h) => ({ href: `#${h.slug}`, text: h.text })),
+      ...(specGroups.length > 0 ? [{ href: '#specifications', text: 'Specifications' }] : []),
+      ...(faqItems.length > 0 ? [{ href: '#faq', text: 'FAQ' }] : []),
+    ]
+  : [];
 ---
 <Base
   title={productContent?.data.seoTitle ?? product.title}
@@ -497,15 +513,28 @@ const orderingRows = (productData?.orderingRows ?? []).map((row) => {
     </div>
   )}
 
+  {/* ── On this page ── */}
+  {quickLinks.length > 0 && (
+    <nav class="container-x pb-8 md:pb-12" aria-label="On this page">
+      <h2 class="m-0 pb-3 font-mono text-[12px] uppercase tracking-[0.16em] text-brand-dark">On this page</h2>
+      <ul class="m-0 grid list-none grid-cols-1 gap-x-8 gap-y-1 p-0 sm:grid-cols-2 lg:grid-cols-3">
+        {quickLinks.map((l) => (
+          <li><a href={l.href} class="flex min-h-[32px] items-center text-[15px] text-ink no-underline hover:text-brand-dark">{l.text}</a></li>
+        ))}
+      </ul>
+    </nav>
+  )}
+
   {/* ── Sizes and part numbers ── */}
   {orderingRows.length > 0 && (
-    <section class="container-x flex flex-col gap-5 pb-12 md:pb-16">
+    <section id="sizes" class="container-x flex scroll-mt-24 flex-col gap-5 pb-12 md:pb-16">
       <h2 class="h-display m-0 text-[20px] md:text-2xl">Sizes and part numbers</h2>
       <div class="overflow-x-auto -mx-5 px-5 md:mx-0 md:px-0">
-        <table class="w-full min-w-[640px] border-collapse text-[14px]">
+        <table class={`w-full ${hasSkuTitles ? "min-w-[900px]" : "min-w-[640px]"} border-collapse text-[14px]`}>
           <thead>
             <tr class="border-b border-line bg-ground-alt text-left text-[12px] font-semibold uppercase tracking-wider text-ink-muted">
               <th class="py-2.5 px-3">Part number</th>
+              {hasSkuTitles && <th class="py-2.5 px-3">Description</th>}
               <th class="py-2.5 px-3">Size W × H</th>
               <th class="py-2.5 px-3">Squares</th>
               <th class="py-2.5 px-3">Square · marker</th>
@@ -518,10 +547,12 @@ const orderingRows = (productData?.orderingRows ?? []).map((row) => {
           <tbody>
             {orderingRows.map((row, i) => (
               <tr
-                class={`border-b border-line cursor-pointer hover:bg-ground-alt/50 ${i % 2 === 1 ? 'bg-ground-alt' : ''}`}
+                id={skuAnchor(row.partNumber)}
+                class={`scroll-mt-24 border-b border-line cursor-pointer hover:bg-ground-alt/50 target:bg-brand/10 ${i % 2 === 1 ? 'bg-ground-alt' : ''}`}
                 data-select-size={row.size.split(/\s*[×x]\s*/)[0]?.trim()}
               >
-                <td class="py-3 px-3 font-mono text-[13px] text-brand-dark">{row.partNumber}</td>
+                <td class="whitespace-nowrap py-3 px-3 font-mono text-[13px] text-brand-dark">{row.partNumber}</td>
+                {hasSkuTitles && <td class="py-3 px-3 text-[14px] text-ink">{skuTitleFor(row.partNumber, skuNotes) ?? ''}</td>}
                 <td class="py-3 px-3 whitespace-nowrap">{row.size}</td>
                 <td class="py-3 px-3 font-mono text-[13px]">{row.squares}</td>
                 <td class="py-3 px-3 font-mono text-[13px]">{row.squareMarker}</td>
@@ -537,6 +568,15 @@ const orderingRows = (productData?.orderingRows ?? []).map((row) => {
       {productData && (
         <p class="m-0 text-[13px] text-ink-soft">Start ID 0, row-major, OpenCV &ge; 4.6 placement. Larger sizes on request.</p>
       )}
+    </section>
+  )}
+
+  {/* ── Long-form product content (markdown body) ── */}
+  {hasLongform && LongformContent && (
+    <section id="overview" class="container-x pb-12 md:pb-16">
+      <article class="prose-calib flex max-w-[760px] flex-col gap-5 [&_h2]:scroll-mt-24">
+        <LongformContent />
+      </article>
     </section>
   )}
 
