@@ -20,6 +20,9 @@ catalog pages from the Storefront API and links into the cart.
 - Keep pages static; use `client:load` islands only for interactive tools.
 - No new runtime dependency without a one-line reason in the PR. Never jsPDF; use pdf-lib.
 - No analytics or tracking scripts. No cookies beyond what Shopify needs on its own domain.
+  Exception — customer accounts (saved patterns, quote history): sign-in through Shopify customer
+  accounts; after sign-in only, one first-party HttpOnly session cookie on calib.tools. Saved patterns
+  are stored on the customer's Shopify record. No tracking, no third parties; list it on /privacy/.
 
 ## Conventions
 - No personal names anywhere: not on the site, in copy, metadata, structured data, PDFs, review replies or docs. Sign as "Calib.Tools" or "Calib.Tools Engineering"; use role mailboxes (hello@, support@ …), never a personal address.
