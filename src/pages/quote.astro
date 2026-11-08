@@ -9,7 +9,21 @@ import Base from '@/layouts/Base.astro';
         <p class="m-0 text-base text-ink-muted">Need a formal quote, invoice or purchase order? Fill in the form and we will reply within one business day.</p>
       </div>
 
-      <form action="/api/quote" method="POST" class="flex flex-col gap-4">
+      {/* Shown after a successful submit (?sent=1) */}
+      <div id="q-sent" class="hidden flex-col gap-2 rounded border border-line bg-ground-alt p-5">
+        <p class="m-0 text-[17px] font-semibold">Thank you, your request is in.</p>
+        <p class="m-0 text-sm text-ink-muted">We reply within one business day. Nothing arrived by then? Email <a href="mailto:hello@calib.tools">hello@calib.tools</a>.</p>
+      </div>
+
+      {/* Pattern sent from the generator: parameters only, no files */}
+      <div id="q-pattern-card" class="hidden flex-col gap-1 rounded border border-line bg-ground-alt p-4">
+        <span class="font-mono text-[12px] uppercase tracking-[0.16em] text-brand-dark">Your pattern</span>
+        <span id="q-pattern-summary" class="text-[15px] font-medium"></span>
+        <a id="q-pattern-link" href="/tools/generator/" class="text-sm">Open this pattern in the generator</a>
+        <span class="text-[13px] text-ink-muted">We receive the same parameters, so we quote exactly this pattern.</span>
+      </div>
+
+      <form id="q-form" action="/api/quote" method="POST" class="flex flex-col gap-4">
         <div class="flex flex-col gap-1.5">
           <label for="q-name" class="label">Name</label>
           <input id="q-name" name="name" type="text" required class="input" />
@@ -33,6 +47,7 @@ import Base from '@/layouts/Base.astro';
 
         {/* Source page — sent with the form submission, not tracking */}
         <input type="hidden" name="source_page" id="q-source" />
+        <input type="hidden" name="pattern" id="q-pattern" />
 
         {/* Honeypot */}
         <input type="text" name="website" tabindex={-1} autocomplete="off" class="absolute -left-[9999px] h-0 w-0 overflow-hidden" aria-hidden="true" />
@@ -43,6 +58,24 @@ import Base from '@/layouts/Base.astro';
     </div>
   </div>
   <script>
+    const qp = new URLSearchParams(location.search);
+    if (qp.get('sent') === '1') {
+      document.getElementById('q-sent')!.classList.replace('hidden', 'flex');
+      document.getElementById('q-form')!.classList.replace('flex', 'hidden');
+    }
+    const pattern = qp.get('pattern') ?? '';
+    const summary = (qp.get('summary') ?? '').slice(0, 300);
+    const boards = Number(qp.get('boards') ?? '1');
+    // Only a calib.tools generator path is accepted; anything else is ignored.
+    if (/^\/tools\/generator(\/[a-z-]+)?\/?\?[A-Za-z0-9_.~%=&+-]*$/.test(pattern) && summary) {
+      const label = boards > 1 && boards < 100 ? `${summary}, set of ${boards} boards` : summary;
+      (document.getElementById('q-pattern') as HTMLInputElement).value = pattern;
+      (document.getElementById('q-product') as HTMLInputElement).value = label;
+      document.getElementById('q-pattern-summary')!.textContent = label;
+      (document.getElementById('q-pattern-link') as HTMLAnchorElement).href = pattern;
+      document.getElementById('q-pattern-card')!.classList.replace('hidden', 'flex');
+      (document.getElementById('q-message') as HTMLTextAreaElement).placeholder = 'Material (aluminum composite, ceramic or glass), quantity, delivery country, deadline...';
+    }
     const src = document.getElementById('q-source') as HTMLInputElement | null;
     if (src) {
       try {
