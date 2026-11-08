@@ -28,6 +28,7 @@ import { COMPOSITE_FLATNESS, COMPOSITE_TOLERANCE } from '../src/lib/claims';
 const args = Object.fromEntries(process.argv.slice(2).map((a, i, arr) => (a.startsWith('--') ? [a.slice(2), arr[i + 1]] : [])).filter((p) => p.length));
 const PN = args.pn ?? 'CT-CHA-P-400X300-D5';
 const REV = args.rev ?? 'A';
+const FOR = args.for ?? '';          // customer name for the approval drawing, optional
 const OUT = resolve(args.out ?? 'out/factory', PN);
 mkdirSync(OUT, { recursive: true });
 
@@ -143,23 +144,24 @@ const rows: string[][] = [
   ['Feature tolerance', COMPOSITE_TOLERANCE],
   ['Flatness', COMPOSITE_FLATNESS],
   ['Acceptance', `10 squares = ${10 * spec.square} mm ±1 mm on both axes; no visible gap under a straightedge along each edge and both diagonals`],
-  ['Label line', 'Compact wordmark (cap 1 % of board height), part number, pattern summary, SN + revision in Geist Mono, Gray 80'],
-  ['Revision', `${REV} · ${new Date().toISOString().slice(0, 10)}`],
+  ['Verification', 'Before dispatch: 10-square accumulated length measured on both axes, straightedge check on all edges and both diagonals; values recorded on the inspection report shipped with the board'],
+  ['Files supplied', 'This drawing, opencv.json (CharucoBoard parameters), marker ID table (CSV), datasheet and inspection report'],
+  ['Revision', `${REV} · ${new Date().toISOString().slice(0, 10)}${FOR ? ` · prepared for ${FOR}` : ''}`],
 ];
 const tableX = dx + bw + 28, tableY = dy - 4;
 let tableSvg = '';
-rows.forEach(([k, v], i) => {
-  const y = tableY + i * 11;
-  tableSvg += text(k, sansBold, 2.8, tableX, y, '#111111');
-  // wrap long values at ~ 95 mm
-  const words = v.split(' '); let line = ''; let ly = y; const maxW = A3W - dx - (tableX + 34);
+let rowY = tableY;
+for (const [k, v] of rows) {
+  tableSvg += text(k, sansBold, 2.8, tableX, rowY, '#111111');
+  const words = v.split(' '); const lines: string[] = []; let line = ''; const maxW = A3W - dx - (tableX + 34);
   for (const w of words) {
     const t = line ? `${line} ${w}` : w;
-    if (textWidth(t, sans, 2.6) > maxW && line) { tableSvg += text(line, sans, 2.6, tableX + 34, ly, '#333333'); line = w; ly += 3.6; }
-    else line = t;
+    if (textWidth(t, sans, 2.6) > maxW && line) { lines.push(line); line = w; } else line = t;
   }
-  tableSvg += text(line, sans, 2.6, tableX + 34, ly, '#333333');
-});
+  lines.push(line);
+  lines.forEach((l, i) => { tableSvg += text(l, sans, 2.6, tableX + 34, rowY + i * 3.6, '#333333'); });
+  rowY += Math.max(10, lines.length * 3.6 + 5);
+}
 
 // marker ID map (small, bottom-left)
 let idMap = '';
@@ -179,8 +181,17 @@ const drawingSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="${A3W}mm" hei
   <title>${PN} approval drawing</title>
   <rect width="${A3W}" height="${A3H}" fill="#FFFFFF"/>
   ${wordmarkSvgGroup({ x: dx, y: 8, heightMm: 6.5 })}
-  ${text(`${PN} · approval drawing · Rev ${REV}`, sansBold, 4, A3W - dx, 13, '#111111', 'end')}
-  ${text('Scale 1:2 · all dimensions in mm · pattern geometry from the calib.tools generator (OpenCV cv.aruco.CharucoBoard convention)', sans, 2.6, A3W - dx, 18, '#666666', 'end')}
+  ${text(`${PN} · drawing for approval · Rev ${REV}`, sansBold, 4, A3W - dx, 13, '#111111', 'end')}
+  ${text('Scale 1:2 · all dimensions in mm · geometry follows OpenCV cv.aruco.CharucoBoard; the printed artwork is the same data at 1:1', sans, 2.6, A3W - dx, 18, '#666666', 'end')}
+  <g id="signoff" transform="translate(${A3W - dx - 150},${A3H - 60})">
+    <rect width="150" height="40" fill="none" stroke="#111111" stroke-width="0.3"/>
+    <line x1="0" y1="10" x2="150" y2="10" stroke="#111111" stroke-width="0.3"/>
+    <line x1="75" y1="10" x2="75" y2="40" stroke="#111111" stroke-width="0.3"/>
+    ${text('Customer approval — please sign and return, or reply "approved" by email', sansBold, 2.6, 3, 6.5, '#111111')}
+    ${text('Name / company', sans, 2.4, 3, 15, '#666666')}
+    ${text('Date / signature', sans, 2.4, 78, 15, '#666666')}
+    ${text('Changes requested (if any):', sans, 2.4, 3, 34, '#666666')}
+  </g>
   <g transform="translate(${dx},${dy}) scale(${S})">
     <rect width="${boardW}" height="${boardH}" fill="#FFFFFF" stroke="#111111" stroke-width="0.4"/>
     ${renderCharucoSvg(spec, ox, oy)}
