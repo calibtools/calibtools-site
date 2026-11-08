@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 
-// Rule (2026-11-08): header and footer use only the framed wordmark
+// Rule (2026-11-08, no ™ since 2026-11-09): header and footer use only the framed wordmark
 // (positive on light, negative on dark, red dot); the C.T icon is the favicon only.
 const read = (p: string) => readFileSync(p, 'utf-8');
 const imgSrcs = (src: string) => [...src.matchAll(/\/brand\/[a-z0-9-]+\.svg/g)].map((m) => m[0]);
@@ -11,23 +11,20 @@ describe('header and footer logo', () => {
     it(`${file} references only the framed wordmark`, () => {
       const srcs = imgSrcs(read(file));
       expect(srcs.length).toBeGreaterThan(0);
-      for (const s of srcs) expect(['/brand/wordmark-framed-light-tm.svg', '/brand/wordmark-framed-dark-tm.svg']).toContain(s);
+      for (const s of srcs) expect(['/brand/wordmark-framed-light.svg', '/brand/wordmark-framed-dark.svg']).toContain(s);
     });
   }
 
   it('framed wordmarks keep the red dot', () => {
-    for (const f of ['public/brand/wordmark-framed-light.svg', 'public/brand/wordmark-framed-dark.svg', 'public/brand/wordmark-framed-light-tm.svg', 'public/brand/wordmark-framed-dark-tm.svg']) {
+    for (const f of ['public/brand/wordmark-framed-light.svg', 'public/brand/wordmark-framed-dark.svg']) {
       expect(read(f)).toMatch(/<rect x="3340\.00" y="-196\.00" width="196\.00" height="196\.00" fill="#E60012"\/>/);
     }
   });
 
-  it('the logo files used on the site carry the ™ in the letter color, with no NaN', () => {
-    const light = read('public/brand/wordmark-framed-light-tm.svg');
-    const dark = read('public/brand/wordmark-framed-dark-tm.svg');
-    expect(light).toContain('with TM'); expect(dark).toContain('with TM');
-    expect(light).toMatch(/<path d="[^"]+" fill="#000000"\/><\/svg>$/);
-    expect(dark).toMatch(/<path d="[^"]+" fill="#FFFFFF"\/><\/svg>$/);
-    expect(light + dark).not.toMatch(/NaN/);
+  it('the logo files used on the site carry no ™', () => {
+    for (const f of ['public/brand/wordmark-framed-light.svg', 'public/brand/wordmark-framed-dark.svg']) {
+      expect(read(f)).not.toMatch(/with TM|™/);
+    }
   });
 
   it('light is the positive mark (black), dark the negative (white)', () => {
