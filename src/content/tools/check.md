@@ -33,4 +33,5 @@ You printed a 7 × 10 ChArUco, DICT_6X6_250 on A3. Take a photo with your phone,
 
 ## Related guides
 
+- [Why your calibration board is not detected](/guides/corner-detection-troubleshooting/) — measured limits for bit size, blur, tilt, exposure and glare, and the board-definition mistakes
 - [Composite board datasheet](/files/datasheets/CT-DS-CHA-P.pdf) — feature tolerance and flatness of the board
