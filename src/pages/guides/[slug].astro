@@ -14,7 +14,8 @@ export async function getStaticPaths() {
 const { entry } = Astro.props;
 const { Content, headings } = await entry.render();
 const d = entry.data;
-const related = (await Promise.all(d.related.map((s: string) => getEntry('guides', s)))).filter(Boolean);
+// Draft guides are noindex; never link to them from a live page
+const related = (await Promise.all(d.related.map((s: string) => getEntry('guides', s)))).filter((g) => g && !g.data.draft);
 
 // Resolve product handles → product objects for cards
 const allProducts = await getProducts();
