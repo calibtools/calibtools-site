@@ -4,7 +4,7 @@ description: "Three patterns cover almost every calibration job. Which one depen
 date: 2026-10-22
 updated: 2026-10-22
 readingTime: "8 min"
-related: []
+related: ["corner-detection-troubleshooting", "calibration-target-size", "opencv-camera-calibration"]
 products: ["charuco-composite", "checkerboard-composite", "aprilgrid-composite", "circlegrid-composite"]
 sampleFiles: []
 ---

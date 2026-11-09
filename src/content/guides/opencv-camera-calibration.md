@@ -5,7 +5,7 @@ date: 2026-11-07
 updated: 2026-11-07
 readingTime: "12 min"
 keyRule: "Fill the image corners with board views, keep focus and zoom fixed, and judge the result by per-view error, not the overall RMS alone."
-related: ["calibration-target-size", "reprojection-error", "charuco-vs-checkerboard-vs-aprilgrid", "multi-board-marker-ids"]
+related: ["calibration-target-size", "reprojection-error", "charuco-vs-checkerboard-vs-aprilgrid", "corner-detection-troubleshooting"]
 products: ["charuco-composite", "charuco-ceramic", "checkerboard-composite"]
 sampleFiles: []
 faq:
@@ -177,7 +177,7 @@ To undistort a video stream, build the maps once with `cv2.getOptimalNewCameraMa
 | Symptom | Likely cause | Fix |
 |---|---|---|
 | No corners found | Wrong board size, or columns and rows swapped | Board size is (columns, rows) in squares for ChArUco, inner corners for a checkerboard |
-| ChArUco markers found but no corners | Board made with the pre-4.6 layout | Call `board.setLegacyPattern(True)` |
+| ChArUco markers found but no corners | Board made with the pre-4.6 layout | Call `board.setLegacyPattern(True)`; see the [detection troubleshooting guide](/guides/corner-detection-troubleshooting/) |
 | RMS above 1 px | Blur, glare, bent target, few corner views | Re-shoot sharper views that cover the image corners |
 | Good RMS, wrong distances | Square size mis-entered or printer scaling | Measure the printed square and use that value |
 | Calibration drifts between sessions | Focus or zoom moved | Lock the lens, recalibrate after any change |

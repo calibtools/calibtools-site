@@ -5,7 +5,7 @@ date: 2026-11-07
 updated: 2026-11-07
 readingTime: "11 min"
 keyRule: "Size the board to fill about 60 % of the frame at your working distance, then check that each square is at least 25 px and each marker bit at least 3 px."
-related: ["opencv-camera-calibration", "charuco-vs-checkerboard-vs-aprilgrid", "composite-ceramic-or-glass", "multi-board-marker-ids"]
+related: ["opencv-camera-calibration", "charuco-vs-checkerboard-vs-aprilgrid", "corner-detection-troubleshooting", "multi-board-marker-ids"]
 products: ["charuco-composite", "charuco-ceramic", "checkerboard-composite"]
 sampleFiles: []
 faq:
