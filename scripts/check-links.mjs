@@ -2,6 +2,10 @@
  * Post-build link checker: crawls dist/ for internal <a href> targets
  * and exits 1 if any points to a path that does not exist in dist/.
  *
+ * Also exits 1 if a live page links to a page marked noindex (draft guides etc.):
+ * Google follows the link and reports "Excluded by 'noindex' tag". Utility pages
+ * that are noindex on purpose but meant to be reached (quote, cart …) are allowed.
+ *
  * Ignores: external URLs, mailto:, tel:, anchor-only (#), javascript:.
  */
 
@@ -26,6 +30,11 @@ function findHtmlFiles(dir) {
 const htmlFiles = findHtmlFiles(DIST);
 const hrefRegex = /<a\s[^>]*?href="([^"]*?)"/gi;
 const broken = [];
+const toNoindex = [];
+/** noindex on purpose and fine to link to. */
+const NOINDEX_LINK_OK = ['/quote/', '/cart/', '/review/', '/verify/'];
+const NOINDEX_RE = /<meta[^>]+name="robots"[^>]+content="[^"]*noindex/i;
+const isNoindex = (path) => NOINDEX_RE.test(readFileSync(path, 'utf-8'));
 
 for (const file of htmlFiles) {
   const html = readFileSync(file, 'utf-8');
@@ -53,9 +62,12 @@ for (const file of htmlFiles) {
       existsSync(join(target, 'index.html')) ||
       existsSync(publicTarget);
 
+    const relFile = file.replace(DIST + '/', '');
     if (!exists) {
-      const relFile = file.replace(DIST + '/', '');
       broken.push({ file: relFile, href });
+    } else if (!isNoindex(file) && !NOINDEX_LINK_OK.some((p) => clean.startsWith(p))) {
+      const page = existsSync(join(target, 'index.html')) ? join(target, 'index.html') : (target.endsWith('.html') && existsSync(target) ? target : '');
+      if (page && isNoindex(page)) toNoindex.push({ file: relFile, href });
     }
   }
 }
@@ -65,6 +77,13 @@ if (broken.length > 0) {
   for (const { file, href } of broken) {
     console.error(`    ${file} → ${href}`);
   }
+  console.error('');
+  process.exit(1);
+}
+
+if (toNoindex.length > 0) {
+  console.error(`\n  ${toNoindex.length} link(s) from live pages to noindex pages:\n`);
+  for (const { file, href } of toNoindex) console.error(`    ${file} → ${href}`);
   console.error('');
   process.exit(1);
 }
