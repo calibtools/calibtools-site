@@ -1,18 +1,14 @@
 ---
 import Base from '@/layouts/Base.astro';
+import { MATERIALS, countryOptions } from '@/lib/quote';
+const countries = countryOptions();
 ---
 <Base title="Request a quote" description="Request a quote or invoice/PO for Calib.Tools calibration targets." noindex>
   <div class="container-x py-[var(--section-y)]">
     <div class="mx-auto flex max-w-[560px] flex-col gap-6">
       <div class="flex flex-col gap-2">
         <h1 class="h-display m-0 text-[32px] md:text-[40px]">Request a quote</h1>
-        <p class="m-0 text-base text-ink-muted">Need a formal quote, invoice or purchase order? Fill in the form and we will reply within one business day.</p>
-      </div>
-
-      {/* Shown after a successful submit (?sent=1) */}
-      <div id="q-sent" class="hidden flex-col gap-2 rounded border border-line bg-ground-alt p-5">
-        <p class="m-0 text-[17px] font-semibold">Thank you, your request is in.</p>
-        <p class="m-0 text-sm text-ink-muted">We reply within one business day. Nothing arrived by then? Email <a href="mailto:hello@calib.tools">hello@calib.tools</a>.</p>
+        <p class="m-0 text-base text-ink-muted">Custom pattern, formal quote, invoice or purchase order: fill in the form and we reply within one business day. You get a reference number straight away.</p>
       </div>
 
       {/* Pattern sent from the generator: parameters only, no files */}
@@ -44,14 +40,43 @@ import Base from '@/layouts/Base.astro';
           <label for="q-product" class="label">Product / SKU</label>
           <input id="q-product" name="product" type="text" class="input" placeholder="e.g. ChArUco composite 400 × 300, DICT_6X6_250" />
         </div>
+        <fieldset class="m-0 flex flex-col gap-2 border-0 p-0">
+          <legend class="label mb-1.5">Material</legend>
+          {MATERIALS.map((m) => (
+            <label class="flex cursor-pointer items-start gap-3 rounded-sm border border-line p-3 has-[:checked]:border-brand-dark">
+              <input type="radio" name="material" value={m.id} required class="mt-1" />
+              <span class="flex flex-col gap-0.5">
+                <span class="text-[15px] font-medium">{m.label}</span>
+                <span class="text-[13px] text-ink-muted">{m.note}</span>
+              </span>
+            </label>
+          ))}
+          <p id="q-material-err" class="m-0 hidden text-sm text-brand"></p>
+        </fieldset>
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-[140px_1fr]">
+          <div class="flex flex-col gap-1.5">
+            <label for="q-quantity" class="label" id="q-quantity-label">Quantity</label>
+            <input id="q-quantity" name="quantity" type="number" min="1" max="9999" step="1" required inputmode="numeric" class="input" />
+            <p id="q-quantity-err" class="m-0 hidden text-sm text-brand"></p>
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label for="q-country" class="label">Delivery country</label>
+            <select id="q-country" name="country" required class="input">
+              <option value="">Choose…</option>
+              {countries.map((c) => <option value={c.code}>{c.name}</option>)}
+            </select>
+            <p id="q-country-err" class="m-0 hidden text-sm text-brand"></p>
+          </div>
+        </div>
         <div class="flex flex-col gap-1.5">
-          <label for="q-message" class="label">Message</label>
-          <textarea id="q-message" name="message" rows={4} class="input" placeholder="Quantity, delivery address, special requirements..."></textarea>
+          <label for="q-message" class="label">Message <span class="font-normal text-ink-muted">(optional)</span></label>
+          <textarea id="q-message" name="message" rows={4} class="input" placeholder="Deadline, how you use the target, special requirements..."></textarea>
         </div>
 
         {/* Source page — sent with the form submission, not tracking */}
         <input type="hidden" name="source_page" id="q-source" />
         <input type="hidden" name="pattern" id="q-pattern" />
+        <input type="hidden" name="boards" id="q-boards" value="1" />
 
         {/* Honeypot */}
         <input type="text" name="website" tabindex={-1} autocomplete="off" class="absolute -left-[9999px] h-0 w-0 overflow-hidden" aria-hidden="true" />
@@ -74,7 +99,7 @@ import Base from '@/layouts/Base.astro';
       const el = document.getElementById(`q-${field}-err`) ?? document.getElementById('q-form-err')!;
       el.textContent = msg; el.classList.toggle('hidden', !msg);
     };
-    const clearErrs = () => ['name', 'company', 'email', 'form'].forEach((f) => showErr(f, ''));
+    const clearErrs = () => ['name', 'company', 'email', 'material', 'quantity', 'country', 'form'].forEach((f) => showErr(f, ''));
 
     // Instant work-email feedback
     const emailInput = document.getElementById('q-email') as HTMLInputElement;
@@ -107,9 +132,21 @@ import Base from '@/layouts/Base.astro';
         const res = await fetch('/api/quote', { method: 'POST', body: fd, headers: { Accept: 'application/json' } });
         const data = await res.json().catch(() => ({ ok: false, message: 'Something went wrong. Please email hello@calib.tools.' }));
         if (data.ok) {
-          document.getElementById('q-sent')!.classList.replace('hidden', 'flex');
-          form.classList.replace('flex', 'hidden');
-          window.scrollTo({ top: 0, behavior: 'smooth' });
+          // Hand the summary to the confirmation page (this tab only, nothing stored on a server by the browser)
+          const material = fd.get('material');
+          const card = {
+            id: data.id,
+            product: String(fd.get('product') ?? ''),
+            material: String(material ?? ''),
+            quantity: String(fd.get('quantity') ?? ''),
+            boards: String(fd.get('boards') ?? '1'),
+            country: String(fd.get('country') ?? ''),
+            pattern: String(fd.get('pattern') ?? ''),
+            emailSent: Boolean(data.customerEmailSent),
+          };
+          try { sessionStorage.setItem('ct-quote', JSON.stringify(card)); } catch { /* private mode */ }
+          window.location.href = `/quote/sent/?q=${encodeURIComponent(data.id)}`;
+          return;
         } else {
           showErr(data.field && data.field !== 'turnstile' ? data.field : 'form', data.message ?? 'Something went wrong.');
           resetCheck(); token = '';
@@ -122,10 +159,7 @@ import Base from '@/layouts/Base.astro';
     });
 
     const qp = new URLSearchParams(location.search);
-    if (qp.get('sent') === '1') {
-      document.getElementById('q-sent')!.classList.replace('hidden', 'flex');
-      document.getElementById('q-form')!.classList.replace('flex', 'hidden');
-    }
+    if (qp.get('sent') === '1') window.location.replace('/quote/sent/');
     const pattern = qp.get('pattern') ?? '';
     const summary = (qp.get('summary') ?? '').slice(0, 300);
     const boards = Number(qp.get('boards') ?? '1');
@@ -133,11 +167,14 @@ import Base from '@/layouts/Base.astro';
     if (/^\/tools\/generator(\/[a-z-]+)?\/?\?[A-Za-z0-9_.~%=&+-]*$/.test(pattern) && summary) {
       const label = boards > 1 && boards < 100 ? `${summary}, set of ${boards} boards` : summary;
       (document.getElementById('q-pattern') as HTMLInputElement).value = pattern;
+      if (boards > 1 && boards < 100) {
+        (document.getElementById('q-boards') as HTMLInputElement).value = String(boards);
+        document.getElementById('q-quantity-label')!.textContent = 'Quantity (sets)';
+      }
       (document.getElementById('q-product') as HTMLInputElement).value = label;
       document.getElementById('q-pattern-summary')!.textContent = label;
       (document.getElementById('q-pattern-link') as HTMLAnchorElement).href = pattern;
       document.getElementById('q-pattern-card')!.classList.replace('hidden', 'flex');
-      (document.getElementById('q-message') as HTMLTextAreaElement).placeholder = 'Material (aluminum composite, ceramic or glass), quantity, delivery country, deadline...';
     }
     const src = document.getElementById('q-source') as HTMLInputElement | null;
     if (src) {

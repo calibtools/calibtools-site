@@ -1,0 +1,67 @@
+---
+import Base from '@/layouts/Base.astro';
+---
+<Base title="Quote request received" description="Your Calib.Tools quote request and reference number." noindex>
+  <div class="container-x py-[var(--section-y)]">
+    <div class="mx-auto flex max-w-[560px] flex-col gap-6">
+      <div class="flex flex-col gap-2">
+        <span class="font-mono text-[12px] uppercase tracking-[0.16em] text-brand-dark">Quote request received</span>
+        <h1 class="h-display m-0 text-[32px] md:text-[40px]">Thank you</h1>
+        <p class="m-0 text-base text-ink-muted">We reply within one business day. Keep the reference number for any follow-up.</p>
+      </div>
+
+      <div class="flex flex-col gap-1 rounded-sm border border-line p-5">
+        <span class="text-[13px] text-ink-muted">Reference number</span>
+        <span id="qs-id" class="font-mono text-[24px] font-semibold tracking-[0.04em]">—</span>
+      </div>
+
+      <dl id="qs-card" class="m-0 hidden flex-col gap-0 rounded-sm border border-line">
+        <div class="flex gap-4 border-b border-line px-5 py-3"><dt class="w-[140px] shrink-0 text-[13px] text-ink-muted">Product / pattern</dt><dd id="qs-product" class="m-0 text-[15px]"></dd></div>
+        <div class="flex gap-4 border-b border-line px-5 py-3"><dt class="w-[140px] shrink-0 text-[13px] text-ink-muted">Material</dt><dd id="qs-material" class="m-0 text-[15px]"></dd></div>
+        <div class="flex gap-4 border-b border-line px-5 py-3"><dt class="w-[140px] shrink-0 text-[13px] text-ink-muted">Quantity</dt><dd id="qs-quantity" class="m-0 text-[15px]"></dd></div>
+        <div class="flex gap-4 px-5 py-3"><dt class="w-[140px] shrink-0 text-[13px] text-ink-muted">Delivery country</dt><dd id="qs-country" class="m-0 text-[15px]"></dd></div>
+      </dl>
+      <a id="qs-pattern" href="/tools/generator/" class="hidden text-sm">Open this pattern in the generator</a>
+
+      <div id="qs-email" class="flex flex-col gap-1 rounded-sm bg-ground-alt p-4 text-sm">
+        <p class="m-0">We sent a confirmation to your email. Please click the link in it so we can send the quote to that address.</p>
+        <p class="m-0 text-ink-muted">Nothing in your inbox within a few minutes? Check spam, or email <a href="mailto:hello@calib.tools">hello@calib.tools</a> with your reference number.</p>
+      </div>
+
+      <div class="flex flex-wrap gap-3">
+        <button id="qs-print" type="button" class="btn-md btn-secondary">Print or save as PDF</button>
+        <a href="/" class="btn-md btn-ghost">Back to calib.tools</a>
+      </div>
+    </div>
+  </div>
+  <script>
+    import { isQuoteId, materialLabel, countryName } from '@/lib/quote';
+    const qp = new URLSearchParams(location.search);
+    const id = qp.get('q') ?? '';
+    const idEl = document.getElementById('qs-id')!;
+    if (isQuoteId(id)) idEl.textContent = id;
+
+    let card: Record<string, string | boolean> | null = null;
+    try { card = JSON.parse(sessionStorage.getItem('ct-quote') ?? 'null'); } catch { card = null; }
+    if (card && card.id === id) {
+      const boards = Number(card.boards) || 1;
+      const set = (k: string, v: string) => { document.getElementById(`qs-${k}`)!.textContent = v || '—'; };
+      set('product', String(card.product));
+      set('material', materialLabel(String(card.material)));
+      set('quantity', boards > 1 ? `${card.quantity} sets of ${boards} boards` : String(card.quantity));
+      set('country', card.country ? countryName(String(card.country)) : '');
+      document.getElementById('qs-card')!.classList.replace('hidden', 'flex');
+      const pattern = String(card.pattern ?? '');
+      if (/^\/tools\/generator(\/[a-z-]+)?\/?\?[A-Za-z0-9_.~%=&+-]*$/.test(pattern)) {
+        const a = document.getElementById('qs-pattern') as HTMLAnchorElement;
+        a.href = pattern;
+        a.classList.remove('hidden');
+      }
+      if (card.emailSent === false) {
+        document.getElementById('qs-email')!.innerHTML =
+          '<p class="m-0">We could not send the confirmation email just now, but your request is saved under this reference number. We will reply to the address you entered.</p>';
+      }
+    }
+    document.getElementById('qs-print')!.addEventListener('click', () => window.print());
+  </script>
+</Base>
