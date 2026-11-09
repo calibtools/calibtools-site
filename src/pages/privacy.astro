@@ -23,7 +23,7 @@ const lastUpdated = new Date().toISOString().slice(0, 10);
       <ul class="ml-5 flex flex-col gap-2 text-[15px] list-disc">
         <li><strong>Hosting.</strong> The site runs on Cloudflare Pages. Cloudflare processes your IP address and browser details to deliver pages and block attacks. See <a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener">Cloudflare&rsquo;s privacy policy</a>.</li>
         <li><strong>Page counts.</strong> We count page views on the server: page path and a referrer category such as &ldquo;generator&rdquo; or &ldquo;guide&rdquo;. No IP addresses, visitor IDs or sessions are stored, so a count can&rsquo;t be traced back to you. Known crawlers are skipped; the User-Agent is read for that check and not stored.</li>
-        <li><strong>In your browser.</strong> The only thing we store on your device is a cart ID (<code>localStorage</code> key <code>calib-cart-id</code>), created when you first add something to the cart. No cookies.</li>
+        <li><strong>In your browser.</strong> We store a cart ID on your device (<code>localStorage</code> key <code>calib-cart-id</code>), created when you first add something to the cart. After you send a quote request, a summary of it is kept for that browser tab only (<code>sessionStorage</code> key <code>ct-quote</code>) so the confirmation page can show it; it is gone when you close the tab. No cookies.</li>
         <li><strong>Fonts.</strong> Geist fonts are served from our own domain; no external font services.</li>
       </ul>
 
@@ -31,7 +31,9 @@ const lastUpdated = new Date().toISOString().slice(0, 10);
       <p>Everything you enter in the generator, calculators and image checks stays in your browser. Images you check are not uploaded.</p>
 
       <h2>Quote requests</h2>
-      <p>When you send the quote form, we receive your name, company, work email, product, message and, if you came from the generator, the link to your pattern. It arrives by email (sent through Resend) and a copy is kept in our Cloudflare storage so no request is lost.</p>
+      <p>When you send the quote form, we receive your name, company, work email, product, material, quantity, delivery country, message and, if you came from the generator, the link to your pattern.</p>
+      <p>Each request gets a reference number. It arrives by email (sent through Resend) and a copy is kept in our Cloudflare storage so no request is lost.</p>
+      <p>We send you one confirmation email with that number and a link to confirm your address; clicking the link only records that the address is yours.</p>
       <p>Your IP address is used for one hour to limit spam. We use all of this only to answer and follow up on your request.</p>
       <p>To check that a work address can receive mail, our server looks up the mail server of its domain (not the address itself) through Cloudflare DNS.</p>
 

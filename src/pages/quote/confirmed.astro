@@ -1,0 +1,28 @@
+---
+import Base from '@/layouts/Base.astro';
+---
+<Base title="Email confirmed" description="Email confirmation for a Calib.Tools quote request." noindex>
+  <div class="container-x py-[var(--section-y)]">
+    <div class="mx-auto flex max-w-[560px] flex-col gap-4">
+      <div id="qc-ok" class="flex flex-col gap-2">
+        <h1 id="qc-title" class="h-display m-0 text-[32px] md:text-[40px]">Email confirmed</h1>
+        <p class="m-0 text-base text-ink-muted">Thank you. We will send the quote for <span id="qc-id" class="font-mono">your request</span> to this address within one business day.</p>
+      </div>
+      <div id="qc-bad" class="hidden flex-col gap-2">
+        <p class="h-display m-0 text-[32px] md:text-[40px]">This link does not work</p>
+        <p class="m-0 text-base text-ink-muted">The confirmation link is incomplete or has been changed. Your request is still saved; reply to our confirmation email or write to <a href="mailto:hello@calib.tools">hello@calib.tools</a> with your reference number.</p>
+      </div>
+      <a href="/" class="text-sm">Back to calib.tools</a>
+    </div>
+  </div>
+  <script>
+    import { isQuoteId } from '@/lib/quote';
+    const qp = new URLSearchParams(location.search);
+    const id = qp.get('q') ?? '';
+    if (isQuoteId(id)) document.getElementById('qc-id')!.textContent = id;
+    if (qp.get('status') !== 'ok') {
+      document.getElementById('qc-ok')!.classList.add('hidden');
+      document.getElementById('qc-bad')!.classList.replace('hidden', 'flex');
+    }
+  </script>
+</Base>
