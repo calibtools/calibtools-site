@@ -62,15 +62,29 @@ export function innerCorners(rows: number, cols: number, square: number): Array<
   return pts;
 }
 
-import type { PageLayout } from './pageLayout';
+import { patternExtent, type PageLayout } from './pageLayout';
+
+/**
+ * The pattern alone (no page, scale bar, axes or brand block), top-left at (ox, oy) mm.
+ * Every output format draws from this: SVG uses it as is, PDF and DXF read its shapes
+ * through patternShapes(), so the three can never disagree.
+ */
+export function renderPatternSvg(s: PatternSpec, ox: number, oy: number): string {
+  if (s.type === 'PuzzleBoard') return renderPuzzleBoardSvg(s, ox, oy);
+  if (s.type === 'Marker sheet') return renderMarkerSheetSvg(s, ox, oy);
+  if (s.type.includes('circles') || s.type.includes('dots')) return renderCirclesSvg(s, ox, oy);
+  if (s.type === 'AprilGrid (Kalibr)') return renderAprilGridSvg(s, ox, oy);
+  if (s.type === 'ChArUco' || s.type === 'ArUco grid') return renderCharucoSvg(s, ox, oy);
+  return renderCheckerboardSvg(s, ox, oy);
+}
 
 /**
  * SVG of the pattern centered on a page of pw×ph mm, 1 user unit = 1 mm.
  * If a PageLayout is provided, its geometry (orientation, ox/oy, brand, axes) is used.
  */
 export function checkerboardSvg(s: PatternSpec, pw: number, ph: number, layout?: PageLayout): string {
-  const bw = layout?.bw ?? s.cols * s.square;
-  const bh = layout?.bh ?? s.rows * s.square;
+  const bw = layout?.bw ?? patternExtent(s).bw;
+  const bh = layout?.bh ?? patternExtent(s).bh;
   const ox = layout?.ox ?? (pw - bw) / 2;
   const oy = layout?.oy ?? ((ph - bh) / 2 - (s.scaleBar ? 6 : 0));
   const usePw = layout?.pw ?? pw;
@@ -84,25 +98,7 @@ export function checkerboardSvg(s: PatternSpec, pw: number, ph: number, layout?:
   const parts: string[] = [];
   parts.push(svgOpen(ctx));
 
-  // Dispatch to per-type renderer
-  const isCircles = s.type.includes('circles') || s.type.includes('dots');
-  const isMarkerType = s.type === 'ChArUco' || s.type === 'ArUco grid' || s.type === 'AprilGrid (Kalibr)';
-
-  if (s.type === 'PuzzleBoard') {
-    parts.push(renderPuzzleBoardSvg(s, ox, oy));
-  } else if (s.type === 'Marker sheet') {
-    parts.push(renderMarkerSheetSvg(s, ox, oy));
-  } else if (isCircles) {
-    parts.push(renderCirclesSvg(s, ox, oy));
-  } else if (isMarkerType) {
-    if (s.type === 'AprilGrid (Kalibr)') {
-      parts.push(renderAprilGridSvg(s, ox, oy));
-    } else {
-      parts.push(renderCharucoSvg(s, ox, oy));
-    }
-  } else {
-    parts.push(renderCheckerboardSvg(s, ox, oy));
-  }
+  parts.push(renderPatternSvg(s, ox, oy));
 
   parts.push(scaleBarSvg(ctx));
   parts.push(axesSvg(ctx));

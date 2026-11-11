@@ -1,9 +1,9 @@
 /**
  * PDF export — browser-side, 1:1 mm output using pdf-lib.
- * All coordinates come from src/lib/patterns.ts geometry; this file only handles rendering.
+ * The pattern is drawn from patternShapes() (the renderer output the SVG uses); this file holds no pattern geometry.
  * 1 PDF point = 1/72 inch. 1 mm = 72/25.4 pt ≈ 2.8346 pt.
  */
-import { PDFDocument, rgb } from 'pdf-lib';
+import { PDFDocument, rgb, pushGraphicsState, popGraphicsState, rectangle, clip, endPath, type PDFFont, type PDFPage } from 'pdf-lib';
 import fontkit from '@pdf-lib/fontkit';
 import type { PatternSpec } from './patterns';
 import { BRAND_RED_RGB, BRAND_INK_RGB } from './brand';
@@ -18,8 +18,8 @@ import {
   WORDMARK_DOT_RECT,
   WORDMARK_VB,
 } from './exportBrand';
-import { getArUcoDict, decodeMarkerBits } from './dicts/dicts';
-import type { PageLayout } from './pageLayout';
+import { patternShapes, fillRgb, shapeBox, type Shape } from './patternShapes';
+import { patternExtent, type PageLayout } from './pageLayout';
 
 /** Conversion factor: millimeters → PDF points. */
 export const MM = 72 / 25.4;
@@ -69,13 +69,11 @@ export async function exportPdf({ spec, pw: rawPw, ph: rawPh, fontBytes, layout 
   /** Convert mm x/y to PDF points (flip y). */
   const pt = (xMm: number, yMm: number): [number, number] => [xMm * MM, pageH - yMm * MM];
 
-  const bw = layout?.bw ?? spec.cols * spec.square;
-  const bh = layout?.bh ?? spec.rows * spec.square;
+  const bw = layout?.bw ?? patternExtent(spec).bw;
+  const bh = layout?.bh ?? patternExtent(spec).bh;
   const ox = layout?.ox ?? (pw - bw) / 2;
   const oy = layout?.oy ?? ((ph - bh) / 2 - (spec.scaleBar ? 6 : 0));
 
-  const isMarkerType = spec.type === 'ChArUco' || spec.type === 'ArUco grid' || spec.type === 'AprilGrid (Kalibr)';
-  const isCircles = spec.type.includes('circles') || spec.type.includes('dots');
 
   // --- Embed fonts ---
   const fonts = await loadFontBytes(fontBytes);
@@ -83,68 +81,8 @@ export async function exportPdf({ spec, pw: rawPw, ph: rawPh, fontBytes, layout 
   const fontSemiBold = await doc.embedFont(fonts.semiBold, { subset: true });
   const fontMono = await doc.embedFont(fonts.mono, { subset: true });
 
-  // Draw pattern squares / circles
-  for (let r = 0; r < spec.rows; r++) {
-    for (let c = 0; c < spec.cols; c++) {
-      const x = ox + c * spec.square;
-      const y = oy + r * spec.square;
-      const black = (r + c) % 2 === 0;
-
-      if (isCircles) {
-        const asym = spec.type === 'Asymmetric circles';
-        if (asym && (r + c) % 2 === 1) continue;
-        const cx = x + spec.square / 2;
-        const cy = y + spec.square / 2;
-        const radius = spec.square * 0.28;
-        // Approximate circle with 4 Bézier curves
-        drawCircle(page, pt, cx, cy, radius);
-        continue;
-      }
-
-      if (black) {
-        const [px, py] = pt(x, y + spec.square);
-        page.drawRectangle({ x: px, y: py, width: spec.square * MM, height: spec.square * MM, color: rgb(0, 0, 0) });
-      } else if (isMarkerType) {
-        // Real ArUco dictionary bits — matches SVG renderer (renderCharucoSvg)
-        const m = spec.marker;
-        const mx = x + (spec.square - m) / 2;
-        const my = y + (spec.square - m) / 2;
-        const dict = getArUcoDict(spec.dict);
-
-        // Compute marker index: count white squares before this one (row-major)
-        let markerIdx = 0;
-        for (let rr = 0; rr < spec.rows; rr++) {
-          for (let cc = 0; cc < spec.cols; cc++) {
-            if (rr === r && cc === c) break;
-            if ((rr + cc) % 2 !== 0) markerIdx++;
-          }
-          if (rr === r) break;
-        }
-        const markerId = spec.startId + markerIdx;
-
-        // Black marker background
-        const [pmx, pmy] = pt(mx, my + m);
-        page.drawRectangle({ x: pmx, y: pmy, width: m * MM, height: m * MM, color: rgb(0, 0, 0) });
-
-        if (dict && markerId < dict.count) {
-          const bits = decodeMarkerBits(dict.bits[markerId], dict.markerSize);
-          const n = dict.markerSize;
-          const border = 1;
-          const totalCells = n + 2 * border;
-          const cell = m / totalCells;
-          // White cells from bit grid (1 = white)
-          for (let bi = 0; bi < n; bi++) {
-            for (let bj = 0; bj < n; bj++) {
-              if (bits[bi][bj] === 1) {
-                const [bx, by] = pt(mx + (bj + border) * cell, my + (bi + border) * cell + cell);
-                page.drawRectangle({ x: bx, y: by, width: cell * MM, height: cell * MM, color: rgb(1, 1, 1) });
-              }
-            }
-          }
-        }
-      }
-    }
-  }
+  // Pattern: the same shapes the SVG renderer draws, at the same place.
+  drawShapes(page, patternShapes(spec, ox, oy), pt, fontMono);
 
   // Scale bar
   let scaleBarBottom = 0;
@@ -405,8 +343,7 @@ export async function exportTiledPdf({ spec, tiling, fontBytes }: TiledPdfOption
   const fonts = await loadFontBytes(fontBytes);
   const fontMono = await doc.embedFont(fonts.mono, { subset: true });
 
-  const bw = spec.cols * spec.square;
-  const bh = spec.rows * spec.square;
+  const { bw, bh } = patternExtent(spec);
   const { tilePw, tilePh, tileW, tileH, cols, rows, overlapMm } = tiling;
   const pageW = tilePw * MM;
   const pageH = tilePh * MM;
@@ -416,8 +353,6 @@ export async function exportTiledPdf({ spec, tiling, fontBytes }: TiledPdfOption
   const bbH = brandBlockHeight(wmW);
   const cs = wordmarkClearSpace(wmH);
 
-  const isMarkerType = spec.type === 'ChArUco' || spec.type === 'ArUco grid' || spec.type === 'AprilGrid (Kalibr)';
-  const isCircles = spec.type.includes('circles') || spec.type.includes('dots');
 
   const summary = patternSummary(spec);
   const provenance = provenanceLine('generator');
@@ -438,88 +373,16 @@ export async function exportTiledPdf({ spec, tiling, fontBytes }: TiledPdfOption
       const pageOx = PAGE_MARGIN;
       const pageOy = PAGE_MARGIN;
 
-      // Draw pattern squares in this window
-      for (let r = 0; r < spec.rows; r++) {
-        for (let c = 0; c < spec.cols; c++) {
-          const px = c * spec.square;
-          const py = r * spec.square;
-          const black = (r + c) % 2 === 0;
-
-          // Check if this square's region overlaps the window
-          if (px + spec.square <= winX0 || px >= winX1) continue;
-          if (py + spec.square <= winY0 || py >= winY1) continue;
-
-          // Clip to window
-          const cx0 = Math.max(px, winX0);
-          const cy0 = Math.max(py, winY0);
-          const cx1 = Math.min(px + spec.square, winX1);
-          const cy1 = Math.min(py + spec.square, winY1);
-          const drawX = pageOx + (cx0 - winX0);
-          const drawY = pageOy + (cy0 - winY0);
-          const drawW = cx1 - cx0;
-          const drawH = cy1 - cy0;
-
-          if (isCircles) {
-            // Only draw if circle center is in window
-            const ccx = px + spec.square / 2;
-            const ccy = py + spec.square / 2;
-            if (ccx >= winX0 && ccx < winX1 && ccy >= winY0 && ccy < winY1) {
-              const radius = spec.square * 0.28;
-              drawCircle(page, pt, pageOx + (ccx - winX0), pageOy + (ccy - winY0), radius);
-            }
-            continue;
-          }
-
-          if (black) {
-            const [rpx, rpy] = pt(drawX, drawY + drawH);
-            page.drawRectangle({ x: rpx, y: rpy, width: drawW * MM, height: drawH * MM, color: rgb(0, 0, 0) });
-          } else if (isMarkerType) {
-            // Draw marker if its center is in window — simplified: draw the black background clipped
-            const m = spec.marker;
-            const mx = px + (spec.square - m) / 2;
-            const my = py + (spec.square - m) / 2;
-            const mcx0 = Math.max(mx, winX0);
-            const mcy0 = Math.max(my, winY0);
-            const mcx1 = Math.min(mx + m, winX1);
-            const mcy1 = Math.min(my + m, winY1);
-            if (mcx1 > mcx0 && mcy1 > mcy0) {
-              const mdx = pageOx + (mcx0 - winX0);
-              const mdy = pageOy + (mcy0 - winY0);
-              const [bmx, bmy] = pt(mdx, mdy + (mcy1 - mcy0));
-              page.drawRectangle({ x: bmx, y: bmy, width: (mcx1 - mcx0) * MM, height: (mcy1 - mcy0) * MM, color: rgb(0, 0, 0) });
-
-              // Real ArUco dictionary bits — only for fully visible markers
-              if (mcx0 <= mx && mcy0 <= my && mcx1 >= mx + m && mcy1 >= my + m) {
-                const dict = getArUcoDict(spec.dict);
-                let markerIdx = 0;
-                for (let rr = 0; rr < spec.rows; rr++) {
-                  for (let cc = 0; cc < spec.cols; cc++) {
-                    if (rr === r && cc === c) break;
-                    if ((rr + cc) % 2 !== 0) markerIdx++;
-                  }
-                  if (rr === r) break;
-                }
-                const markerId = spec.startId + markerIdx;
-                if (dict && markerId < dict.count) {
-                  const bits = decodeMarkerBits(dict.bits[markerId], dict.markerSize);
-                  const n = dict.markerSize;
-                  const border = 1;
-                  const totalCells = n + 2 * border;
-                  const cell = m / totalCells;
-                  for (let bi = 0; bi < n; bi++) {
-                    for (let bj = 0; bj < n; bj++) {
-                      if (bits[bi][bj] === 1) {
-                        const [wx, wy] = pt(pageOx + (mx + (bj + border) * cell - winX0), pageOy + (my + (bi + border) * cell + cell - winY0));
-                        page.drawRectangle({ x: wx, y: wy, width: cell * MM, height: cell * MM, color: rgb(1, 1, 1) });
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+      // Draw the part of the pattern that falls in this window, clipped at the window edge.
+      const winW = winX1 - winX0, winH = winY1 - winY0;
+      const inWindow = patternShapes(spec, pageOx - winX0, pageOy - winY0).filter((sh) => {
+        const b = shapeBox(sh);
+        return b.x1 > pageOx && b.x0 < pageOx + winW && b.y1 > pageOy && b.y0 < pageOy + winH;
+      });
+      const [clipX, clipY] = pt(pageOx, pageOy + winH);
+      page.pushOperators(pushGraphicsState(), rectangle(clipX, clipY, winW * MM, winH * MM), clip(), endPath());
+      drawShapes(page, inWindow, pt, fontMono);
+      page.pushOperators(popGraphicsState());
 
       // Crop marks at window corners (6 mm lines, 0.3 mm wide)
       const cropLen = 6;
@@ -594,13 +457,33 @@ export async function exportTiledPdf({ spec, tiling, fontBytes }: TiledPdfOption
   return doc.save();
 }
 
-/** Draw a filled black circle using 4 Bézier quarter-arcs. */
+/** Draw pattern shapes (mm, y down) on a page. */
+function drawShapes(page: PDFPage, shapes: Shape[], pt: (x: number, y: number) => [number, number], font: PDFFont) {
+  for (const s of shapes) {
+    const [r, g, b] = fillRgb(s.fill);
+    const color = rgb(r, g, b);
+    if (s.kind === 'rect') {
+      const [x, y] = pt(s.x, s.y + s.h);
+      page.drawRectangle({ x, y, width: s.w * MM, height: s.h * MM, color });
+    } else if (s.kind === 'circle') {
+      drawCircle(page, pt, s.cx, s.cy, s.r, color);
+    } else {
+      const size = s.size * MM;
+      const w = font.widthOfTextAtSize(s.text, size);
+      const [x, y] = pt(s.x, s.y);
+      page.drawText(s.text, { x: x - (s.anchor === 'middle' ? w / 2 : s.anchor === 'end' ? w : 0), y, size, font, color });
+    }
+  }
+}
+
+/** Draw a filled circle using 4 Bézier quarter-arcs. */
 function drawCircle(
-  page: ReturnType<PDFDocument['addPage']>,
+  page: PDFPage,
   pt: (x: number, y: number) => [number, number],
   cx: number,
   cy: number,
   r: number,
+  color = rgb(0, 0, 0),
 ) {
   // Bézier approximation constant for quarter-circle
   const k = r * 0.5522847498;
@@ -619,6 +502,6 @@ function drawCircle(
       `C ${-rPt} ${-kPt} ${-kPt} ${-rPt} ${0} ${-rPt}`,
       'Z',
     ].join(' '),
-    { x: pcx, y: pcy, color: rgb(0, 0, 0) },
+    { x: pcx, y: pcy, color },
   );
 }

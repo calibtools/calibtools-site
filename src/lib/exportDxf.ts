@@ -18,7 +18,8 @@ import {
   WORDMARK_DOT_RECT as WM_DOT_RECT,
   WORDMARK_VIEWBOX as WM_VB,
 } from './wordmarkDxf';
-import type { PageLayout } from './pageLayout';
+import { patternExtent, type PageLayout } from './pageLayout';
+import { patternShapes } from './patternShapes';
 
 export interface DxfExportOptions {
   spec: PatternSpec;
@@ -150,7 +151,7 @@ function tablesSection(): string {
     gc(2, 'TABLES') +
     gc(0, 'TABLE') +
     gc(2, 'LAYER') +
-    gc(70, 3) +
+    gc(70, 5) +
     // Layer "0"
     gc(0, 'LAYER') +
     gc(2, '0') +
@@ -169,6 +170,18 @@ function tablesSection(): string {
     gc(70, 0) +
     gc(62, 1) +   // color red
     gc(6, 'CONTINUOUS') +
+    // Layer "PATTERN_WHITE": white shapes on top of black ink
+    gc(0, 'LAYER') +
+    gc(2, 'PATTERN_WHITE') +
+    gc(70, 0) +
+    gc(62, 9) +   // light gray, so it shows on both light and dark CAD backgrounds
+    gc(6, 'CONTINUOUS') +
+    // Layer "PATTERN_LABELS": printed marker and tag IDs
+    gc(0, 'LAYER') +
+    gc(2, 'PATTERN_LABELS') +
+    gc(70, 0) +
+    gc(62, 8) +   // gray
+    gc(6, 'CONTINUOUS') +
     gc(0, 'ENDTAB') +
     gc(0, 'ENDSEC')
   );
@@ -179,45 +192,20 @@ function entitiesSection(spec: PatternSpec, pw: number, ph: number, layout?: Pag
   parts.push(gc(0, 'SECTION'));
   parts.push(gc(2, 'ENTITIES'));
 
-  const bw = layout?.bw ?? spec.cols * spec.square;
-  const bh = layout?.bh ?? spec.rows * spec.square;
+  const bw = layout?.bw ?? patternExtent(spec).bw;
+  const bh = layout?.bh ?? patternExtent(spec).bh;
   const ox = layout?.ox ?? (pw - bw) / 2;
   const oy = layout?.oy ?? ((ph - bh) / 2 - (spec.scaleBar ? 6 : 0));
 
-  const isMarkerType = spec.type === 'ChArUco' || spec.type === 'ArUco grid' || spec.type === 'AprilGrid (Kalibr)';
-  const isCircles = spec.type.includes('circles') || spec.type.includes('dots');
-
-  // --- Pattern entities ---
-  for (let r = 0; r < spec.rows; r++) {
-    for (let c = 0; c < spec.cols; c++) {
-      const xMm = ox + c * spec.square;
-      const yTopMm = oy + r * spec.square;          // y-down top of square
-      const yBottomMm = yTopMm + spec.square;       // y-down bottom of square
-
-      if (isCircles) {
-        const asym = spec.type === 'Asymmetric circles';
-        if (asym && (r + c) % 2 === 1) continue;
-        const cxMm = xMm + spec.square / 2;
-        const cyMm = yTopMm + spec.square / 2;
-        const rad = spec.square * 0.28;
-        parts.push(circle('0', cxMm, dxfY(cyMm, ph), rad));
-        continue;
-      }
-
-      const black = (r + c) % 2 === 0;
-      if (black) {
-        // Convert: DXF SOLID y1=bottom (y-up), y2=top (y-up)
-        const yDxfBottom = dxfY(yBottomMm, ph);
-        parts.push(solid('0', xMm, yDxfBottom, spec.square, spec.square));
-      } else if (isMarkerType) {
-        const m = spec.marker;
-        const mx = xMm + (spec.square - m) / 2;
-        const myTop = yTopMm + (spec.square - m) / 2;
-        const myBottom = myTop + m;
-        const yDxfBottom = dxfY(myBottom, ph);
-        parts.push(solid('0', mx, yDxfBottom, m, m));
-      }
-    }
+  // --- Pattern entities: the shapes the SVG renderer draws, y flipped for DXF ---
+  // Black ink on layer "0". White shapes (marker bits, circles on an inverted board) sit on
+  // PATTERN_WHITE and are knocked out of the black beneath them. ID labels on PATTERN_LABELS.
+  for (const sh of patternShapes(spec, ox, oy)) {
+    const white = sh.fill.toLowerCase() === '#fff' || sh.fill.toLowerCase() === '#ffffff';
+    if (sh.kind === 'rect') parts.push(solid(white ? 'PATTERN_WHITE' : '0', sh.x, dxfY(sh.y + sh.h, ph), sh.w, sh.h));
+    else if (sh.kind === 'circle') parts.push(circle(white ? 'PATTERN_WHITE' : '0', sh.cx, dxfY(sh.cy, ph), sh.r));
+    else if (sh.anchor === 'middle') parts.push(textCentre('PATTERN_LABELS', sh.x, dxfY(sh.y, ph), sh.size, sh.text));
+    else parts.push(text('PATTERN_LABELS', sh.x, dxfY(sh.y, ph), sh.size, sh.text));
   }
 
   // --- Brand footer: bracket-framed wordmark as polylines ---

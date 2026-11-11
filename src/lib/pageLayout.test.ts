@@ -1,3 +1,4 @@
+import { aprilGridTags } from './renderAprilGrid';
 import { describe, it, expect } from 'vitest';
 import {
   PAPERS,
@@ -389,5 +390,46 @@ describe('marker sheet layout', () => {
     const e = patternExtent({ ...sheet, rows: 2, cols: 3, marker: 40 } as any);
     expect(e.bw).toBeCloseTo(3 * 48 - 8, 6);
     expect(e.bh).toBeCloseTo(2 * 48 - 8, 6);
+  });
+});
+
+describe('AprilGrid layout', () => {
+  const grid = { type: 'AprilGrid (Kalibr)', rows: 6, cols: 6, square: 22, tagSpacing: 0.3, startId: 0, paper: 'A4', scaleBar: true } as const;
+  const inkRight = (spec: any, ox: number) => { const t = aprilGridTags(spec); const last = t[t.length - 1]; return ox + last.x + last.size; };
+
+  it('measures first tag edge to last tag edge, gaps included', () => {
+    const e = patternExtent(grid as any);
+    expect(e.bw).toBeCloseTo(6 * 22 + 5 * 6.6, 6);
+    expect(e.bh).toBeCloseTo(6 * 22 + 5 * 6.6, 6);
+  });
+
+  it('agrees with the tag positions the renderer draws', () => {
+    for (const [rows, cols, square, tagSpacing] of [[6, 6, 22, 0.3], [7, 5, 25, 0.3], [4, 9, 18, 0.25], [1, 1, 40, 0.3]] as const) {
+      const spec = { ...grid, rows, cols, square, tagSpacing } as any;
+      const e = patternExtent(spec);
+      const t = aprilGridTags(spec); const last = t[t.length - 1];
+      expect(e.bw).toBeCloseTo(last.x + last.size, 6);
+      expect(e.bh).toBeCloseTo(last.y + last.size, 6);
+    }
+  });
+
+  it('keeps a single-page grid centered and inside the margins', () => {
+    for (const square of [14, 18, 20]) {
+      const spec = { ...grid, square } as any;
+      const l = computeLayout(spec, 210, 297);
+      expect(l.fit).toBe('single');
+      const right = inkRight(spec, l.ox);
+      expect(right).toBeLessThanOrEqual(l.pw - PAGE_MARGIN + 1e-6);
+      expect(l.ox + right).toBeCloseTo(l.pw, 6); // equal space left and right
+    }
+  });
+
+  it('tiles a grid that is wider than the page, instead of running off the sheet', () => {
+    const l = computeLayout(grid as any, 210, 297); // 165 mm of tags; 210 mm page less margins and quiet zone
+    expect(l.fit).toBe('tile');
+    const r = l.reducedSpec!;
+    const fit = computeLayout({ ...grid, rows: r.rows, cols: r.cols } as any, 210, 297, r.orientation);
+    expect(fit.fit).toBe('single');
+    expect(r.rows * r.cols).toBeLessThan(36);
   });
 });
