@@ -1,6 +1,6 @@
 ---
 title: "Why your printed target is costing you 0.5 px"
-description: "Paper stretches, printers scale, foam board bows. What each does to reprojection error and focal length, measured in a synthetic test, and when a print is enough."
+description: "Paper stretches, printers scale, foam board bows. What each does to reprojection error and focal length, measured in a synthetic test, and when a print will do."
 date: 2026-10-22
 updated: 2026-11-11
 readingTime: "10 min"
