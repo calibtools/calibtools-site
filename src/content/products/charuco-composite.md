@@ -94,7 +94,7 @@ The matte finish keeps glare off the corners under bench lights. The board works
 
 Aluminum expands about 24 µm per meter per °C. On the 800 × 600 mm board, a 10 °C change moves the outer corners by about 0.19 mm, so let the board settle to room temperature before a precise run.
 
-If you need a tighter tolerance or near-zero expansion for close-range work, the [ceramic ChArUco target](/targets/charuco-ceramic/) uses the same pattern on a ceramic substrate.
+If you need a tighter tolerance or near-zero expansion for close-range work, the [ceramic ChArUco target](/targets/charuco-ceramic/) uses the same pattern on a ceramic substrate. The [composite, ceramic or glass guide](/guides/composite-ceramic-or-glass/) compares the three.
 
 ## Measured before it ships
 

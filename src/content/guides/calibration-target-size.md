@@ -86,7 +86,7 @@ Multiply the coverage long side by 0.6 and pick the nearest board. Rounding **do
 
 For the 587 mm coverage above, 0.6 × 587 = 352 mm, so the [300 × 200 composite board](/targets/charuco-composite/) is the pick, with the 400 × 300 as the alternative if you can move it a little further away.
 
-Ceramic boards are for small fields of view and for when position accuracy below a few micrometers matters; see the [ceramic ChArUco target](/targets/charuco-ceramic/).
+Ceramic boards are for small fields of view and for when position accuracy below a few micrometers matters; see the [ceramic ChArUco target](/targets/charuco-ceramic/), and [composite, ceramic or glass](/guides/composite-ceramic-or-glass/) for how the three substrates compare.
 
 For fields wider than about 1.3 m, use two or more boards with distinct marker IDs instead of one huge panel; the [multi-board guide](/guides/multi-board-marker-ids/) covers the setup.
 

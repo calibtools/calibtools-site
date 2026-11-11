@@ -5,7 +5,7 @@ date: 2026-11-07
 updated: 2026-11-07
 readingTime: "12 min"
 keyRule: "RMS is measured only where the board was. Look at the error per view and per image radius, and verify the model where it will be used, not where it was fitted."
-related: ["calibration-target-size", "opencv-camera-calibration"]
+related: ["calibration-target-size", "opencv-camera-calibration", "printed-target-costs-half-a-pixel"]
 products: ["charuco-composite", "charuco-ceramic"]
 sampleFiles: []
 faq:
@@ -48,6 +48,8 @@ For a rigid board, a lens at its working focus, sharp images and 15 or more view
 | > 1.0 | Wrong pattern geometry or a detection failure in some view |
 
 These scale with resolution: 0.3 px on a 640 × 480 image is a different fraction of the frame than 0.3 px on 4000 × 3000. Quote the image size next to the number.
+
+The [printed target guide](/guides/printed-target-costs-half-a-pixel/) shows where paper stretch, printer scaling and a bowed board land on this table.
 
 ## What it hides
 
