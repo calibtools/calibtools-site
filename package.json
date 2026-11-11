@@ -8,6 +8,7 @@
     "dev": "astro dev",
     "prebuild": "node scripts/check-prose.mjs && tsx scripts/check-part-numbers.ts && node scripts/verify-storefront.mjs && node scripts/validate-product-images.mjs && tsx scripts/generate-placeholders.ts && node scripts/docs-check.mjs",
     "docs:build": "tsx scripts/docs-build.mjs",
+    "halcon:plate": "tsx scripts/halcon-plate.ts",
     "docs:check": "node scripts/docs-check.mjs",
     "build": "astro build",
     "postbuild": "node scripts/sitemap-lastmod.mjs && node scripts/check-links.mjs && node scripts/check-specs.mjs && tsx scripts/check-exports.mjs && node scripts/check-seo.mjs && node scripts/check-placeholders.mjs",
