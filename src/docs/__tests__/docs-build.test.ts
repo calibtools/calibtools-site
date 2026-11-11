@@ -190,22 +190,23 @@ describe('CT-DS PDF title matches markdown source', () => {
 
   for (const code of DS_CODES) {
     it(`${code} PDF page 1 contains the markdown title`, { timeout: 30_000 }, async () => {
-      const { execFileSync } = await import('node:child_process');
       const outBase = join(tmp, code);
       await buildDS({ code, outBase });
 
-      // Extract page-1 text with pdftotext
-      const pdfPath = `${outBase}.pdf`;
-      const text = execFileSync('pdftotext', ['-f', '1', '-l', '1', pdfPath, '-'], { encoding: 'utf-8' });
-      const normalized = text.replace(/\s+/g, ' ').trim();
+      // Extract page-1 text with pdf.js (no system tools, so the test runs anywhere)
+      const pdfjs = await import('pdfjs-dist/legacy/build/pdf.mjs');
+      const doc = await pdfjs.getDocument({ data: new Uint8Array(readFileSync(`${outBase}.pdf`)), useSystemFonts: false }).promise;
+      const content = await (await doc.getPage(1)).getTextContent();
+      const text = content.items.map((it) => ('str' in it ? it.str : '')).join(' ');
+      // Text runs can split inside a word, so compare without any whitespace
+      const normalized = text.replace(/\s+/g, '');
 
       // Read the expected title from the markdown source
       const mdPath = resolve(process.cwd(), `docs/datasheets/${code}.md`);
       const md = readFileSync(mdPath, 'utf-8');
       const { meta } = parseFrontMatter(md);
 
-      // Title may wrap across lines in pdftotext output — normalize both
-      const expectedWords = meta.title.replace(/\s+/g, ' ').trim();
+      const expectedWords = meta.title.replace(/\s+/g, '');
       expect(normalized).toContain(expectedWords);
     });
   }

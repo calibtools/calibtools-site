@@ -7,7 +7,7 @@
  * Run as part of prebuild via tsx.
  */
 
-import { writeFileSync, mkdirSync, readFileSync, readdirSync } from 'node:fs';
+import { writeFileSync, mkdirSync, readFileSync, readdirSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { Resvg } from '@resvg/resvg-js';
 import {
@@ -26,6 +26,10 @@ import {
   WORDMARK_DOT_RECT as WM_DOT,
   WORDMARK_VB,
 } from '../src/lib/exportBrand';
+import { ogSvg } from '../src/lib/ogImage';
+import { TAGLINE } from '../src/lib/claims';
+import { drawingForPartNumber, representativePartNumber } from '../src/lib/boardDrawing';
+import { caltabGeometry, caltabSvg } from '../src/lib/halconCaltab';
 
 const ROOT = resolve('public');
 
@@ -33,41 +37,16 @@ const ROOT = resolve('public');
 
 mkdirSync(resolve(ROOT, 'og'), { recursive: true });
 
-// Bracket-framed wordmark for OG image (screen context — 40px tall)
-const ogWordmark = wordmarkSvgGroup({ x: 350, y: 240, heightMm: 40 });
+const defaultOgSvg = ogSvg({
+  label: 'Calibration targets and tools',
+  title: `${TAGLINE}.`,
+  drawing: drawingForPartNumber('CT-CHA-P-400X300-D5'),
+});
 
-// Pattern fragment — a small checkerboard in the bottom-right
-const patternRects: string[] = [];
-for (let r = 0; r < 6; r++) {
-  for (let c = 0; c < 10; c++) {
-    if ((r + c) % 2 === 0) {
-      patternRects.push(`<rect x="${820 + c * 32}" y="${380 + r * 32}" width="32" height="32" fill="#E6E6E6"/>`);
-    }
-  }
-}
-
-const ogSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
-  <rect width="1200" height="630" fill="#FFFFFF"/>
-  <!-- Pattern fragment -->
-  <g opacity="0.5">
-    ${patternRects.join('\n    ')}
-  </g>
-  <!-- Wordmark -->
-  ${ogWordmark}
-  <!-- Tagline -->
-  <text x="600" y="360" font-family="'Geist', system-ui, sans-serif" font-size="20" fill="#6B6B6B" text-anchor="middle">Calibration targets whose files, geometry and data agree</text>
-  <!-- URL -->
-  <text x="600" y="580" font-family="monospace" font-size="16" fill="#9A9A9A" text-anchor="middle">${BRAND_URL}</text>
-</svg>`;
-
-writeFileSync(resolve(ROOT, 'og/default.svg'), ogSvg);
+writeFileSync(resolve(ROOT, 'og/default.svg'), defaultOgSvg);
 console.log('[placeholders] Generated public/og/default.svg (1200×630)');
 
-// Render SVG → PNG for social crawlers
-const resvg = new Resvg(ogSvg, { fitTo: { mode: 'width', value: 1200 } });
-const pngData = resvg.render();
-writeFileSync(resolve(ROOT, 'og/default.png'), pngData.asPng());
-console.log('[placeholders] Generated public/og/default.png (1200×630)');
+// Render SVG → PNG for social crawlers (fonts and renderOg are defined below, so render after them)
 
 // --- 2. Sample inspection report (WITHDRAWN — no longer generated) ---
 
@@ -100,20 +79,28 @@ const productHandles = [
   { handle: "radar-camera-target", title: "Radar-Camera Calibration Target" },
 ];
 
+const ogFonts = {
+  fontFiles: ['Geist-Regular.ttf', 'Geist-SemiBold.ttf', 'GeistMono-Regular.ttf'].map((f) => resolve('src/assets/fonts', f)),
+  loadSystemFonts: false,
+  defaultFontFamily: 'Geist',
+};
+const renderOg = (svg: string, out: string) => writeFileSync(out, new Resvg(svg, { fitTo: { mode: 'width', value: 1200 }, font: ogFonts }).render().asPng());
+renderOg(defaultOgSvg, resolve(ROOT, 'og/default.png'));
+console.log('[placeholders] Generated public/og/default.png (1200×630)');
+
+/** Line drawing for the share image, from the same geometry as the product page. */
+function productDrawing(handle: string): { drawing?: string; note?: string } {
+  const pn = representativePartNumber(handle);
+  const svg = pn ? drawingForPartNumber(pn) : undefined;
+  if (pn && svg) return { drawing: svg, note: pn.replace('{DICT}', 'D6') };
+  if (handle === 'halcon-composite') return { drawing: caltabSvg(caltabGeometry({ xNum: 9, yNum: 7, markDist: 30, diameterRatio: 0.5 }), 400, 300), note: 'gen_caltab layout' };
+  return {};
+}
+
 for (const { handle, title } of productHandles) {
-  const outPath = resolve(ROOT, `og/${handle}.png`);
-  const productOgSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
-  <rect width="1200" height="630" fill="#FFFFFF"/>
-  <g opacity="0.5">
-    ${patternRects.join('\n    ')}
-  </g>
-  ${ogWordmark}
-  <text x="600" y="340" font-family="'Geist', system-ui, sans-serif" font-size="28" font-weight="700" fill="${BRAND_INK}" text-anchor="middle">${title.replace(/&/g, '&amp;')}</text>
-  <text x="600" y="380" font-family="'Geist', system-ui, sans-serif" font-size="18" fill="#6B6B6B" text-anchor="middle">Precision calibration target</text>
-  <text x="600" y="580" font-family="monospace" font-size="16" fill="#9A9A9A" text-anchor="middle">${BRAND_URL}</text>
-</svg>`;
-  const productResvg = new Resvg(productOgSvg, { fitTo: { mode: 'width', value: 1200 } });
-  writeFileSync(outPath, productResvg.render().asPng());
+  const contentFile = resolve('src/content/products', `${handle}.md`);
+  const summary = existsSync(contentFile) ? /^summary:\s*"([^"]+)"/m.exec(readFileSync(contentFile, 'utf-8'))?.[1] : undefined;
+  renderOg(ogSvg({ label: handle === 'certificate-ilac' ? 'Service' : handle === 'mounting-fixture' ? 'Accessory' : 'Calibration target', title, sub: summary, ...productDrawing(handle) }), resolve(ROOT, `og/${handle}.png`));
   console.log(`[placeholders] Generated public/og/${handle}.png`);
 }
 
@@ -126,18 +113,6 @@ for (const file of readdirSync(guidesDir).filter((f) => f.endsWith('.md')).sort(
   const src = readFileSync(resolve(guidesDir, file), 'utf-8');
   const m = src.match(/^title:\s*"([^"]+)"/m);
   if (!m) continue;
-  const title = m[1].replace(/&/g, '&amp;').replace(/</g, '&lt;');
-  const guideOgSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
-  <rect width="1200" height="630" fill="#FFFFFF"/>
-  <g opacity="0.5">
-    ${patternRects.join('\n    ')}
-  </g>
-  ${ogWordmark}
-  <text x="600" y="340" font-family="'Geist', system-ui, sans-serif" font-size="${title.length > 42 ? 24 : 28}" font-weight="700" fill="${BRAND_INK}" text-anchor="middle">${title}</text>
-  <text x="600" y="380" font-family="'Geist', system-ui, sans-serif" font-size="18" fill="#6B6B6B" text-anchor="middle">Calibration guide</text>
-  <text x="600" y="580" font-family="monospace" font-size="16" fill="#9A9A9A" text-anchor="middle">${BRAND_URL}</text>
-</svg>`;
-  const guideResvg = new Resvg(guideOgSvg, { fitTo: { mode: 'width', value: 1200 } });
-  writeFileSync(resolve(ROOT, `og/${slug}.png`), guideResvg.render().asPng());
+  renderOg(ogSvg({ label: 'Guide', title: m[1], sub: /^description:\s*"([^"]+)"/m.exec(src)?.[1] }), resolve(ROOT, `og/${slug}.png`));
   console.log(`[placeholders] Generated public/og/${slug}.png (guide)`);
 }
