@@ -101,8 +101,7 @@ export default function MobileBottomCluster({ mode, defaultPrice }: Props) {
       <button
         type="button"
         onClick={openCart}
-        className="relative flex h-12 w-12 items-center justify-center rounded-full border border-white/10 shadow-lg backdrop-blur-md"
-        style={{ backgroundColor: 'rgba(10,10,10,0.82)' }}
+        className="relative flex h-12 w-12 items-center justify-center rounded border border-ink bg-ink"
         aria-label={`Cart${count > 0 ? ` (${count} items)` : ''}`}
       >
         <ShoppingCart size={20} strokeWidth={1.6} color="white" aria-hidden="true" />
@@ -117,7 +116,7 @@ export default function MobileBottomCluster({ mode, defaultPrice }: Props) {
       {mode === 'shop' ? (
         <a
           href="/targets/"
-          className="btn-md btn-primary rounded-full shadow-lg"
+          className="btn-md btn-primary"
         >
           Shop targets
         </a>
@@ -126,7 +125,7 @@ export default function MobileBottomCluster({ mode, defaultPrice }: Props) {
           type="button"
           onClick={handleAddToCart}
           disabled={busy || !variantId || !available}
-          className="btn-md btn-primary rounded-full shadow-lg disabled:opacity-50"
+          className="btn-md btn-primary disabled:opacity-50"
         >
           {busy ? 'Adding\u2026' : `Add to cart \u00B7 ${price}`}
         </button>

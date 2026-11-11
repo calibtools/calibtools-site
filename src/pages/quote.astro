@@ -184,6 +184,10 @@ const countries = countryOptions();
       }
       document.getElementById('q-pattern-card')!.classList.replace('hidden', 'flex');
     }
+    // A product name handed over from a product or collection page fills the product line
+    const productParam = (qp.get('product') ?? '').slice(0, 120);
+    const productInput = document.getElementById('q-product') as HTMLInputElement | null;
+    if (productParam && productInput && !productInput.value) productInput.value = productParam;
     const src = document.getElementById('q-source') as HTMLInputElement | null;
     if (src) {
       try {

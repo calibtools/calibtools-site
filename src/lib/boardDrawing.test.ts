@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { boardDrawingSvg, drawingForPartNumber, toScaleOutlines } from './boardDrawing';
+import { boardDrawingSvg, drawingForPartNumber, representativePartNumber, toScaleOutlines } from './boardDrawing';
 import { ALL_CHARUCO_SIZES, COMPOSITE_SIZES, CERAMIC_SIZES } from './boardSizes';
 import { CATALOG } from './catalogPatterns';
 
@@ -104,5 +104,44 @@ describe('toScaleOutlines', () => {
   it('accepts only sizes that exist in the catalog', () => {
     expect(() => toScaleOutlines(['123 × 45'], 10)).toThrow(/not a stock size/);
     expect(toScaleOutlines(CERAMIC_SIZES.slice(0, 3).map((s) => s.label), 2.5).caption).toBe('110 · 150 · 185 mm, 1:2.5');
+  });
+});
+
+describe('drawings for product cards', () => {
+  it('draws stock checkerboards from the checkerboard renderer, with true dimensions', () => {
+    const entries = CATALOG.filter((e) => e.spec.type === 'Checkerboard');
+    expect(entries.length).toBe(10);
+    for (const e of entries) {
+      const svg = drawingForPartNumber(e.partNumber)!;
+      const d = byName(svg);
+      const [w, h] = e.partNumber.split('-')[3].split('X').map(Number);
+      expect(d['board-w'].mm).toBe(w);
+      expect(d['board-h'].mm).toBe(h);
+      expect(d['pattern-w'].mm).toBeCloseTo(e.spec.cols * e.spec.square, 2);
+      expect(Math.abs(d['pattern-w'].len - e.spec.cols * e.spec.square)).toBeLessThanOrEqual(0.01);
+      expect(Math.abs(d['pattern-h'].len - e.spec.rows * e.spec.square)).toBeLessThanOrEqual(0.01);
+      const squares = [...svg.matchAll(new RegExp(`width="${e.spec.square}" height="${e.spec.square}" fill="#141414"`, 'g'))];
+      expect(squares.length, e.partNumber).toBe(Math.ceil((e.spec.rows * e.spec.cols) / 2));
+    }
+  });
+
+  it('compact drawing: same board and pattern, no dimension lines', () => {
+    const full = drawingForPartNumber('CT-CHA-P-400X300-D6')!;
+    const compact = drawingForPartNumber('CT-CHA-P-400X300-D6', { dimensions: false })!;
+    expect(compact).not.toContain('class="dim"');
+    expect(compact).toContain('class="origin"');
+    expect(/<g class="pattern">.*?<\/g>/s.exec(compact)![0]).toBe(/<g class="pattern">.*?<\/g>/s.exec(full)![0]);
+    expect(compact.length).toBeLessThan(full.length);
+  });
+
+  it('picks one representative stock board per product, and nothing for products we cannot draw', () => {
+    expect(representativePartNumber('charuco-composite')).toBe('CT-CHA-P-400X300-D6');
+    expect(representativePartNumber('charuco-ceramic')).toBe('CT-CHA-C-150X100-D6');
+    expect(representativePartNumber('checkerboard-composite')).toBe('CT-CHT-P-400X300-F');
+    expect(representativePartNumber('aprilgrid-composite')).toBeUndefined();
+    expect(representativePartNumber('mounting-fixture')).toBeUndefined();
+    for (const h of ['charuco-composite', 'charuco-ceramic', 'checkerboard-composite']) {
+      expect(drawingForPartNumber(representativePartNumber(h)!, { dimensions: false })).toBeTruthy();
+    }
   });
 });

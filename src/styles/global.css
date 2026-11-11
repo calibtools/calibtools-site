@@ -38,22 +38,6 @@
   --color-brand-tint: #FBE9EA;
 }
 
-[data-theme="dark"] {
-  --color-ground: 10 10 10;
-  --color-ground-alt: 17 17 17;
-  --color-ground-panel: 22 22 22;
-  --color-line: 38 38 38;
-  --color-line-strong: 51 51 51;
-  --color-ink: 242 242 242;
-  --color-ink-muted: 163 163 163;
-  --color-ink-soft: 138 138 138;
-  --color-brand: 230 0 18;
-  --color-brand-text: 255 59 71;
-  --color-brand-dark: 179 0 14;
-  --color-brand-on-dark: 255 77 77;
-  --color-brand-tint: rgba(230, 0, 18, 0.16);
-}
-
 /* --- Brand-kit color aliases (from calibtools-tokens.css) --- */
 :root {
   --ct-black: #000000;
@@ -166,6 +150,9 @@
   .spec      { @apply font-mono text-[15px] tabular-nums; }
   .stat      { @apply font-mono text-[40px] leading-none; }
   .h-display { @apply font-semibold tracking-[-0.01em]; }
+
+  /* Inline SVG scaled to fit its box (line drawings on cards) */
+  .fit-svg > svg { max-height: 100%; max-width: 100%; width: auto; height: auto; }
 
   /* Section marker: plain label, 40 × 3 red rule, heading. No numbers or codes (DESIGN.md §2) */
   .section-no   { @apply font-mono text-[12px] font-medium uppercase tracking-[0.04em] text-ink-soft; }

@@ -568,7 +568,7 @@ export default function Generator({ initialSpec, heading = 'Pattern generator' }
           </div>
         )}
         <div className="flex justify-center overflow-hidden rounded-xl bg-ground-panel p-6 md:p-10">
-          <div className="w-full max-w-[560px] overflow-hidden bg-white shadow-[0_12px_40px_rgba(0,0,0,0.12)] [&>svg]:h-auto [&>svg]:w-full" dangerouslySetInnerHTML={{ __html: svg }} />
+          <div className="w-full max-w-[560px] overflow-hidden border border-line-strong bg-white [&>svg]:h-auto [&>svg]:w-full" dangerouslySetInnerHTML={{ __html: svg }} />
         </div>
         <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 rounded border border-line px-5 py-3" data-testid="pattern-id-row">
           <span className="text-sm text-ink-muted">Pattern ID <span className="font-mono text-[15px] font-medium text-ink" data-testid="pattern-id">{urlRead ? pid : '\u2014'}</span> <span className="hidden sm:inline">&middot; same parameters, same ID. Quote it when you talk to a colleague or to us.</span></span>
