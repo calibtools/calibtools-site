@@ -11,7 +11,8 @@
 import type { PatternSpec } from './patterns';
 import { renderCharucoSvg } from './renderCharuco';
 import { renderCheckerboardSvg } from './renderCheckerboard';
-import { patternExtent } from './pageLayout';
+import { renderAprilGridSvg, aprilGridTags } from './renderAprilGrid';
+import { renderCirclesSvg } from './renderCircles';
 import { CATALOG, specFromEntry } from './catalogPatterns';
 import { GENERATOR_DEFAULT } from './patternLink';
 import { ALL_CHARUCO_SIZES } from './boardSizes';
@@ -36,12 +37,64 @@ export interface BoardDrawingInput {
   dimensions?: boolean;
 }
 
-/** Pattern types this module can draw; their extent is exactly cols × square by rows × square. */
+/** Pattern types this module can draw. */
 const RENDERERS: Partial<Record<PatternSpec['type'], (s: PatternSpec, ox: number, oy: number) => string>> = {
   ChArUco: renderCharucoSvg,
   'ArUco grid': renderCharucoSvg,
   Checkerboard: renderCheckerboardSvg,
+  'AprilGrid (Kalibr)': renderAprilGridSvg,
+  'Symmetric circles': renderCirclesSvg,
+  'Asymmetric circles': renderCirclesSvg,
 };
+
+/**
+ * Where a pattern's ink is, relative to the origin its renderer is called with, and what
+ * the pattern dimension measures. Read off the renderers, never guessed:
+ * - squares: the block of squares, cols × square by rows × square;
+ * - AprilGrid: first tag edge to last tag edge (tags plus the gaps between them);
+ * - circle grids: the renderer centers each circle in a spacing-sized cell, so the ink starts
+ *   half a spacing minus the radius in; the dimension runs between the outermost circle centers.
+ */
+interface PatternFrame {
+  box: { x: number; y: number; w: number; h: number };
+  dimX: { from: number; to: number; text: string };
+  dimY: { from: number; to: number; text: string };
+  origin: { x: number; y: number };
+}
+
+export function patternFrame(s: PatternSpec): PatternFrame {
+  if (s.type === 'AprilGrid (Kalibr)') {
+    const tags = aprilGridTags(s);
+    const last = tags[tags.length - 1];
+    const w = last.x + last.size, h = last.y + last.size;
+    const gap = s.cols > 1 ? tags[1].x - tags[0].x - s.square : 0;
+    const part = (n: number) => (n > 1 ? `${n} × ${fmt(s.square)} + ${n - 1} × ${fmt(gap)}` : `${fmt(s.square)}`);
+    return {
+      box: { x: 0, y: 0, w, h },
+      dimX: { from: 0, to: w, text: `${fmt(w)} = ${part(s.cols)}` },
+      dimY: { from: 0, to: h, text: `${fmt(h)} = ${part(s.rows)}` },
+      origin: { x: 0, y: 0 },
+    };
+  }
+  if (s.type === 'Symmetric circles' || s.type === 'Asymmetric circles') {
+    const sx = s.circleSpacingX ?? s.square, sy = s.circleSpacingY ?? s.square;
+    const d = s.circleDiameter ?? s.square * 0.56;
+    const spanX = (s.cols - 1) * sx, spanY = (s.rows - 1) * sy;
+    return {
+      box: { x: sx / 2 - d / 2, y: sy / 2 - d / 2, w: spanX + d, h: spanY + d },
+      dimX: { from: sx / 2, to: sx / 2 + spanX, text: `${fmt(spanX)} = ${s.cols - 1} × ${fmt(sx)}` },
+      dimY: { from: sy / 2, to: sy / 2 + spanY, text: `${fmt(spanY)} = ${s.rows - 1} × ${fmt(sy)}` },
+      origin: { x: sx / 2, y: sy / 2 },
+    };
+  }
+  const w = s.cols * s.square, h = s.rows * s.square;
+  return {
+    box: { x: 0, y: 0, w, h },
+    dimX: { from: 0, to: w, text: `${fmt(w)} = ${s.cols} × ${fmt(s.square)}` },
+    dimY: { from: 0, to: h, text: `${fmt(h)} = ${s.rows} × ${fmt(s.square)}` },
+    origin: { x: 0, y: 0 },
+  };
+}
 
 /** One dimension line with end ticks and its value; `data-mm` is the dimension in mm. */
 function dim(name: string, x1: number, y1: number, x2: number, y2: number, mm: number, text: string, u: number): string {
@@ -63,9 +116,13 @@ const ext = (x1: number, y1: number, x2: number, y2: number) => `<line x1="${fmt
 export function boardDrawingSvg({ boardW, boardH, spec, label, dimensions = true }: BoardDrawingInput): string {
   const render = RENDERERS[spec.type];
   if (!render) throw new Error(`No line drawing for pattern type "${spec.type}"`);
-  const { bw: patW, bh: patH } = patternExtent(spec);
-  if (patW > boardW + 1e-6 || patH > boardH + 1e-6) throw new Error(`Pattern ${patW} × ${patH} mm does not fit on a ${boardW} × ${boardH} mm board`);
+  const f = patternFrame(spec);
+  const patW = f.box.w, patH = f.box.h;
+  if (patW > boardW + 1e-6 || patH > boardH + 1e-6) throw new Error(`Pattern ${fmt(patW)} × ${fmt(patH)} mm does not fit on a ${boardW} × ${boardH} mm board`);
+  // The ink is centered on the board. (rx, ry) is where the renderer starts; (ox, oy) is the ink's top-left corner.
   const ox = r2((boardW - patW) / 2), oy = r2((boardH - patH) / 2);
+  const rx = r2(ox - f.box.x), ry = r2(oy - f.box.y);
+  const dx1 = r2(rx + f.dimX.from), dx2 = r2(rx + f.dimX.to), dy1 = r2(ry + f.dimY.from), dy2 = r2(ry + f.dimY.to);
 
   // Line weights and text scale with the board so every size reads the same on screen.
   const u = Math.max(boardW, boardH) / 400;
@@ -76,7 +133,7 @@ export function boardDrawingSvg({ boardW, boardH, spec, label, dimensions = true
   const padT = dimensions ? d2 + 8 * u : 6 * u, padR = dimensions ? d2 + 8 * u : 6 * u;
 
   // The pattern, from the shared renderer; black is drawn in ink so the drawing matches the page.
-  const pattern = render(spec, ox, oy).replaceAll('fill="#000"', `fill="${INK}"`);
+  const pattern = render(spec, rx, ry).replaceAll('fill="#000"', `fill="${INK}"`);
 
   const axisLen = Math.min(patW, patH) * 0.16;
   const gapX = Math.min(oy, 6 * u) / 2 + 1.5 * u; // X arrow sits in the top margin, Y arrow in the left margin
@@ -85,8 +142,8 @@ export function boardDrawingSvg({ boardW, boardH, spec, label, dimensions = true
   const xa = { x1: ox, y: r2(oy - gapX), x2: r2(ox + axisLen) };
   const ya = { x: r2(ox - gapY), y1: oy, y2: r2(oy + axisLen) };
 
-  const gridW = `${fmt(patW)} = ${spec.cols} × ${fmt(spec.square)}`;
-  const gridH = `${fmt(patH)} = ${spec.rows} × ${fmt(spec.square)}`;
+  const gridW = f.dimX.text;
+  const gridH = f.dimY.text;
 
   return [
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${fmt(-padL)} ${fmt(-padT)} ${fmt(boardW + padL + padR)} ${fmt(boardH + padT + padB)}" role="img" aria-label="Line drawing of ${label}: board ${fmt(boardW)} × ${fmt(boardH)} mm, pattern area ${fmt(patW)} × ${fmt(patH)} mm, ${spec.cols} × ${spec.rows} squares of ${fmt(spec.square)} mm" font-family="${MONO}" fill="${INK}">`,
@@ -101,26 +158,26 @@ export function boardDrawingSvg({ boardW, boardH, spec, label, dimensions = true
     `</g>`,
     `<text x="${fmt(xa.x2 + 2 * u)}" y="${fmt(xa.y + 2.2 * u)}" font-size="${fmt(6 * u)}" fill="${RED}">X</text>`,
     `<text x="${fmt(ya.x)}" y="${fmt(ya.y2 + 8 * u)}" font-size="${fmt(6 * u)}" text-anchor="middle" fill="#007A3D">Y</text>`,
-    `<circle class="origin" cx="${fmt(ox)}" cy="${fmt(oy)}" r="${fmt(1.7 * u)}" fill="${RED}"/>`,
+    `<circle class="origin" cx="${fmt(rx + f.origin.x)}" cy="${fmt(ry + f.origin.y)}" r="${fmt(1.7 * u)}" fill="${RED}"/>`,
     ...(dimensions ? [
     // Dimension and extension lines
     `<g class="dims" stroke="${INK}" stroke-width="${fmt(thin)}">`,
     ext(0, 0, 0, -d2 - over), ext(boardW, 0, boardW, -d2 - over),
-    ext(ox, oy, ox, -d1 - over), ext(ox + patW, oy, ox + patW, -d1 - over),
+    ext(dx1, oy, dx1, -d1 - over), ext(dx2, oy, dx2, -d1 - over),
     ext(boardW, 0, boardW + d2 + over, 0), ext(boardW, boardH, boardW + d2 + over, boardH),
-    ext(ox + patW, oy, boardW + d1 + over, oy), ext(ox + patW, oy + patH, boardW + d1 + over, oy + patH),
+    ext(ox + patW, dy1, boardW + d1 + over, dy1), ext(ox + patW, dy2, boardW + d1 + over, dy2),
     `<g stroke-width="${fmt(thin)}" fill="${INK}">`,
     dim('board-w', 0, -d2, boardW, -d2, boardW, fmt(boardW), u),
-    dim('pattern-w', ox, -d1, ox + patW, -d1, patW, gridW, u),
+    dim('pattern-w', dx1, -d1, dx2, -d1, f.dimX.to - f.dimX.from, gridW, u),
     dim('board-h', boardW + d2, 0, boardW + d2, boardH, boardH, fmt(boardH), u),
-    dim('pattern-h', boardW + d1, oy, boardW + d1, oy + patH, patH, gridH, u),
+    dim('pattern-h', boardW + d1, dy1, boardW + d1, dy2, f.dimY.to - f.dimY.from, gridH, u),
     `</g></g>`,
     ] : []),
     `</svg>`,
   ].join('').replace(/<text /g, '<text stroke="none" ');
 }
 
-/** Drawing of a stock ChArUco or checkerboard target by part number; undefined for anything else. */
+/** Drawing of a stock ChArUco, checkerboard, AprilGrid or circle-grid target by part number; undefined for anything else. */
 export function drawingForPartNumber(partNumber: string, opts: { dimensions?: boolean } = {}): string | undefined {
   const entry = CATALOG.find((e) => e.partNumber === partNumber && RENDERERS[e.spec.type]);
   if (!entry) return undefined;

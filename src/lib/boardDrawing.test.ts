@@ -138,10 +138,84 @@ describe('drawings for product cards', () => {
     expect(representativePartNumber('charuco-composite')).toBe('CT-CHA-P-400X300-D6');
     expect(representativePartNumber('charuco-ceramic')).toBe('CT-CHA-C-150X100-D6');
     expect(representativePartNumber('checkerboard-composite')).toBe('CT-CHT-P-400X300-F');
-    expect(representativePartNumber('aprilgrid-composite')).toBeUndefined();
+    expect(representativePartNumber('aprilgrid-composite')).toBe('CT-APR-P-400X300-T36');
+    expect(representativePartNumber('circlegrid-composite')).toBe('CT-CIR-P-400X300-SYM');
+    expect(representativePartNumber('halcon-composite')).toBeUndefined();
     expect(representativePartNumber('mounting-fixture')).toBeUndefined();
     for (const h of ['charuco-composite', 'charuco-ceramic', 'checkerboard-composite']) {
       expect(drawingForPartNumber(representativePartNumber(h)!, { dimensions: false })).toBeTruthy();
     }
   });
 });
+
+describe('AprilGrid and circle-grid drawings', () => {
+  /** x of every pattern element the renderer drew, to compare with the dimension lines. */
+  const attr = (svg: string, tag: string, name: string) => [...svg.matchAll(new RegExp(`<${tag}[^>]* ${name}="([0-9.-]+)"`, 'g'))].map((m) => Number(m[1]));
+
+  it('AprilGrid: the dimension runs from the first tag edge to the last, tags plus gaps', () => {
+    const entries = CATALOG.filter((e) => e.spec.type === 'AprilGrid (Kalibr)');
+    expect(entries.length).toBe(5);
+    for (const e of entries) {
+      const svg = drawingForPartNumber(e.partNumber)!;
+      const d = byName(svg);
+      const [w, h] = e.partNumber.split('-')[3].split('X').map(Number);
+      const tag = e.spec.square, gap = tag * 0.3;
+      const expectW = e.spec.cols * tag + (e.spec.cols - 1) * gap;
+      const expectH = e.spec.rows * tag + (e.spec.rows - 1) * gap;
+      expect(d['board-w'].mm).toBe(w);
+      expect(d['pattern-w'].mm, e.partNumber).toBeCloseTo(expectW, 2);
+      expect(d['pattern-h'].mm, e.partNumber).toBeCloseTo(expectH, 2);
+      expect(Math.abs(d['pattern-w'].len - expectW)).toBeLessThanOrEqual(0.01);
+      expect(Math.abs(d['pattern-h'].len - expectH)).toBeLessThanOrEqual(0.01);
+      // The tags the renderer drew span exactly that width, and sit centered on the board
+      const pattern = /<g class="pattern">.*?<\/g>/s.exec(svg)![0];
+      const xs = [...pattern.matchAll(/<rect x="([0-9.-]+)" y="[0-9.-]+" width="([0-9.]+)" height="[0-9.]+" class="tag-bg"/g)].map((m) => [Number(m[1]), Number(m[2])]);
+      expect(xs.length).toBe(e.spec.rows * e.spec.cols);
+      const left = Math.min(...xs.map(([x]) => x)), right = Math.max(...xs.map(([x, s]) => x + s));
+      expect(right - left).toBeCloseTo(expectW, 2);
+      expect(left).toBeCloseTo((w - expectW) / 2, 1);
+      expect(expectW).toBeLessThanOrEqual(w);
+      expect(expectH).toBeLessThanOrEqual(h);
+    }
+  });
+
+  it('circle grids: the dimension runs between the outermost circle centers, and every circle is on the board', () => {
+    const entries = CATALOG.filter((e) => e.spec.type === 'Symmetric circles' || e.spec.type === 'Asymmetric circles');
+    expect(entries.length).toBe(10);
+    for (const e of entries) {
+      const svg = drawingForPartNumber(e.partNumber)!;
+      const d = byName(svg);
+      const [w, h] = e.partNumber.split('-')[3].split('X').map(Number);
+      const pitch = e.spec.square, r = e.spec.circleDiameter! / 2;
+      const pattern = /<g class="pattern">.*?<\/g>/s.exec(svg)![0];
+      const cx = attr(pattern, 'circle', 'cx'), cy = attr(pattern, 'circle', 'cy');
+      const expected = e.spec.type === 'Symmetric circles' ? e.spec.rows * e.spec.cols : Math.ceil((e.spec.rows * e.spec.cols) / 2);
+      expect(cx.length, e.partNumber).toBe(expected);
+      const spanX = Math.max(...cx) - Math.min(...cx), spanY = Math.max(...cy) - Math.min(...cy);
+      expect(d['pattern-w'].mm, e.partNumber).toBeCloseTo(spanX, 2);
+      expect(d['pattern-h'].mm, e.partNumber).toBeCloseTo(spanY, 2);
+      expect(d['pattern-w'].mm).toBeCloseTo((e.spec.cols - 1) * pitch, 2);
+      expect(Math.abs(d['pattern-w'].len - spanX)).toBeLessThanOrEqual(0.01);
+      // Ink stays on the board and is centered
+      expect(Math.min(...cx) - r).toBeGreaterThanOrEqual(0);
+      expect(Math.max(...cx) + r).toBeLessThanOrEqual(w);
+      expect(Math.min(...cy) - r).toBeGreaterThanOrEqual(0);
+      expect(Math.max(...cy) + r).toBeLessThanOrEqual(h);
+      expect(Math.min(...cx) - r).toBeCloseTo(w - (Math.max(...cx) + r), 1);
+    }
+  });
+
+  it('the origin dot sits on the first circle center for circle grids and on the first tag corner for AprilGrid', () => {
+    const cir = drawingForPartNumber('CT-CIR-P-400X300-SYM')!;
+    const first = /<g class="pattern"><circle cx="([0-9.]+)" cy="([0-9.]+)"/.exec(cir)!;
+    const o = /<circle class="origin" cx="([0-9.]+)" cy="([0-9.]+)"/.exec(cir)!;
+    expect(Number(o[1])).toBeCloseTo(Number(first[1]), 2);
+    expect(Number(o[2])).toBeCloseTo(Number(first[2]), 2);
+    const apr = drawingForPartNumber('CT-APR-P-400X300-T36')!;
+    const tag = /<g class="pattern"><rect x="([0-9.]+)" y="([0-9.]+)"/.exec(apr)!;
+    const oa = /<circle class="origin" cx="([0-9.]+)" cy="([0-9.]+)"/.exec(apr)!;
+    expect(Number(oa[1])).toBeCloseTo(Number(tag[1]), 2);
+    expect(Number(oa[2])).toBeCloseTo(Number(tag[2]), 2);
+  });
+});
+
