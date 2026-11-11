@@ -27,7 +27,8 @@ const tiles = await Promise.all(collections.map(async (c) => {
     description: entry?.data.description ?? c.description,
     price: priced.length ? formatCardPrice(priced[0].priceFrom) : '',
     outline: outlines[c.handle],
-    countLabel: `${count} ${count === 1 ? 'product' : 'products'}`,
+    /* The store may list none yet (quote-only collections): say nothing rather than "0 products" */
+    countLabel: count > 0 ? `${count} ${count === 1 ? 'product' : 'products'}` : '',
   };
 }));
 ---
