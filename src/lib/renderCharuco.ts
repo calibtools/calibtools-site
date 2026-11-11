@@ -8,6 +8,25 @@
 import type { PatternSpec } from './patterns';
 import { getArUcoDict, decodeMarkerBits } from './dicts/dicts';
 
+/** One marker on the board: ID, cell, and top-left corner in mm from the board's top-left corner. */
+export interface BoardMarker { id: number; row: number; col: number; x: number; y: number; size: number }
+
+function markerAt(s: PatternSpec, r: number, c: number): BoardMarker {
+  const inset = (s.square - s.marker) / 2;
+  return {
+    id: s.startId + markerIndex(r, c, s.rows, s.cols, s.legacyLayout),
+    row: r, col: c,
+    x: c * s.square + inset, y: r * s.square + inset, size: s.marker,
+  };
+}
+
+/** Every marker of a ChArUco or ArUco grid board, in ID order. The renderer draws from the same positions. */
+export function charucoMarkers(s: PatternSpec): BoardMarker[] {
+  const out: BoardMarker[] = [];
+  for (let r = 0; r < s.rows; r++) for (let c = 0; c < s.cols; c++) if ((r + c) % 2 !== 0) out.push(markerAt(s, r, c));
+  return out;
+}
+
 /** Returns SVG elements for a ChArUco or ArUco grid pattern. */
 export function renderCharucoSvg(s: PatternSpec, ox: number, oy: number): string {
   const parts: string[] = [];
@@ -21,10 +40,9 @@ export function renderCharucoSvg(s: PatternSpec, ox: number, oy: number): string
         parts.push(`<rect x="${x}" y="${y}" width="${s.square}" height="${s.square}" fill="#000"/>`);
       } else {
         // Marker in white square
-        const markerId = s.startId + markerIndex(r, c, s.rows, s.cols, s.legacyLayout);
-        const m = s.marker;
-        const mx = x + (s.square - m) / 2;
-        const my = y + (s.square - m) / 2;
+        const { id: markerId, x: relX, y: relY, size: m } = markerAt(s, r, c);
+        const mx = ox + relX;
+        const my = oy + relY;
 
         if (dict && markerId < dict.count) {
           // Real dictionary bits

@@ -32,6 +32,18 @@ export function parseTagIdList(input: string | undefined, startId: number, count
   return ids.slice(0, count);
 }
 
+/** One tag on the grid: ID, cell, and top-left corner in mm from the grid's top-left corner. */
+export interface GridTag { id: number; row: number; col: number; x: number; y: number; size: number }
+
+/** Every tag of an AprilGrid, row-major. The renderer draws from the same positions. */
+export function aprilGridTags(s: PatternSpec): GridTag[] {
+  const step = s.square + s.square * (s.tagSpacing ?? 0.3);
+  const ids = parseTagIdList(s.tagIdList, s.startId, s.rows * s.cols);
+  const out: GridTag[] = [];
+  for (let r = 0; r < s.rows; r++) for (let c = 0; c < s.cols; c++) out.push({ id: ids[r * s.cols + c], row: r, col: c, x: c * step, y: r * step, size: s.square });
+  return out;
+}
+
 /** Returns SVG elements for an AprilGrid pattern. */
 export function renderAprilGridSvg(s: PatternSpec, ox: number, oy: number): string {
   const parts: string[] = [];
@@ -42,15 +54,14 @@ export function renderAprilGridSvg(s: PatternSpec, ox: number, oy: number): stri
   const tagSize = s.square; // tag outer size in mm (including border)
   const gap = tagSize * tagSpacingRatio;
   const step = tagSize + gap;
-  const numTags = s.rows * s.cols;
-  const tagIds = parseTagIdList(s.tagIdList, s.startId, numTags);
+  const tags = aprilGridTags(s);
 
   for (let r = 0; r < s.rows; r++) {
     for (let c = 0; c < s.cols; c++) {
-      const idx = r * s.cols + c;
-      const tagId = tagIds[idx];
-      const tx = ox + c * step;
-      const ty = oy + r * step;
+      const tag = tags[r * s.cols + c];
+      const tagId = tag.id;
+      const tx = ox + tag.x;
+      const ty = oy + tag.y;
 
       // Tag background (black, includes border)
       parts.push(`<rect x="${tx}" y="${ty}" width="${tagSize}" height="${tagSize}" class="tag-bg" fill="#000"/>`);

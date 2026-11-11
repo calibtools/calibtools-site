@@ -6,6 +6,12 @@
  * sends the customer a confirmation that doubles as an email-address check
  * (/api/quote-confirm). KV is written first so no request is lost if email fails.
  *
+ * When the request carries a generator pattern, the internal email also gets the board
+ * definition (OpenCV JSON) and the marker list as attachments, and a second internal
+ * email follows with a 1:1 PDF of the pattern. The PDF is built after the response has
+ * been sent: it needs a few hundred milliseconds of CPU, and if the plan's CPU limit
+ * stops it, only that second email is missing. The files hold no customer details.
+ *
  * Setup required in Cloudflare Pages:
  * 1. Environment variable: RESEND_API_KEY (encrypted secret)
  * 2. KV namespace QUOTES bound as QUOTES
@@ -18,7 +24,8 @@
  */
 
 import { checkWorkEmail, hasMailServer, WORK_EMAIL_MESSAGE } from '../../src/lib/workEmail';
-import { patternIdFromPath } from '../../src/lib/patternLink';
+import { patternIdFromPath, specFromLink } from '../../src/lib/patternLink';
+import { quoteAttachments, fileStem, bytesToBase64, type EmailAttachment } from '../../src/lib/quoteFiles';
 import { verifyTurnstile, TURNSTILE_FIELD } from '../../src/lib/turnstile';
 import {
   confirmToken, confirmUrl, customerBody, customerSubject, internalBody, internalSubject,
@@ -33,6 +40,8 @@ interface Env {
   /** Signs the email-confirmation link. */
   QUOTE_HMAC_SECRET?: string;
   REVIEW_HMAC_SECRET?: string;
+  /** Static assets of the site (Pages binding); the PDF fonts are read from /fonts/pdf/. */
+  ASSETS?: { fetch: (input: Request | string) => Promise<Response> };
 }
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -67,17 +76,43 @@ function validate(fields: Record<string, string>): FieldError | null {
   return null;
 }
 
-async function sendEmail(apiKey: string, msg: { to: string; reply_to: string; subject: string; text: string }): Promise<boolean> {
+async function sendEmail(apiKey: string, msg: { to: string; reply_to: string; subject: string; text: string; attachments?: EmailAttachment[] }): Promise<boolean> {
   try {
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ from: 'Calib.Tools <quotes@calib.tools>', to: [msg.to], reply_to: msg.reply_to, subject: msg.subject, text: msg.text }),
+      body: JSON.stringify({
+        from: 'Calib.Tools <quotes@calib.tools>', to: [msg.to], reply_to: msg.reply_to, subject: msg.subject, text: msg.text,
+        ...(msg.attachments?.length ? { attachments: msg.attachments } : {}),
+      }),
     });
     return res.ok;
   } catch {
     return false;
   }
+}
+
+const PDF_FONTS = { regular: 'Geist-Regular.ttf', semiBold: 'Geist-SemiBold.ttf', mono: 'GeistMono-Regular.ttf' } as const;
+
+/** Second internal email with the 1:1 PDF. Runs after the response; any failure only means this email is not sent. */
+async function sendFactoryPdf(env: Env, origin: string, record: QuoteRecord): Promise<void> {
+  const spec = specFromLink(record.pattern);
+  if (!spec || !env.RESEND_API_KEY || !env.ASSETS) return;
+  const load = async (file: string) => {
+    const res = await env.ASSETS!.fetch(`${origin}/fonts/pdf/${file}`);
+    if (!res.ok) throw new Error(`font ${file}: ${res.status}`);
+    return res.arrayBuffer();
+  };
+  const [regular, semiBold, mono] = await Promise.all([load(PDF_FONTS.regular), load(PDF_FONTS.semiBold), load(PDF_FONTS.mono)]);
+  const { factoryPdf } = await import('../../src/lib/quoteFiles');
+  const pdf = await factoryPdf(spec, { regular, semiBold, mono });
+  await sendEmail(env.RESEND_API_KEY, {
+    to: 'hello@calib.tools',
+    reply_to: 'hello@calib.tools',
+    subject: `${record.id} · 1:1 PDF of the pattern`,
+    text: [`Reference: ${record.id}`, `Pattern ID: ${record.patternId ?? ''}`, '', 'Attached: the pattern at 1:1 on its own page, built from the pattern link in the request.', 'The file holds no customer details.'].join('\n'),
+    attachments: [{ filename: `${fileStem(record.id, spec)}_1to1.pdf`, content: bytesToBase64(pdf) }],
+  });
 }
 
 export const onRequestPost: PagesFunction<Env> = async (ctx) => {
@@ -163,14 +198,29 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
   const secret = ctx.env.QUOTE_HMAC_SECRET || ctx.env.REVIEW_HMAC_SECRET || '';
   const link = secret ? confirmUrl(new URL(ctx.request.url).origin, id, await confirmToken(secret, id)) : '';
 
+  // Board definition and marker list for the factory; never let them block the email
+  let attachments: EmailAttachment[] = [];
+  try {
+    const spec = specFromLink(record.pattern);
+    if (spec) attachments = quoteAttachments(spec, id);
+  } catch { attachments = []; }
+
   let internalSent = false;
   if (ctx.env.RESEND_API_KEY) {
+    const body = internalBody(record, link ? 'not yet confirmed; confirmation link sent' : 'no confirmation link: QUOTE_HMAC_SECRET not set');
+    const filesNote = attachments.length
+      ? `\n\nAttached (pattern only, no customer details): ${attachments.map((a) => a.filename).join(', ')}. A 1:1 PDF follows in a second email.`
+      : '';
     internalSent = await sendEmail(ctx.env.RESEND_API_KEY, {
       to: 'hello@calib.tools',
       reply_to: record.email,
       subject: internalSubject(record),
-      text: internalBody(record, link ? 'not yet confirmed; confirmation link sent' : 'no confirmation link: QUOTE_HMAC_SECRET not set'),
+      text: body + filesNote,
+      attachments,
     });
+    if (internalSent && attachments.length && typeof ctx.waitUntil === 'function') {
+      ctx.waitUntil(sendFactoryPdf(ctx.env, new URL(ctx.request.url).origin, record).catch(() => {}));
+    }
     record.customerEmailSent = await sendEmail(ctx.env.RESEND_API_KEY, {
       to: record.email,
       reply_to: 'hello@calib.tools',
