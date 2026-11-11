@@ -54,5 +54,8 @@ export const MULTI_SENSOR_HANDLES: string[] = ["lidar-camera-target", "thermal-c
 /** Quote-only image-quality and metrology families defined locally (no Shopify variants yet). */
 export const IMAGE_QUALITY_HANDLES: string[] = ['reflectance-panel', 'resolution-chart', 'color-chart', 'grayscale-oecf-chart', 'focus-siemens-star-chart', 'resolution-targets-glass', 'grid-distortion-target', 'backlit-target'];
 
+/** Catalog products whose layout is agreed with the customer before they are made, so they cannot go straight into the cart. */
+export const LAYOUT_ON_ORDER_HANDLES: string[] = ['halcon-composite'];
+
 /** Products sold on quote only: no cart, "Request a quote" CTA. */
-export const QUOTE_ONLY_HANDLES: string[] = [...IMAGE_QUALITY_HANDLES, ...MULTI_SENSOR_HANDLES];
+export const QUOTE_ONLY_HANDLES: string[] = [...IMAGE_QUALITY_HANDLES, ...MULTI_SENSOR_HANDLES, ...LAYOUT_ON_ORDER_HANDLES];
