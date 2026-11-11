@@ -72,7 +72,7 @@ describe('product long-form content', () => {
 
     it(`${slug}: every internal link in the body and related lists points to a page that exists`, () => {
       const all = [...extractInternalLinks(body), ...extractFrontmatterHrefs(frontmatter)];
-      const broken = all.filter((h) => !valid.has(h.split('#')[0]));
+      const broken = all.filter((h) => !valid.has(h.split(/[?#]/)[0]));
       expect(broken).toEqual([]);
     });
 
@@ -128,5 +128,34 @@ describe('long-form batch 1 (C6)', () => {
   it('every size line on the ceramic page still carries the word "target" next to the ±2 µm figure', () => {
     const raw = readFileSync(resolve(CONTENT, 'products/charuco-ceramic.md'), 'utf-8');
     for (const m of raw.matchAll(/[^.\n]*±2 µm[^.\n]*/g)) expect(m[0]).toMatch(/target/i);
+  });
+});
+
+describe('long-form batch 2 (C6)', () => {
+  for (const slug of ['mounting-fixture', 'hand-eye-calibration-kit', 'multi-camera-target']) {
+    it(`${slug}: has a long-form body and links out to other products and a guide`, () => {
+      const raw = readFileSync(resolve(CONTENT, 'products', `${slug}.md`), 'utf-8');
+      const { body, frontmatter } = splitFrontmatter(raw);
+      expect(bodyWordCount(raw)).toBeGreaterThanOrEqual(450);
+      const links = [...extractInternalLinks(body), ...extractFrontmatterHrefs(frontmatter)];
+      expect(new Set(links.filter((h) => h.startsWith('/targets/') && h !== `/targets/${slug}/`)).size).toBeGreaterThanOrEqual(4);
+      expect(links.some((h) => h.startsWith('/guides/'))).toBe(true);
+    });
+  }
+
+  it('made-to-order pages say that their figures are target values', () => {
+    for (const slug of ['hand-eye-calibration-kit', 'multi-camera-target']) {
+      const { body } = splitFrontmatter(readFileSync(resolve(CONTENT, 'products', `${slug}.md`), 'utf-8'));
+      expect(body, slug).toMatch(/These are target values/);
+    }
+  });
+
+  it('fixture figures match the datasheet', () => {
+    const { body } = splitFrontmatter(readFileSync(resolve(CONTENT, 'products/mounting-fixture.md'), 'utf-8'));
+    const ds = readFileSync(resolve(ROOT, 'docs/datasheets/CT-DS-ACC-A-FIX-14.md'), 'utf-8');
+    for (const fact of ['120 mm', '180 g', '7 mm deep', '3.2 kg', '5 kg', '3 mm hex key']) {
+      expect(ds, fact).toContain(fact);
+      expect(body, fact).toContain(fact);
+    }
   });
 });
