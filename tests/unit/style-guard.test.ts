@@ -1,6 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync, readdirSync } from 'node:fs';
-import { join, relative } from 'node:path';
+import { join, relative, resolve } from 'node:path';
+
+const ROOT = process.cwd();
 
 /**
  * DESIGN.md: no shadows, no gradients, no backdrop blur, no dark marketing pages.
@@ -45,5 +47,20 @@ describe('style guard (DESIGN.md)', () => {
     const samples = ['class="shadow-lg"', 'box-shadow: 0 1px 2px #000;', 'class="bg-gradient-to-t"', 'background: linear-gradient(red, blue);', 'class="backdrop-blur-md"', '<Base theme="dark">'];
     for (const s of samples) expect(BANNED.some(([, re]) => re.test(s)), s).toBe(true);
     for (const ok of ['class="shadow-none"', 'box-shadow: none;', 'const shadowRoot = 1']) expect(BANNED.some(([, re]) => re.test(ok)), ok).toBe(false);
+  });
+});
+
+describe('pixel values use the pixel face', () => {
+  it('the FOV calculator and the quality report mark their pixel results', () => {
+    const fovSrc = readFileSync(resolve(ROOT, 'src/islands/FovCalculator.tsx'), 'utf-8');
+    const qualitySrc = readFileSync(resolve(ROOT, 'src/islands/QualityAnalyzer.tsx'), 'utf-8');
+    expect(fovSrc).toMatch(/label="Pixels per square"[^\n]*pixel/);
+    expect(fovSrc).toContain("'font-pixel text-xl'");
+    expect(qualitySrc).toContain("'font-pixel'");
+  });
+  it('Geist Pixel is not used for headings or labels', () => {
+    for (const f of ['src/pages/index.astro', 'src/components/Nav.astro', 'src/components/Footer.astro']) {
+      expect(readFileSync(resolve(ROOT, f), 'utf-8'), f).not.toContain('font-pixel');
+    }
   });
 });

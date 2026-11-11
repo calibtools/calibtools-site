@@ -93,7 +93,7 @@ export default function QualityAnalyzer() {
                 <div className="text-xs font-semibold uppercase">{report.grade}</div>
               </div>
               <div className="text-sm">
-                <p className="m-0">RMS reprojection error: <strong>{report.reprojection.rms.toFixed(4)} px</strong></p>
+                <p className="m-0">RMS reprojection error: <strong className="font-pixel font-normal" data-unit="px">{report.reprojection.rms.toFixed(4)} px</strong></p>
                 <p className="m-0 mt-1">{data?.imageCount} images analyzed</p>
               </div>
             </div>
@@ -186,7 +186,8 @@ function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded bg-ground-panel px-3 py-2">
       <span className="text-xs text-ink-muted">{label}: </span>
-      <span className="font-mono font-semibold">{value}</span>
+      {/* Values in pixels are set in Geist Pixel; everything else stays in Mono (DESIGN.md) */}
+      <span className={/ px$/.test(value) ? 'font-pixel' : 'font-mono font-semibold'} data-unit={/ px$/.test(value) ? 'px' : undefined}>{value}</span>
     </div>
   );
 }
