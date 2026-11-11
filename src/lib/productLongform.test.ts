@@ -207,3 +207,28 @@ describe('long-form batch 3: multi-sensor targets (principle and selection)', ()
   }
 });
 
+describe('long-form batch 4: image-quality and metrology targets (principle and selection)', () => {
+  const slugsB4 = ['reflectance-panel', 'resolution-chart', 'color-chart', 'grayscale-oecf-chart', 'focus-siemens-star-chart', 'resolution-targets-glass', 'grid-distortion-target', 'backlit-target'];
+  for (const slug of slugsB4) {
+    it(`${slug}: explains the principle, says its figures are target values and ends with what to send`, () => {
+      const raw = readFileSync(resolve(CONTENT, 'products', `${slug}.md`), 'utf-8');
+      const { body, frontmatter } = splitFrontmatter(raw);
+      expect(bodyWordCount(raw)).toBeGreaterThanOrEqual(400);
+      expect(body).toMatch(/These are target values/);
+      expect(body).toContain('## What to tell us');
+      expect(body).toContain('(/quote/?product=');
+      expect(body).not.toMatch(/±\s?\d/);
+      const links = [...extractInternalLinks(body), ...extractFrontmatterHrefs(frontmatter)];
+      expect(new Set(links.filter((h) => h.startsWith('/targets/') && h !== `/targets/${slug}/`)).size).toBeGreaterThanOrEqual(4);
+      expect(links.some((h) => h.startsWith('/guides/'))).toBe(true);
+    });
+  }
+
+  it('every product page now has long-form text', () => {
+    for (const slug of slugs('products').filter((s) => !NO_PAGE.has(s))) {
+      const raw = readFileSync(resolve(CONTENT, 'products', `${slug}.md`), 'utf-8');
+      expect(bodyWordCount(raw), slug).toBeGreaterThanOrEqual(400);
+    }
+  });
+});
+
