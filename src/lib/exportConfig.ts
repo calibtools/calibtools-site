@@ -195,6 +195,14 @@ export function opencvJson(s: PatternSpec): string {
     dictionary: s.dict,
     start_id: s.startId,
   };
+  // findCirclesGrid takes (points per row, rows). For an asymmetric grid the lattice holds a
+  // circle at every other position, so a row has cols / 2 circles.
+  if (s.type === 'Symmetric circles') obj.opencv_pattern_size = [s.cols, s.rows];
+  if (s.type === 'Asymmetric circles' && s.cols % 2 === 0) obj.opencv_pattern_size = [s.cols / 2, s.rows];
+  if (s.type === 'Symmetric circles' || s.type === 'Asymmetric circles') {
+    obj.circle_diameter_mm = s.circleDiameter ?? s.square * 0.56;
+    obj.opencv_flag = s.type === 'Symmetric circles' ? 'CALIB_CB_SYMMETRIC_GRID' : 'CALIB_CB_ASYMMETRIC_GRID';
+  }
   const range = idRange(s);
   if (range) {
     obj.id_range = [range.min, range.max];

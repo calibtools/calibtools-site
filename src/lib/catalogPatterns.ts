@@ -75,10 +75,15 @@ for (const [w, h, rows, cols, tag] of [
   });
 }
 
-// Circle grids, aluminum composite (CT-DS-CIR-P): spacing = pitch
+// Circle grids, aluminum composite (CT-DS-CIR-P): spacing = pitch.
+// rows × cols are positions of the square lattice the renderer walks. A symmetric grid fills
+// every position. An asymmetric grid fills every other one, checkerboard-wise, so a lattice of
+// R × C holds R rows of C / 2 circles; OpenCV's pattern size for it is (C / 2, R). R is odd so
+// that the board does not look the same after a half turn.
+// Every layout leaves at least one pitch of white between the outermost circles and the board edge.
 for (const [w, h, sr, sc, ar, ac, d, pitch] of [
-  [200, 150, 7, 10, 7, 5, 12, 20], [300, 200, 9, 14, 9, 7, 14, 22], [400, 300, 11, 16, 11, 8, 17, 25],
-  [600, 400, 13, 20, 13, 10, 20, 30], [800, 600, 16, 24, 16, 12, 22, 33],
+  [200, 150, 5, 8, 5, 8, 12, 20], [300, 200, 7, 12, 7, 12, 14, 22], [400, 300, 10, 14, 9, 14, 17, 25],
+  [600, 400, 11, 18, 11, 18, 20, 30], [800, 600, 16, 22, 15, 22, 22, 33],
 ] as const) {
   entries.push({ partNumber: `CT-CIR-P-${w}X${h}-SYM`, handle: 'circlegrid-composite', options: { size: spaced(w, h), layout: 'Symmetric' }, spec: { type: 'Symmetric circles', rows: sr, cols: sc, square: pitch, circleDiameter: d } });
   entries.push({ partNumber: `CT-CIR-P-${w}X${h}-ASY`, handle: 'circlegrid-composite', options: { size: spaced(w, h), layout: 'Asymmetric' }, spec: { type: 'Asymmetric circles', rows: ar, cols: ac, square: pitch, circleDiameter: d } });

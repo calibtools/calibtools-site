@@ -17,23 +17,23 @@ Circle grids use filled dot centroids rather than corner intersections. Centroid
 
 | Part number | Size (W × H) | Circles (rows × cols) | Circle ⌀ / spacing | Total circles |
 |---|---|---|---|---|
-| CT-CIR-P-200X150-SYM | 200 × 150 mm | 7 × 10 | 12 / 20 mm | 70 |
-| CT-CIR-P-300X200-SYM | 300 × 200 mm | 9 × 14 | 14 / 22 mm | 126 |
-| CT-CIR-P-400X300-SYM | 400 × 300 mm | 11 × 16 | 17 / 25 mm | 176 |
-| CT-CIR-P-600X400-SYM | 600 × 400 mm | 13 × 20 | 20 / 30 mm | 260 |
-| CT-CIR-P-800X600-SYM | 800 × 600 mm | 16 × 24 | 22 / 33 mm | 384 |
+| CT-CIR-P-200X150-SYM | 200 × 150 mm | 5 × 8 | 12 / 20 mm | 40 |
+| CT-CIR-P-300X200-SYM | 300 × 200 mm | 7 × 12 | 14 / 22 mm | 84 |
+| CT-CIR-P-400X300-SYM | 400 × 300 mm | 10 × 14 | 17 / 25 mm | 140 |
+| CT-CIR-P-600X400-SYM | 600 × 400 mm | 11 × 18 | 20 / 30 mm | 198 |
+| CT-CIR-P-800X600-SYM | 800 × 600 mm | 16 × 22 | 22 / 33 mm | 352 |
 
 ### Asymmetric (ASYM)
 
 | Part number | Size (W × H) | Circles (rows × cols) | Circle ⌀ / spacing | Total circles |
 |---|---|---|---|---|
-| CT-CIR-P-200X150-ASY | 200 × 150 mm | 7 × 5 | 12 / 20 mm | 35 |
-| CT-CIR-P-300X200-ASY | 300 × 200 mm | 9 × 7 | 14 / 22 mm | 63 |
-| CT-CIR-P-400X300-ASY | 400 × 300 mm | 11 × 8 | 17 / 25 mm | 88 |
-| CT-CIR-P-600X400-ASY | 600 × 400 mm | 13 × 10 | 20 / 30 mm | 130 |
-| CT-CIR-P-800X600-ASY | 800 × 600 mm | 16 × 12 | 22 / 33 mm | 192 |
+| CT-CIR-P-200X150-ASY | 200 × 150 mm | 5 × 4 | 12 / 20 mm | 20 |
+| CT-CIR-P-300X200-ASY | 300 × 200 mm | 7 × 6 | 14 / 22 mm | 42 |
+| CT-CIR-P-400X300-ASY | 400 × 300 mm | 9 × 7 | 17 / 25 mm | 63 |
+| CT-CIR-P-600X400-ASY | 600 × 400 mm | 11 × 9 | 20 / 30 mm | 99 |
+| CT-CIR-P-800X600-ASY | 800 × 600 mm | 15 × 11 | 22 / 33 mm | 165 |
 
-Spacing is centre-to-centre pitch. Asymmetric boards use a half-pitch row offset; pass `CALIB_CB_ASYMMETRIC_GRID` to `cv::findCirclesGrid`. Other grid sizes or circle dimensions: custom order (CUS).
+Spacing is the pitch of the underlying square lattice. A symmetric grid has a circle at every lattice position; its `findCirclesGrid` pattern size is (cols, rows). An asymmetric grid has a circle at every other position, so circles in a row are two pitches apart and each row is shifted by one pitch against the next; rows × cols above are rows and circles per row, and the pattern size is (circles per row, rows) with `CALIB_CB_ASYMMETRIC_GRID`. Every layout leaves at least one pitch of white between the outermost circles and the board edge. Other grid sizes or circle dimensions: custom order (CUS).
 
 Pattern area is centered with a white quiet zone ≥ 1 circle pitch on all sides; the edge strip with part number, serial and 100 mm scale bar sits outside the quiet zone.
 
