@@ -3,25 +3,25 @@ code: CT-DS-HAL-P
 title: HALCON Calibration Plate, Aluminum Composite
 type: datasheet
 rev: A
-date: 2026-10-29
+date: 2026-11-11
 status: draft
 family: HAL
 material: P
 ---
 
-MVTec HALCON calibration plate. A central reference circle is surrounded by smaller dot marks arranged in a regular grid. The asymmetric mark sizes allow `find_caltab` to determine board orientation without additional fiducials. Designed for use with the `find_caltab` and `calibrate_cameras` operators in HALCON 12 and later.
+HALCON calibration plate with rectangularly arranged marks, the layout that HALCON's `gen_caltab` operator describes: black circular marks of one size in a regular grid on a white field, inside a black frame with a triangular mark in one corner. The frame lets `find_caltab` locate the plate and the triangle fixes its orientation. For use with `find_calib_object`, `find_caltab` and `calibrate_cameras`.
 
 ## Ordering
 
-| Part number | Size (W × H) | Mark grid | Central mark ⌀ | Grid mark ⌀ | Total marks |
-|---|---|---|---|---|---|
-| CT-HAL-P-200X150-STD | 200 × 150 mm | 7 × 5 | 8 mm | 3 mm | 36 |
-| CT-HAL-P-300X200-STD | 300 × 200 mm | 7 × 7 | 10 mm | 4 mm | 50 |
-| CT-HAL-P-400X300-STD | 400 × 300 mm | 9 × 7 | 12 mm | 5 mm | 64 |
-| CT-HAL-P-600X400-STD | 600 × 400 mm | 11 × 9 | 14 mm | 6 mm | 100 |
-| CT-HAL-P-800X600-STD | 800 × 600 mm | 13 × 11 | 16 mm | 7 mm | 144 |
+| Part number | Size (W × H) |
+|---|---|
+| CT-HAL-P-200X150-STD | 200 × 150 mm |
+| CT-HAL-P-300X200-STD | 300 × 200 mm |
+| CT-HAL-P-400X300-STD | 400 × 300 mm |
+| CT-HAL-P-600X400-STD | 600 × 400 mm |
+| CT-HAL-P-800X600-STD | 800 × 600 mm |
 
-Mark grid is (rows × cols) including the central reference mark. Total marks = rows × cols. A `.descr` description file for HALCON is supplied with every board; it encodes the exact mark positions and diameters as measured during inspection. Other grid sizes: custom order (CUS).
+The number of marks, the mark distance and the mark diameter are fixed with the order: send your existing `.descr` file, or the `gen_caltab` parameters (marks in x and y, mark distance, diameter ratio), and the plate is made to them. A `.descr` description file in `gen_caltab` format is supplied with every plate. Plates with hexagonally arranged marks (`create_caltab`, `.cpd`): custom order (CUS).
 
 Pattern area is centered with a white quiet zone ≥ 1 mark pitch on all sides; the edge strip with part number, serial and 100 mm scale bar sits outside the quiet zone.
 
