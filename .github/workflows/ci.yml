@@ -16,7 +16,12 @@ jobs:
         with: { node-version: 22, cache: pnpm }
       - name: Install system dependencies
         run: |
-          sudo apt-get update && sudo apt-get install -y poppler-utils
+          # The package mirrors are sometimes unreachable for a few minutes; try again before giving up
+          for attempt in 1 2 3 4 5; do
+            if sudo apt-get -o Acquire::Retries=3 update && sudo apt-get -o Acquire::Retries=3 install -y poppler-utils; then break; fi
+            echo "apt attempt $attempt failed; waiting 60 s"; sleep 60
+          done
+          command -v pdftoppm
           pip install Pillow opencv-python-headless numpy
 
       - run: pnpm install --frozen-lockfile
