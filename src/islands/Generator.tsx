@@ -85,6 +85,7 @@ export default function Generator({ initialSpec, heading = 'Pattern generator' }
   const ext = patternExtent(spec);
   const boardW = Math.round(ext.bw * 10) / 10, boardH = Math.round(ext.bh * 10) / 10;
   const catalog = useMemo(() => matchCatalog(spec), [spec]);
+  // Shown only after the link's parameters are read, so the server-rendered default never shows a wrong ID
   const pid = useMemo(() => patternId(spec), [spec]);
   const [copied, setCopied] = useState<'ok' | 'fail' | null>(null);
   /** Copy a link that reopens this exact pattern (always the main generator URL, all parameters included). */
@@ -570,10 +571,10 @@ export default function Generator({ initialSpec, heading = 'Pattern generator' }
           <div className="w-full max-w-[560px] overflow-hidden bg-white shadow-[0_12px_40px_rgba(0,0,0,0.12)] [&>svg]:h-auto [&>svg]:w-full" dangerouslySetInnerHTML={{ __html: svg }} />
         </div>
         <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 rounded border border-line px-5 py-3" data-testid="pattern-id-row">
-          <span className="text-sm text-ink-muted">Pattern ID <span className="font-mono text-[15px] font-medium text-ink" data-testid="pattern-id">{pid}</span> <span className="hidden sm:inline">&middot; same parameters, same ID. Quote it when you talk to a colleague or to us.</span></span>
+          <span className="text-sm text-ink-muted">Pattern ID <span className="font-mono text-[15px] font-medium text-ink" data-testid="pattern-id">{urlRead ? pid : '\u2014'}</span> <span className="hidden sm:inline">&middot; same parameters, same ID. Quote it when you talk to a colleague or to us.</span></span>
           <span className="flex items-center gap-3">
             <span className="text-[13px] text-ink-muted" role="status" aria-live="polite">{copied === 'ok' ? 'Link copied' : copied === 'fail' ? 'Could not copy; use the address bar' : ''}</span>
-            <button type="button" onClick={copyPatternLink} className="rounded border border-ink px-3 py-2 text-sm font-semibold min-h-[44px] md:min-h-[36px]" data-testid="copy-pattern-link">Copy pattern link</button>
+            <button type="button" onClick={copyPatternLink} disabled={!urlRead} className="rounded border border-ink px-3 py-2 text-sm font-semibold min-h-[44px] md:min-h-[36px]" data-testid="copy-pattern-link">Copy pattern link</button>
           </span>
         </div>
         {catalog.exact ? (
