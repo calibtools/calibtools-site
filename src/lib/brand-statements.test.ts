@@ -58,3 +58,11 @@ describe('brand statements', () => {
     expect(text).toContain(`"slogan":"${TAGLINE}"`);
   });
 });
+
+describe('home headline', () => {
+  it('fits a browser title on its own', async () => {
+    const { HOME_HEADLINE } = await import('./claims');
+    expect(HOME_HEADLINE).toBe('Calibration targets and tools for Machine Vision');
+    expect(HOME_HEADLINE.length).toBeLessThanOrEqual(60);
+  });
+});

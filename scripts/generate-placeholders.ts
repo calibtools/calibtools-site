@@ -27,7 +27,7 @@ import {
   WORDMARK_VB,
 } from '../src/lib/exportBrand';
 import { ogSvg } from '../src/lib/ogImage';
-import { TAGLINE } from '../src/lib/claims';
+import { TAGLINE, HOME_HEADLINE } from '../src/lib/claims';
 import { drawingForPartNumber, representativePartNumber } from '../src/lib/boardDrawing';
 import { caltabGeometry, caltabSvg } from '../src/lib/halconCaltab';
 
@@ -38,8 +38,9 @@ const ROOT = resolve('public');
 mkdirSync(resolve(ROOT, 'og'), { recursive: true });
 
 const defaultOgSvg = ogSvg({
-  label: 'Calibration targets and tools',
-  title: `${TAGLINE}.`,
+  label: 'Camera calibration',
+  title: HOME_HEADLINE,
+  sub: `${TAGLINE}.`,
   drawing: drawingForPartNumber('CT-CHA-P-400X300-D5'),
 });
 
