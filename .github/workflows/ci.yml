@@ -6,7 +6,7 @@ on:
     branches: [main]
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: write   # to commit new screenshot baselines to the pull request branch
     steps:
@@ -14,10 +14,8 @@ jobs:
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with: { node-version: 22, cache: pnpm }
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update && sudo apt-get install -y poppler-utils
-          pip install Pillow opencv-python-headless numpy
+      - name: Install Python packages
+        run: pip install Pillow opencv-python-headless numpy
 
       - run: pnpm install --frozen-lockfile
 
@@ -34,10 +32,15 @@ jobs:
 
       - name: Install Playwright Chromium
         if: steps.pw-cache.outputs.cache-hit != 'true'
-        run: pnpm exec playwright install --with-deps chromium
+        run: pnpm exec playwright install chromium
 
-      - name: Install Playwright system deps
-        if: steps.pw-cache.outputs.cache-hit == 'true'
+      # System libraries come from the Ubuntu package mirrors, which the runners could not
+      # reach for hours on 2026-11-11. The runner image already carries what Chromium needs,
+      # so this step is bounded and may fail without failing the run; the tests that follow
+      # start the browser and fail on their own if a library is really missing.
+      - name: Install Playwright system deps (best effort)
+        continue-on-error: true
+        timeout-minutes: 4
         run: pnpm exec playwright install-deps chromium
 
       - run: pnpm test
