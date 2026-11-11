@@ -221,3 +221,22 @@ describe('opencvJson checkerboard flags', () => {
     expect(j.inverted).toBeUndefined();
   });
 });
+
+describe('opencvJson for circle grids', () => {
+  const base = { type: 'Symmetric circles', rows: 10, cols: 14, square: 25, marker: 0, dict: '', paper: 'A3', startId: 0, scaleBar: false, circleDiameter: 17 } as const;
+  it('gives the findCirclesGrid pattern size and flag for a symmetric grid', () => {
+    const j = JSON.parse(opencvJson({ ...base }));
+    expect(j.opencv_pattern_size).toEqual([14, 10]);
+    expect(j.opencv_flag).toBe('CALIB_CB_SYMMETRIC_GRID');
+    expect(j.circle_diameter_mm).toBe(17);
+  });
+  it('halves the columns for an asymmetric grid, which fills every other lattice position', () => {
+    const j = JSON.parse(opencvJson({ ...base, type: 'Asymmetric circles', rows: 9 }));
+    expect(j.opencv_pattern_size).toEqual([7, 9]);
+    expect(j.opencv_flag).toBe('CALIB_CB_ASYMMETRIC_GRID');
+  });
+  it('gives no pattern size for an asymmetric lattice with an odd number of columns', () => {
+    expect(JSON.parse(opencvJson({ ...base, type: 'Asymmetric circles', cols: 13 })).opencv_pattern_size).toBeUndefined();
+  });
+});
+

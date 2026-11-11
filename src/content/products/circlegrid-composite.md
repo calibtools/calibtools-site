@@ -13,25 +13,25 @@ chips:
 story: "Corner detectors struggle when your image is slightly out of focus, blurred or dim. Circle grids don't depend on sharp corners: the center of each dot comes from an ellipse fit, so it holds up in exactly those conditions.\n\nChoose a symmetric or an asymmetric layout. Both work natively with OpenCV findCirclesGrid, for mono, stereo and structured-light setups; in HALCON you use the circle centers as a point-based calibration object."
 skus:
   - partNumber: "CT-CIR-P-200X150-SYM"
-    title: "Symmetric 7 × 10, ⌀ 12 mm at 20 mm pitch, 200 × 150 mm, 70 circles"
+    title: "Symmetric 5 × 8, ⌀ 12 mm at 20 mm pitch, 200 × 150 mm, 40 circles"
   - partNumber: "CT-CIR-P-300X200-SYM"
-    title: "Symmetric 9 × 14, ⌀ 14 mm at 22 mm pitch, 300 × 200 mm, 126 circles"
+    title: "Symmetric 7 × 12, ⌀ 14 mm at 22 mm pitch, 300 × 200 mm, 84 circles"
   - partNumber: "CT-CIR-P-400X300-SYM"
-    title: "Symmetric 11 × 16, ⌀ 17 mm at 25 mm pitch, 400 × 300 mm, 176 circles"
+    title: "Symmetric 10 × 14, ⌀ 17 mm at 25 mm pitch, 400 × 300 mm, 140 circles"
   - partNumber: "CT-CIR-P-600X400-SYM"
-    title: "Symmetric 13 × 20, ⌀ 20 mm at 30 mm pitch, 600 × 400 mm, 260 circles"
+    title: "Symmetric 11 × 18, ⌀ 20 mm at 30 mm pitch, 600 × 400 mm, 198 circles"
   - partNumber: "CT-CIR-P-800X600-SYM"
-    title: "Symmetric 16 × 24, ⌀ 22 mm at 33 mm pitch, 800 × 600 mm, 384 circles"
+    title: "Symmetric 16 × 22, ⌀ 22 mm at 33 mm pitch, 800 × 600 mm, 352 circles"
   - partNumber: "CT-CIR-P-200X150-ASY"
-    title: "Asymmetric 7 × 5, ⌀ 12 mm at 20 mm pitch, 200 × 150 mm, 35 circles"
+    title: "Asymmetric 5 × 4, ⌀ 12 mm at 20 mm pitch, 200 × 150 mm, 20 circles"
   - partNumber: "CT-CIR-P-300X200-ASY"
-    title: "Asymmetric 9 × 7, ⌀ 14 mm at 22 mm pitch, 300 × 200 mm, 63 circles"
+    title: "Asymmetric 7 × 6, ⌀ 14 mm at 22 mm pitch, 300 × 200 mm, 42 circles"
   - partNumber: "CT-CIR-P-400X300-ASY"
-    title: "Asymmetric 11 × 8, ⌀ 17 mm at 25 mm pitch, 400 × 300 mm, 88 circles"
+    title: "Asymmetric 9 × 7, ⌀ 17 mm at 25 mm pitch, 400 × 300 mm, 63 circles"
   - partNumber: "CT-CIR-P-600X400-ASY"
-    title: "Asymmetric 13 × 10, ⌀ 20 mm at 30 mm pitch, 600 × 400 mm, 130 circles"
+    title: "Asymmetric 11 × 9, ⌀ 20 mm at 30 mm pitch, 600 × 400 mm, 99 circles"
   - partNumber: "CT-CIR-P-800X600-ASY"
-    title: "Asymmetric 16 × 12, ⌀ 22 mm at 33 mm pitch, 800 × 600 mm, 192 circles"
+    title: "Asymmetric 15 × 11, ⌀ 22 mm at 33 mm pitch, 800 × 600 mm, 165 circles"
 relatedTargets:
   - { label: "Checkerboard, aluminum", href: "/targets/checkerboard-composite/", note: "Sharper features when the image is in focus." }
   - { label: "ChArUco, aluminum", href: "/targets/charuco-composite/", note: "Every corner has an ID, so partial views still count." }
@@ -61,7 +61,7 @@ The offset grows with tilt and with the size of the circle in the image. For the
 
 **Symmetric** grids have dots on a square lattice. They look the same after a half turn, so they suit a single camera, or software that knows the board's orientation some other way.
 
-**Asymmetric** grids offset every other row by half a pitch. The pattern looks different after a half turn, so two cameras always agree on which dot is the first one. Use an asymmetric grid for stereo pairs and multi-camera rigs.
+**Asymmetric** grids leave out every other dot, so each row is shifted against the next by half the dot spacing in a row. The pattern looks different after a half turn, so two cameras always agree on which dot is the first one. Use an asymmetric grid for stereo pairs and multi-camera rigs.
 
 In OpenCV both go through `cv2.findCirclesGrid`, with `CALIB_CB_SYMMETRIC_GRID` or `CALIB_CB_ASYMMETRIC_GRID`. Take the pattern size from the board's `.opencv.json`, since the convention for asymmetric grids is easy to get backwards.
 
@@ -88,15 +88,15 @@ found, centers = cv2.findCirclesGrid(
 
 The field widths below assume the board fills about 60 % of the image, as in the [target size guide](/guides/calibration-target-size/). The image scales are the range that keeps the circles between 10 and 75 px with default settings; the [FOV calculator](/tools/fov/) gives yours.
 
-**200 × 150 mm**, circles of 12 mm at a 20 mm pitch, about 0.2 kg, for a field about 330 mm wide. [Symmetric](#CT-CIR-P-200X150-SYM): 7 × 10, 70 circles. [Asymmetric](#CT-CIR-P-200X150-ASY): 7 × 5, 35 circles. Keep the image scale between 0.16 and 1.2 mm per pixel.
+**200 × 150 mm**, circles of 12 mm at a 20 mm pitch, about 0.2 kg, for a field about 330 mm wide. [Symmetric](#CT-CIR-P-200X150-SYM): 5 × 8, 40 circles. [Asymmetric](#CT-CIR-P-200X150-ASY): 5 × 4, 20 circles. Keep the image scale between 0.16 and 1.2 mm per pixel.
 
-**300 × 200 mm**, circles of 14 mm at a 22 mm pitch, about 0.4 kg, for a field about 500 mm wide. [Symmetric](#CT-CIR-P-300X200-SYM): 9 × 14, 126 circles. [Asymmetric](#CT-CIR-P-300X200-ASY): 9 × 7, 63 circles. Keep the image scale between 0.19 and 1.4 mm per pixel.
+**300 × 200 mm**, circles of 14 mm at a 22 mm pitch, about 0.4 kg, for a field about 500 mm wide. [Symmetric](#CT-CIR-P-300X200-SYM): 7 × 12, 84 circles. [Asymmetric](#CT-CIR-P-300X200-ASY): 7 × 6, 42 circles. Keep the image scale between 0.19 and 1.4 mm per pixel.
 
-**400 × 300 mm**, circles of 17 mm at a 25 mm pitch, about 0.8 kg, for a field about 670 mm wide. [Symmetric](#CT-CIR-P-400X300-SYM): 11 × 16, 176 circles. [Asymmetric](#CT-CIR-P-400X300-ASY): 11 × 8, 88 circles. Keep the image scale between 0.23 and 1.7 mm per pixel.
+**400 × 300 mm**, circles of 17 mm at a 25 mm pitch, about 0.8 kg, for a field about 670 mm wide. [Symmetric](#CT-CIR-P-400X300-SYM): 10 × 14, 140 circles. [Asymmetric](#CT-CIR-P-400X300-ASY): 9 × 7, 63 circles. Keep the image scale between 0.23 and 1.7 mm per pixel.
 
-**600 × 400 mm**, circles of 20 mm at a 30 mm pitch, about 1.6 kg, for a field about 1 m wide. [Symmetric](#CT-CIR-P-600X400-SYM): 13 × 20, 260 circles. [Asymmetric](#CT-CIR-P-600X400-ASY): 13 × 10, 130 circles. Keep the image scale between 0.27 and 2 mm per pixel.
+**600 × 400 mm**, circles of 20 mm at a 30 mm pitch, about 1.6 kg, for a field about 1 m wide. [Symmetric](#CT-CIR-P-600X400-SYM): 11 × 18, 198 circles. [Asymmetric](#CT-CIR-P-600X400-ASY): 11 × 9, 99 circles. Keep the image scale between 0.27 and 2 mm per pixel.
 
-**800 × 600 mm**, circles of 22 mm at a 33 mm pitch, about 3.2 kg, for a field about 1.3 m wide. [Symmetric](#CT-CIR-P-800X600-SYM): 16 × 24, 384 circles. [Asymmetric](#CT-CIR-P-800X600-ASY): 16 × 12, 192 circles. Keep the image scale between 0.29 and 2.2 mm per pixel.
+**800 × 600 mm**, circles of 22 mm at a 33 mm pitch, about 3.2 kg, for a field about 1.3 m wide. [Symmetric](#CT-CIR-P-800X600-SYM): 16 × 22, 352 circles. [Asymmetric](#CT-CIR-P-800X600-ASY): 15 × 11, 165 circles. Keep the image scale between 0.29 and 2.2 mm per pixel.
 
 Other grids and circle sizes are a custom order; [ask for a quote](/quote/).
 
