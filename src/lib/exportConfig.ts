@@ -6,6 +6,7 @@ import type { PatternSpec } from './patterns';
 import { BRAND_NAME, SITE_URL, patternSummary, provenanceLine } from './exportBrand';
 import { idRange } from './idRange';
 import { innerCorners } from './patterns';
+import { isKalibrFrame } from './renderAprilGrid';
 
 function brandHeader(s: PatternSpec, commentChar = '#'): string {
   const summary = patternSummary(s);
@@ -56,7 +57,7 @@ export function kalibrYaml(s: PatternSpec): string {
     lines.push(`tagRows: ${s.rows}`);
     lines.push(`tagCols: ${s.cols}`);
     lines.push(`tagSize: ${(s.square / 1000).toFixed(6)}`);
-    lines.push(`tagSpacing: ${(s.tagSpacing ?? s.marker / s.square).toFixed(6)}`);
+    lines.push(`tagSpacing: ${(s.tagSpacing ?? 0.3).toFixed(6)}`);
     if (s.aprilFamily) lines.push(`# tagFamily: ${s.aprilFamily}`);
     if (s.borderBits) lines.push(`# borderBits: ${s.borderBits}`);
   } else {
@@ -213,7 +214,7 @@ export function opencvJson(s: PatternSpec): string {
   if (s.radonCheckers) obj.radon = true;
   if (s.invert) obj.inverted = true;
   if (s.showAxes !== false) {
-    const isKalibr = s.type === 'AprilGrid (Kalibr)' && s.symmetricCorners;
+    const isKalibr = isKalibrFrame(s);
     obj.axes = {
       frame: isKalibr ? 'kalibr' : 'opencv',
       origin: isKalibr ? 'bottom-left' : 'top-left',

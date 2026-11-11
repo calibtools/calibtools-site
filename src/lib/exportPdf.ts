@@ -20,6 +20,7 @@ import {
 } from './exportBrand';
 import { patternShapes, fillRgb, shapeBox, type Shape } from './patternShapes';
 import { patternExtent, type PageLayout } from './pageLayout';
+import { isKalibrFrame, scaleBarTop, axesOffset } from './renderAprilGrid';
 
 /** Conversion factor: millimeters → PDF points. */
 export const MM = 72 / 25.4;
@@ -87,7 +88,7 @@ export async function exportPdf({ spec, pw: rawPw, ph: rawPh, fontBytes, layout 
   // Scale bar
   let scaleBarBottom = 0;
   if (spec.scaleBar) {
-    const sbY = oy + bh + 8;
+    const sbY = scaleBarTop(spec, oy, bh);
     const [sx, sy] = pt(ox, sbY);
     // 100 mm horizontal line, 0.6 mm thick
     page.drawRectangle({ x: sx, y: sy - 0.6 * MM, width: 100 * MM, height: 0.6 * MM, color: rgb(0, 0, 0) });
@@ -219,17 +220,16 @@ export async function exportPdf({ spec, pw: rawPw, ph: rawPh, fontBytes, layout 
   // --- XY orientation axes (same geometry as SVG/DXF) ---
   if (spec.showAxes !== false) {
     const ax = layout?.axes;
-    const isKalibr = ax ? ax.isKalibr : (spec.type === 'AprilGrid (Kalibr)' && (spec.symmetricCorners ?? false));
+    const isKalibr = ax ? ax.isKalibr : isKalibrFrame(spec);
     const shorter = Math.min(bw, bh);
     const arrowLen = ax?.arrowLen ?? Math.max(15, Math.min(40, shorter * 0.15));
     const shaftW = ax?.shaft ?? 0.4;
     const headLen = ax?.headLen ?? Math.min(3, arrowLen * 0.2);
     const headW = ax?.headW ?? headLen * 0.6;
-    const axGap = 0.5 * spec.square;
 
     // Origin in mm (y-down pattern coords)
-    const axOx = ax?.originX ?? ox - axGap;
-    const axOy = ax?.originY ?? (isKalibr ? oy + bh + axGap : oy - axGap);
+    const axOx = ax?.originX ?? ox - axesOffset(spec).x;
+    const axOy = ax?.originY ?? (isKalibr ? oy + bh + axesOffset(spec).y : oy - axesOffset(spec).y);
 
     const xColor = rgb(230 / 255, 0, 18 / 255); // #E60012
     const yColor = rgb(27 / 255, 165 / 255, 90 / 255); // #1BA55A
@@ -259,14 +259,6 @@ export async function exportPdf({ spec, pw: rawPw, ph: rawPh, fontBytes, layout 
     const [yShaftX2, yShaftY2] = pt(axOx, axOy);
     // Shaft as a thin rectangle
     const yShaftLen = (arrowLen - headLen) * MM;
-    if (isKalibr) {
-      // y-up in pattern coords → y-down in PDF → draw upward from origin
-      page.drawRectangle({
-        x: yShaftY2 - shaftW / 2 * MM, y: yShaftY2,
-        width: shaftW * MM, height: yShaftLen,
-        color: yColor,
-      });
-    }
     // Use line approach: draw shaft as a very thin rect along Y axis
     const yShaftTopMm = Math.min(axOy, yEnd - yDir * headLen);
     const yShaftBotMm = Math.max(axOy, yEnd - yDir * headLen);

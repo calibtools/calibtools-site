@@ -395,7 +395,7 @@ describe('marker sheet layout', () => {
 
 describe('AprilGrid layout', () => {
   const grid = { type: 'AprilGrid (Kalibr)', rows: 6, cols: 6, square: 22, tagSpacing: 0.3, startId: 0, paper: 'A4', scaleBar: true } as const;
-  const inkRight = (spec: any, ox: number) => { const t = aprilGridTags(spec); const last = t[t.length - 1]; return ox + last.x + last.size; };
+  const inkRight = (spec: any, ox: number) => ox + Math.max(...aprilGridTags(spec).map((g) => g.x + g.size));
 
   it('measures first tag edge to last tag edge, gaps included', () => {
     const e = patternExtent(grid as any);
@@ -407,9 +407,11 @@ describe('AprilGrid layout', () => {
     for (const [rows, cols, square, tagSpacing] of [[6, 6, 22, 0.3], [7, 5, 25, 0.3], [4, 9, 18, 0.25], [1, 1, 40, 0.3]] as const) {
       const spec = { ...grid, rows, cols, square, tagSpacing } as any;
       const e = patternExtent(spec);
-      const t = aprilGridTags(spec); const last = t[t.length - 1];
-      expect(e.bw).toBeCloseTo(last.x + last.size, 6);
-      expect(e.bh).toBeCloseTo(last.y + last.size, 6);
+      const t = aprilGridTags(spec);
+      expect(e.bw).toBeCloseTo(Math.max(...t.map((g) => g.x + g.size)), 6);
+      expect(e.bh).toBeCloseTo(Math.max(...t.map((g) => g.y + g.size)), 6);
+      expect(Math.min(...t.map((g) => g.x))).toBe(0);
+      expect(Math.min(...t.map((g) => g.y))).toBe(0);
     }
   });
 

@@ -44,7 +44,10 @@ describe('marker positions come from the renderer', () => {
   it('AprilGrid: one tag per cell at tag size plus gap, and the drawing agrees', () => {
     const tags = aprilGridTags(april);
     expect(tags).toHaveLength(24);
-    expect(tags[7]).toMatchObject({ id: 7, row: 1, col: 1, x: 32.5, y: 32.5, size: 25 });
+    // Kalibr numbering: row 0 is the bottom row, so tag 7 (row 1, col 1) is the third row from the top of a 4-row grid.
+    expect(tags[0]).toMatchObject({ id: 0, row: 0, col: 0, x: 0, y: 97.5, size: 25 });
+    expect(tags[7]).toMatchObject({ id: 7, row: 1, col: 1, x: 32.5, y: 65, size: 25 });
+    expect(tags[23]).toMatchObject({ id: 23, row: 3, col: 5, x: 162.5, y: 0, size: 25 });
     const svg = renderAprilGridSvg(april, 0, 0);
     for (const t of tags) expect(svg).toContain(`<rect x="${t.x}" y="${t.y}" width="${t.size}" height="${t.size}" class="tag-bg"`);
   });

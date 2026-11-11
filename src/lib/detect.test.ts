@@ -20,8 +20,8 @@ describe('expectedCount', () => {
     expect(expectedCount({ ...base, type: 'ArUco grid' })).toBe(35);
   });
 
-  it('AprilGrid 6x6 → 18 markers', () => {
-    expect(expectedCount({ ...base, type: 'AprilGrid (Kalibr)', rows: 6, cols: 6 })).toBe(18);
+  it('AprilGrid 6x6 → 36 tags, one per cell', () => {
+    expect(expectedCount({ ...base, type: 'AprilGrid (Kalibr)', rows: 6, cols: 6 })).toBe(36);
   });
 
   it('Symmetric circles 7x10 → 70 centers', () => {

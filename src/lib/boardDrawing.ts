@@ -60,20 +60,22 @@ interface PatternFrame {
   dimX: { from: number; to: number; text: string };
   dimY: { from: number; to: number; text: string };
   origin: { x: number; y: number };
+  /** Kalibr frame: origin at the bottom-left of the pattern, y pointing up. */
+  yUp?: boolean;
 }
 
 export function patternFrame(s: PatternSpec): PatternFrame {
   if (s.type === 'AprilGrid (Kalibr)') {
     const tags = aprilGridTags(s);
-    const last = tags[tags.length - 1];
-    const w = last.x + last.size, h = last.y + last.size;
+    const w = Math.max(...tags.map((t) => t.x + t.size)), h = Math.max(...tags.map((t) => t.y + t.size));
     const gap = s.cols > 1 ? tags[1].x - tags[0].x - s.square : 0;
     const part = (n: number) => (n > 1 ? `${n} × ${fmt(s.square)} + ${n - 1} × ${fmt(gap)}` : `${fmt(s.square)}`);
     return {
       box: { x: 0, y: 0, w, h },
       dimX: { from: 0, to: w, text: `${fmt(w)} = ${part(s.cols)}` },
       dimY: { from: 0, to: h, text: `${fmt(h)} = ${part(s.rows)}` },
-      origin: { x: 0, y: 0 },
+      origin: { x: 0, y: h },
+      yUp: true,
     };
   }
   if (s.type === 'Symmetric circles' || s.type === 'Asymmetric circles') {
@@ -139,8 +141,14 @@ export function boardDrawingSvg({ boardW, boardH, spec, label, dimensions = true
   const gapX = Math.min(oy, 6 * u) / 2 + 1.5 * u; // X arrow sits in the top margin, Y arrow in the left margin
   const gapY = Math.min(ox, 6 * u) / 2 + 1.5 * u;
   const head = 2.6 * u;
-  const xa = { x1: ox, y: r2(oy - gapX), x2: r2(ox + axisLen) };
-  const ya = { x: r2(ox - gapY), y1: oy, y2: r2(oy + axisLen) };
+  // OpenCV frame: X arrow in the top margin, Y arrow down the left margin from the top.
+  // Kalibr frame (AprilGrid): X arrow in the bottom margin, Y arrow up the left margin from the bottom.
+  const up = f.yUp === true;
+  const oyAxis = r2(ry + f.origin.y);
+  const xa = { x1: ox, y: up ? r2(oyAxis + gapX) : r2(oy - gapX), x2: r2(ox + axisLen) };
+  const ya = { x: r2(ox - gapY), y1: up ? oyAxis : oy, y2: up ? r2(oyAxis - axisLen) : r2(oy + axisLen) };
+  const yHead = up ? -head : head; // arrow head points along the axis
+  const yLabel = up ? r2(ya.y2 - 3 * u) : r2(ya.y2 + 8 * u);
 
   const gridW = f.dimX.text;
   const gridH = f.dimY.text;
@@ -149,15 +157,15 @@ export function boardDrawingSvg({ boardW, boardH, spec, label, dimensions = true
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${fmt(-padL)} ${fmt(-padT)} ${fmt(boardW + padL + padR)} ${fmt(boardH + padT + padB)}" role="img" aria-label="Line drawing of ${label}: board ${fmt(boardW)} × ${fmt(boardH)} mm, pattern area ${fmt(patW)} × ${fmt(patH)} mm, ${spec.cols} × ${spec.rows} squares of ${fmt(spec.square)} mm" font-family="${MONO}" fill="${INK}">`,
     `<rect class="board" x="0" y="0" width="${fmt(boardW)}" height="${fmt(boardH)}" fill="#fff" stroke="${INK}" stroke-width="${fmt(1.2 * u)}"/>`,
     `<g class="pattern">${pattern}</g>`,
-    // Origin and axes, as printed on the boards: X right in red, Y down in green
+    // Origin and axes, as printed on the boards: X right in red, Y in green (down, or up for the Kalibr frame)
     `<g class="axes" stroke-width="${fmt(0.9 * u)}" fill="none">`,
     `<line class="axis-x" x1="${fmt(xa.x1)}" y1="${fmt(xa.y)}" x2="${fmt(xa.x2)}" y2="${fmt(xa.y)}" stroke="${RED}"/>`,
     `<path d="M${fmt(xa.x2 - head)} ${fmt(xa.y - head * 0.5)}L${fmt(xa.x2)} ${fmt(xa.y)}L${fmt(xa.x2 - head)} ${fmt(xa.y + head * 0.5)}" stroke="${RED}"/>`,
     `<line class="axis-y" x1="${fmt(ya.x)}" y1="${fmt(ya.y1)}" x2="${fmt(ya.x)}" y2="${fmt(ya.y2)}" stroke="${GREEN}"/>`,
-    `<path d="M${fmt(ya.x - head * 0.5)} ${fmt(ya.y2 - head)}L${fmt(ya.x)} ${fmt(ya.y2)}L${fmt(ya.x + head * 0.5)} ${fmt(ya.y2 - head)}" stroke="${GREEN}"/>`,
+    `<path d="M${fmt(ya.x - head * 0.5)} ${fmt(ya.y2 - yHead)}L${fmt(ya.x)} ${fmt(ya.y2)}L${fmt(ya.x + head * 0.5)} ${fmt(ya.y2 - yHead)}" stroke="${GREEN}"/>`,
     `</g>`,
     `<text x="${fmt(xa.x2 + 2 * u)}" y="${fmt(xa.y + 2.2 * u)}" font-size="${fmt(6 * u)}" fill="${RED}">X</text>`,
-    `<text x="${fmt(ya.x)}" y="${fmt(ya.y2 + 8 * u)}" font-size="${fmt(6 * u)}" text-anchor="middle" fill="#007A3D">Y</text>`,
+    `<text x="${fmt(ya.x)}" y="${fmt(yLabel)}" font-size="${fmt(6 * u)}" text-anchor="middle" fill="#007A3D">Y</text>`,
     `<circle class="origin" cx="${fmt(rx + f.origin.x)}" cy="${fmt(ry + f.origin.y)}" r="${fmt(1.7 * u)}" fill="${RED}"/>`,
     ...(dimensions ? [
     // Dimension and extension lines
