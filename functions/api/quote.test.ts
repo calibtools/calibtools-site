@@ -2,6 +2,7 @@ import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
 import { cleanPatternPath, onRequestPost } from './quote';
 import { onRequestGet as confirmGet } from './quote-confirm';
 import { confirmToken, isQuoteId } from '../../src/lib/quote';
+import { GENERATOR_DEFAULT, patternPath, patternId } from '../../src/lib/patternLink';
 
 describe('cleanPatternPath', () => {
   it('accepts generator links with parameters', () => {
@@ -122,6 +123,23 @@ describe('POST /api/quote', () => {
     expect(customer.subject).toContain(id);
     expect(customer.reply_to).toBe('hello@calib.tools');
     expect(customer.text).toContain(`/api/quote-confirm?q=${id}&t=${await confirmToken('s', id)}`);
+  });
+
+  it('computes the pattern ID on the server from the pattern link and puts it in the record, the reply and both emails', async () => {
+    const spec = { ...GENERATOR_DEFAULT, rows: 9, cols: 12, square: 30, marker: 22 };
+    const { store, res } = call({ ...ok, product: 'ChArUco 9 × 12, 30 mm', pattern: patternPath(spec), patternId: 'P-222222' }, { RESEND_API_KEY: 'k', QUOTE_HMAC_SECRET: 's' });
+    const data = await (await res).json();
+    expect(data.patternId).toBe(patternId(spec)); // not the value the browser claimed
+    expect(JSON.parse(store.get(`quote:${data.id}`)!).patternId).toBe(patternId(spec));
+    for (const m of sent) expect(m.text).toContain(`Pattern ID: ${patternId(spec)}`);
+  });
+
+  it('has no pattern ID when the request carries no pattern', async () => {
+    const { store, res } = call({ ...ok, product: 'Custom glass target' }, { RESEND_API_KEY: 'k', QUOTE_HMAC_SECRET: 's' });
+    const data = await (await res).json();
+    expect(data.patternId).toBe('');
+    expect(JSON.parse(store.get(`quote:${data.id}`)!).patternId).toBe('');
+    for (const m of sent) expect(m.text).not.toContain('Pattern ID');
   });
 
   it('keeps the request when email fails (KV first)', async () => {

@@ -18,6 +18,7 @@
  */
 
 import { checkWorkEmail, hasMailServer, WORK_EMAIL_MESSAGE } from '../../src/lib/workEmail';
+import { patternIdFromPath } from '../../src/lib/patternLink';
 import { verifyTurnstile, TURNSTILE_FIELD } from '../../src/lib/turnstile';
 import {
   confirmToken, confirmUrl, customerBody, customerSubject, internalBody, internalSubject,
@@ -145,6 +146,7 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
     country: fields.country,
     message: fields.message,
     pattern: patternPath ? `https://calib.tools${patternPath}` : '',
+    patternId: patternPath ? patternIdFromPath(patternPath) : '',
     source_page: fields.source_page,
     emailVerified: false,
     customerEmailSent: false,
@@ -183,7 +185,7 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
   }
 
   if (wantsJson) {
-    return new Response(JSON.stringify({ ok: true, id, customerEmailSent: record.customerEmailSent }), {
+    return new Response(JSON.stringify({ ok: true, id, patternId: record.patternId ?? '', customerEmailSent: record.customerEmailSent }), {
       headers: { 'Content-Type': 'application/json' },
     });
   }

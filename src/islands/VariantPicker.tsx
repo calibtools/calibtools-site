@@ -10,6 +10,7 @@ import { computeSetBoards } from '@/lib/exportSet';
 import { dictMarkerCount } from '@/lib/dicts/dicts';
 import { LEAD_TIME, INSPECTION_CLAIM_SHORT } from '@/lib/claims';
 import { findCharucoSize, findAprilGridSize, markerCount } from '@/lib/boardSizes';
+import { entryForOptions, generatorUrlFor } from '@/lib/catalogPatterns';
 
 interface BoardSetImage {
   src: string;
@@ -100,6 +101,12 @@ export default function VariantPicker({ product, fixtureVariantId, fixturePrice,
   const isBoardProduct = isCharuco || isAprilGrid;
 
   // Selected size and dictionary from variant options
+  // Stock pattern for the selected options, so it can be opened (and changed) in the generator
+  const generatorUrl = useMemo(() => {
+    const entry = entryForOptions(product.handle, selections);
+    return entry ? generatorUrlFor(entry) : '';
+  }, [product.handle, selections]);
+
   const selectedSize = selections['Size'] ?? '';
   const selectedDict = selections['Dictionary'] ?? '';
 
@@ -452,6 +459,9 @@ export default function VariantPicker({ product, fixtureVariantId, fixturePrice,
       {confirmation && <p className="m-0 text-sm font-medium text-green-700">{confirmation}</p>}
       {error && <p className="m-0 text-sm text-brand">{error}</p>}
 
+      {generatorUrl && (
+        <a href={generatorUrl} className="text-sm text-ink-soft no-underline hover:text-ink min-h-[24px] inline-flex items-center gap-1" data-testid="open-in-generator">Need a different size or layout? Open this pattern in the generator <ArrowRight size={14} strokeWidth={1.6} aria-hidden="true" /></a>
+      )}
       <a href="/quote/" className="text-sm text-ink-soft no-underline hover:text-ink min-h-[24px] inline-flex items-center gap-1">Need a quote or invoice/PO? <ArrowRight size={14} strokeWidth={1.6} aria-hidden="true" /></a>
 
       <div className="grid grid-cols-2 gap-3 pt-2 text-sm text-ink-muted">

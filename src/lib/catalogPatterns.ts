@@ -7,6 +7,7 @@
  * that product URLs use option values that exist in the store.
  */
 import type { PatternSpec } from './patterns';
+import { GENERATOR_DEFAULT, patternPath } from './patternLink';
 
 export interface CatalogEntry {
   partNumber: string;
@@ -161,6 +162,20 @@ export function productUrlFor(e: CatalogEntry): string {
   const p = new URLSearchParams(e.options);
   p.set('from', 'generator');
   return `/targets/${e.handle}/?${p.toString()}`;
+}
+
+/** Generator link that opens a stock target's pattern, so it can be changed from there. */
+export function generatorUrlFor(e: CatalogEntry): string {
+  return patternPath({ ...GENERATOR_DEFAULT, ...specFromEntry(e) } as PatternSpec);
+}
+
+const normOpt = (s: string) => s.toLowerCase().replace(/×/g, 'x').replace(/\s+/g, '');
+
+/** Stock target for the options selected on a product page (option names in any case). */
+export function entryForOptions(handle: string, selections: Record<string, string>): CatalogEntry | undefined {
+  const sel: Record<string, string> = {};
+  for (const [k, v] of Object.entries(selections)) sel[k.toLowerCase()] = normOpt(v);
+  return CATALOG.find((e) => e.handle === handle && Object.entries(e.options).every(([k, v]) => sel[k] === normOpt(v)));
 }
 
 const n = (v: number | undefined) => String(Math.round((v ?? 0) * 100) / 100);
