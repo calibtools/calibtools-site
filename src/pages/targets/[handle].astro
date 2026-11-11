@@ -384,7 +384,8 @@ if (isComposite || isCeramic) {
   specExplainers['Flatness'] = FLATNESS_EXPLAINER;
 }
 
-const ogImage = hasLocalImages ? galleryImages[0].src : product.images[0]?.url ?? `/og/${handle}.png`;
+// Share image: the drawing-sheet card for this product (scripts/generate-placeholders.ts), not a photo
+const ogImage = `/og/${handle}.png`;
 
 // Pairs with / Compare
 const isAccessory = handle === 'mounting-fixture';
