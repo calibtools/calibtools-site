@@ -15,7 +15,7 @@ import { WARRANTY_TEXT, COMPLIANCE, PRODUCT_TO_COLLECTION } from '@/lib/constant
 import { getProductImages } from '@/lib/product-images';
 import { getImageMetadata } from '@/lib/productImageImports';
 import { optimizeProductImage } from '@/lib/optimizeProductImage';
-import { Ruler, Package, Plug, CircleDot, Truck, HelpCircle, Plus, Download, Wand2, Columns2, MessageSquare, ArrowRight, ArrowUp, Clock, ChevronDown, FileCheck as FileCheckIcon } from 'lucide-astro';
+import { Ruler, Plus, Download, Columns2, ArrowRight, ArrowUp, ChevronDown } from 'lucide-astro';
 import { getProductData } from '@/lib/productData';
 import ReviewsSection from '@/islands/ReviewsSection';
 import { LEAD_TIME } from '@/lib/claims';
@@ -30,6 +30,9 @@ import pkgExplodedImage from '@/assets/products/packaging/CT-PK-M_exploded.webp'
 import { compatRows, digitalFiles } from '@/lib/productCompat';
 import { QUOTE_ONLY_HANDLES, LAYOUT_ON_ORDER_HANDLES } from '@/lib/constants';
 import { skuAnchor, skuTitleFor } from '@/lib/productLongform';
+import { splitSpecValue } from '@/lib/specValue';
+import { drawingForPartNumber, representativePartNumber } from '@/lib/boardDrawing';
+import { caltabGeometry, caltabSvg } from '@/lib/halconCaltab';
 
 /** The datasheet writes ChArUco rows as …-{DICT}; visitors see the default dictionary instead of the placeholder. */
 const shownPn = (pn: string) => pn.replace('{DICT}', 'D6');
@@ -246,6 +249,21 @@ if (!hasLocalImages && product.images.length === 0 && hasPatternData) {
   }
 }
 
+// Line drawing shown before any photo (DESIGN.md §4): generated from the board geometry, never hand-drawn
+let leadDrawing: { svg: string; caption: string } | null = null;
+const drawingPn = representativePartNumber(handle!);
+const drawingSvg = drawingPn ? drawingForPartNumber(drawingPn) : undefined;
+if (drawingPn && drawingSvg) {
+  leadDrawing = { svg: drawingSvg, caption: `${drawingPn.replace('{DICT}', 'D6')}, drawn to scale from the board geometry. Dimensions in mm.` };
+} else if (handle === 'halcon-composite') {
+  leadDrawing = {
+    svg: caltabSvg(caltabGeometry({ xNum: 9, yNum: 7, markDist: 30, diameterRatio: 0.5 }), 400, 300),
+    caption: 'Example layout on a 400 × 300 mm board: 9 × 7 marks, 30 mm apart. Your layout is agreed with the order.',
+  };
+}
+const hasGallery = hasLocalImages || product.images.length > 0 || !!placeholderSvg;
+const hasVisual = hasGallery || !!leadDrawing;
+
 // --- Reviews ---
 const productReviews = await getReviewsForProduct(handle!);
 const reviewSummary = summarize(productReviews.filter(r => r.status === 'published'));
@@ -460,22 +478,32 @@ const quickLinks = hasLongform
   {/* ── Buy box ── */}
   <section class="container-x flex flex-wrap gap-14 py-8 md:pb-16">
     {/* Gallery */}
-    <div class="flex min-w-0 flex-1 basis-[520px] flex-col gap-4">
-      <ImageGallery
-        client:load
-        images={hasLocalImages ? galleryImages : undefined}
-        shopifyImages={!hasLocalImages ? product.images : undefined}
-        placeholderSvg={placeholderSvg}
-        title={product.title}
-      />
-    </div>
+    {hasVisual && (
+      <div class="flex min-w-0 flex-1 basis-[520px] flex-col gap-4">
+        {leadDrawing && (
+          <figure class="card bracket m-0 flex flex-col gap-3 p-5" data-lead-drawing>
+            <div class="fit-svg flex aspect-[4/3] w-full items-center justify-center" set:html={leadDrawing.svg} />
+            <figcaption class="font-mono text-[12px] leading-snug text-ink-soft">{leadDrawing.caption}</figcaption>
+          </figure>
+        )}
+        {hasGallery && (
+          <ImageGallery
+            client:load
+            images={hasLocalImages ? galleryImages : undefined}
+            shopifyImages={!hasLocalImages ? product.images : undefined}
+            placeholderSvg={placeholderSvg}
+            title={product.title}
+          />
+        )}
+      </div>
+    )}
 
     {/* Product info */}
-    <div class="flex min-w-0 flex-1 basis-[420px] flex-col gap-5" data-buy-box>
+    <div class:list={['flex min-w-0 flex-1 basis-[420px] flex-col gap-5', !hasVisual && 'max-w-[760px]']} data-buy-box>
       {/* Badges */}
       <div class="flex flex-wrap gap-2">
-        <span class="badge bg-brand/10 text-brand-dark inline-flex items-center gap-1.5"><Clock size={14} stroke-width={1.6} aria-hidden="true" />{eyebrow}</span>
-        <span class="badge bg-ink text-white inline-flex items-center gap-1.5"><FileCheckIcon size={14} stroke-width={1.6} aria-hidden="true" />Measured before it ships</span>
+        <span class="badge text-brand-dark">{eyebrow}</span>
+        <span class="badge text-ink">Measured before it ships</span>
       </div>
 
       {/* Arrived from the generator with a matching stock target */}
@@ -505,11 +533,14 @@ const quickLinks = hasLongform
 
       {/* Key-specs strip */}
       {keySpecs.length > 0 && (
-        <dl class:list={['m-0 grid grid-cols-1 gap-px border border-line bg-line sm:grid-cols-2', keySpecs.length === 3 ? 'md:grid-cols-3' : 'md:grid-cols-4']}>
+        <dl class:list={['m-0 grid grid-cols-1 gap-px border border-line bg-line sm:grid-cols-2', keySpecs.length === 1 ? 'sm:grid-cols-1' : keySpecs.length === 2 ? 'md:grid-cols-2' : keySpecs.length === 3 ? 'md:grid-cols-3' : 'md:grid-cols-4']}>
           {keySpecs.map((ks) => (
             <div class="flex flex-col gap-1 bg-sheet p-3">
               <dt class="spec-label">{ks.label}</dt>
-              <dd class="m-0 font-mono text-[15px] font-medium">{ks.value}</dd>
+              <dd class="m-0 flex flex-col gap-1">
+                <span class="font-mono text-[16px] font-medium leading-snug text-ink">{splitSpecValue(ks.value).value}</span>
+                {splitSpecValue(ks.value).cond && <span class="spec-cond">{splitSpecValue(ks.value).cond}</span>}
+              </dd>
             </div>
           ))}
         </dl>
@@ -709,7 +740,7 @@ const quickLinks = hasLongform
       {/* 2. What's in the box & files */}
       <details class="group" id="in-the-box">
         <summary class="flex cursor-pointer list-none items-center justify-between gap-4 py-5 text-[20px] font-semibold [&::-webkit-details-marker]:hidden">
-          <span class="flex items-center gap-3"><Package size={22} stroke-width={1.6} class="text-ink-soft" aria-hidden="true" />What&rsquo;s in the box &amp; files</span>
+          <span>What&rsquo;s in the box &amp; files</span>
           <Plus size={22} stroke-width={1.6} class="shrink-0 text-ink-soft transition-transform group-open:rotate-45" aria-hidden="true" />
         </summary>
         <div class="flex flex-col gap-6 pb-6">
@@ -778,7 +809,7 @@ const quickLinks = hasLongform
       {compat.length > 0 && (
       <details class="group" id="compatibility">
         <summary class="flex cursor-pointer list-none items-center justify-between gap-4 py-5 text-[20px] font-semibold [&::-webkit-details-marker]:hidden">
-          <span class="flex items-center gap-3"><Plug size={22} stroke-width={1.6} class="text-ink-soft" aria-hidden="true" />Compatibility</span>
+          <span>Compatibility</span>
           <Plus size={22} stroke-width={1.6} class="shrink-0 text-ink-soft transition-transform group-open:rotate-45" aria-hidden="true" />
         </summary>
         <table class="mb-6 w-full border-collapse text-[14px]">
@@ -797,7 +828,7 @@ const quickLinks = hasLongform
       {/* 4. Measurement & certificate */}
       <details class="group" id="inspection">
         <summary class="flex cursor-pointer list-none items-center justify-between gap-4 py-5 text-[20px] font-semibold [&::-webkit-details-marker]:hidden">
-          <span class="flex items-center gap-3"><CircleDot size={22} stroke-width={1.6} class="text-ink-soft" aria-hidden="true" />Measurement &amp; certificate</span>
+          <span>Measurement &amp; certificate</span>
           <Plus size={22} stroke-width={1.6} class="shrink-0 text-ink-soft transition-transform group-open:rotate-45" aria-hidden="true" />
         </summary>
         <div class="flex flex-col gap-4 pb-6 text-[15px] leading-relaxed text-ink-muted">
@@ -813,7 +844,7 @@ const quickLinks = hasLongform
       {/* 5. Shipping, returns & warranty */}
       <details class="group" id="shipping">
         <summary class="flex cursor-pointer list-none items-center justify-between gap-4 py-5 text-[20px] font-semibold [&::-webkit-details-marker]:hidden">
-          <span class="flex items-center gap-3"><Truck size={22} stroke-width={1.6} class="text-ink-soft" aria-hidden="true" />Shipping, returns &amp; warranty</span>
+          <span>Shipping, returns &amp; warranty</span>
           <Plus size={22} stroke-width={1.6} class="shrink-0 text-ink-soft transition-transform group-open:rotate-45" aria-hidden="true" />
         </summary>
         <table class="mb-6 w-full border-collapse text-[14px]">
@@ -837,7 +868,7 @@ const quickLinks = hasLongform
       {faqItems.length > 0 && (
         <details class="group" id="faq">
           <summary class="flex cursor-pointer list-none items-center justify-between gap-4 py-5 text-[20px] font-semibold [&::-webkit-details-marker]:hidden">
-            <span class="flex items-center gap-3"><HelpCircle size={22} stroke-width={1.6} class="text-ink-soft" aria-hidden="true" />Frequently asked questions</span>
+            <span>Frequently asked questions</span>
             <Plus size={22} stroke-width={1.6} class="shrink-0 text-ink-soft transition-transform group-open:rotate-45" aria-hidden="true" />
           </summary>
           <div class="flex flex-col divide-y divide-line pb-6">
@@ -865,7 +896,7 @@ const quickLinks = hasLongform
 
       {/* Size wizard */}
       <div class="card flex flex-col gap-2 bg-ground-alt p-5">
-        <strong class="flex items-center gap-2 text-[15px]"><Wand2 size={20} stroke-width={1.6} class="text-brand" aria-hidden="true" />Not sure about the size?</strong>
+        <strong class="flex items-center gap-2 text-[15px]">Not sure about the size?</strong>
         <span class="text-sm text-ink-muted">Run the free selection wizard with your camera and lens.</span>
         <a href="/tools/wizard/" class="text-sm font-semibold min-h-[44px] md:min-h-[24px] inline-flex items-center">Open wizard <ArrowRight size={14} stroke-width={1.6} class="inline" aria-hidden="true" /></a>
       </div>
@@ -881,7 +912,7 @@ const quickLinks = hasLongform
 
       {/* Request a quote */}
       <div class="card flex flex-col gap-2 bg-ground-alt p-5">
-        <strong class="flex items-center gap-2 text-[15px]"><MessageSquare size={20} stroke-width={1.6} class="text-brand" aria-hidden="true" />Need a quote?</strong>
+        <strong class="flex items-center gap-2 text-[15px]">Need a quote?</strong>
         <span class="text-sm text-ink-muted">Reply within one business day.</span>
         <a href="/quote/" class="text-sm font-semibold min-h-[44px] md:min-h-[24px] inline-flex items-center">Request a quote <ArrowRight size={14} stroke-width={1.6} class="inline" aria-hidden="true" /></a>
       </div>
