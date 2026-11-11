@@ -11,7 +11,7 @@ import { patternSummary } from '@/lib/brand';
 import { computeSetBoards, buildSetManifest, setBoardFilename } from '@/lib/exportSet';
 import { PAPERS, computeLayout, fitNotice, reductionNotice, smallestFittingPaper, patternExtent, type Orientation } from '@/lib/pageLayout';
 import { LEAD_TIME } from '@/lib/claims';
-import { markerForSquare } from '@/lib/boardSizes';
+import { GENERATOR_DEFAULT, specFromParams, specToParams, patternPath, patternId } from '@/lib/patternLink';
 
 /**
  * Pattern generator.
@@ -38,7 +38,7 @@ function mmToIn(mm: number): string {
 }
 
 export default function Generator({ initialSpec, heading = 'Pattern generator' }: GeneratorProps = {}) {
-  const defaultSpec: PatternSpec = { type: 'ChArUco', rows: 7, cols: 10, square: 25, marker: markerForSquare(25), dict: 'DICT_6X6_250', paper: 'A4', startId: 0, scaleBar: true };
+  const defaultSpec: PatternSpec = GENERATOR_DEFAULT;
   const [spec, setSpec] = useState<PatternSpec>({ ...defaultSpec, ...initialSpec });
   const [busy, setBusy] = useState<'pdf' | 'png' | null>(null);
   const [boardCount, setBoardCount] = useState(1);
@@ -62,24 +62,7 @@ export default function Generator({ initialSpec, heading = 'Pattern generator' }
   // Read state from URL on mount
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    const params = new URLSearchParams(window.location.search);
-    const fromUrl: Partial<PatternSpec> = {};
-    const strFields: (keyof PatternSpec)[] = ['type', 'dict', 'paper', 'aprilFamily', 'tagIdList'];
-    const numFields: (keyof PatternSpec)[] = ['rows', 'cols', 'square', 'marker', 'startId', 'borderBits', 'tagSpacing', 'circleDiameter', 'circleSpacingX', 'circleSpacingY', 'puzzleOffsetX', 'puzzleOffsetY'];
-    const boolFields: (keyof PatternSpec)[] = ['scaleBar', 'finderMarkers', 'radonCheckers', 'invert', 'legacyLayout', 'showTagIds', 'symmetricCorners', 'showAxes', 'monochromeAxes', 'showCornerBadge'];
-
-    for (const k of strFields) {
-      const v = params.get(k);
-      if (v !== null) (fromUrl as any)[k] = v;
-    }
-    for (const k of numFields) {
-      const v = params.get(k);
-      if (v !== null && !isNaN(+v)) (fromUrl as any)[k] = +v;
-    }
-    for (const k of boolFields) {
-      const v = params.get(k);
-      if (v !== null) (fromUrl as any)[k] = v === 'true';
-    }
+    const fromUrl = specFromParams(new URLSearchParams(window.location.search));
 
     if (Object.keys(fromUrl).length > 0) {
       setSpec(s => ({ ...s, ...fromUrl }));
@@ -90,13 +73,7 @@ export default function Generator({ initialSpec, heading = 'Pattern generator' }
   // Write state to URL on change (only after initial read)
   useEffect(() => {
     if (!urlRead || typeof window === 'undefined') return;
-    const params = new URLSearchParams();
-    const entries = Object.entries(spec) as [string, unknown][];
-    for (const [k, v] of entries) {
-      if (v !== undefined && v !== '' && v !== false && v !== null) {
-        params.set(k, String(v));
-      }
-    }
+    const params = specToParams(spec);
     window.history.replaceState(null, '', `${window.location.pathname}?${params.toString()}`);
   }, [spec, urlRead]);
 
@@ -108,11 +85,35 @@ export default function Generator({ initialSpec, heading = 'Pattern generator' }
   const ext = patternExtent(spec);
   const boardW = Math.round(ext.bw * 10) / 10, boardH = Math.round(ext.bh * 10) / 10;
   const catalog = useMemo(() => matchCatalog(spec), [spec]);
+  const pid = useMemo(() => patternId(spec), [spec]);
+  const [copied, setCopied] = useState<'ok' | 'fail' | null>(null);
+  /** Copy a link that reopens this exact pattern (always the main generator URL, all parameters included). */
+  const copyPatternLink = async () => {
+    const url = `${window.location.origin}${patternPath(spec)}`;
+    let ok = false;
+    try {
+      await navigator.clipboard.writeText(url);
+      ok = true;
+    } catch {
+      // Older browsers or a blocked clipboard: fall back to a temporary text field
+      const ta = document.createElement('textarea');
+      ta.value = url;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try { ok = document.execCommand('copy'); } catch { ok = false; }
+      ta.remove();
+    }
+    setCopied(ok ? 'ok' : 'fail');
+    window.setTimeout(() => setCopied(null), 2500);
+  };
   /** Quote request prefilled with this exact pattern (parameters only, no files). */
   const requestQuote = () => {
     const q = new URLSearchParams();
     q.set('summary', quoteSummary(spec));
-    q.set('pattern', `${window.location.pathname}${window.location.search}`);
+    q.set('pattern', patternPath(spec));
     if (boardCount > 1) q.set('boards', String(boardCount));
     window.location.href = `/quote/?${q.toString()}`;
   };
@@ -567,6 +568,13 @@ export default function Generator({ initialSpec, heading = 'Pattern generator' }
         )}
         <div className="flex justify-center overflow-hidden rounded-xl bg-ground-panel p-6 md:p-10">
           <div className="w-full max-w-[560px] overflow-hidden bg-white shadow-[0_12px_40px_rgba(0,0,0,0.12)] [&>svg]:h-auto [&>svg]:w-full" dangerouslySetInnerHTML={{ __html: svg }} />
+        </div>
+        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 rounded border border-line px-5 py-3" data-testid="pattern-id-row">
+          <span className="text-sm text-ink-muted">Pattern ID <span className="font-mono text-[15px] font-medium text-ink" data-testid="pattern-id">{pid}</span> <span className="hidden sm:inline">&middot; same parameters, same ID. Quote it when you talk to a colleague or to us.</span></span>
+          <span className="flex items-center gap-3">
+            <span className="text-[13px] text-ink-muted" role="status" aria-live="polite">{copied === 'ok' ? 'Link copied' : copied === 'fail' ? 'Could not copy; use the address bar' : ''}</span>
+            <button type="button" onClick={copyPatternLink} className="rounded border border-ink px-3 py-2 text-sm font-semibold min-h-[44px] md:min-h-[36px]" data-testid="copy-pattern-link">Copy pattern link</button>
+          </span>
         </div>
         {catalog.exact ? (
           <div className="card flex flex-wrap items-center justify-between gap-3 bg-ground-alt px-5 py-4">

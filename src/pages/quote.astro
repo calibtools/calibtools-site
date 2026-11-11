@@ -15,6 +15,7 @@ const countries = countryOptions();
       <div id="q-pattern-card" class="hidden flex-col gap-1 rounded border border-line bg-ground-alt p-4">
         <span class="font-mono text-[12px] uppercase tracking-[0.16em] text-brand-dark">Your pattern</span>
         <span id="q-pattern-summary" class="text-[15px] font-medium"></span>
+        <span id="q-pattern-id-row" class="hidden text-[13px] text-ink-muted">Pattern ID <span id="q-pattern-id" class="font-mono text-ink"></span></span>
         <a id="q-pattern-link" href="/tools/generator/" class="text-sm">Open this pattern in the generator</a>
         <span class="text-[13px] text-ink-muted">We receive the same parameters, so we quote exactly this pattern.</span>
       </div>
@@ -93,6 +94,7 @@ const countries = countryOptions();
   <script>
     import { checkWorkEmail, WORK_EMAIL_MESSAGE } from '@/lib/workEmail';
     import { mountTurnstile, TURNSTILE_SITE_KEY } from '@/lib/turnstileClient';
+    import { patternIdFromPath } from '@/lib/patternLink';
 
     const form = document.getElementById('q-form') as HTMLFormElement;
     const showErr = (field: string, msg: string) => {
@@ -142,6 +144,7 @@ const countries = countryOptions();
             boards: String(fd.get('boards') ?? '1'),
             country: String(fd.get('country') ?? ''),
             pattern: String(fd.get('pattern') ?? ''),
+            patternId: typeof data.patternId === 'string' ? data.patternId : '',
             emailSent: Boolean(data.customerEmailSent),
           };
           try { sessionStorage.setItem('ct-quote', JSON.stringify(card)); } catch { /* private mode */ }
@@ -174,6 +177,11 @@ const countries = countryOptions();
       (document.getElementById('q-product') as HTMLInputElement).value = label;
       document.getElementById('q-pattern-summary')!.textContent = label;
       (document.getElementById('q-pattern-link') as HTMLAnchorElement).href = pattern;
+      const pid = patternIdFromPath(pattern);
+      if (pid) {
+        document.getElementById('q-pattern-id')!.textContent = pid;
+        document.getElementById('q-pattern-id-row')!.classList.remove('hidden');
+      }
       document.getElementById('q-pattern-card')!.classList.replace('hidden', 'flex');
     }
     const src = document.getElementById('q-source') as HTMLInputElement | null;

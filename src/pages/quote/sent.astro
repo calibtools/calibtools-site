@@ -17,6 +17,7 @@ import Base from '@/layouts/Base.astro';
 
       <dl id="qs-card" class="m-0 hidden flex-col gap-0 rounded-sm border border-line">
         <div class="flex gap-4 border-b border-line px-5 py-3"><dt class="w-[140px] shrink-0 text-[13px] text-ink-muted">Product / pattern</dt><dd id="qs-product" class="m-0 text-[15px]"></dd></div>
+        <div id="qs-pattern-id-row" class="hidden gap-4 border-b border-line px-5 py-3"><dt class="w-[140px] shrink-0 text-[13px] text-ink-muted">Pattern ID</dt><dd id="qs-pattern-id" class="m-0 font-mono text-[15px]"></dd></div>
         <div class="flex gap-4 border-b border-line px-5 py-3"><dt class="w-[140px] shrink-0 text-[13px] text-ink-muted">Material</dt><dd id="qs-material" class="m-0 text-[15px]"></dd></div>
         <div class="flex gap-4 border-b border-line px-5 py-3"><dt class="w-[140px] shrink-0 text-[13px] text-ink-muted">Quantity</dt><dd id="qs-quantity" class="m-0 text-[15px]"></dd></div>
         <div class="flex gap-4 px-5 py-3"><dt class="w-[140px] shrink-0 text-[13px] text-ink-muted">Delivery country</dt><dd id="qs-country" class="m-0 text-[15px]"></dd></div>
@@ -36,6 +37,7 @@ import Base from '@/layouts/Base.astro';
   </div>
   <script>
     import { isQuoteId, materialLabel, countryName } from '@/lib/quote';
+    import { isPatternId } from '@/lib/patternLink';
     const qp = new URLSearchParams(location.search);
     const id = qp.get('q') ?? '';
     const idEl = document.getElementById('qs-id')!;
@@ -51,6 +53,11 @@ import Base from '@/layouts/Base.astro';
       set('quantity', boards > 1 ? `${card.quantity} sets of ${boards} boards` : String(card.quantity));
       set('country', card.country ? countryName(String(card.country)) : '');
       document.getElementById('qs-card')!.classList.replace('hidden', 'flex');
+      const pid = String(card.patternId ?? '');
+      if (isPatternId(pid)) {
+        document.getElementById('qs-pattern-id')!.textContent = pid;
+        document.getElementById('qs-pattern-id-row')!.classList.replace('hidden', 'flex');
+      }
       const pattern = String(card.pattern ?? '');
       if (/^\/tools\/generator(\/[a-z-]+)?\/?\?[A-Za-z0-9_.~%=&+-]*$/.test(pattern)) {
         const a = document.getElementById('qs-pattern') as HTMLAnchorElement;

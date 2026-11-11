@@ -81,6 +81,8 @@ export interface QuoteRecord {
   message: string;
   /** Full generator URL that reopens the exact pattern, or ''. */
   pattern: string;
+  /** Pattern ID (P-XXXXXX) computed on the server from the pattern link, or ''. Optional: records before C2 have none. */
+  patternId?: string;
   source_page: string;
   emailVerified: boolean;
   verifiedAt?: string;
@@ -121,6 +123,7 @@ export function internalBody(r: QuoteRecord, verifyNote: string): string {
     '',
     `Message:\n${r.message || '—'}`,
   ];
+  if (r.patternId) lines.push('', `Pattern ID: ${r.patternId}`);
   if (r.pattern) lines.push('', `Pattern (opens the exact pattern in the generator):\n${r.pattern}`);
   if (r.source_page) lines.push('', `Sent from: ${r.source_page}`);
   return lines.join('\n');
@@ -143,6 +146,7 @@ export function customerBody(r: QuoteRecord, confirmUrl: string): string {
     `- Quantity: ${r.quantity ?? '—'}${r.boards > 1 ? ` (sets of ${r.boards} boards)` : ''}`,
     `- Delivery country: ${r.country ? countryName(r.country) : '—'}`,
   ];
+  if (r.patternId) lines.push(`- Pattern ID: ${r.patternId}`);
   if (r.pattern) lines.push(`- Pattern: ${r.pattern}`);
   lines.push(
     '',
