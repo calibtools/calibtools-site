@@ -54,6 +54,7 @@ const HANDLE_TO_DATASHEET: Record<string, string> = {
   'charuco-ceramic': 'CT-DS-CHA-C.md',
   'aprilgrid-composite': 'CT-DS-APR-P.md',
   'circlegrid-composite': 'CT-DS-CIR-P.md',
+  'halcon-composite': 'CT-DS-HAL-P.md',
   'mounting-fixture': 'CT-DS-ACC-A-FIX-14.md',
   'certificate-ilac': 'CT-SV-CERT-ILAC.md',
 };
