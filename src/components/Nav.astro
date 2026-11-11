@@ -12,10 +12,7 @@ const dark = theme === 'dark';
 
 <nav
   class:list={[
-    'sticky top-0 z-50 backdrop-blur-[14px]',
-    dark
-      ? 'bg-[rgba(10,10,10,0.82)] border-b border-white/[0.08]'
-      : 'bg-[rgba(255,255,255,0.86)] border-b border-black/[0.08]',
+    'sticky top-0 z-50 bg-ground border-b border-line',
   ]}
   aria-label="Main"
   data-nav-bar
@@ -63,7 +60,7 @@ const dark = theme === 'dark';
                   class="absolute left-1/2 -translate-x-1/2 top-full pt-1 hidden w-[660px]"
                   data-nav-panel
                 >
-                  <div class="rounded-lg border border-line bg-ground shadow-lg">
+                  <div class="border border-line-strong bg-sheet">
                   <div class="grid grid-cols-3 gap-0 p-[var(--nav-space-5)]" data-mega-grid>
                     {group.columns.map((col) => (
                       <div data-mega-col>
@@ -89,7 +86,7 @@ const dark = theme === 'dark';
                   class="absolute left-0 top-full pt-1 hidden w-[280px]"
                   data-nav-panel
                 >
-                  <div class="rounded-lg border border-line bg-ground shadow-lg">
+                  <div class="border border-line-strong bg-sheet">
                   <div class="flex flex-col p-[var(--nav-space-1)]">
                     {group.items!.map((item, idx) => (
                       <a

@@ -23,17 +23,25 @@ interface Props {
   rating?: number;
   /** Review count (hidden when 0). */
   reviewCount?: number;
+  /** Line drawing (SVG markup from boardDrawing.ts). Shown instead of the image when given. */
+  drawing?: string;
+  /** Caption under the drawing, e.g. the part number drawn. */
+  drawingCaption?: string;
 }
 const {
   href, title, summary, sub, from: rawFrom, image, localImage,
-  placeholder = 'PRODUCT', chips, rating = 0, reviewCount = 0,
+  placeholder = 'PRODUCT', chips, rating = 0, reviewCount = 0, drawing, drawingCaption,
 } = Astro.props;
 const from = formatCardPrice(rawFrom);
 const displaySummary = summary || sub || '';
 ---
-<a href={href} data-card class="card flex flex-col overflow-hidden text-ink no-underline hover:text-ink hover:border-ink/40">
-  <div class="aspect-[4/3] bg-ground-panel flex items-center justify-center overflow-hidden font-mono text-xs text-ink-soft">
-    {localImage ? (
+<a href={href} data-card class="card bracket flex flex-col text-ink no-underline hover:text-ink hover:border-ink">
+  {/* No picture, no box: an empty frame is a placeholder (DESIGN.md §8.6) */}
+  {(drawing || localImage || image) && (
+  <div class="aspect-[4/3] border-b border-line bg-sheet flex items-center justify-center overflow-hidden font-mono text-xs text-ink-soft">
+    {drawing ? (
+      <div class="flex h-full w-full items-center justify-center p-4 [&>svg]:max-h-full [&>svg]:w-auto [&>svg]:max-w-full" set:html={drawing} />
+    ) : localImage ? (
       <Picture
         src={localImage}
         widths={[480, 800]}
@@ -46,17 +54,19 @@ const displaySummary = summary || sub || '';
       <img src={image} alt="" class="h-full w-full object-cover" loading="lazy" />
     ) : null}
   </div>
+  )}
   <div class="flex flex-col gap-1.5 p-5">
-    <strong class="text-[17px]">{title}</strong>
+    {drawing && drawingCaption && <span class="spec-label">{drawingCaption}</span>}
+    <strong class="text-[17px] leading-snug">{title}</strong>
     {reviewCount > 0 && <Rating average={rating} count={reviewCount} size={12} />}
     {displaySummary && <span class="text-sm text-ink-muted line-clamp-2">{displaySummary}</span>}
     {chips && chips.length > 0 && (
       <span class="text-[12px] font-mono text-ink-muted">{chips.join(' · ')}</span>
     )}
     {from ? (
-      <span class="text-sm font-semibold text-brand-dark [html[data-theme=dark]_&]:text-brand-on-dark">from {from}</span>
+      <span class="font-mono text-[14px] font-semibold text-ink">from {from}</span>
     ) : (
-      <span class="text-sm text-ink-muted">Quote on request</span>
+      <span class="font-mono text-[14px] font-semibold text-ink">quote</span>
     )}
   </div>
 </a>

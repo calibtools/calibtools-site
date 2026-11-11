@@ -1,0 +1,46 @@
+---
+/**
+ * Category tiles (home and /targets/): rows on phones, tiles from md.
+ * Board outlines are drawn to scale, and only for collections whose sizes are in boardSizes.ts.
+ */
+import { getEntry } from 'astro:content';
+import { formatCardPrice, type Collection } from '@/lib/shopify';
+import { toScaleOutlines } from '@/lib/boardDrawing';
+import { COMPOSITE_SIZES, CERAMIC_SIZES } from '@/lib/boardSizes';
+
+interface Props { collections: Collection[] }
+const { collections } = Astro.props;
+
+const outlines: Record<string, { svg: string; caption: string }> = {
+  'composite-boards': toScaleOutlines([COMPOSITE_SIZES[0], COMPOSITE_SIZES[2], COMPOSITE_SIZES[4]].map((s) => s.label), 10),
+  'ceramic-glass': toScaleOutlines(CERAMIC_SIZES.slice(0, 3).map((s) => s.label), 2.5),
+};
+
+const tiles = await Promise.all(collections.map(async (c) => {
+  const entry = await getEntry('collections', c.handle);
+  /* Lowest priced product of the collection (0 = quote only) */
+  const priced = c.products.filter((p) => Number(p.priceMinAmount) > 0).sort((x, y) => Number(x.priceMinAmount) - Number(y.priceMinAmount));
+  const count = c.products.length;
+  return {
+    handle: c.handle,
+    title: entry?.data.title ?? c.title,
+    description: entry?.data.description ?? c.description,
+    price: priced.length ? formatCardPrice(priced[0].priceFrom) : '',
+    outline: outlines[c.handle],
+    countLabel: `${count} ${count === 1 ? 'product' : 'products'}`,
+  };
+}));
+---
+<div class="grid grid-cols-1 border-t border-line md:grid-cols-3 md:gap-6 md:border-t-0 lg:grid-cols-5">
+  {tiles.map((t) => (
+    <a href={`/targets/collection/${t.handle}/`} data-card class="group flex items-center justify-between gap-4 border-b border-line py-4 text-ink no-underline hover:text-ink md:card md:bracket md:flex-col md:items-stretch md:justify-start md:gap-3 md:border-b md:p-5 md:hover:border-ink">
+      <div class="hidden h-24 items-end md:flex" set:html={t.outline?.svg ?? ''} />
+      <span class="spec-label hidden md:block">{t.outline ? t.outline.caption : t.countLabel}</span>
+      <div class="flex min-w-0 flex-col gap-1 md:gap-2">
+        <strong class="text-[17px] leading-tight md:text-[20px]">{t.title}</strong>
+        <span class="text-[14px] leading-snug text-ink-muted">{t.description}</span>
+      </div>
+      <span class="shrink-0 font-mono text-[14px] font-semibold md:mt-auto md:pt-2">{t.price ? `from ${t.price}` : 'quote'}</span>
+    </a>
+  ))}
+</div>

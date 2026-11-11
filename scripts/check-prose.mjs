@@ -51,6 +51,16 @@ const BANNED_PATTERNS = [
   /I\s+started\s+Calib\.Tools/i,
   /\bpremium\b/i,
   /\bbest-in-class\b/i,
+  // DESIGN.md §6: say the number instead of an adjective
+  /\bcutting[- ]edge\b/i,
+  /\bseamless(ly)?\b/i,
+  /\bworld[- ]class\b/i,
+  /\bstate[- ]of[- ]the[- ]art\b/i,
+  /\bgame[- ]chang/i,
+  /\brevolutionary\b/i,
+  /\beffortless(ly)?\b/i,
+  /\bunleash/i,
+  /\bnext[- ]generation\b/i,
 ];
 
 /** Phrases that are allowed even when they contain a banned word. */
@@ -210,6 +220,30 @@ if (banned.length > 0) {
 }
 
 console.log('[check-prose] OK — no banned phrases found.');
+
+// ---------------------------------------------------------------------------
+// Paired-slogan headings (build-breaking) — DESIGN.md §6
+// "Free tools. Serious targets." : two short sentences, each with its own period.
+// ---------------------------------------------------------------------------
+
+const PAIRED = /^[A-Z][^.!?]{1,30}\.\s+[A-Z][^.!?]{1,30}\.$/;
+const slogans = [];
+for (const file of proseFiles) {
+  const src = readFileSync(file, 'utf-8');
+  const headings = file.endsWith('.astro')
+    ? [...src.matchAll(/<h[1-3][^>]*>([\s\S]*?)<\/h[1-3]>/g)].map((m) => ({ text: m[1], index: m.index }))
+    : [...src.matchAll(/^#{1,3}\s+(.+)$/gm)].map((m) => ({ text: m[1], index: m.index }));
+  for (const h of headings) {
+    const text = h.text.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+    if (PAIRED.test(text)) slogans.push({ file: relative(ROOT, file), line: src.slice(0, h.index).split('\n').length, text });
+  }
+}
+if (slogans.length > 0) {
+  console.error('\n[check-prose] Paired-slogan headings (write what the section is instead):');
+  for (const h of slogans) console.error(`  ${h.file}:${h.line}  "${h.text}"`);
+  process.exit(1);
+}
+console.log('[check-prose] OK — no paired-slogan headings.');
 
 // ---------------------------------------------------------------------------
 // Card text check (build-breaking) — [data-card] elements <= 220 chars

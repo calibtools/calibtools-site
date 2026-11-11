@@ -14,6 +14,7 @@ import { findDatasheetUrl } from '@/lib/datasheetManifest';
 import { getProductImages } from '@/lib/product-images';
 import { getImageMetadata } from '@/lib/productImageImports';
 import { ArrowDown, ArrowRight } from 'lucide-astro';
+import { drawingForPartNumber, representativePartNumber } from '@/lib/boardDrawing';
 
 export async function getStaticPaths() {
   const collections = await getCollections();
@@ -39,7 +40,6 @@ const allProducts = await getProducts();
 let specsTable: Array<{ label: string; value: string }> = [];
 let sellingPoints: string[] = [];
 let pairsWith: string[] = [];
-let collectionColor: string = 'brand';
 let brandNote: string | undefined;
 let ContentComponent: any = null;
 
@@ -47,7 +47,6 @@ if (entry) {
   specsTable = entry.data.specsTable;
   sellingPoints = entry.data.sellingPoints;
   pairsWith = entry.data.pairsWith;
-  collectionColor = entry.data.color;
   brandNote = entry.data.brandNote;
   const rendered = await entry.render();
   ContentComponent = rendered.Content;
@@ -57,15 +56,6 @@ if (entry) {
 const pairedProducts = pairsWith
   .map((h) => allProducts.find((p) => p.handle === h))
   .filter(Boolean);
-
-// Collection color class mapping
-const colorClasses: Record<string, string> = {
-  brand: 'bg-collection-brand text-white',
-  'slate-blue': 'bg-collection-slate-blue text-white',
-  amber: 'bg-collection-amber text-white',
-  gray: 'bg-collection-grey text-white',
-};
-const pillClass = colorClasses[collectionColor] ?? colorClasses.brand;
 
 // Build map of handle → local hero ImageMetadata
 const localHeroMap = new Map<string, ImageMetadata>();
@@ -86,7 +76,11 @@ for (const p of collection.products) {
 }
 
 // Generate preview thumbnails for products
-function productPreview(p: typeof collection.products[0]) {
+function productPreview(p: typeof collection.products[0], dimensions = false) {
+  /* Line drawing from catalog geometry where we have it (one representative stock board) */
+  const pn = representativePartNumber(p.handle);
+  const drawing = pn ? drawingForPartNumber(pn, { dimensions }) : undefined;
+  if (pn && drawing) return { type: 'drawing' as const, svg: drawing, pn };
   const localMeta = localHeroMap.get(p.handle);
   if (localMeta) return { type: 'local' as const, meta: localMeta, title: p.title };
   if (p.image) return { type: 'image' as const, src: p.image };
@@ -165,20 +159,13 @@ const breadcrumbLd = {
     <div class="flex flex-col gap-8 lg:flex-row lg:gap-12">
       {/* Left column */}
       <div class="flex flex-col gap-5 flex-1 min-w-0">
-        {/* Color pill + H1 */}
-        <div class="flex items-center gap-3">
-          <span class={`badge ${pillClass}`}>{collection.title}</span>
-        </div>
-        <h1 class="h-display m-0 text-[36px] md:text-[48px]">{collection.title}</h1>
+        <h1 class="m-0 text-[32px] font-semibold leading-[1.12] md:text-[40px]">{collection.title}</h1>
 
         {/* Selling points */}
         {sellingPoints.length > 0 && (
           <ul class="m-0 flex flex-col gap-2 pl-0 list-none">
             {sellingPoints.map((sp) => (
-              <li class="flex items-start gap-2 text-[15px] text-ink-muted">
-                <span class="text-brand mt-0.5 shrink-0">&#10003;</span>
-                <span>{sp}</span>
-              </li>
+              <li class="border-l-2 border-line-strong pl-3 text-[16px] leading-relaxed text-ink-muted">{sp}</li>
             ))}
           </ul>
         )}
@@ -188,21 +175,22 @@ const breadcrumbLd = {
           <div class="flex gap-3 overflow-x-auto pb-2 scrollbar-none">
             {collection.products.map((p) => {
               const preview = productPreview(p);
+              if (preview.type === 'placeholder') return null;
               return (
                 <a
                   href={`#product-${p.handle}`}
-                  class="shrink-0 w-[100px] h-[75px] rounded border border-line bg-ground-panel flex items-center justify-center overflow-hidden no-underline hover:border-brand transition-colors"
+                  class="shrink-0 w-[100px] h-[75px] border border-line bg-sheet flex items-center justify-center overflow-hidden no-underline hover:border-ink"
                   title={p.title}
                 >
-                  {preview.type === 'local' ? (
+                  {preview.type === 'drawing' ? (
+                    <div class="flex h-full w-full items-center justify-center p-1.5 [&>svg]:max-h-full [&>svg]:w-auto [&>svg]:max-w-full" set:html={preview.svg} />
+                  ) : preview.type === 'local' ? (
                     <Picture src={preview.meta} widths={[200]} formats={['avif', 'webp', 'jpeg']} alt={preview.title} class="h-full w-full object-contain" loading="lazy" />
                   ) : preview.type === 'image' ? (
                     <img src={preview.src} alt={p.title} class="h-full w-full object-contain" loading="lazy" />
                   ) : preview.type === 'svg' ? (
                     <div class="h-full w-full flex items-center justify-center p-1" set:html={preview.svg} />
-                  ) : (
-                    <span class="font-mono text-[12px] text-ink-soft">{p.title.slice(0, 12)}</span>
-                  )}
+                  ) : null}
                 </a>
               );
             })}
@@ -219,17 +207,15 @@ const breadcrumbLd = {
       {/* Right rail: Pairs with */}
       {pairedProducts.length > 0 && (
         <aside class="lg:w-[300px] shrink-0 flex flex-col gap-4">
-          <h2 class="m-0 text-[15px] font-semibold text-ink-soft uppercase tracking-[0.06em]">Pairs with</h2>
+          <h2 class="spec-label m-0">Pairs with</h2>
           <div class="flex flex-col gap-3">
             {pairedProducts.map((p) => p && (
               <a href={p.url} class="card flex gap-3 p-3 no-underline text-ink hover:text-ink hover:border-ink/40">
-                <div class="w-14 h-14 rounded bg-ground-panel flex items-center justify-center shrink-0">
-                  {p.image ? (
-                    <img src={p.image} alt="" class="h-full w-full object-contain rounded" loading="lazy" />
-                  ) : (
-                    <span class="font-mono text-[12px] text-ink-soft">{p.title.slice(0, 6)}</span>
-                  )}
-                </div>
+                {p.image && (
+                  <div class="w-14 h-14 bg-sheet flex items-center justify-center shrink-0">
+                    <img src={p.image} alt="" class="h-full w-full object-contain" loading="lazy" />
+                  </div>
+                )}
                 <div class="flex flex-col gap-0.5 min-w-0">
                   <strong class="text-sm truncate">{p.title}</strong>
                   <span class="text-xs text-ink-muted truncate">{p.description}</span>
@@ -285,37 +271,42 @@ const breadcrumbLd = {
   <section id="product-groups" class="container-x flex flex-col gap-12 py-10 md:py-14">
     {collection.products.length > 0 ? (
       collection.products.map((p) => {
-        const preview = productPreview(p);
+        const preview = productPreview(p, true);
         const bullets = specBullets(p);
         return (
           <div id={`product-${p.handle}`} class="flex flex-col gap-6 scroll-mt-20">
             {/* Group title */}
-            <h2 class="h-display m-0 text-2xl text-brand">{p.title}</h2>
+            <div class="flex flex-col gap-4 border-t border-line pt-8">
+              <span class="section-rule"></span>
+              <h2 class="m-0 text-[24px] font-semibold"><a href={p.url} class="text-ink no-underline hover:text-brand-dark">{p.title}</a></h2>
+            </div>
 
             {/* Render + spec bullets */}
             <div class="flex flex-col md:flex-row gap-6">
               {/* Product render */}
-              <div class="w-full md:w-[280px] shrink-0 aspect-[4/3] rounded border border-line bg-ground-panel flex items-center justify-center overflow-hidden">
-                {preview.type === 'local' ? (
+              {preview.type !== 'placeholder' && (
+              <div class:list={['card bracket w-full shrink-0 flex flex-col items-center justify-center overflow-hidden', preview.type === 'drawing' ? 'md:w-[400px] gap-2 p-3' : 'md:w-[280px] aspect-[4/3]']}>
+                {preview.type === 'drawing' ? (
+                  <>
+                    <div class="w-full [&>svg]:h-auto [&>svg]:w-full" set:html={preview.svg} />
+                    <span class="spec-label self-start">{preview.pn} &middot; mm</span>
+                  </>
+                ) : preview.type === 'local' ? (
                   <Picture src={preview.meta} widths={[480, 800]} formats={['avif', 'webp', 'jpeg']} alt={preview.title} class="h-full w-full object-contain" loading="lazy" />
                 ) : preview.type === 'image' ? (
                   <img src={preview.src} alt={p.title} class="h-full w-full object-contain" loading="lazy" />
                 ) : preview.type === 'svg' ? (
                   <div class="h-full w-full flex items-center justify-center p-4" set:html={preview.svg} />
-                ) : (
-                  <span class="font-mono text-xs text-ink-soft">{p.title}</span>
-                )}
+                ) : null}
               </div>
+              )}
 
               {/* Spec bullets + description */}
               <div class="flex flex-col gap-3 flex-1 min-w-0">
                 {bullets.length > 0 && (
-                  <ul class="m-0 pl-0 list-none flex flex-col gap-1.5">
+                  <ul class="m-0 pl-0 list-none flex flex-col border-t border-line">
                     {bullets.map((b) => (
-                      <li class="flex items-start gap-2 text-[15px]">
-                        <span class="text-brand mt-0.5 shrink-0">&#8226;</span>
-                        <span class="spec">{b}</span>
-                      </li>
+                      <li class="spec border-b border-line py-1.5">{b}</li>
                     ))}
                   </ul>
                 )}

@@ -164,7 +164,7 @@ export default function CaptureAssistant() {
 
             {/* Pose overlay */}
             {cameraActive && pose && (
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
+              <div className="absolute bottom-0 left-0 right-0 bg-black/60 p-4">
                 <p className="m-0 text-lg font-bold text-white">
                   {pose.id}/{GUIDED_POSES.length}: {pose.label}
                 </p>

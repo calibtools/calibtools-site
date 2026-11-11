@@ -10,6 +10,7 @@
  */
 import type { PatternSpec } from './patterns';
 import { renderCharucoSvg } from './renderCharuco';
+import { renderCheckerboardSvg } from './renderCheckerboard';
 import { patternExtent } from './pageLayout';
 import { CATALOG, specFromEntry } from './catalogPatterns';
 import { GENERATOR_DEFAULT } from './patternLink';
@@ -31,7 +32,16 @@ export interface BoardDrawingInput {
   spec: PatternSpec;
   /** Accessible name, e.g. the part number. */
   label: string;
+  /** Dimension lines (default true). Off for small cards, where the values would not be readable. */
+  dimensions?: boolean;
 }
+
+/** Pattern types this module can draw; their extent is exactly cols × square by rows × square. */
+const RENDERERS: Partial<Record<PatternSpec['type'], (s: PatternSpec, ox: number, oy: number) => string>> = {
+  ChArUco: renderCharucoSvg,
+  'ArUco grid': renderCharucoSvg,
+  Checkerboard: renderCheckerboardSvg,
+};
 
 /** One dimension line with end ticks and its value; `data-mm` is the dimension in mm. */
 function dim(name: string, x1: number, y1: number, x2: number, y2: number, mm: number, text: string, u: number): string {
@@ -50,7 +60,9 @@ function dim(name: string, x1: number, y1: number, x2: number, y2: number, mm: n
 /** Extension line from the object to just past the dimension line. */
 const ext = (x1: number, y1: number, x2: number, y2: number) => `<line x1="${fmt(x1)}" y1="${fmt(y1)}" x2="${fmt(x2)}" y2="${fmt(y2)}"/>`;
 
-export function boardDrawingSvg({ boardW, boardH, spec, label }: BoardDrawingInput): string {
+export function boardDrawingSvg({ boardW, boardH, spec, label, dimensions = true }: BoardDrawingInput): string {
+  const render = RENDERERS[spec.type];
+  if (!render) throw new Error(`No line drawing for pattern type "${spec.type}"`);
   const { bw: patW, bh: patH } = patternExtent(spec);
   if (patW > boardW + 1e-6 || patH > boardH + 1e-6) throw new Error(`Pattern ${patW} × ${patH} mm does not fit on a ${boardW} × ${boardH} mm board`);
   const ox = r2((boardW - patW) / 2), oy = r2((boardH - patH) / 2);
@@ -60,10 +72,11 @@ export function boardDrawingSvg({ boardW, boardH, spec, label }: BoardDrawingInp
   const thin = 0.45 * u;
   const d1 = 14 * u, d2 = 31 * u; // offsets of the inner (pattern) and outer (board) dimension lines
   const over = 3 * u;
-  const padL = 6 * u, padT = d2 + 8 * u, padR = d2 + 8 * u, padB = 6 * u;
+  const padL = 6 * u, padB = 6 * u;
+  const padT = dimensions ? d2 + 8 * u : 6 * u, padR = dimensions ? d2 + 8 * u : 6 * u;
 
   // The pattern, from the shared renderer; black is drawn in ink so the drawing matches the page.
-  const pattern = renderCharucoSvg(spec, ox, oy).replaceAll('fill="#000"', `fill="${INK}"`);
+  const pattern = render(spec, ox, oy).replaceAll('fill="#000"', `fill="${INK}"`);
 
   const axisLen = Math.min(patW, patH) * 0.16;
   const gapX = Math.min(oy, 6 * u) / 2 + 1.5 * u; // X arrow sits in the top margin, Y arrow in the left margin
@@ -89,6 +102,7 @@ export function boardDrawingSvg({ boardW, boardH, spec, label }: BoardDrawingInp
     `<text x="${fmt(xa.x2 + 2 * u)}" y="${fmt(xa.y + 2.2 * u)}" font-size="${fmt(6 * u)}" fill="${RED}">X</text>`,
     `<text x="${fmt(ya.x)}" y="${fmt(ya.y2 + 8 * u)}" font-size="${fmt(6 * u)}" text-anchor="middle" fill="#007A3D">Y</text>`,
     `<circle class="origin" cx="${fmt(ox)}" cy="${fmt(oy)}" r="${fmt(1.7 * u)}" fill="${RED}"/>`,
+    ...(dimensions ? [
     // Dimension and extension lines
     `<g class="dims" stroke="${INK}" stroke-width="${fmt(thin)}">`,
     ext(0, 0, 0, -d2 - over), ext(boardW, 0, boardW, -d2 - over),
@@ -101,18 +115,31 @@ export function boardDrawingSvg({ boardW, boardH, spec, label }: BoardDrawingInp
     dim('board-h', boardW + d2, 0, boardW + d2, boardH, boardH, fmt(boardH), u),
     dim('pattern-h', boardW + d1, oy, boardW + d1, oy + patH, patH, gridH, u),
     `</g></g>`,
+    ] : []),
     `</svg>`,
   ].join('').replace(/<text /g, '<text stroke="none" ');
 }
 
-/** Drawing of a stock ChArUco board by part number (CT-CHA-P-… / CT-CHA-C-…); undefined for anything else. */
-export function drawingForPartNumber(partNumber: string): string | undefined {
-  const entry = CATALOG.find((e) => e.partNumber === partNumber && e.spec.type === 'ChArUco');
+/** Drawing of a stock ChArUco or checkerboard target by part number; undefined for anything else. */
+export function drawingForPartNumber(partNumber: string, opts: { dimensions?: boolean } = {}): string | undefined {
+  const entry = CATALOG.find((e) => e.partNumber === partNumber && RENDERERS[e.spec.type]);
   if (!entry) return undefined;
   const m = /-(\d+)X(\d+)-/.exec(partNumber);
   if (!m) return undefined;
   const spec = { ...GENERATOR_DEFAULT, ...specFromEntry(entry) } as PatternSpec;
-  return boardDrawingSvg({ boardW: Number(m[1]), boardH: Number(m[2]), spec, label: partNumber });
+  return boardDrawingSvg({ boardW: Number(m[1]), boardH: Number(m[2]), spec, label: partNumber, dimensions: opts.dimensions });
+}
+
+/**
+ * The stock board shown for a product on cards: the 400 × 300 mm size where the product has one,
+ * else the second size; first variant (default dictionary or fine grid). Undefined when we cannot draw it.
+ */
+export function representativePartNumber(handle: string): string | undefined {
+  const entries = CATALOG.filter((e) => e.handle === handle && RENDERERS[e.spec.type]);
+  if (!entries.length) return undefined;
+  const sizes = [...new Set(entries.map((e) => e.partNumber.split('-')[3]))];
+  const size = sizes.includes('400X300') ? '400X300' : sizes[Math.min(1, sizes.length - 1)];
+  return entries.find((e) => e.partNumber.split('-')[3] === size)?.partNumber;
 }
 
 /**

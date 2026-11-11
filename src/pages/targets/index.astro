@@ -1,6 +1,8 @@
 ---
 import Base from '@/layouts/Base.astro';
 import ProductCard from '@/components/ProductCard.astro';
+import CollectionTiles from '@/components/CollectionTiles.astro';
+import { drawingForPartNumber, representativePartNumber } from '@/lib/boardDrawing';
 import type { ImageMetadata } from 'astro';
 import { getCollections, getProducts } from '@/lib/shopify';
 import { getProductImages } from '@/lib/product-images';
@@ -11,12 +13,6 @@ import { getReviewsForProduct, summarize } from '@/lib/reviews';
 const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: 'Calibration targets' }]);
 
 const collections = await getCollections();
-/* Overlay local title + description from content collection */
-const localCollectionData = new Map<string, { title: string; description: string }>();
-for (const c of collections) {
-  const entry = await getEntry('collections', c.handle);
-  if (entry) localCollectionData.set(c.handle, { title: entry.data.title, description: entry.data.description });
-}
 const products = await getProducts();
 
 // Build hero image map for all products
@@ -28,6 +24,14 @@ for (const p of products) {
     const meta = getImageMetadata(hero.handle, hero.file);
     if (meta) heroImageMap.set(p.handle, meta);
   }
+}
+
+/* Line drawing for products we can draw from catalog geometry (one representative stock board each) */
+const drawings = new Map<string, { svg: string; pn: string }>();
+for (const p of products) {
+  const pn = representativePartNumber(p.handle);
+  const svg = pn ? drawingForPartNumber(pn, { dimensions: false }) : undefined;
+  if (pn && svg) drawings.set(p.handle, { svg, pn });
 }
 
 // Build review + content data for cards
@@ -46,43 +50,27 @@ for (const p of products) {
 }
 ---
 <Base title="Calibration targets" section="targets" description="Checkerboard, ChArUco, AprilGrid, circle grid, HALCON and ceramic calibration targets for your cameras. Made to order, measured before it ships." jsonLd={bcLd}>
-  <section class="container-x flex flex-col gap-9 py-[var(--section-y)]">
-    <div class="flex flex-col gap-2.5">
-      <span class="eyebrow">Calibration targets</span>
-      <h1 class="h-display m-0 text-[36px] md:text-[48px]">Find the target for your setup.</h1>
+  <section class="container-x flex flex-col gap-8 pb-[var(--section-y)] pt-10 md:pt-12">
+    <div class="flex flex-col gap-4">
+      <span class="section-no">Calibration targets</span>
+      <h1 class="m-0 text-[32px] font-semibold leading-[1.12] md:text-[40px]">Find the target for your setup</h1>
+      <p class="m-0 max-w-[640px] text-[17px] leading-[1.55] text-ink-muted">Start from the material, or go straight to a pattern below. Not sure which size fits your camera? The <a href="/tools/wizard/" class="underline decoration-1 underline-offset-[3px]">selection wizard</a> asks five questions and names one.</p>
     </div>
 
-    {/* Collections */}
-    <div class="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
-      {collections.map((c) => {
-        const firstProduct = c.products[0];
-        const localHero = firstProduct ? heroImageMap.get(firstProduct.handle) : undefined;
-        const local = localCollectionData.get(c.handle);
-        const displayTitle = local?.title ?? c.title;
-        const displayDesc = local?.description ?? c.description;
-        const hasPurchasable = c.products.length > 0;
-        return (
-          <ProductCard
-            href={`/targets/collection/${c.handle}/`}
-            title={displayTitle}
-            sub={displayDesc}
-            from={hasPurchasable ? (firstProduct?.priceFrom ?? '') : ''}
-            localImage={localHero}
-            image={!localHero ? (c.image ?? firstProduct?.image) : undefined}
-            placeholder={displayTitle}
-          />
-        );
-      })}
-    </div>
+    <CollectionTiles collections={collections} />
 
     {/* All products */}
     {products.length > 0 && (
       <>
-        <h2 class="h-display m-0 mt-4 text-[28px]">All targets</h2>
-        <div class="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
+        <div class="mt-6 flex flex-col gap-4 border-t border-line pt-10">
+          <span class="section-rule"></span>
+          <h2 class="m-0 text-[24px] font-semibold md:text-[28px]">All targets</h2>
+        </div>
+        <div class="grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-6 lg:grid-cols-4">
           {products.map((p) => {
             const localHero = heroImageMap.get(p.handle);
             const cd = cardDataMap.get(p.handle);
+            const dr = drawings.get(p.handle);
             return (
               <ProductCard
                 href={p.url}
@@ -92,6 +80,8 @@ for (const p of products) {
                 from={p.priceFrom}
                 localImage={localHero}
                 image={!localHero ? p.image : undefined}
+                drawing={dr?.svg}
+                drawingCaption={dr?.pn}
                 rating={cd?.rating}
                 reviewCount={cd?.count}
                 chips={cd?.chips}
