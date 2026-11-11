@@ -29,6 +29,8 @@ const SVG_ALLOW = [
   'src/lib/renderCharuco.ts',
   'src/lib/boardDrawing.ts',
   'src/lib/boardDrawing.test.ts',
+  'src/lib/halconCaltab.ts',
+  'src/lib/halconCaltab.test.ts',
   'src/lib/renderAprilGrid.ts',
   'src/lib/renderCircles.ts',
   'src/lib/renderMarkerSheet.ts',
