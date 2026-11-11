@@ -184,10 +184,10 @@ export default function FovCalculator({ heading = 'FOV calculator' }: { heading?
           <div className="grid grid-cols-3 gap-4">
             <ResultCard label="Board" value={`${rec.board.label} mm`} />
             <ResultCard label="Frame fill" value={`${Math.round(rec.fill * 100)} %`} />
-            <ResultCard label="Pixels per square" value={fmt(rec.pxPerSquare, 0)} />
+            <ResultCard label="Pixels per square" value={`${fmt(rec.pxPerSquare, 0)} px`} pixel />
           </div>
           <p className="m-0 mt-4 text-sm">
-            ChArUco {rec.board.cols} × {rec.board.rows}, {rec.board.square} mm squares, {rec.board.marker} mm markers (DICT_6X6_250): {fmt(rec.pxPerBit)} px per marker bit.
+            ChArUco {rec.board.cols} × {rec.board.rows}, {rec.board.square} mm squares, {rec.board.marker} mm markers (DICT_6X6_250): <span className="font-pixel" data-unit="px">{fmt(rec.pxPerBit)} px</span> per marker bit.
             {rec.fill > 0.9 && ' The field is smaller than every stock board; use a printed pattern sized to the field or move the camera back.'}
             {!rec.decodable && ' Markers will be too small to decode reliably at this distance; move closer or use a longer lens.'}
           </p>
@@ -207,11 +207,12 @@ export default function FovCalculator({ heading = 'FOV calculator' }: { heading?
   );
 }
 
-function ResultCard({ label, value }: { label: string; value: string }) {
+/** `pixel`: the value is a count of camera pixels, set in Geist Pixel (DESIGN.md: pixels and millimeters use different faces). */
+function ResultCard({ label, value, pixel }: { label: string; value: string; pixel?: boolean }) {
   return (
     <div className="flex flex-col gap-1 rounded-lg bg-ground-panel p-4">
       <span className="text-xs font-medium text-ink-muted">{label}</span>
-      <span className="font-mono text-lg font-bold">{value}</span>
+      <span className={pixel ? 'font-pixel text-xl' : 'font-mono text-lg font-bold'} data-unit={pixel ? 'px' : undefined}>{value}</span>
     </div>
   );
 }
