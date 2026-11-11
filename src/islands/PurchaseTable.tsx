@@ -34,7 +34,8 @@ function variantColumns(variant: Variant, product: Product, fallbackDocsUrl?: st
   const isAprilGrid = product.handle.includes('aprilgrid');
   if (size) {
     const agSize = isAprilGrid ? findAprilGridSize(size) : null;
-    const chSize = !isAprilGrid ? findCharucoSize(size) : null;
+    // Only marker boards have IDs; a checkerboard of the same size has none
+    const chSize = product.handle.includes('charuco') ? findCharucoSize(size) : null;
     if (agSize) {
       const spec: PatternSpec = {
         type: 'AprilGrid (Kalibr)', rows: agSize.rows, cols: agSize.cols,
@@ -104,8 +105,12 @@ export default function PurchaseTable({ product, datasheetUrl: fallbackUrl }: Pr
 
   if (variants.length === 0) {
     return (
-      <div className="rounded border border-line bg-ground-panel p-5 text-center text-sm text-ink-muted">
-        Variants and pricing are loaded from Shopify at build time. Run with credentials to see the purchase table.
+      <div className="card flex flex-wrap items-center justify-between gap-3 p-4 text-[15px]" data-testid="purchase-table-empty">
+        <span className="text-ink-muted">This target cannot be ordered online yet. Ask for a quote and we reply within one business day.</span>
+        <span className="flex flex-wrap gap-3">
+          <a href={product.url} className="btn-md btn-secondary">Product page</a>
+          <a href={`/quote/?product=${encodeURIComponent(product.title)}`} className="btn-md btn-primary">Request a quote</a>
+        </span>
       </div>
     );
   }
