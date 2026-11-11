@@ -124,11 +124,17 @@ export function patternId(spec: PatternSpec): string {
   return `P-${out}`;
 }
 
+/** The full pattern a generator link (path or full calib.tools URL) describes; null if it is not one or carries no parameters. */
+export function specFromLink(link: string): PatternSpec | null {
+  const m = /^(?:https:\/\/calib\.tools)?\/tools\/generator(?:\/[a-z-]+)?\/?\?(.+)$/.exec(link.trim());
+  if (!m) return null;
+  const fromUrl = specFromParams(new URLSearchParams(m[1]));
+  if (Object.keys(fromUrl).length === 0) return null;
+  return { ...GENERATOR_DEFAULT, ...fromUrl };
+}
+
 /** Pattern ID for a generator link (path or full calib.tools URL); '' if it is not one or carries no parameters. */
 export function patternIdFromPath(link: string): string {
-  const m = /^(?:https:\/\/calib\.tools)?\/tools\/generator(?:\/[a-z-]+)?\/?\?(.+)$/.exec(link.trim());
-  if (!m) return '';
-  const fromUrl = specFromParams(new URLSearchParams(m[1]));
-  if (Object.keys(fromUrl).length === 0) return '';
-  return patternId({ ...GENERATOR_DEFAULT, ...fromUrl });
+  const spec = specFromLink(link);
+  return spec ? patternId(spec) : '';
 }

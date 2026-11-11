@@ -134,6 +134,71 @@ describe('POST /api/quote', () => {
     for (const m of sent) expect(m.text).toContain(`Pattern ID: ${patternId(spec)}`);
   });
 
+  describe('files for the factory', () => {
+    const spec = { ...GENERATOR_DEFAULT, type: 'ChArUco' as const, rows: 5, cols: 7, square: 25, marker: 18, dict: 'DICT_5X5_100' };
+    const person = { name: 'Ada Example', company: 'Example Robotics', email: 'ada@example-robotics.com' };
+    const decode = (b: string) => Buffer.from(b, 'base64').toString('utf-8');
+
+    it('attaches the board definition and marker list to the internal email only, without customer details', async () => {
+      const { res } = call({ ...person, pattern: patternPath(spec) }, { RESEND_API_KEY: 'k' });
+      const { id } = await (await res).json();
+      const [internal, customer] = sent as any[];
+      const stem = `${id}_${patternId(spec)}`;
+      expect(internal.attachments.map((a: any) => a.filename)).toEqual([`${stem}_opencv.json`, `${stem}_marker-ids.csv`]);
+      expect(internal.text).toContain(`${stem}_opencv.json`);
+      expect(customer.attachments).toBeUndefined();
+      for (const a of internal.attachments) {
+        const text = decode(a.content);
+        for (const secret of [person.name, person.company, person.email, 'example-robotics', 'FR']) expect(text, a.filename).not.toContain(secret);
+      }
+      expect(JSON.parse(decode(internal.attachments[0].content))).toMatchObject({ rows: 5, cols: 7, dictionary: 'DICT_5X5_100' });
+    });
+
+    it('sends no attachments when the request has no pattern', async () => {
+      const { res } = call({ ...person }, { RESEND_API_KEY: 'k' });
+      await res;
+      expect((sent[0] as any).attachments).toBeUndefined();
+      expect(sent[0].text).not.toContain('Attached');
+    });
+
+    it('follows up with a 1:1 PDF after the response when the site assets are reachable', async () => {
+      const { readFileSync } = await import('node:fs');
+      const { resolve } = await import('node:path');
+      const fetched: string[] = [];
+      const ASSETS = { fetch: async (url: string) => { fetched.push(String(url)); return new Response(readFileSync(resolve(__dirname, '../../public', new URL(String(url)).pathname.slice(1)))); } };
+      const fd = new FormData();
+      for (const [k, v] of Object.entries({ ...full, ...person, pattern: patternPath(spec) })) fd.set(k, v);
+      const store = new Map<string, string>();
+      const env = { RESEND_API_KEY: 'k', ASSETS, QUOTES: { get: async (k: string) => store.get(k) ?? null, put: async (k: string, v: string) => { store.set(k, v); } } };
+      const later: Promise<unknown>[] = [];
+      const request = new Request('https://calib.tools/api/quote', { method: 'POST', body: fd, headers: { Accept: 'application/json' } });
+      const res: Response = await (onRequestPost as any)({ request, env, waitUntil: (p: Promise<unknown>) => later.push(p) });
+      const { id } = await res.json();
+      expect(sent).toHaveLength(2);
+      await Promise.all(later);
+      expect(fetched).toHaveLength(3);
+      expect(sent).toHaveLength(3);
+      const pdfMail = sent[2] as any;
+      expect(pdfMail.to).toEqual(['hello@calib.tools']);
+      expect(pdfMail.subject).toContain(id);
+      expect(pdfMail.attachments[0].filename).toBe(`${id}_${patternId(spec)}_1to1.pdf`);
+      expect(Buffer.from(pdfMail.attachments[0].content, 'base64').subarray(0, 5).toString()).toBe('%PDF-');
+      for (const secret of [person.name, person.company, person.email]) expect(pdfMail.text).not.toContain(secret);
+    });
+
+    it('a failing PDF step does not affect the response or the first two emails', async () => {
+      const fd = new FormData();
+      for (const [k, v] of Object.entries({ ...full, ...person, pattern: patternPath(spec) })) fd.set(k, v);
+      const env = { RESEND_API_KEY: 'k', ASSETS: { fetch: async () => new Response('', { status: 404 }) } };
+      const later: Promise<unknown>[] = [];
+      const request = new Request('https://calib.tools/api/quote', { method: 'POST', body: fd, headers: { Accept: 'application/json' } });
+      const res: Response = await (onRequestPost as any)({ request, env, waitUntil: (p: Promise<unknown>) => later.push(p) });
+      expect(res.status).toBe(200);
+      await Promise.all(later);
+      expect(sent).toHaveLength(2);
+    });
+  });
+
   it('has no pattern ID when the request carries no pattern', async () => {
     const { store, res } = call({ ...ok, product: 'Custom glass target' }, { RESEND_API_KEY: 'k', QUOTE_HMAC_SECRET: 's' });
     const data = await (await res).json();
