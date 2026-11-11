@@ -183,7 +183,7 @@ const breadcrumbLd = {
                   title={p.title}
                 >
                   {preview.type === 'drawing' ? (
-                    <div class="flex h-full w-full items-center justify-center p-1.5 [&>svg]:max-h-full [&>svg]:w-auto [&>svg]:max-w-full" set:html={preview.svg} />
+                    <div class="fit-svg flex h-full w-full items-center justify-center p-1.5" set:html={preview.svg} />
                   ) : preview.type === 'local' ? (
                     <Picture src={preview.meta} widths={[200]} formats={['avif', 'webp', 'jpeg']} alt={preview.title} class="h-full w-full object-contain" loading="lazy" />
                   ) : preview.type === 'image' ? (

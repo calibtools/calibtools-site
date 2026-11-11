@@ -40,7 +40,7 @@ const displaySummary = summary || sub || '';
   {(drawing || localImage || image) && (
   <div class="aspect-[4/3] border-b border-line bg-sheet flex items-center justify-center overflow-hidden font-mono text-xs text-ink-soft">
     {drawing ? (
-      <div class="flex h-full w-full items-center justify-center p-4 [&>svg]:max-h-full [&>svg]:w-auto [&>svg]:max-w-full" set:html={drawing} />
+      <div class="fit-svg flex h-full w-full items-center justify-center p-4" set:html={drawing} />
     ) : localImage ? (
       <Picture
         src={localImage}
