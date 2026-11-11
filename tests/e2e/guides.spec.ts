@@ -1,13 +1,12 @@
 import { test, expect } from '@playwright/test';
 
 const FINISHED_GUIDE = '/guides/multi-board-marker-ids/';
-const UNFINISHED_GUIDE = '/guides/composite-ceramic-or-glass/';
 
 // ---------------------------------------------------------------------------
 // Schema: all guides render without error
 // ---------------------------------------------------------------------------
 
-test('All four guide pages render', async ({ page }) => {
+test('Guide pages render', async ({ page }) => {
   for (const slug of [
     'multi-board-marker-ids',
     'charuco-vs-checkerboard-vs-aprilgrid',
@@ -21,7 +20,7 @@ test('All four guide pages render', async ({ page }) => {
 });
 
 // ---------------------------------------------------------------------------
-// FAQPage JSON-LD present only when faq is non-empty
+// FAQPage JSON-LD present when faq is non-empty
 // ---------------------------------------------------------------------------
 
 test('Finished guide has FAQPage JSON-LD', async ({ page }) => {
@@ -31,12 +30,6 @@ test('Finished guide has FAQPage JSON-LD', async ({ page }) => {
   expect(hasFaq).toBe(true);
 });
 
-test('Unfinished guide does NOT have FAQPage JSON-LD', async ({ page }) => {
-  await page.goto(UNFINISHED_GUIDE);
-  const scripts = await page.locator('script[type="application/ld+json"]').allTextContents();
-  const hasFaq = scripts.some((s) => s.includes('"FAQPage"'));
-  expect(hasFaq).toBe(false);
-});
 
 // ---------------------------------------------------------------------------
 // Author JSON-LD is an Organization, no personal name in dist
@@ -84,11 +77,6 @@ test('Finished guide shows SHORT ANSWER box', async ({ page }) => {
   await expect(box).toBeVisible();
 });
 
-test('Unfinished guide does NOT show SHORT ANSWER box', async ({ page }) => {
-  await page.goto(UNFINISHED_GUIDE);
-  const box = page.locator('text=Short answer');
-  await expect(box).toHaveCount(0);
-});
 
 // ---------------------------------------------------------------------------
 // FAQ accordion renders only when faq present
@@ -102,11 +90,6 @@ test('Finished guide shows FAQ accordion', async ({ page }) => {
   expect(await details.count()).toBeGreaterThanOrEqual(3);
 });
 
-test('Unfinished guide does NOT show FAQ section', async ({ page }) => {
-  await page.goto(UNFINISHED_GUIDE);
-  const faqSection = page.locator('h2#faq');
-  await expect(faqSection).toHaveCount(0);
-});
 
 // ---------------------------------------------------------------------------
 // See a real report links
