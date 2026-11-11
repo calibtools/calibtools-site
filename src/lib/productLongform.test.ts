@@ -159,3 +159,29 @@ describe('long-form batch 2 (C6)', () => {
     }
   });
 });
+
+describe('HALCON long-form (C6)', () => {
+  const raw = readFileSync(resolve(CONTENT, 'products/halcon-composite.md'), 'utf-8');
+  const { body } = splitFrontmatter(raw);
+
+  it('describes the gen_caltab layout and links every size to its row', () => {
+    expect(bodyWordCount(raw)).toBeGreaterThanOrEqual(450);
+    for (const word of ['gen_caltab', 'frame', 'triangle', 'find_calib_object']) expect(body).toContain(word);
+    for (const size of ['200X150', '300X200', '400X300', '600X400', '800X600']) expect(body).toContain(`(#CT-HAL-P-${size}-STD)`);
+    expect(body).not.toMatch(/central (reference )?(mark|circle)/i);
+  });
+
+  it('every example layout fits its board with at least 15 mm to spare on each side', async () => {
+    const { caltabGeometry, caltabSize } = await import('./halconCaltab');
+    const examples = [...body.matchAll(/\((?:#CT-HAL-P-)(\d+)X(\d+)-STD\)\*\*: for example (\d+) × (\d+) marks, ([\d.]+) mm apart, ([\d.]+) mm in diameter/g)];
+    expect(examples).toHaveLength(5);
+    for (const [, w, h, x, y, dist, dia] of examples) {
+      const g = caltabGeometry({ xNum: +x, yNum: +y, markDist: +dist, diameterRatio: 0.5 });
+      const size = caltabSize(g);
+      expect(size.w, `${w}x${h}`).toBeLessThanOrEqual(+w - 30);
+      expect(size.h, `${w}x${h}`).toBeLessThanOrEqual(+h - 30);
+      expect(g.marks[0].r * 2).toBe(+dia);
+    }
+  });
+});
+
