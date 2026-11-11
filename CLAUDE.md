@@ -11,8 +11,9 @@ catalog pages from the Storefront API and links into the cart.
 - Printed output is 1:1 in millimeters. SVG/PDF use mm units with a 100 mm scale bar.
   Any change to `src/lib/patterns.ts` or PDF export needs a test and `/verify-pdf`.
 - Tools run entirely in the browser. No upload of images or calibration files, ever.
-- Design direction A (see docs/design.md): red #E60012 / dark red #B3000E on white,
-  Geist Sans + Geist Mono + Geist Pixel (accent). Use Tailwind tokens from tailwind.config.mjs, not raw hex.
+- Design: read DESIGN.md (drawing-sheet system, VI v3) before changing any page, component or style.
+  Paper ground, ink lines, red #E60012 for fills and red-text #B3000E for text, Geist Sans + Geist Mono, Geist Pixel
+  for pixel values only. No dark pages, gradients, shadows or radii above 2 px. Use Tailwind tokens, not raw hex.
 
 ## Workflow
 - New feature: plan first (list files + tests), then implement tests before code.

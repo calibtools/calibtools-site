@@ -1,3 +1,5 @@
+> Superseded on 2026-11-11 by /DESIGN.md (drawing-sheet system, VI v3). Kept for history; do not follow.
+
 # Design direction A
 
 Source: Claude Design canvas "calib.tools Landing Page" (artboards: Home desktop, Home mobile,

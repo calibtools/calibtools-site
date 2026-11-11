@@ -27,6 +27,8 @@ const SVG_ALLOW = [
   'src/lib/exportPng.test.ts',
   'src/lib/renderCheckerboard.ts',
   'src/lib/renderCharuco.ts',
+  'src/lib/boardDrawing.ts',
+  'src/lib/boardDrawing.test.ts',
   'src/lib/renderAprilGrid.ts',
   'src/lib/renderCircles.ts',
   'src/lib/renderMarkerSheet.ts',

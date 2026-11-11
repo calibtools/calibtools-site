@@ -21,19 +21,20 @@
 
 /* --- Theme color tokens (RGB triplets for Tailwind alpha support) --- */
 :root {
-  --color-ground: 255 255 255;
-  --color-ground-alt: 242 242 242;
-  --color-ground-panel: 245 245 245;
-  --color-line: 230 230 230;
-  --color-line-strong: 236 236 236;
-  --color-line-soft: 179 179 179;
-  --color-ink: 26 26 26;
-  --color-ink-muted: 51 51 51;
-  --color-ink-soft: 102 102 102;
-  --color-brand: 230 0 18;
-  --color-brand-text: 230 0 18;
+  /* DESIGN.md §2 (VI v3). Contrast on paper: ink 16.6, ink-muted 8.0, ink-soft 4.9, red-text 6.5. */
+  --color-ground: 244 243 239;        /* paper #F4F3EF */
+  --color-ground-alt: 234 232 226;    /* paper-alt #EAE8E2 */
+  --color-ground-panel: 234 232 226;  /* paper-alt */
+  --color-line: 214 211 203;          /* hairline #D6D3CB */
+  --color-line-strong: 168 165 156;   /* line-strong #A8A59C */
+  --color-line-soft: 168 165 156;
+  --color-ink: 20 20 20;              /* #141414 */
+  --color-ink-muted: 74 74 71;        /* #4A4A47 */
+  --color-ink-soft: 107 106 102;      /* #6B6A66, on paper and sheet only */
+  --color-brand: 230 0 18;            /* red #E60012: fills, graphics, text >= 24 px */
+  --color-brand-text: 179 0 14;       /* red-text #B3000E: every normal-size red text */
   --color-brand-dark: 179 0 14;
-  --color-brand-on-dark: 255 77 77;
+  --color-brand-on-dark: 179 0 14;    /* no dark pages; kept so old markup stays legible */
   --color-brand-tint: #FBE9EA;
 }
 
@@ -117,52 +118,72 @@
      which breaks IntersectionObserver-based visibility toggling.
      Anchor smooth-scroll handled via JS where needed. */
   a { @apply text-brand-dark hover:text-brand; }
+  strong, b { font-weight: 600; }
+  h1, h2, h3, h4 { letter-spacing: -0.01em; }
 }
 
 @layer components {
   .container-x { @apply mx-auto w-full max-w-[1280px] px-5 md:px-16; }
   /* ── Button system: 3 sizes × 3 variants on a 4 px grid ─────────── */
   .btn {
-    @apply inline-flex items-center justify-center rounded font-semibold no-underline transition-colors;
-    letter-spacing: 0.02em;
+    @apply inline-flex items-center justify-center rounded font-mono font-medium uppercase no-underline transition-colors;
+    letter-spacing: 0.04em;
   }
 
   /* Size — single height on the 4 px grid */
-  .btn-md { @apply btn h-10 text-[14px] px-5; }
+  .btn-md { @apply btn h-10 text-[13px] px-4; }
 
   /* Variants — color only, no sizing */
   .btn-primary { @apply bg-brand text-white hover:bg-brand-dark hover:text-white; }
-  .btn-secondary { @apply border border-ink bg-ground text-ink hover:text-ink hover:bg-ground-panel; }
+  .btn-secondary { @apply border border-ink bg-transparent text-ink hover:text-ink hover:bg-ground-alt; }
   .btn-ghost { @apply bg-transparent text-ink hover:text-brand hover:underline underline-offset-4; }
-  .card { @apply rounded-lg border border-line bg-ground; }
-  .input { @apply w-full rounded border border-line bg-ground px-3 py-[11px] text-[15px] focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand; }
+  .card { @apply border border-line bg-sheet; }
+  /* Bracket corners (brand asset A3): four L-shaped ink corners on a card, photo or detection frame. */
+  .bracket { position: relative; --bracket: 14px; }
+  .bracket::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border: 1.5px solid rgb(var(--color-ink));
+    pointer-events: none;
+    /* Four corner squares joined by zero-area paths: only the corners of the border show. */
+    clip-path: polygon(
+      0 0, var(--bracket) 0, var(--bracket) var(--bracket), 0 var(--bracket), 0 0,
+      100% 0, 100% var(--bracket), calc(100% - var(--bracket)) var(--bracket), calc(100% - var(--bracket)) 0, 100% 0,
+      100% 100%, calc(100% - var(--bracket)) 100%, calc(100% - var(--bracket)) calc(100% - var(--bracket)), 100% calc(100% - var(--bracket)), 100% 100%,
+      0 100%, 0 calc(100% - var(--bracket)), var(--bracket) calc(100% - var(--bracket)), var(--bracket) 100%, 0 100%,
+      100% 100%, 100% 0, 0 0
+    );
+  }
+  .input { @apply w-full rounded border border-line-strong bg-sheet px-3 py-[11px] text-[15px] focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand; }
   .label { @apply text-[13px] font-semibold; }
 
   /* Geist Pixel accent utilities */
   .font-pixel { font-family: 'Geist Pixel', 'Geist Mono', monospace; font-variation-settings: 'ELSH' 1; -webkit-font-smoothing: auto; }
-  .eyebrow   { @apply font-pixel text-[13px] uppercase tracking-[0.04em] text-brand-text; }
-  .badge     { @apply font-pixel text-[12px] uppercase tracking-[0.04em] rounded px-2.5 py-1.5; }
+  /* Geist Pixel is for pixel values, IDs and detection results only (DESIGN.md), not for labels. */
+  .eyebrow   { @apply font-mono text-[12px] font-medium uppercase tracking-[0.04em] text-ink-soft; }
+  .badge     { @apply inline-flex items-center border border-current font-mono text-[11px] font-medium uppercase tracking-[0.04em] px-2 py-1; }
   .spec      { @apply font-mono text-[15px] tabular-nums; }
-  .stat      { @apply font-pixel text-[48px] leading-none; }
-  .h-display { @apply font-extrabold tracking-[-0.03em]; }
+  .stat      { @apply font-mono text-[40px] leading-none; }
+  .h-display { @apply font-semibold tracking-[-0.01em]; }
 
-  /* Hero image edge fade — blends crop edges into #0A0A0A */
-  .hero-fade {
-    -webkit-mask-image: linear-gradient(to right, transparent, black 60px),
-                        linear-gradient(to top, transparent, black 60px);
-    -webkit-mask-composite: destination-in;
-    mask-image: linear-gradient(to right, transparent, black 60px),
-                linear-gradient(to top, transparent, black 60px);
-    mask-composite: intersect;
-  }
+  /* Section marker: number + label, 40 × 3 red rule, heading (DESIGN.md §2) */
+  .section-no   { @apply font-mono text-[12px] font-medium uppercase tracking-[0.04em] text-ink-soft; }
+  .section-rule { @apply block h-[3px] w-10 bg-brand; }
+
+  /* Spec strip cell: label (Mono 12) + value (Mono 16–18) + condition (Sans 13) */
+  .spec-label { @apply font-mono text-[12px] font-medium uppercase tracking-[0.04em] text-ink-soft; }
+  .spec-value { @apply font-mono text-[18px] text-ink tabular-nums; }
+  .spec-cond  { @apply text-[13px] text-ink-muted; }
 }
 
 @layer components {
-  .prose-calib h2 { @apply mt-3 text-[26px] font-extrabold tracking-[-0.03em]; }
+  .prose-calib h2 { @apply mt-3 text-[26px] font-semibold tracking-[-0.01em]; }
   .prose-calib p { @apply m-0 text-[17px] leading-[1.65]; }
   .prose-calib table { @apply w-full border-collapse text-[15px]; }
   .prose-calib thead tr { @apply bg-brand-tint; }
-  .prose-calib th { @apply p-3 text-left font-bold text-brand-dark; }
+  .prose-calib th { @apply p-3 text-left font-mono text-[13px] font-medium text-brand-dark; }
+  .prose-calib a { @apply underline decoration-1 underline-offset-[3px]; }
   .prose-calib td { @apply border-b border-line p-3; }
   .prose-calib { min-width: 0; }
   .prose-calib pre { @apply max-w-full overflow-x-auto; }

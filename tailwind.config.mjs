@@ -26,6 +26,10 @@ export default {
           alt: 'rgb(var(--color-ground-alt) / <alpha-value>)',
           panel: 'rgb(var(--color-ground-panel) / <alpha-value>)',
         },
+        /* DESIGN.md: sheet = white card on paper; axis-y = Y arrow (graphics on white only); ok = green text */
+        sheet: '#FFFFFF',
+        'axis-y': '#00A651',
+        ok: '#007A3D',
         collection: {
           brand: '#E60012',
           'slate-blue': '#475C8A',
@@ -38,7 +42,10 @@ export default {
         mono: ['Geist Mono', 'ui-monospace', 'SFMono-Regular', 'monospace'],
         pixel: ['Geist Pixel', 'Geist Mono', 'monospace'],
       },
-      borderRadius: { DEFAULT: '6px', lg: '10px', xl: '12px' },
+      /* DESIGN.md: 2 px for buttons and inputs, 0 for everything else. rounded-full stays for real circles. */
+      borderRadius: { DEFAULT: '2px', sm: '0', md: '2px', lg: '0', xl: '0', '2xl': '0', '3xl': '0' },
+      /* DESIGN.md: never 700–800. Old font-bold / font-extrabold markup renders at 600. */
+      fontWeight: { bold: '600', extrabold: '600', black: '600' },
     },
   },
   plugins: [],
