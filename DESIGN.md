@@ -55,13 +55,13 @@ Rules: red covers ≤ 3 % of a viewport. No gradients. No shadows. No backdrop b
 
 Scale (px): 12, 13, 14, 16, 18, 22, 28, 40, 56. Body 16. Tables 14. Labels 12 Mono uppercase, tracking +4 %.
 Never use weight 700–800 (Tailwind's `font-bold` and `font-extrabold` are mapped to 600 so old markup cannot bring them back). Table head differs from body in weight and background. `ink-soft` is for meta only (≤ 20 % of characters, never table values).
-Each major section starts with: section number (Mono 12) + 40 × 3 red rule + heading.
+Each major section starts with: a plain-word label (Mono 12) + 40 × 3 red rule + heading.
 
 ### Shape and space
 
 - Radius: 0 for cards, images, tables; 2 px for buttons and inputs (`rounded` = 2 px; `rounded-lg` and `rounded-xl` = 0). `rounded-full` only for real circles (dots, spinners).
 - Grid: 12 columns, max content 1200 px, gutter 24 px. Sections separated by a 1 px `hairline` rule.
-- Section number at the top left of each major section: `01 / TOOLS` (Mono 12, `ink-soft`).
+- No section numbers or internal codes on pages (`00 /`, `01 / TOOLS`, `T1`): owner decision 2026-11-11, visitors do not know what they mean.
 - Dense where data is (spec tables), loose where reading is (guides). Left-aligned by default.
 
 ## 3. Components
@@ -77,7 +77,7 @@ Each major section starts with: section number (Mono 12) + 40 × 3 red rule + he
 | Spec strip | 3–4 cells: label (Mono 12 `ink-soft` uppercase), value (Mono 16 `ink`), condition (Sans 13 `ink-muted`) |
 | Spec table | header `red-tint` bg + `red-text` text (never white on red), row height 40, stripes `paper-alt`, numeric columns Mono right-aligned |
 | Dimension line | 1 px ink line, 45° ticks at both ends, value in Mono 12 with a `paper`/`sheet` knockout |
-| Title-block footer | 5 cells: issuer · sheet (page code) · rev · date built · units; Mono 12; 1.5 px ink outer frame. No scale cell on the web: a screen is not 1:1 |
+| Title block | PDFs, drawings and packaging labels only (issuer · document number · rev · date · scale). Not on web pages: page codes and build revisions mean nothing to a visitor (§7a) |
 | Origin + axes | red dot at the origin, red X arrow right, green Y arrow down, as printed on the boards. At most once per page |
 
 Icons: only where they speed up recognition (download, file type, tolerance class). Tolerance icons use GD&T symbols (⏥ flatness, ⌖ position, ⊥ perpendicularity). No decorative icon next to every heading.
@@ -108,6 +108,13 @@ No parallax, fade-in headings, hover zoom on cards, floating blobs.
 
 Home is utility-first: one-line statement, part-number input, pattern shortcuts and category tiles above the fold. No marketing hero image. The generated line drawing appears in section 03 and as the product-page main image until real photos exist.
 A Figma reference exists for the home and product pages (pages 01 Home, 02 Product page, 90 Components, 91 Foundations); ask the owner for access.
+
+## 7a. Nothing a visitor has to decode
+
+Owner rule (2026-11-11): if a first-time visitor could ask "what is this for?", it does not go on the page.
+That covers section numbers, internal codes, abbreviations we invented, and decoration borrowed from drawings that
+carries no information for the reader. A label says in plain words what the section is. Part numbers, units and
+standard names (OpenCV, DICT_5X5_100) are fine: the reader uses them.
 
 ## 8. Pre-merge checklist (AI-feel)
 

@@ -1,13 +1,6 @@
 ---
-import { FOOTER_LINE, APP_VERSION } from '@/lib/claims';
+import { FOOTER_LINE } from '@/lib/claims';
 import { footerGroups } from '@/lib/nav';
-import { sheetCode } from '@/lib/sheetCode';
-
-/* Title block (brand asset A5): the same cells as on our PDFs. Every value is real:
-   sheet = this page's code, rev = the commit the site was built from, date = build date. */
-const sheet = sheetCode(Astro.url.pathname);
-const rev = (process.env.CF_PAGES_COMMIT_SHA ?? '').slice(0, 7) || APP_VERSION;
-const built = new Date().toISOString().slice(0, 10);
 ---
 <footer class="border-t border-line">
   <div class="container-x grid grid-cols-2 gap-[var(--nav-space-8)] py-[var(--nav-space-10)] md:grid-cols-4 md:py-[var(--nav-space-12)]">
@@ -27,12 +20,5 @@ const built = new Date().toISOString().slice(0, 10);
       <img src="/brand/wordmark-framed-light.svg" alt="Calib.Tools" width="126" height="28" class="h-7" />
       <span class="text-[length:var(--nav-text-sm)] text-ink-soft">{FOOTER_LINE}</span>
     </div>
-    <dl class="m-0 grid grid-cols-2 border-[1.5px] border-ink font-mono text-[12px] sm:grid-cols-5" data-title-block>
-      <div class="flex flex-col gap-1 border-b border-r border-ink px-3 py-2 sm:border-b-0"><dt class="uppercase tracking-[0.04em] text-ink-soft">Issuer</dt><dd class="m-0 text-[13px]">Calib.Tools</dd></div>
-      <div class="flex flex-col gap-1 border-b border-ink px-3 py-2 sm:border-b-0 sm:border-r"><dt class="uppercase tracking-[0.04em] text-ink-soft">Sheet</dt><dd class="m-0 truncate text-[13px]">{sheet}</dd></div>
-      <div class="flex flex-col gap-1 border-b border-r border-ink px-3 py-2 sm:border-b-0"><dt class="uppercase tracking-[0.04em] text-ink-soft">Rev</dt><dd class="m-0 text-[13px]">{rev}</dd></div>
-      <div class="flex flex-col gap-1 border-b border-ink px-3 py-2 sm:border-b-0 sm:border-r"><dt class="uppercase tracking-[0.04em] text-ink-soft">Built</dt><dd class="m-0 text-[13px]">{built}</dd></div>
-      <div class="col-span-2 flex flex-col gap-1 px-3 py-2 sm:col-span-1"><dt class="uppercase tracking-[0.04em] text-ink-soft">Units</dt><dd class="m-0 text-[13px]">mm &middot; <span class="font-pixel">px</span></dd></div>
-    </dl>
   </div>
 </footer>
