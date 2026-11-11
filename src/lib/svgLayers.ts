@@ -13,6 +13,7 @@ import {
 } from './exportBrand';
 import { GEIST_MONO_WOFF2_B64 } from './geistMonoBase64';
 import type { BrandGeometry, AxesGeometry } from './pageLayout';
+import { isKalibrFrame, scaleBarTop, axesOffset } from './renderAprilGrid';
 
 export interface SvgContext {
   spec: PatternSpec;
@@ -45,7 +46,7 @@ export function scaleBarSvg(ctx: SvgContext): string {
   const { spec: s, ox, oy, bw, bh } = ctx;
   if (!s.scaleBar) return '';
   const parts: string[] = [];
-  const y = oy + bh + 8;
+  const y = scaleBarTop(s, oy, bh);
   parts.push(`<rect x="${ox}" y="${y}" width="100" height="0.6" fill="#000"/>`);
   parts.push(`<text x="${ox}" y="${y + 4}" font-family="monospace" font-size="2.6" fill="#333">100 mm scale check</text>`);
   return parts.join('');
@@ -66,15 +67,16 @@ export function axesSvg(ctx: SvgContext): string {
 
   // Use layout-computed geometry if available, else legacy inline computation
   const ax = ctx.axes;
-  const isKalibr = ax ? ax.isKalibr : (s.type === 'AprilGrid (Kalibr)' && (s.symmetricCorners ?? false));
+  const isKalibr = ax ? ax.isKalibr : isKalibrFrame(s);
   const shorter = Math.min(bw, bh);
   const arrowLen = ax ? ax.arrowLen : Math.max(15, Math.min(40, shorter * 0.15));
   const shaft = ax ? ax.shaft : 0.4;
   const headLen = ax ? ax.headLen : Math.min(3, arrowLen * 0.2);
   const headW = ax ? ax.headW : headLen * 0.6;
 
-  const originX = ax ? ax.originX : ox - 0.5 * s.square;
-  const originY = ax ? ax.originY : (isKalibr ? oy + bh + 0.5 * s.square : oy - 0.5 * s.square);
+  const off = axesOffset(s);
+  const originX = ax ? ax.originX : ox - off.x;
+  const originY = ax ? ax.originY : (isKalibr ? oy + bh + off.y : oy - off.y);
 
   const xColor = mono ? '#000' : '#E60012';
   const yColor = mono ? '#000' : '#1BA55A';

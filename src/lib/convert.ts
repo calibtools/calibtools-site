@@ -50,6 +50,8 @@ export function serialize(config: CalibConfig, format: Format): string {
     ...config,
     paper: 'A4',
     scaleBar: true,
+    // For an AprilGrid the config carries the gap in mm as `marker`; Kalibr wants it as a ratio of the tag side.
+    ...(config.type === 'AprilGrid (Kalibr)' && config.marker > 0 && config.square > 0 ? { tagSpacing: config.marker / config.square } : {}),
   };
   switch (format) {
     case 'opencv-json':

@@ -43,7 +43,9 @@ describe('kalibrYaml', () => {
     const y = kalibrYaml(aprilgrid);
     expect(y).toContain("target_type: 'aprilgrid'");
     expect(y).toContain('tagRows: 7');
-    expect(y).toContain(`tagSpacing: ${(18 / 25).toFixed(6)}`);
+    // The gap the file states is the gap the renderer draws: 0.3 of the tag side unless tagSpacing is set.
+    expect(y).toContain('tagSpacing: 0.300000');
+    expect(kalibrYaml({ ...aprilgrid, tagSpacing: 0.25 })).toContain('tagSpacing: 0.250000');
   });
 
   it('contains generator attribution', () => {

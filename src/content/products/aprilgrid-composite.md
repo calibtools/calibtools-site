@@ -77,7 +77,7 @@ tagSize: 0.035
 tagSpacing: 0.3
 ```
 
-Every board comes with this file filled in for its own grid. All sizes use a spacing ratio of 0.3, and IDs start at 0 and run row by row.
+Every board comes with this file filled in for its own grid. All sizes use a spacing ratio of 0.3, and IDs start at 0 at the bottom-left tag and run left to right, then upward, the way Kalibr numbers them.
 
 `tagSize` is the number that matters most. An error of 1 % in it is an error of 1 % in every distance Kalibr estimates. That is the reason to use a board made to a stated tag size instead of a print you measure with a ruler.
 

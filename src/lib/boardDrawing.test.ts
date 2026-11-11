@@ -205,17 +205,21 @@ describe('AprilGrid and circle-grid drawings', () => {
     }
   });
 
-  it('the origin dot sits on the first circle center for circle grids and on the first tag corner for AprilGrid', () => {
+  it('the origin dot sits on the first circle center for circle grids and on the bottom-left corner of tag 0 for AprilGrid', () => {
     const cir = drawingForPartNumber('CT-CIR-P-400X300-SYM')!;
     const first = /<g class="pattern"><circle cx="([0-9.]+)" cy="([0-9.]+)"/.exec(cir)!;
     const o = /<circle class="origin" cx="([0-9.]+)" cy="([0-9.]+)"/.exec(cir)!;
     expect(Number(o[1])).toBeCloseTo(Number(first[1]), 2);
     expect(Number(o[2])).toBeCloseTo(Number(first[2]), 2);
+    // AprilGrid uses Kalibr's frame: the origin is the bottom-left corner of the first tag (ID 0), y points up.
     const apr = drawingForPartNumber('CT-APR-P-400X300-T36')!;
-    const tag = /<g class="pattern"><rect x="([0-9.]+)" y="([0-9.]+)"/.exec(apr)!;
+    const tag = /<g class="pattern"><rect x="([0-9.]+)" y="([0-9.]+)" width="([0-9.]+)" height="([0-9.]+)"/.exec(apr)!;
     const oa = /<circle class="origin" cx="([0-9.]+)" cy="([0-9.]+)"/.exec(apr)!;
     expect(Number(oa[1])).toBeCloseTo(Number(tag[1]), 2);
-    expect(Number(oa[2])).toBeCloseTo(Number(tag[2]), 2);
+    expect(Number(oa[2])).toBeCloseTo(Number(tag[2]) + Number(tag[4]), 2);
+    const yAxis = /<line class="axis-y" x1="[0-9.]+" y1="([0-9.]+)" x2="[0-9.]+" y2="([0-9.]+)"/.exec(apr)!;
+    expect(Number(yAxis[1])).toBeCloseTo(Number(oa[2]), 2);
+    expect(Number(yAxis[2])).toBeLessThan(Number(yAxis[1]));
   });
 });
 

@@ -8,6 +8,7 @@
 
 import type { PatternSpec } from './patterns';
 import { WORDMARK_VB } from './exportBrand';
+import { isKalibrFrame, axesOffset } from './renderAprilGrid';
 
 // ---------------------------------------------------------------------------
 // Standard paper sizes (mm) — always stored as [short, long]
@@ -493,15 +494,16 @@ export function computeLayout(
   };
 
   // Axes — fully inside PAGE_MARGIN and outside PATTERN_QUIET_ZONE
-  const isKalibr = spec.type === 'AprilGrid (Kalibr)' && (spec.symmetricCorners ?? false);
+  const isKalibr = isKalibrFrame(spec);
   const shorter = Math.min(bw, bh);
   const arrowLen = Math.max(15, Math.min(40, shorter * 0.15));
   const headLen = Math.min(3, arrowLen * 0.2);
   const headW = headLen * 0.6;
   const shaft = 0.4;
 
-  const idealAxOx = oxFinal - 0.5 * spec.square;
-  const idealAxOy = isKalibr ? oyFinal + bh + 0.5 * spec.square : oyFinal - 0.5 * spec.square;
+  const axOff = axesOffset(spec);
+  const idealAxOx = oxFinal - axOff.x;
+  const idealAxOy = isKalibr ? oyFinal + bh + axOff.y : oyFinal - axOff.y;
 
   const minEdge = PAGE_MARGIN;
   const axOriginX = Math.max(minEdge, idealAxOx);

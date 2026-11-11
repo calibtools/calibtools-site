@@ -48,6 +48,8 @@ interface PatternSummaryOpts {
   marker?: number;
   dict?: string;
   startId?: number;
+  aprilFamily?: string;
+  tagSpacing?: number;
 }
 
 /**
@@ -64,6 +66,12 @@ interface PatternSummaryOpts {
 export function patternSummary(opts: PatternSummaryOpts): string {
   const { type, rows, cols, square, marker, dict, startId } = opts;
   const grid = `${rows}\u00D7${cols}`;
+  if (type === 'AprilGrid (Kalibr)') {
+    // Tags, not squares and ArUco markers: tag side, gap and AprilTag family; IDs run over every cell.
+    const first = startId ?? 0;
+    const gap = Math.round(square * (opts.tagSpacing ?? 0.3) * 1000) / 1000;
+    return `${type} ${grid} \u00B7 ${square} mm tags, ${gap} mm gap \u00B7 tag${opts.aprilFamily ?? '36h11'} \u00B7 IDs ${first}\u2013${first + rows * cols - 1}`;
+  }
   const hasMarker = marker !== undefined && marker > 0;
   const hasDict = dict !== undefined && dict !== '';
 

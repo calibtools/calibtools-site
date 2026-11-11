@@ -32,9 +32,13 @@ export function expectedCount(spec: PatternSpec): number {
     // ChArUco: inner corners same as checkerboard
     return (spec.rows - 1) * (spec.cols - 1);
   }
-  if (spec.type === 'ArUco grid' || spec.type === 'AprilGrid (Kalibr)') {
+  if (spec.type === 'ArUco grid') {
     // Number of markers (white squares contain markers)
     return Math.floor((spec.rows * spec.cols) / 2);
+  }
+  if (spec.type === 'AprilGrid (Kalibr)') {
+    // One tag per cell
+    return spec.rows * spec.cols;
   }
   if (spec.type === 'Marker sheet') {
     return spec.rows * spec.cols;

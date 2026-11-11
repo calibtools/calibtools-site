@@ -20,6 +20,7 @@ import {
 } from './wordmarkDxf';
 import { patternExtent, type PageLayout } from './pageLayout';
 import { patternShapes } from './patternShapes';
+import { isKalibrFrame, axesOffset } from './renderAprilGrid';
 
 export interface DxfExportOptions {
   spec: PatternSpec;
@@ -272,15 +273,14 @@ function entitiesSection(spec: PatternSpec, pw: number, ph: number, layout?: Pag
   // --- Axes ---
   if (spec.showAxes !== false) {
     const ax = layout?.axes;
-    const isKalibr = ax ? ax.isKalibr : (spec.type === 'AprilGrid (Kalibr)' && (spec.symmetricCorners ?? false));
+    const isKalibr = ax ? ax.isKalibr : isKalibrFrame(spec);
     const shorter = Math.min(bw, bh);
     const arrowLen = ax?.arrowLen ?? Math.max(15, Math.min(40, shorter * 0.15));
     const headLen = ax?.headLen ?? Math.min(3, arrowLen * 0.2);
-    const axGap = 0.5 * spec.square;
 
     // Origin in pattern coords (y-down)
-    const axOriginX = ax?.originX ?? ox - axGap;
-    const axOriginYDown = ax?.originY ?? (isKalibr ? oy + bh + axGap : oy - axGap);
+    const axOriginX = ax?.originX ?? ox - axesOffset(spec).x;
+    const axOriginYDown = ax?.originY ?? (isKalibr ? oy + bh + axesOffset(spec).y : oy - axesOffset(spec).y);
 
     // Convert to DXF y-up
     const axOriginYDxf = dxfY(axOriginYDown, ph);

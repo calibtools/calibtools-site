@@ -73,7 +73,9 @@ describe('patternShapes', () => {
       const spec = specOf(over);
       const { bw, bh } = patternExtent(spec);
       for (const s of patternShapes(spec)) {
-        if (s.kind === 'text' || (s.kind === 'rect' && s.w < spec.square * 0.2)) continue;
+        // AprilGrid corner squares are one gap wide and stand outside the tag block, in the quiet zone.
+        const cornerSquare = s.kind === 'rect' && spec.type === 'AprilGrid (Kalibr)' && Math.abs(s.w - spec.square * (spec.tagSpacing ?? 0.3)) < 1e-9 && Math.abs(s.h - s.w) < 1e-9;
+        if (s.kind === 'text' || cornerSquare || (s.kind === 'rect' && s.w < spec.square * 0.2)) continue;
         const b = shapeBox(s);
         expect(b.x0).toBeGreaterThanOrEqual(-1e-9);
         expect(b.y0).toBeGreaterThanOrEqual(-1e-9);
