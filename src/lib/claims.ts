@@ -72,8 +72,15 @@ export const CERAMIC_CTE_UM_PER_M_K = 7.2;
 export const INSPECTION_CLAIM_SHORT = 'Measured before it ships';
 
 /**
- * Primary tagline (owner decision 2026-11-11) — home H1, home description, organization slogan.
- * Too long for a <title> (60 characters), so the home page title is a plain description.
+ * Home page headline and browser title (owner decision 2026-11-11): says what we sell and for whom.
+ * 48 characters; with the " · Calib.Tools" suffix it would pass the 60-character limit for a
+ * title, so the home page uses it without the suffix (search results show the site name anyway).
+ */
+export const HOME_HEADLINE = 'Calibration targets and tools for Machine Vision';
+
+/**
+ * Primary tagline (owner decision 2026-11-11) — the line under the home headline, the home
+ * description and the organization slogan. Says how we differ; HOME_HEADLINE says what we sell.
  * Replaces "Know your target to the micron", which only the ceramic targets could back up.
  */
 export const TAGLINE = 'Calibration targets whose files, geometry and data agree';

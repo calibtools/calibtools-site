@@ -260,12 +260,12 @@ test('brand-overlay.py config uses 185110 ceramic board, not 200150', () => {
 // Tagline and micron claim guard
 // ---------------------------------------------------------------------------
 
-test('Home H1 displays TAGLINE in correct form', async ({ page }) => {
+test('Home H1 displays the home headline', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/');
   const h1 = page.locator('[data-hero-h1]');
   const text = (await h1.innerText())?.replace(/\s+/g, ' ').trim().toUpperCase();
-  expect(text).toBe('KNOW YOUR TARGET TO THE MICRON');
+  expect(text).toBe('CALIBRATION TARGETS AND TOOLS FOR MACHINE VISION');
 });
 
 test('Composite product page does not contain "micron"', async ({ page }) => {

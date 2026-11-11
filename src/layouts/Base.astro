@@ -26,12 +26,14 @@ interface Props {
   preloadImages?: PreloadImage[];
   /** Add noindex meta tag. */
   noindex?: boolean;
+  /** Use the title as it is, without the " · Calib.Tools" suffix (home page: the headline plus suffix is over 60 characters). */
+  bareTitle?: boolean;
   /** Page color theme. Only the home page uses 'dark'. */
   theme?: 'dark' | 'light';
   /** Open Graph type. Defaults to 'website'. */
   ogType?: 'website' | 'article';
 }
-const { title, description = 'Precision camera calibration targets and free browser tools for machine vision.', section, jsonLd, ogImage, preloadImages, noindex, theme = 'light', ogType = 'website' } = Astro.props;
+const { title, description = 'Precision camera calibration targets and free browser tools for machine vision.', section, jsonLd, ogImage, preloadImages, noindex, bareTitle, theme = 'light', ogType = 'website' } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 // Absolute URL: link previews in chat and social apps do not resolve relative image paths
 const ogImageUrl = new URL(ogImage ?? '/og/default.png', Astro.site).href;
@@ -45,7 +47,7 @@ const jsonLdItems = [...providedLd, ...(autoBc ? [autoBc] : []), ORGANIZATION_LD
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{title} · Calib.Tools</title>
+    <title>{bareTitle ? title : `${title} · Calib.Tools`}</title>
     <meta name="description" content={description} />
     {noindex && <meta name="robots" content="noindex" />}
     <link rel="canonical" href={canonical} />
