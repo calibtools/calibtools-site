@@ -25,7 +25,7 @@ const allGuides = await getCollection('guides');
 const isReady = (g: typeof allGuides[number]) => !g.data.draft && !g.body?.includes('[BODY COPY');
 const guides = allGuides.filter(isReady).slice(0, 3);
 
-/* Three tools on the home page, numbered like the tools index */
+/* Three tools on the home page */
 const featuredTools = tools.slice(0, 3);
 
 /* Part numbers → product pages, for the "Have a part number?" box */
@@ -77,11 +77,11 @@ const featuredReviews = allReviews
 ---
 <Base title={TAGLINE} ogImage="/og/boards.png" description={`${TAGLINE}. Calibration targets measured before they ship, plus free browser tools for your machine-vision work. Made to order.`}>
 
-  {/* ── 00 Find a target ── */}
+  {/* ── Find a target ── */}
   <section id="top" class="container-x flex flex-col gap-8 pb-12 pt-10 md:gap-10 md:pb-14 md:pt-12">
     <div class="flex flex-col gap-8 lg:flex-row lg:items-end lg:gap-6">
       <div class="flex min-w-0 flex-col gap-4 lg:w-[58%]">
-        <span class="section-no">00 / Calibration targets and tools</span>
+        <span class="section-no">Calibration targets and tools</span>
         <h1 class="m-0 text-[32px] font-semibold leading-[1.12] md:text-[40px]" data-hero-h1>Calibration targets whose files, geometry and data agree.</h1>
         <p class="m-0 max-w-[640px] text-[17px] leading-[1.55] text-ink-muted md:text-[18px]">
           Checkerboard, ChArUco, AprilGrid, circle-grid and HALCON boards for OpenCV, Kalibr, ROS and HALCON. Each board is printed from the same geometry as the config files you download.
@@ -137,21 +137,20 @@ const featuredReviews = allReviews
     </dl>
   </section>
 
-  {/* ── 01 Free tools ── */}
+  {/* ── Free tools ── */}
   <section id="tools" class="border-b border-line bg-ground-alt">
     <div class="container-x flex flex-col gap-8 py-[var(--section-y)] lg:flex-row lg:gap-6">
       <div class="flex flex-col gap-4 lg:w-[42%]">
-        <span class="section-no !text-ink-muted">01 / Free tools</span>
+        <span class="section-no !text-ink-muted">Free tools</span>
         <span class="section-rule"></span>
         <h2 class="m-0 text-[24px] font-semibold md:text-[28px]">Size the board before you buy it</h2>
         <p class="m-0 max-w-[400px] text-[15px] leading-relaxed text-ink-muted">Seven tools that run in your browser. No images or calibration files leave your computer.</p>
         <a href="/tools/" class="text-[14px] font-medium underline decoration-1 underline-offset-[3px]">All tools</a>
       </div>
       <ol class="m-0 flex list-none flex-col border-t border-line-strong p-0 lg:w-[58%]">
-        {featuredTools.map((t, i) => (
+        {featuredTools.map((t) => (
           <li class="border-b border-line-strong">
             <a href={t.href} class="flex items-start gap-4 py-5 text-ink no-underline hover:text-ink md:gap-6">
-              <span class="w-8 shrink-0 pt-1 font-mono text-[12px] text-ink-muted">T{i + 1}</span>
               <span class="flex min-w-0 flex-1 flex-col gap-1">
                 <strong class="text-[17px] font-medium">{t.title}</strong>
                 <span class="text-[15px] leading-relaxed text-ink-muted">{t.body}</span>
@@ -164,10 +163,10 @@ const featuredReviews = allReviews
     </div>
   </section>
 
-  {/* ── 02 What comes with the board ── */}
+  {/* ── What comes with the board ── */}
   <section id="with-the-board" class="container-x flex flex-col gap-8 py-[var(--section-y)]">
     <div class="flex flex-col gap-4">
-      <span class="section-no">02 / What comes with the board</span>
+      <span class="section-no">What comes with the board</span>
       <span class="section-rule"></span>
       <h2 class="m-0 text-[24px] font-semibold md:text-[28px]">The board, its files and the checks behind it</h2>
     </div>
@@ -208,7 +207,7 @@ const featuredReviews = allReviews
       <div class="container-x flex flex-col gap-8 py-[var(--section-y)]">
         <div class="flex flex-wrap items-end justify-between gap-4">
           <div class="flex flex-col gap-2.5">
-            <span class="section-no">03 / Reviews</span>
+            <span class="section-no">Reviews</span>
             <span class="section-rule"></span>
             <h2 class="m-0 text-[24px] font-semibold md:text-[28px]">What engineers measured</h2>
           </div>
@@ -255,7 +254,7 @@ const featuredReviews = allReviews
   <div class="container-x flex flex-wrap gap-12 py-[var(--section-y)]">
     {guides.length > 0 && (
       <div class="flex min-w-0 flex-1 basis-[520px] flex-col gap-5">
-        <span class="section-no">{showReviews ? '04' : '03'} / Guides</span>
+        <span class="section-no">Guides</span>
         <span class="section-rule"></span>
         <h2 class="m-0 text-[24px] font-semibold md:text-[28px]">How to calibrate, with the numbers</h2>
         <div class="flex flex-col border-t border-line">
