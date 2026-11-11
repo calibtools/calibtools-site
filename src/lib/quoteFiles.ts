@@ -1,6 +1,7 @@
 /**
  * Files attached to the internal quote email, built on the server from the pattern
- * link alone: the board definition (OpenCV JSON), the marker list and a 1:1 PDF.
+ * link alone: the board definition (OpenCV JSON) and the marker list. The 1:1 PDF lives in
+ * factoryPdf.ts, which is loaded only when it is needed because pdf-lib is large.
  * They describe the pattern only. Nothing about the customer goes into them, so
  * they can be passed on to the factory as they are.
  */
@@ -9,8 +10,6 @@ import { opencvJson } from './exportConfig';
 import { charucoMarkers } from './renderCharuco';
 import { aprilGridTags } from './renderAprilGrid';
 import { patternId } from './patternLink';
-import { computeLayout, patternExtent, patternFits, requiredDimensions, wordmarkWidth, type PageLayout } from './pageLayout';
-import { exportPdf, type PdfExportOptions } from './exportPdf';
 
 export interface EmailAttachment {
   filename: string;
@@ -56,23 +55,4 @@ export function quoteAttachments(spec: PatternSpec, quoteId: string): EmailAttac
   const csv = markerIdsCsv(spec);
   if (csv) files.push({ filename: `${stem}_marker-ids.csv`, content: toBase64(csv) });
   return files;
-}
-
-/** A page just large enough for the pattern at 1:1 with its quiet zone, scale bar and footer. */
-export function factoryPage(spec: PatternSpec): { layout: PageLayout } {
-  const { bw, bh, qzBasis } = patternExtent(spec);
-  let pw = bw + 60;
-  let ph = bh + 90;
-  for (let i = 0; i < 6 && !patternFits(bw, bh, pw, ph, qzBasis); i++) {
-    const { reqW, reqH } = requiredDimensions(bw, bh, qzBasis, wordmarkWidth(pw, ph));
-    pw = Math.max(pw, Math.ceil(reqW) + 2);
-    ph = Math.max(ph, Math.ceil(reqH) + 2);
-  }
-  return { layout: computeLayout(spec, pw, ph, pw >= ph ? 'landscape' : 'portrait') };
-}
-
-/** 1:1 PDF of the pattern on its own page. Takes a few hundred milliseconds of CPU. */
-export async function factoryPdf(spec: PatternSpec, fontBytes: NonNullable<PdfExportOptions['fontBytes']>): Promise<Uint8Array> {
-  const { layout } = factoryPage(spec);
-  return exportPdf({ spec, pw: layout.pw, ph: layout.ph, fontBytes, layout });
 }

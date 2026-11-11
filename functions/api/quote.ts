@@ -25,7 +25,7 @@
 
 import { checkWorkEmail, hasMailServer, WORK_EMAIL_MESSAGE } from '../../src/lib/workEmail';
 import { patternIdFromPath, specFromLink } from '../../src/lib/patternLink';
-import { quoteAttachments, fileStem, bytesToBase64, type EmailAttachment } from '../../src/lib/quoteFiles';
+import type { EmailAttachment } from '../../src/lib/quoteFiles';
 import { verifyTurnstile, TURNSTILE_FIELD } from '../../src/lib/turnstile';
 import {
   confirmToken, confirmUrl, customerBody, customerSubject, internalBody, internalSubject,
@@ -104,7 +104,7 @@ async function sendFactoryPdf(env: Env, origin: string, record: QuoteRecord): Pr
     return res.arrayBuffer();
   };
   const [regular, semiBold, mono] = await Promise.all([load(PDF_FONTS.regular), load(PDF_FONTS.semiBold), load(PDF_FONTS.mono)]);
-  const { factoryPdf } = await import('../../src/lib/quoteFiles');
+  const [{ factoryPdf }, { fileStem, bytesToBase64 }] = await Promise.all([import('../../src/lib/factoryPdf'), import('../../src/lib/quoteFiles')]);
   const pdf = await factoryPdf(spec, { regular, semiBold, mono });
   await sendEmail(env.RESEND_API_KEY, {
     to: 'hello@calib.tools',
@@ -202,7 +202,8 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
   let attachments: EmailAttachment[] = [];
   try {
     const spec = specFromLink(record.pattern);
-    if (spec) attachments = quoteAttachments(spec, id);
+    // Loaded on demand: the marker dictionaries are large and only needed for requests with a pattern
+    if (spec) attachments = (await import('../../src/lib/quoteFiles')).quoteAttachments(spec, id);
   } catch { attachments = []; }
 
   let internalSent = false;
