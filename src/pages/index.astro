@@ -106,8 +106,9 @@ const featuredReviews = allReviews
     <div class="grid grid-cols-1 border-t border-line md:grid-cols-3 md:gap-6 md:border-t-0 lg:grid-cols-5">
       {collections.map((c) => {
         const local = localCollectionData.get(c.handle);
-        const first = c.products[0];
-        const price = first ? formatCardPrice(first.priceFrom) : '';
+        /* Lowest priced product of the collection (0 = quote only) */
+        const priced = c.products.filter((p) => Number(p.priceMinAmount) > 0).sort((x, y) => Number(x.priceMinAmount) - Number(y.priceMinAmount));
+        const price = priced.length ? formatCardPrice(priced[0].priceFrom) : '';
         const outline = outlines[c.handle];
         return (
           <a href={`/targets/collection/${c.handle}/`} data-card class="group flex items-center justify-between gap-4 border-b border-line py-4 text-ink no-underline hover:text-ink md:card md:bracket md:flex-col md:items-stretch md:justify-start md:gap-3 md:border-b md:p-5 md:hover:border-ink">
