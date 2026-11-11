@@ -32,7 +32,7 @@ export function extractInternalLinks(md: string): string[] {
 
 /** Row anchor for a part number: dictionary placeholder removed, e.g. CT-CHA-P-400X300. */
 export function skuAnchor(partNumber: string): string {
-  return partNumber.replace(/-\{[A-Z]+\}$/, '').trim();
+  return partNumber.replace(/-\{[A-Z0-9|]+\}$/, '').trim();
 }
 
 /** One-line title for an ordering-table row, matched by anchor. */

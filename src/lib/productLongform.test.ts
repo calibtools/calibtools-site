@@ -27,6 +27,10 @@ const valid = new Set<string>([
   '/guides/',
   ...slugs('applications').map((s) => `/applications/${s}/`),
   ...tools.map((t) => t.href),
+  // One generator page per pattern (src/pages/tools/generator/<pattern>.astro)
+  ...readdirSync(resolve(ROOT, 'src/pages/tools/generator'))
+    .filter((f) => f.endsWith('.astro'))
+    .map((f) => `/tools/generator/${f.replace(/\.astro$/, '')}/`),
   '/tools/',
   '/quote/',
   '/contact/',
@@ -79,7 +83,9 @@ describe('product long-form content', () => {
       const all = existsSync(sheets)
         ? readdirSync(sheets).filter((f) => f.endsWith('.md')).map((f) => readFileSync(resolve(sheets, f), 'utf-8')).join('\n')
         : '';
-      const missing = pns.filter((pn) => !all.includes(pn));
+      // A row written as CT-CHT-P-200X150-{F|C} in the datasheet is two part numbers in the ordering data
+      const ordering = readFileSync(resolve(ROOT, 'data/part-numbers.csv'), 'utf-8');
+      const missing = pns.filter((pn) => !all.includes(pn) && !ordering.includes(`${pn},active`));
       expect(missing).toEqual([]);
     });
   }
@@ -98,5 +104,29 @@ describe('product long-form content', () => {
     for (const size of ['200X150', '300X200', '400X300', '600X400', '800X600']) {
       expect(body).toContain(`(#CT-CHA-P-${size})`);
     }
+  });
+});
+
+describe('long-form batch 1 (C6)', () => {
+  const pages: [slug: string, anchors: string[]][] = [
+    ['checkerboard-composite', ['CT-CHT-P-200X150-F', 'CT-CHT-P-200X150-C', 'CT-CHT-P-800X600-F', 'CT-CHT-P-800X600-C']],
+    ['aprilgrid-composite', ['CT-APR-P-200X150-T36', 'CT-APR-P-800X600-T36']],
+    ['circlegrid-composite', ['CT-CIR-P-200X150-SYM', 'CT-CIR-P-800X600-ASY']],
+    ['charuco-ceramic', ['CT-CHA-C-110X85', 'CT-CHA-C-230X140']],
+  ];
+  for (const [slug, anchors] of pages) {
+    it(`${slug}: has a long-form body, links each size to its row and links out to other products`, () => {
+      const raw = readFileSync(resolve(CONTENT, 'products', `${slug}.md`), 'utf-8');
+      const { body, frontmatter } = splitFrontmatter(raw);
+      expect(bodyWordCount(raw)).toBeGreaterThanOrEqual(600);
+      for (const a of anchors) expect(body, a).toContain(`(#${a})`);
+      const productLinks = new Set([...extractInternalLinks(body), ...extractFrontmatterHrefs(frontmatter)].filter((h) => h.startsWith('/targets/') && h !== `/targets/${slug}/`));
+      expect(productLinks.size).toBeGreaterThanOrEqual(4);
+    });
+  }
+
+  it('every size line on the ceramic page still carries the word "target" next to the ±2 µm figure', () => {
+    const raw = readFileSync(resolve(CONTENT, 'products/charuco-ceramic.md'), 'utf-8');
+    for (const m of raw.matchAll(/[^.\n]*±2 µm[^.\n]*/g)) expect(m[0]).toMatch(/target/i);
   });
 });

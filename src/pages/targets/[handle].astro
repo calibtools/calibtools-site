@@ -31,6 +31,9 @@ import { compatRows, digitalFiles } from '@/lib/productCompat';
 import { QUOTE_ONLY_HANDLES } from '@/lib/constants';
 import { skuAnchor, skuTitleFor } from '@/lib/productLongform';
 
+/** The datasheet writes ChArUco rows as …-{DICT}; visitors see the default dictionary instead of the placeholder. */
+const shownPn = (pn: string) => pn.replace('{DICT}', 'D6');
+
 export async function getStaticPaths() {
   const products = await getProducts();
   return products.map((p) => ({ params: { handle: p.handle } }));
@@ -389,15 +392,27 @@ for (const p of pairsWith) {
 const faqItems = getProductFaq(handle!);
 const faqJsonLd = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqItems.map((item) => ({ '@type': 'Question', name: item.question, acceptedAnswer: { '@type': 'Answer', text: item.answer } })) };
 
-// Ordering rows with prices from Shopify variants
-const orderingRows = (productData?.orderingRows ?? []).map((row) => {
-  // Exact part number first (CT-CIR-P-300X200-ASY), else same family-material-size (CT-CHA-P-300X200-{DICT})
-  const base = (pn: string) => pn.split('-').slice(0, 4).join('-');
-  const matchedVariant =
-    product.variants.find((v) => v.sku && row.partNumber === v.sku) ??
-    product.variants.find((v) => v.sku && base(row.partNumber) === base(v.sku));
-  return { ...row, price: matchedVariant?.price ?? '' };
+// Ordering tables as written in the datasheet, each row with its price
+const priceFor = (pn: string) => {
+  const base = (x: string) => x.split('-').slice(0, 4).join('-');
+  const v = product.variants.find((x) => x.sku && pn === x.sku) ?? product.variants.find((x) => x.sku && base(pn) === base(x.sku));
+  return v?.price ?? '';
+};
+const orderingTables = (productData?.orderingTables ?? []).map((t) => {
+  const sizeCol = t.header.findIndex((h) => /^size/i.test(h));
+  return {
+    title: t.title,
+    header: t.header,
+    rows: t.rows.map((cells) => ({
+      pn: cells[0],
+      cells,
+      price: priceFor(cells[0]),
+      selectSize: sizeCol >= 0 ? (cells[sizeCol] ?? '').split(/\s*[×x]\s*/)[0]?.trim() : '',
+    })),
+  };
 });
+const anyPrice = orderingTables.some((t) => t.rows.some((r) => r.price));
+const isCharuco = handle!.includes('charuco');
 
 // Long-form body (markdown) and on-page links
 const longform = productContent ? await productContent.render() : null;
@@ -406,10 +421,10 @@ const hasLongform = !!longform && longform.headings.some((h) => h.depth === 2);
 const skuNotes = productContent?.data.skus ?? [];
 const relatedTargets = productContent?.data.relatedTargets ?? [];
 const relatedGuides = productContent?.data.relatedGuides ?? [];
-const hasSkuTitles = orderingRows.some((r) => skuTitleFor(r.partNumber, skuNotes));
+const hasSkuTitles = orderingTables.some((t) => t.rows.some((r) => skuTitleFor(r.pn, skuNotes)));
 const quickLinks = hasLongform
   ? [
-      ...(orderingRows.length > 0 ? [{ href: '#sizes', text: 'Sizes and part numbers' }] : []),
+      ...(orderingTables.length > 0 ? [{ href: '#sizes', text: 'Sizes and part numbers' }] : []),
       ...longform!.headings.filter((h) => h.depth === 2).map((h) => ({ href: `#${h.slug}`, text: h.text })),
       ...(relatedTargets.length + relatedGuides.length > 0 ? [{ href: '#related', text: 'Related targets' }] : []),
       ...(specGroups.length > 0 ? [{ href: '#specifications', text: 'Specifications' }] : []),
@@ -535,7 +550,7 @@ const quickLinks = hasLongform
         </summary>
         <ol class="m-0 list-none p-0 pb-3">
           {quickLinks.map((l, i) => (
-            <li><a href={l.href} class="flex min-h-[40px] items-center gap-3 text-[15px] text-ink no-underline"><span class="font-mono text-[12px] text-brand-dark">{String(i + 1).padStart(2, '0')}</span>{l.text}</a></li>
+            <li><a href={l.href} class="flex min-h-[40px] items-center gap-3 text-[15px] text-ink no-underline">{l.text}</a></li>
           ))}
         </ol>
       </details>
@@ -543,7 +558,7 @@ const quickLinks = hasLongform
         <h2 class="m-0 pb-3 font-mono text-[12px] uppercase tracking-[0.16em] text-brand-dark">On this page</h2>
         <ol class="m-0 grid list-none grid-cols-2 gap-x-8 gap-y-1 p-0 lg:grid-cols-3">
           {quickLinks.map((l, i) => (
-            <li><a href={l.href} class="flex min-h-[32px] items-center gap-3 text-[15px] text-ink no-underline hover:text-brand-dark"><span class="font-mono text-[12px] text-brand-dark">{String(i + 1).padStart(2, '0')}</span>{l.text}</a></li>
+            <li><a href={l.href} class="flex min-h-[32px] items-center gap-3 text-[15px] text-ink no-underline hover:text-brand-dark">{l.text}</a></li>
           ))}
         </ol>
       </div>
@@ -551,65 +566,50 @@ const quickLinks = hasLongform
   )}
 
   {/* ── Sizes and part numbers ── */}
-  {orderingRows.length > 0 && (
+  {orderingTables.length > 0 && (
     <section id="sizes" class="container-x flex scroll-mt-24 flex-col gap-5 pb-12 md:pb-16">
       <h2 class="h-display m-0 text-[20px] md:text-2xl">Sizes and part numbers</h2>
-      {/* Mobile: one card per size */}
-      <ul class="m-0 flex list-none flex-col p-0 md:hidden">
-        {orderingRows.map((row) => (
-          <li
-            id={`m-${skuAnchor(row.partNumber)}`}
-            class="flex items-start justify-between gap-4 border-t border-line py-4 last:border-b"
-            data-select-size={row.size.split(/\s*[×x]\s*/)[0]?.trim()}
-          >
-            <div class="flex min-w-0 flex-col gap-1">
-              <span class="font-mono text-[13px] font-semibold text-brand-dark">{row.partNumber}</span>
-              {skuTitleFor(row.partNumber, skuNotes) && <span class="text-[14px] text-ink">{skuTitleFor(row.partNumber, skuNotes)}</span>}
-              <span class="text-[13px] text-ink-soft">{row.size} · {row.squares} · {row.squareMarker}</span>
-            </div>
-            {row.price && <span class="shrink-0 font-mono text-[14px] font-semibold">{row.price}</span>}
-          </li>
-        ))}
-      </ul>
-      <div class="hidden overflow-x-auto md:block">
-        <table class={`w-full ${hasSkuTitles ? "min-w-[900px]" : "min-w-[640px]"} border-collapse text-[14px]`}>
-          <thead>
-            <tr class="border-b border-line bg-ground-alt text-left text-[12px] font-semibold uppercase tracking-wider text-ink-muted">
-              <th class="py-2.5 px-3">Part number</th>
-              {hasSkuTitles && <th class="py-2.5 px-3">Description</th>}
-              <th class="py-2.5 px-3">Size W × H</th>
-              <th class="py-2.5 px-3">Squares</th>
-              <th class="py-2.5 px-3">Square · marker</th>
-              <th class="py-2.5 px-3">Corners</th>
-              <th class="py-2.5 px-3">Markers</th>
-              {orderingRows.some((r) => r.weight) && <th class="py-2.5 px-3">Weight</th>}
-              <th class="py-2.5 px-3 text-right">Price</th>
-            </tr>
-          </thead>
-          <tbody>
-            {orderingRows.map((row, i) => (
-              <tr
-                id={skuAnchor(row.partNumber)}
-                class={`scroll-mt-24 border-b border-line cursor-pointer hover:bg-ground-alt/50 target:bg-brand/10 ${i % 2 === 1 ? 'bg-ground-alt' : ''}`}
-                data-select-size={row.size.split(/\s*[×x]\s*/)[0]?.trim()}
-              >
-                <td class="whitespace-nowrap py-3 px-3 font-mono text-[13px] text-brand-dark">{row.partNumber}</td>
-                {hasSkuTitles && <td class="py-3 px-3 text-[14px] text-ink">{skuTitleFor(row.partNumber, skuNotes) ?? ''}</td>}
-                <td class="py-3 px-3 whitespace-nowrap">{row.size}</td>
-                <td class="py-3 px-3 font-mono text-[13px]">{row.squares}</td>
-                <td class="py-3 px-3 font-mono text-[13px]">{row.squareMarker}</td>
-                <td class="py-3 px-3 font-mono text-[13px]">{row.corners}</td>
-                <td class="py-3 px-3 font-mono text-[13px]">{row.markers}</td>
-                {orderingRows.some((r) => r.weight) && <td class="py-3 px-3 font-mono text-[13px]">{row.weight}</td>}
-                <td class="py-3 px-3 font-mono text-[13px] font-semibold text-right">{row.price}</td>
-              </tr>
+      {orderingTables.map((t) => (
+        <div class="flex flex-col gap-3">
+          {t.title && <h3 class="m-0 text-[16px] font-semibold">{t.title}</h3>}
+          {/* Mobile: one card per part number */}
+          <ul class="m-0 flex list-none flex-col p-0 md:hidden">
+            {t.rows.map((row) => (
+              <li id={`m-${skuAnchor(row.pn)}`} class="flex items-start justify-between gap-4 border-t border-line py-4 last:border-b" data-select-size={row.selectSize}>
+                <div class="flex min-w-0 flex-col gap-1">
+                  <span class="font-mono text-[13px] font-semibold text-brand-dark">{shownPn(row.pn)}</span>
+                  {skuTitleFor(row.pn, skuNotes) && <span class="text-[14px] text-ink">{skuTitleFor(row.pn, skuNotes)}</span>}
+                  <span class="text-[13px] text-ink-muted">{row.cells.slice(1).filter(Boolean).join(' · ')}</span>
+                </div>
+                {row.price && <span class="shrink-0 font-mono text-[14px] font-semibold">{row.price}</span>}
+              </li>
             ))}
-          </tbody>
-        </table>
-      </div>
-      {productData && (
-        <p class="m-0 text-[13px] text-ink-soft">Start ID 0, row-major, OpenCV &ge; 4.6 placement. Larger sizes on request.</p>
-      )}
+          </ul>
+          <div class="hidden overflow-x-auto md:block">
+            <table class={`w-full ${hasSkuTitles ? 'min-w-[900px]' : 'min-w-[640px]'} border-collapse border border-line bg-sheet text-[14px]`}>
+              <thead>
+                <tr class="bg-brand-tint text-left font-mono text-[12px] font-medium uppercase tracking-[0.04em] text-brand-dark">
+                  <th class="py-2.5 px-3 font-medium">{t.header[0]}</th>
+                  {hasSkuTitles && <th class="py-2.5 px-3 font-medium">Description</th>}
+                  {t.header.slice(1).map((h) => <th class="py-2.5 px-3 font-medium">{h}</th>)}
+                  {anyPrice && <th class="py-2.5 px-3 text-right font-medium">Price</th>}
+                </tr>
+              </thead>
+              <tbody>
+                {t.rows.map((row, i) => (
+                  <tr id={skuAnchor(row.pn)} class={`scroll-mt-24 border-t border-line cursor-pointer hover:bg-ground-alt/60 target:bg-brand/10 ${i % 2 === 1 ? 'bg-ground-alt/50' : ''}`} data-select-size={row.selectSize}>
+                    <td class="whitespace-nowrap py-3 px-3 font-mono text-[13px] text-brand-dark">{shownPn(row.pn)}</td>
+                    {hasSkuTitles && <td class="py-3 px-3 text-[14px] text-ink">{skuTitleFor(row.pn, skuNotes) ?? ''}</td>}
+                    {row.cells.slice(1).map((c, ci) => <td class={`py-3 px-3 ${ci === 0 ? 'whitespace-nowrap' : 'font-mono text-[13px]'}`}>{c}</td>)}
+                    {anyPrice && <td class="py-3 px-3 text-right font-mono text-[13px] font-semibold">{row.price}</td>}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      ))}
+      <p class="m-0 text-[13px] text-ink-muted">{isCharuco ? 'Part numbers are shown with the default dictionary, D6 (DICT_6X6_250). Replace D6 with D5 (DICT_5X5_100), D4 (DICT_4X4_50) or T36 (AprilTag 36h11) for the others. Start ID 0, row-major, OpenCV ≥ 4.6 placement. ' : ''}Larger sizes and other grids on request.</p>
     </section>
   )}
 
