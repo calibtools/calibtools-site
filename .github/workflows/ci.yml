@@ -7,6 +7,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write   # to commit new screenshot baselines to the pull request branch
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -56,6 +58,24 @@ jobs:
         id: visual
         continue-on-error: true
         run: pnpm exec playwright test -c playwright.visual.config.ts
+      # A missing baseline is written by the comparison above; commit it to the pull request branch.
+      # Existing baselines are never overwritten: to accept a change, delete the PNG in the pull request.
+      - name: Commit new screenshot baselines
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+        run: |
+          new=$(git status --porcelain tests/visual/__screenshots__ | grep '^??' || true)
+          if [ -z "$new" ]; then echo "No new baselines."; exit 0; fi
+          mkdir -p /tmp/baselines && cp tests/visual/__screenshots__/*.png /tmp/baselines/
+          git config user.name "Calib.Tools CI"
+          git config user.email "hello@calib.tools"
+          git fetch --depth=1 origin "$HEAD_REF"
+          git checkout -f -B baseline-update FETCH_HEAD
+          mkdir -p tests/visual/__screenshots__ && cp -n /tmp/baselines/*.png tests/visual/__screenshots__/
+          git add tests/visual/__screenshots__
+          git commit -m "Screenshot baselines written by CI"
+          git push origin "HEAD:$HEAD_REF"
       - name: Report screenshot differences
         if: steps.visual.outcome == 'failure'
         run: echo "::warning::Screenshots differ from the baselines (or a baseline is missing). See the visual-results artifact."
