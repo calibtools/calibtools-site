@@ -178,9 +178,7 @@ Our [composite boards](/targets/collection/composite-boards/) are UV-printed on 
 
 ## Method
 
-The test scripts are in our [public repository](https://github.com/calibtools/calibtools-site/tree/main/docs/content/experiments) (`printed-target-sim.py`, with `ro-check.py` and `ro-varying.py` for the RO tables).
-
-It projects the deformed board through the true camera, adds Gaussian noise and calibrates with `cv2.calibrateCamera` and the standard five-parameter distortion model, OpenCV 5.0.
+The test projects the deformed board through the true camera, adds Gaussian noise and calibrates with `cv2.calibrateCamera` and the standard five-parameter distortion model, OpenCV 5.0. Write to hello@calib.tools if you want the scripts.
 
 Bow keeps the arc length of the sheet; a print that bows also gets very slightly shorter in projection, which is included.
 

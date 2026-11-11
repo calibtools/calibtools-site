@@ -11,6 +11,7 @@ export default function Stars({ rating, max = 5, size = 14, className = '' }: Pr
   return (
     <span
       className={`inline-flex gap-0.5 ${className}`}
+      role="img"
       aria-label={`${rating} out of ${max} stars`}
     >
       {Array.from({ length: max }, (_, i) => (

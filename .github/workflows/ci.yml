@@ -1,5 +1,9 @@
 name: CI
-on: [push, pull_request]
+# One run per change: pull requests, and pushes to main (not both for the same commit)
+on:
+  pull_request:
+  push:
+    branches: [main]
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -39,6 +43,29 @@ jobs:
           BLOCKED_NAMES: ${{ secrets.BLOCKED_NAMES }}
       - run: pnpm check
       - run: pnpm build
+
+      # Accessibility >= 95 and no color-contrast failures (fails); performance >= 90 (warning)
+      - name: Lighthouse
+        run: node scripts/lighthouse-check.mjs
+
+      # Screenshot comparison: reported, not blocking. Baselines live in tests/visual/__screenshots__.
+      - name: Screenshot comparison
+        id: visual
+        continue-on-error: true
+        run: pnpm exec playwright test -c playwright.visual.config.ts
+      - name: Report screenshot differences
+        if: steps.visual.outcome == 'failure'
+        run: echo "::warning::Screenshots differ from the baselines (or a baseline is missing). See the visual-results artifact."
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-results
+          path: |
+            tests/visual/__screenshots__
+            test-results
+          if-no-files-found: ignore
+          retention-days: 14
         env:
           SKIP_STOREFRONT_CHECK: '1'
           SKIP_SPECS_CHECK: '1'

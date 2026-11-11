@@ -103,6 +103,8 @@
      Anchor smooth-scroll handled via JS where needed. */
   a { @apply text-brand-dark hover:text-brand; }
   strong, b { font-weight: 600; }
+  /* Links inside running text are underlined, so they do not rely on color alone */
+  p a:not([class]), li a:not([class]), td a:not([class]) { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
   h1, h2, h3, h4 { letter-spacing: -0.01em; }
 }
 
