@@ -71,8 +71,12 @@ export const CERAMIC_CTE_UM_PER_M_K = 7.2;
 /** Short inspection claim — used where the full INSPECTION_CLAIM is too long. */
 export const INSPECTION_CLAIM_SHORT = 'Measured before it ships';
 
-/** Primary tagline — used for the home H1, <title> suffix, OG fallback. */
-export const TAGLINE = 'Know your target to the micron';
+/**
+ * Primary tagline (owner decision 2026-11-11) — home H1, home description, organization slogan.
+ * Too long for a <title> (60 characters), so the home page title is a plain description.
+ * Replaces "Know your target to the micron", which only the ceramic targets could back up.
+ */
+export const TAGLINE = 'Calibration targets whose files, geometry and data agree';
 
 /** Returns headline — used on index.astro and returns.astro. */
 export const RETURNS_LINE = 'Not flat, not accurate, not what you ordered\u2009\u2014\u2009send it back.';
