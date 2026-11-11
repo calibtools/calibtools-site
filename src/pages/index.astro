@@ -1,32 +1,17 @@
 ---
 import Base from '@/layouts/Base.astro';
-import ProductCard from '@/components/ProductCard.astro';
-import ToolCard from '@/components/ToolCard.astro';
 import NewsletterForm from '@/islands/NewsletterForm';
-import { Picture } from 'astro:assets';
 import { tools } from '@/lib/tools';
-import { stats } from '@/lib/site';
 import { getCollections } from '@/lib/shopify';
 import { getCollection, getEntry } from 'astro:content';
-import { getProductImages } from '@/lib/product-images';
-import { getImageMetadata } from '@/lib/productImageImports';
-import { Tag, Truck, FileCheck, Files, RotateCcw, Grid2x2 as Grid2X2, ScanLine, ListChecks, Package, Ruler, CircleDot, Plug, ArrowRight, Mail } from 'lucide-astro';
 import { getAllPublishedReviews } from '@/lib/reviews';
-import { TAGLINE, RETURNS_LINE, INSPECTION_CLAIM_SHORT } from '@/lib/claims';
+import { TAGLINE, RETURNS_LINE, COMPOSITE_TOLERANCE, COMPOSITE_FLATNESS, CERAMIC_ACCURACY, LEAD_TIME_WEEKS, RETURN_WINDOW_DAYS } from '@/lib/claims';
+import { formatCardPrice } from '@/lib/shopify';
+import { drawingForPartNumber, toScaleOutlines } from '@/lib/boardDrawing';
+import { partNumberIndex } from '@/lib/partNumberLookup';
+import { COMPOSITE_SIZES, CERAMIC_SIZES } from '@/lib/boardSizes';
+import partNumbersCsv from '../../data/part-numbers.csv?raw';
 import Stars from '@/components/Stars';
-import heroTight from '@/assets/products/brand/dark/hero-boards-tight.webp';
-import heroTightMobile from '@/assets/products/brand/dark/hero-boards-tight-mobile.webp';
-import familyComposite from '@/assets/products/brand/dark/family-composite.webp';
-import familyCeramic from '@/assets/products/brand/dark/family-ceramic.webp';
-import familyMounts from '@/assets/products/brand/dark/family-mounts.webp';
-import type { ImageMetadata } from 'astro';
-
-/* Override collection card images on the dark home page */
-const collectionHeroOverrides: Record<string, ImageMetadata> = {
-  'composite-boards': familyComposite,
-  'ceramic-glass': familyCeramic,
-  'mounts-accessories': familyMounts,
-};
 
 const collections = await getCollections();
 /* Overlay local title + description from src/content/collections when available */
@@ -37,31 +22,48 @@ for (const c of collections) {
 }
 const allGuides = await getCollection('guides');
 
-const heroImageMap = new Map<string, ImageMetadata>();
-for (const col of collections) {
-  for (const p of col.products) {
-    const images = getProductImages(p.handle);
-    const hero = images.find((img) => img.file === '01-hero.webp');
-    if (hero) {
-      const meta = getImageMetadata(hero.handle, hero.file);
-      if (meta) heroImageMap.set(p.handle, meta);
-    }
-  }
-}
-
 const isReady = (g: typeof allGuides[number]) => !g.data.draft && !g.body?.includes('[BODY COPY');
 const guides = allGuides.filter(isReady).slice(0, 3);
 
-const why = [
-  ['Transparent pricing', 'Every size and material priced on the page. No quote forms for standard parts.'],
-  ['Lead time you can plan with', 'Made to order, ships in 2\u20133 weeks. Tracked express worldwide.'],
-  [INSPECTION_CLAIM_SHORT, 'Dimensional check on every board, with measured coordinates you can load into your calibration.'],
-  ['Files you can use', 'Datasheet, CAD and pattern JSON for OpenCV, Kalibr and HALCON with every target.'],
-  ['30-day returns', RETURNS_LINE],
+/* Three tools on the home page, numbered like the tools index */
+const featuredTools = tools.slice(0, 3);
+
+/* Part numbers → product pages, for the "Have a part number?" box */
+const pnIndex = partNumberIndex(partNumbersCsv);
+const PN_EXAMPLE = 'CT-CHA-P-400X300-D5';
+
+/* Shortcuts by pattern */
+const patternChips = [
+  ['Checkerboard', '/targets/checkerboard-composite/'],
+  ['ChArUco', '/targets/charuco-composite/'],
+  ['AprilGrid', '/targets/aprilgrid-composite/'],
+  ['Circle grid', '/targets/circlegrid-composite/'],
+  ['HALCON', '/targets/halcon-composite/'],
 ];
 
-/* Show 3 featured tools on the home page */
-const featuredTools = tools.slice(0, 3);
+/* To-scale board outlines for the two collections whose sizes are in boardSizes.ts */
+const outlines: Record<string, { svg: string; caption: string }> = {
+  'composite-boards': toScaleOutlines([COMPOSITE_SIZES[0], COMPOSITE_SIZES[2], COMPOSITE_SIZES[4]].map((s) => s.label), 10),
+  'ceramic-glass': toScaleOutlines(CERAMIC_SIZES.slice(0, 3).map((s) => s.label), 2.5),
+};
+
+/* Key numbers: values from claims.ts, each with its condition */
+const [flatValue, flatCond = ''] = COMPOSITE_FLATNESS.replace(')', '').split(' (');
+const keyNumbers = [
+  { label: 'Feature position, composite', value: COMPOSITE_TOLERANCE, cond: 'any corner to nominal grid, at 20 °C' },
+  { label: 'Flatness, composite', value: flatValue, cond: flatCond },
+  { label: 'Feature accuracy, ceramic', value: CERAMIC_ACCURACY, cond: 'target value at 20 °C; method to be published' },
+  { label: 'Lead time', value: `${LEAD_TIME_WEEKS}`, cond: 'made to order' },
+];
+
+/* What comes with a board (wording follows the collection pages) */
+const deliverables = [
+  ['On the board', 'Its own pattern parameters, printed in the margin', 'print'],
+  ['Config files', 'OpenCV JSON and ROS 2 YAML; Kalibr YAML where Kalibr supports the pattern; HALCON point tuples', '.json .yaml'],
+  ['Datasheet', 'Dimensions, tolerances with their conditions, material', '.pdf'],
+  ['Check before shipping', 'Dimensional, flatness and visual check on every board', 'per board'],
+];
+const drawing = drawingForPartNumber(PN_EXAMPLE)!;
 
 const allReviews = await getAllPublishedReviews();
 const showReviews = allReviews.length >= 3;
@@ -73,166 +75,128 @@ const featuredReviews = allReviews
   })
   .slice(0, 3);
 ---
-<Base title={TAGLINE} theme="dark" ogImage="/og/boards.png" description={`${TAGLINE}. Calibration targets measured before they ship, plus free browser tools for your machine-vision work. Made to order.`}>
+<Base title={TAGLINE} ogImage="/og/boards.png" description={`${TAGLINE}. Calibration targets measured before they ship, plus free browser tools for your machine-vision work. Made to order.`}>
 
-  {/* ── Hero ── */}
-  <section id="top" class="pb-[72px] md:pb-0">
-    {/* Desktop: two-column */}
-    <div class="container-x hidden items-stretch gap-0 py-10 md:flex lg:py-14">
-      {/* Left column 44 % — text */}
-      <div class="flex w-[44%] shrink-0 flex-col justify-center gap-6 pr-8">
-        <span class="font-mono text-[13px] uppercase tracking-[0.18em] text-brand-text">
-          Calibration targets &amp; tools for machine vision
-        </span>
-        <h1 class="m-0 text-[52px] font-[800] uppercase leading-[1.02] tracking-[-0.02em]" data-hero-h1>
-          Know your target<br /><span class="text-brand">to the micron</span>
-        </h1>
-        <p class="m-0 max-w-[460px] text-[18px] leading-[1.5] text-ink-muted">
-          Every board is measured before it ships &mdash; the report is yours. Precision checkerboards, ChArUco, AprilGrid and metrology-grade glass targets, plus free browser tools to generate, size and verify your calibration.
+  {/* ── 00 Find a target ── */}
+  <section id="top" class="container-x flex flex-col gap-8 pb-12 pt-10 md:gap-10 md:pb-14 md:pt-12">
+    <div class="flex flex-col gap-8 lg:flex-row lg:items-end lg:gap-6">
+      <div class="flex min-w-0 flex-col gap-4 lg:w-[58%]">
+        <span class="section-no">00 / Calibration targets and tools</span>
+        <h1 class="m-0 text-[32px] font-semibold leading-[1.12] md:text-[40px]" data-hero-h1>Calibration targets whose files, geometry and data agree.</h1>
+        <p class="m-0 max-w-[640px] text-[17px] leading-[1.55] text-ink-muted md:text-[18px]">
+          Checkerboard, ChArUco, AprilGrid, circle-grid and HALCON boards for OpenCV, Kalibr, ROS and HALCON. Each board is printed from the same geometry as the config files you download.
         </p>
-        <div class="flex flex-wrap gap-3.5 pt-2">
-          <a href="/targets/" class="btn-md btn-primary">Shop targets</a>
-          <a href="/tools/" class="btn-md btn-secondary">Open free tools</a>
+      </div>
+      <div class="flex min-w-0 flex-col gap-2 lg:w-[42%]">
+        <label for="pn-input" class="spec-label">Have a part number?</label>
+        <form id="pn-form" class="flex h-12 items-center gap-1 rounded border border-line-strong bg-sheet p-1 focus-within:border-ink" data-index={JSON.stringify(pnIndex)} novalidate>
+          <input id="pn-input" name="pn" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder={PN_EXAMPLE} class="h-full min-w-0 flex-1 bg-transparent px-3 font-mono text-[14px] uppercase text-ink placeholder:text-ink-soft placeholder:normal-case focus:outline-none" aria-describedby="pn-msg" />
+          <button type="submit" class="btn-md btn-primary shrink-0">Go</button>
+        </form>
+        <p id="pn-msg" class="m-0 hidden text-[13px] text-ink-muted" role="status" aria-live="polite">No stock target has that part number. <a href="/targets/" class="underline decoration-1 underline-offset-[3px]">See all targets</a> or <a href="/quote/" class="underline decoration-1 underline-offset-[3px]">ask for a quote</a>.</p>
+        <div class="flex flex-wrap gap-2 pt-1">
+          {patternChips.map(([label, href]) => (
+            <a href={href} class="badge min-h-[28px] text-ink no-underline hover:bg-ink hover:text-white">{label}</a>
+          ))}
         </div>
-        <p class="m-0 pt-3 font-mono text-[14px] tracking-[0.1em] text-ink-soft">
-          OpenCV &middot; ROS &middot; HALCON &middot; MATLAB &middot; Kalibr
-        </p>
-      </div>
-      {/* Right column 56 % — tight crop image */}
-      <div class="relative w-[56%]" data-hero-col>
-        <Picture
-          src={heroTight}
-          widths={[480, 700, 900]}
-          formats={['avif', 'webp', 'jpeg']}
-          alt="Calib.Tools three calibration boards cropped tight — checkerboard, ChArUco composite and ceramic plate with brand markings, on a dark surface."
-          class="w-full hero-fade"
-          loading="eager"
-          data-hero-img
-        />
       </div>
     </div>
 
-    {/* Mobile: stacked */}
-    <div class="container-x flex flex-col gap-8 py-12 md:hidden">
-      <div class="flex flex-col gap-6">
-        <span class="font-mono text-[12px] uppercase tracking-[0.18em] text-brand-text">
-          Calibration targets &amp; tools for machine vision
-        </span>
-        <p class="m-0 text-[38px] font-[800] uppercase leading-[1.02] tracking-[-0.02em]" aria-hidden="true">
-          Know your target<br /><span class="text-brand">to the micron</span>
-        </p>
-        <p class="m-0 max-w-[480px] text-[17px] leading-[1.5] text-ink-muted">
-          Every board is measured before it ships &mdash; the report is yours. Precision checkerboards, ChArUco, AprilGrid and metrology-grade glass targets, plus free browser tools to generate, size and verify your calibration.
-        </p>
-        <div class="flex flex-wrap gap-3.5 pt-2">
-          <a href="/targets/" class="btn-md btn-primary">Shop targets</a>
-          <a href="/tools/" class="btn-md btn-secondary">Open free tools</a>
-        </div>
-        <p class="m-0 pt-3 font-mono text-[13px] tracking-[0.1em] text-ink-soft">
-          OpenCV &middot; ROS &middot; HALCON &middot; MATLAB &middot; Kalibr
-        </p>
-      </div>
-      <div class="relative">
-        <Picture
-          src={heroTightMobile}
-          widths={[390, 640, 768]}
-          formats={['avif', 'webp', 'jpeg']}
-          alt="Calib.Tools three calibration boards in a tight horizontal crop for mobile, with brand markings and coordinate axes."
-          class="w-full object-contain hero-fade"
-          loading="eager"
-        />
-      </div>
-    </div>
-  </section>
-
-  {/* ── Free tools ── */}
-  <section id="tools" class="border-y border-line bg-ground-alt">
-    <div class="container-x flex flex-col gap-9 py-[var(--section-y)]">
-      <div class="flex flex-wrap items-end justify-between gap-4">
-        <div class="flex flex-col gap-2.5">
-          <span class="font-mono text-[12px] uppercase tracking-[0.18em] text-brand-text md:text-[13px]">Free tools &middot; runs in your browser</span>
-          <h2 class="h-display m-0 text-[28px] md:text-[36px]">Free tools. Serious targets.</h2>
-        </div>
-        <a href="/tools/" class="inline-flex items-center gap-1 text-[15px] font-semibold min-h-[24px] text-brand-on-dark">See all tools <ArrowRight size={20} stroke-width={1.6} class="text-brand-on-dark" aria-hidden="true" /></a>
-      </div>
-      <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
-        <ToolCard href={featuredTools[0].href} title={featuredTools[0].title} cta={featuredTools[0].cta} body={featuredTools[0].body}>
-          <Grid2X2 slot="icon" size={20} stroke-width={1.6} class="text-brand" aria-hidden="true" />
-        </ToolCard>
-        <ToolCard href={featuredTools[1].href} title={featuredTools[1].title} cta={featuredTools[1].cta} body={featuredTools[1].body}>
-          <ScanLine slot="icon" size={20} stroke-width={1.6} class="text-brand" aria-hidden="true" />
-        </ToolCard>
-        <ToolCard href={featuredTools[2].href} title={featuredTools[2].title} cta={featuredTools[2].cta} body={featuredTools[2].body}>
-          <ListChecks slot="icon" size={20} stroke-width={1.6} class="text-brand" aria-hidden="true" />
-        </ToolCard>
-      </div>
-    </div>
-  </section>
-
-  {/* ── Targets ── */}
-  <section id="products" class="container-x flex flex-col gap-9 py-[var(--section-y)]">
-    <div class="flex flex-col gap-2.5">
-      <span class="font-mono text-[12px] uppercase tracking-[0.18em] text-brand-text md:text-[13px]">Calibration targets</span>
-      <h2 class="h-display m-0 text-[28px] md:text-[36px]">Find the target for your setup.</h2>
-    </div>
-    <div class="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
+    {/* Category tiles: rows on phones, tiles from md */}
+    <div class="grid grid-cols-1 border-t border-line md:grid-cols-3 md:gap-6 md:border-t-0 lg:grid-cols-5">
       {collections.map((c) => {
-        const firstProduct = c.products[0];
-        const overrideImage = collectionHeroOverrides[c.handle];
-        const localHero = overrideImage ?? (firstProduct ? heroImageMap.get(firstProduct.handle) : undefined);
         const local = localCollectionData.get(c.handle);
-        const displayTitle = local?.title ?? c.title;
-        const displayDesc = local?.description ?? c.description;
-        const hasPurchasable = c.products.length > 0;
+        const first = c.products[0];
+        const price = first ? formatCardPrice(first.priceFrom) : '';
+        const outline = outlines[c.handle];
         return (
-          <ProductCard
-            href={`/targets/collection/${c.handle}/`}
-            title={displayTitle}
-            sub={displayDesc}
-            from={hasPurchasable ? (firstProduct?.priceFrom ?? '') : ''}
-            localImage={localHero}
-            image={!localHero ? (c.image ?? firstProduct?.image) : undefined}
-            placeholder={displayTitle}
-          />
+          <a href={`/targets/collection/${c.handle}/`} data-card class="group flex items-center justify-between gap-4 border-b border-line py-4 text-ink no-underline hover:text-ink md:card md:bracket md:flex-col md:items-stretch md:justify-start md:gap-3 md:border-b md:p-5 md:hover:border-ink">
+            <div class="hidden h-24 items-end md:flex" set:html={outline?.svg ?? ''} />
+            <span class="spec-label hidden md:block">{outline ? outline.caption : `${c.products.length} ${c.products.length === 1 ? 'product' : 'products'}`}</span>
+            <div class="flex min-w-0 flex-col gap-1 md:gap-2">
+              <strong class="text-[17px] leading-tight md:text-[20px]">{local?.title ?? c.title}</strong>
+              <span class="text-[14px] leading-snug text-ink-muted">{local?.description ?? c.description}</span>
+            </div>
+            <span class="shrink-0 font-mono text-[14px] font-semibold md:mt-auto md:pt-2">{price ? `from ${price}` : 'quote'}</span>
+          </a>
         );
       })}
     </div>
   </section>
 
-  {/* ── Why us ── */}
-  <section id="why" class="border-y border-[#262626] bg-[#0A0A0A]">
-    <div class="container-x flex flex-col gap-10 py-[var(--section-y)]">
-      <h2 class="h-display m-0 max-w-[720px] text-[28px] md:text-[36px]">Built flat. Checked twice.</h2>
-      <div class="grid grid-cols-1 gap-8 md:grid-cols-5">
-        {why.map(([title, desc], i) => {
-          const icons = [Tag, Truck, FileCheck, Files, RotateCcw];
-          const Icon = icons[i];
-          return (
-            <div class="flex flex-col gap-2 pt-4">
-              <div class="mb-1 flex h-[2px]">
-                <span class="block h-full w-6 bg-brand"></span>
-                <span class="block h-full flex-1 bg-[#333333]"></span>
-              </div>
-              <div class="relative flex h-10 w-10 items-center justify-center rounded-lg bg-white/[0.06]">
-                <Icon size={22} stroke-width={1.6} class="text-white" aria-hidden="true" />
-                <span class="absolute -bottom-0.5 -right-0.5 block h-1.5 w-1.5 rounded-full bg-brand"></span>
-              </div>
-              <strong class="text-[17px]">{title}</strong>
-              <span class="text-sm leading-relaxed text-[#A3A3A3]">{desc}</span>
-            </div>
-          );
-        })}
+  {/* ── Key numbers (spec strip) ── */}
+  <section aria-label="Key numbers" class="border-y border-line bg-sheet">
+    <dl class="container-x my-0 grid grid-cols-2 lg:grid-cols-4">
+      {keyNumbers.map((k, i) => (
+        <div class:list={['flex flex-col gap-1.5 py-5 pr-4', i % 2 === 1 && 'border-l border-line pl-4 md:pl-6', i >= 2 && 'border-t border-line lg:border-t-0', i === 2 && 'lg:border-l lg:pl-6']}>
+          <dt class="spec-label">{k.label}</dt>
+          <dd class="m-0 flex flex-col gap-1"><span class="spec-value">{k.value}</span><span class="spec-cond">{k.cond}</span></dd>
+        </div>
+      ))}
+    </dl>
+  </section>
+
+  {/* ── 01 Free tools ── */}
+  <section id="tools" class="border-b border-line bg-ground-alt">
+    <div class="container-x flex flex-col gap-8 py-[var(--section-y)] lg:flex-row lg:gap-6">
+      <div class="flex flex-col gap-4 lg:w-[42%]">
+        <span class="section-no !text-ink-muted">01 / Free tools</span>
+        <span class="section-rule"></span>
+        <h2 class="m-0 text-[24px] font-semibold md:text-[28px]">Size the board before you buy it</h2>
+        <p class="m-0 max-w-[400px] text-[15px] leading-relaxed text-ink-muted">Seven tools that run in your browser. No images or calibration files leave your computer.</p>
+        <a href="/tools/" class="text-[14px] font-medium underline decoration-1 underline-offset-[3px]">All tools</a>
       </div>
-      <div class="grid grid-cols-2 gap-8 pt-4 md:grid-cols-4">
-        {stats.map((s) => (
-          <div class="flex flex-col gap-1">
-            <span class="stat text-white">{s.value}</span>
-            <span class="text-[13px] text-[#A3A3A3]">{s.caption}</span>
-          </div>
+      <ol class="m-0 flex list-none flex-col border-t border-line-strong p-0 lg:w-[58%]">
+        {featuredTools.map((t, i) => (
+          <li class="border-b border-line-strong">
+            <a href={t.href} class="flex items-start gap-4 py-5 text-ink no-underline hover:text-ink md:gap-6">
+              <span class="w-8 shrink-0 pt-1 font-mono text-[12px] text-ink-muted">T{i + 1}</span>
+              <span class="flex min-w-0 flex-1 flex-col gap-1">
+                <strong class="text-[17px] font-medium">{t.title}</strong>
+                <span class="text-[15px] leading-relaxed text-ink-muted">{t.body}</span>
+              </span>
+              <span class="shrink-0 pt-1 font-mono text-[12px] font-semibold uppercase tracking-[0.04em] text-brand-dark">Open</span>
+            </a>
+          </li>
         ))}
-      </div>
-      <div class="flex flex-wrap items-center gap-10 pt-2 font-mono text-sm text-[#A3A3A3]">
-        <span>OpenCV</span><span>ROS 2</span><span>MVTec HALCON</span><span>MATLAB</span><span>Kalibr</span><span>COLMAP</span>
+      </ol>
+    </div>
+  </section>
+
+  {/* ── 02 What comes with the board ── */}
+  <section id="with-the-board" class="container-x flex flex-col gap-8 py-[var(--section-y)]">
+    <div class="flex flex-col gap-4">
+      <span class="section-no">02 / What comes with the board</span>
+      <span class="section-rule"></span>
+      <h2 class="m-0 text-[24px] font-semibold md:text-[28px]">The board, its files and the checks behind it</h2>
+    </div>
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <figure class="card bracket m-0 flex flex-col gap-3 p-3 md:p-5">
+        <div class="[&>svg]:h-auto [&>svg]:w-full" set:html={drawing} />
+        <figcaption class="spec-label leading-relaxed">{PN_EXAMPLE} &middot; DICT_5X5_100 &middot; drawn from the same geometry we print &middot; mm</figcaption>
+      </figure>
+      <div class="flex flex-col gap-5">
+        <table class="w-full border-collapse border border-line bg-sheet text-[15px]">
+          <thead>
+            <tr class="bg-brand-tint text-left font-mono text-[12px] uppercase tracking-[0.04em] text-brand-dark">
+              <th class="px-4 py-3 font-medium">Item</th><th class="px-4 py-3 font-medium">What it is</th><th class="hidden px-4 py-3 font-medium sm:table-cell">Format</th>
+            </tr>
+          </thead>
+          <tbody>
+            {deliverables.map(([item, what, format]) => (
+              <tr class="border-t border-line align-top">
+                <th scope="row" class="px-4 py-3.5 text-left font-medium">{item}</th>
+                <td class="px-4 py-3.5 text-ink-muted">{what}</td>
+                <td class="hidden whitespace-nowrap px-4 py-3.5 font-mono text-[14px] sm:table-cell">{format}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <p class="m-0 text-[15px] leading-relaxed text-ink-muted">{RETURN_WINDOW_DAYS}-day returns: {RETURNS_LINE} <a href="/returns/" class="underline decoration-1 underline-offset-[3px]">Returns and warranty</a></p>
+        <div class="flex flex-wrap gap-3">
+          <a href={`/targets/charuco-composite/?size=400x300&dictionary=DICT_5X5_100`} class="btn-md btn-primary">See this board</a>
+          <a href="/files/" class="btn-md btn-secondary">Sample files</a>
+        </div>
       </div>
     </div>
   </section>
@@ -243,8 +207,9 @@ const featuredReviews = allReviews
       <div class="container-x flex flex-col gap-8 py-[var(--section-y)]">
         <div class="flex flex-wrap items-end justify-between gap-4">
           <div class="flex flex-col gap-2.5">
-            <span class="font-mono text-[12px] uppercase tracking-[0.18em] text-brand-text md:text-[13px]">From the bench</span>
-            <h2 class="h-display m-0 text-[28px] md:text-[36px]">What engineers measured.</h2>
+            <span class="section-no">03 / Reviews</span>
+            <span class="section-rule"></span>
+            <h2 class="m-0 text-[24px] font-semibold md:text-[28px]">What engineers measured</h2>
           </div>
           <p class="m-0 max-w-[460px] text-sm text-ink-muted">
             We publish every review unedited and disclose material connections.
@@ -253,7 +218,7 @@ const featuredReviews = allReviews
 
         <div class="flex gap-5 overflow-x-auto pb-2 scrollbar-none md:grid md:grid-cols-3 md:overflow-visible md:pb-0">
           {featuredReviews.map((r) => (
-            <article class="flex w-[85vw] shrink-0 flex-col gap-2.5 rounded border border-line bg-ground-alt p-5 md:w-auto">
+            <article class="flex w-[85vw] shrink-0 flex-col gap-2.5 card p-5 md:w-auto">
               <div class="flex items-center justify-between gap-2.5">
                 <Stars client:load rating={r.stars} />
                 <span class="font-mono text-xs text-ink-muted">
@@ -277,7 +242,7 @@ const featuredReviews = allReviews
           ))}
         </div>
 
-        <a href="/targets/" class="text-[15px] font-medium text-brand-on-dark">
+        <a href="/targets/" class="text-[15px] font-medium underline decoration-1 underline-offset-[3px]">
           Read all reviews on the product pages
         </a>
       </div>
@@ -285,25 +250,44 @@ const featuredReviews = allReviews
   )}
 
   {/* ── Learn + subscribe ── */}
-  <section id="learn" class="container-x flex flex-wrap gap-12 py-[var(--section-y)]">
+  <section id="learn" class="border-t border-line">
+  <div class="container-x flex flex-wrap gap-12 py-[var(--section-y)]">
     {guides.length > 0 && (
       <div class="flex min-w-0 flex-1 basis-[520px] flex-col gap-5">
-        <span class="font-mono text-[12px] uppercase tracking-[0.18em] text-brand-text md:text-[13px]">Knowledge base</span>
-        <h2 class="h-display m-0 text-[26px] md:text-[32px]">Where calibration starts.</h2>
+        <span class="section-no">{showReviews ? '04' : '03'} / Guides</span>
+        <span class="section-rule"></span>
+        <h2 class="m-0 text-[24px] font-semibold md:text-[28px]">How to calibrate, with the numbers</h2>
         <div class="flex flex-col border-t border-line">
           {guides.map((g) => (
             <a href={`/guides/${g.slug}/`} class="flex justify-between gap-4 border-b border-line py-4 text-ink no-underline hover:text-ink">
-              <span class="font-semibold">{g.data.title}</span><ArrowRight size={20} stroke-width={1.6} class="text-brand-on-dark" aria-hidden="true" />
+              <span class="font-medium">{g.data.title}</span><span class="shrink-0 font-mono text-[12px] font-semibold uppercase tracking-[0.04em] text-brand-dark">Read</span>
             </a>
           ))}
         </div>
       </div>
     )}
     <div class="min-w-0 flex-1 basis-[360px] flex flex-col gap-5">
-      <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-ground-alt">
-        <Mail size={22} stroke-width={1.6} class="text-brand" aria-hidden="true" />
-      </div>
       <NewsletterForm client:load />
     </div>
+  </div>
   </section>
+
+  <script>
+    import { resolvePartNumber } from '@/lib/partNumberLookup';
+    const form = document.getElementById('pn-form') as HTMLFormElement | null;
+    const input = document.getElementById('pn-input') as HTMLInputElement | null;
+    const msg = document.getElementById('pn-msg');
+    if (form && input && msg) {
+      const index: Record<string, string> = JSON.parse(form.dataset.index ?? '{}');
+      input.addEventListener('input', () => msg.classList.add('hidden'));
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const value = input.value.trim();
+        if (!value) { input.focus(); return; }
+        const href = resolvePartNumber(value, index);
+        if (href) window.location.href = href;
+        else msg.classList.remove('hidden');
+      });
+    }
+  </script>
 </Base>
