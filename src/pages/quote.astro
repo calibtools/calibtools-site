@@ -12,9 +12,11 @@ const countries = countryOptions();
       </div>
 
       {/* Pattern sent from the generator: parameters only, no files */}
-      <div id="q-pattern-card" class="hidden flex-col gap-1 rounded border border-line bg-ground-alt p-4">
-        <span class="font-mono text-[12px] uppercase tracking-[0.16em] text-brand-dark">Your pattern</span>
-        <span id="q-pattern-summary" class="text-[15px] font-medium"></span>
+      <div id="q-pattern-card" class="card bracket hidden flex-col gap-4 p-5">
+        <span class="eyebrow text-brand-dark">Your pattern</span>
+        <div id="q-pattern-drawing" class="fit-svg hidden aspect-[3/2] w-full items-center justify-center"></div>
+        <span id="q-pattern-summary" class="text-[17px] font-semibold"></span>
+        <dl id="q-pattern-specs" class="m-0 hidden grid-cols-2 gap-px border border-line bg-line sm:grid-cols-3"></dl>
         <span id="q-pattern-id-row" class="hidden text-[13px] text-ink-muted">Pattern ID <span id="q-pattern-id" class="font-mono text-ink"></span></span>
         <a id="q-pattern-link" href="/tools/generator/" class="text-sm">Open this pattern in the generator</a>
         <span class="text-[13px] text-ink-muted">We receive the same parameters, so we quote exactly this pattern.</span>
@@ -24,18 +26,18 @@ const countries = countryOptions();
         <div class="flex flex-col gap-1.5">
           <label for="q-name" class="label">Name</label>
           <input id="q-name" name="name" type="text" required autocomplete="name" class="input" />
-          <p id="q-name-err" class="m-0 hidden text-sm text-brand"></p>
+          <p id="q-name-err" class="m-0 hidden text-sm text-brand-dark"></p>
         </div>
         <div class="flex flex-col gap-1.5">
           <label for="q-company" class="label">Company or institution</label>
           <input id="q-company" name="company" type="text" required autocomplete="organization" class="input" />
-          <p id="q-company-err" class="m-0 hidden text-sm text-brand"></p>
+          <p id="q-company-err" class="m-0 hidden text-sm text-brand-dark"></p>
         </div>
         <div class="flex flex-col gap-1.5">
           <label for="q-email" class="label">Work email</label>
           <input id="q-email" name="email" type="email" required autocomplete="email" class="input" aria-describedby="q-email-hint" />
           <p id="q-email-hint" class="m-0 text-[13px] text-ink-muted">Company or university address; free mailboxes (Gmail, Outlook, QQ …) are not accepted.</p>
-          <p id="q-email-err" class="m-0 hidden text-sm text-brand"></p>
+          <p id="q-email-err" class="m-0 hidden text-sm text-brand-dark"></p>
         </div>
         <div class="flex flex-col gap-1.5">
           <label for="q-product" class="label">Product / SKU</label>
@@ -52,13 +54,13 @@ const countries = countryOptions();
               </span>
             </label>
           ))}
-          <p id="q-material-err" class="m-0 hidden text-sm text-brand"></p>
+          <p id="q-material-err" class="m-0 hidden text-sm text-brand-dark"></p>
         </fieldset>
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-[140px_1fr]">
           <div class="flex flex-col gap-1.5">
             <label for="q-quantity" class="label" id="q-quantity-label">Quantity</label>
             <input id="q-quantity" name="quantity" type="number" min="1" max="9999" step="1" required inputmode="numeric" class="input" />
-            <p id="q-quantity-err" class="m-0 hidden text-sm text-brand"></p>
+            <p id="q-quantity-err" class="m-0 hidden text-sm text-brand-dark"></p>
           </div>
           <div class="flex flex-col gap-1.5">
             <label for="q-country" class="label">Delivery country</label>
@@ -66,7 +68,7 @@ const countries = countryOptions();
               <option value="">Choose…</option>
               {countries.map((c) => <option value={c.code}>{c.name}</option>)}
             </select>
-            <p id="q-country-err" class="m-0 hidden text-sm text-brand"></p>
+            <p id="q-country-err" class="m-0 hidden text-sm text-brand-dark"></p>
           </div>
         </div>
         <div class="flex flex-col gap-1.5">
@@ -84,7 +86,7 @@ const countries = countryOptions();
 
         {/* Cloudflare human check (rendered when a site key is configured) */}
         <div id="q-turnstile" class="min-h-0"></div>
-        <p id="q-form-err" class="m-0 hidden text-sm text-brand"></p>
+        <p id="q-form-err" class="m-0 hidden text-sm text-brand-dark"></p>
 
         <button id="q-submit" type="submit" class="btn-md btn-primary mt-2">Send quote request</button>
         <p class="m-0 text-sm text-ink-muted">We reply within one business day. You can also email <a href="mailto:hello@calib.tools">hello@calib.tools</a> directly.</p>
@@ -94,7 +96,8 @@ const countries = countryOptions();
   <script>
     import { checkWorkEmail, WORK_EMAIL_MESSAGE } from '@/lib/workEmail';
     import { mountTurnstile, TURNSTILE_SITE_KEY } from '@/lib/turnstileClient';
-    import { patternIdFromPath } from '@/lib/patternLink';
+    import { patternIdFromPath, specFromLink } from '@/lib/patternLink';
+    import { patternRows } from '@/lib/patternRows';
 
     const form = document.getElementById('q-form') as HTMLFormElement;
     const showErr = (field: string, msg: string) => {
@@ -183,6 +186,27 @@ const countries = countryOptions();
         document.getElementById('q-pattern-id-row')!.classList.remove('hidden');
       }
       document.getElementById('q-pattern-card')!.classList.replace('hidden', 'flex');
+
+      // The parameters as a table and the pattern drawn from them, so the visitor sees what we will quote
+      const spec = specFromLink(pattern);
+      if (spec) {
+        const dl = document.getElementById('q-pattern-specs')!;
+        for (const [label, value] of patternRows(spec)) {
+          const cell = document.createElement('div');
+          cell.className = 'flex flex-col gap-1 bg-sheet p-3';
+          const dt = document.createElement('dt'); dt.className = 'spec-label'; dt.textContent = label;
+          const dd = document.createElement('dd'); dd.className = 'm-0 font-mono text-[14px] text-ink'; dd.textContent = value;
+          cell.append(dt, dd); dl.append(cell);
+        }
+        dl.classList.replace('hidden', 'grid');
+        // Loaded on demand: the marker dictionaries are large and only needed when a pattern was sent
+        Promise.all([import('@/lib/patterns'), import('@/lib/pageLayout')]).then(([{ checkerboardSvg }, { patternExtent }]) => {
+          const { bw, bh } = patternExtent(spec);
+          const box = document.getElementById('q-pattern-drawing')!;
+          box.innerHTML = checkerboardSvg({ ...spec, scaleBar: false, showCornerBadge: false, showAxes: false }, bw + 20, bh + 20);
+          box.classList.replace('hidden', 'flex');
+        }).catch(() => { /* the card works without the drawing */ });
+      }
     }
     // A product name handed over from a product or collection page fills the product line
     const productParam = (qp.get('product') ?? '').slice(0, 120);
