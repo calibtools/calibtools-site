@@ -297,3 +297,26 @@ describe('checkerboard Radon (rounded)', () => {
     expect(svg).toContain('ry="');
   });
 });
+
+describe('ChArUco legacy layout (OpenCV <= 4.5)', () => {
+  const base: PatternSpec = { type: 'ChArUco', rows: 6, cols: 9, square: 25, marker: 18, dict: 'DICT_6X6_250', paper: 'A4', startId: 0, scaleBar: false };
+  it('even rows: the top-left cell is white and carries the first marker', async () => {
+    const { charucoMarkers, isMarkerCell } = await import('./renderCharuco');
+    const now = charucoMarkers(base), legacy = charucoMarkers({ ...base, legacyLayout: true });
+    expect(now[0]).toMatchObject({ id: 0, row: 0, col: 1 });
+    expect(legacy[0]).toMatchObject({ id: 0, row: 0, col: 0 });
+    expect(legacy).toHaveLength(now.length);
+    expect(isMarkerCell({ rows: 6, legacyLayout: true }, 0, 0)).toBe(true);
+    // every cell flips between the two layouts
+    for (let r = 0; r < 6; r++) for (let c = 0; c < 9; c++) expect(isMarkerCell({ rows: 6, legacyLayout: true }, r, c)).toBe(!isMarkerCell({ rows: 6 }, r, c));
+  });
+  it('odd rows: both layouts are the same board', async () => {
+    const { charucoMarkers } = await import('./renderCharuco');
+    expect(charucoMarkers({ ...base, rows: 7, legacyLayout: true })).toEqual(charucoMarkers({ ...base, rows: 7 }));
+  });
+  it('the drawing follows: no black square at the top-left of a legacy even-row board', async () => {
+    const { renderCharucoSvg } = await import('./renderCharuco');
+    expect(renderCharucoSvg(base, 0, 0)).toContain('<rect x="0" y="0" width="25" height="25" fill="#000"/>');
+    expect(renderCharucoSvg({ ...base, legacyLayout: true }, 0, 0)).not.toContain('<rect x="0" y="0" width="25" height="25" fill="#000"/>');
+  });
+});

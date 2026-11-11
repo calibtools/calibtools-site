@@ -36,6 +36,7 @@ const COMPAT: Record<FamilyKey, CompatRow[]> = {
   ],
   circlegrid: [
     { tool: 'OpenCV', note: 'findCirclesGrid (symmetric and asymmetric)' },
+    { tool: 'ROS 2', note: 'camera_calibration with the circles or acircles pattern' },
     { tool: 'Kalibr', note: 'circlegrid target (symmetric grids)' },
     { tool: 'MATLAB', note: 'detectCircleGridPoints' },
     { tool: 'HALCON', note: 'Circle centers as a point tuple for set_calib_data_calib_object' },
@@ -51,7 +52,7 @@ const FILES: Record<FamilyKey, string[]> = {
   charuco: ['Datasheet PDF', `OpenCV JSON · ROS 2 YAML ${GENERATOR}`, `HALCON point tuple ${GENERATOR}`, 'DXF drawing on request'],
   checkerboard: ['Datasheet PDF', `OpenCV JSON · Kalibr YAML · ROS 2 YAML ${GENERATOR}`, `HALCON point tuple ${GENERATOR}`, 'DXF drawing on request'],
   aprilgrid: ['Datasheet PDF', `Kalibr YAML · OpenCV JSON ${GENERATOR}`, 'DXF drawing on request'],
-  circlegrid: ['Datasheet PDF', `OpenCV JSON ${GENERATOR}`, `Kalibr YAML for symmetric grids ${GENERATOR}`, 'DXF drawing on request'],
+  circlegrid: ['Datasheet PDF', `OpenCV JSON · ROS 2 YAML ${GENERATOR}`, `Kalibr YAML for symmetric grids ${GENERATOR}`, 'DXF drawing on request'],
   halcon: ['Datasheet PDF', 'HALCON .descr calibration plate description', 'DXF drawing on request'],
 };
 

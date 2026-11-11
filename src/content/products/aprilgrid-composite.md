@@ -101,7 +101,7 @@ The matte print matters here more than elsewhere: a sensor rig moving in front o
 
 ## Files and software
 
-Each board comes with `.kalibr.yaml`, `.opencv.json`, `.ros2.yaml` and a `.dxf` of the pattern. The [Kalibr guide](/guides/kalibr-camera-imu-calibration/) covers the IMU noise file, the recording and how to read the result.
+Each board comes with `.kalibr.yaml`, `.opencv.json` and a `.dxf` of the pattern. The [Kalibr guide](/guides/kalibr-camera-imu-calibration/) covers the IMU noise file, the recording and how to read the result.
 
 To rehearse the motion before the board arrives, print the same grid with the [AprilGrid generator](/tools/generator/aprilgrid/). If the same rig also needs a stereo or hand-eye calibration in OpenCV, the [ChArUco board](/targets/charuco-composite/) is the better fit for that step.
 
