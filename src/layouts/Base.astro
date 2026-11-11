@@ -106,5 +106,16 @@ const jsonLdItems = [...providedLd, ...(autoBc ? [autoBc] : []), ORGANIZATION_LD
         check();
       })();
     </script>
+    <script>
+      // A link to a folded section, or to something inside one, opens it first.
+      import { openDisclosuresFor, idFromHash } from '@/lib/openForHash';
+      function openTarget() {
+        const id = idFromHash(location.hash);
+        const el = id ? document.getElementById(id) : null;
+        if (el && openDisclosuresFor(el) > 0) el.scrollIntoView({ block: 'start' });
+      }
+      openTarget();
+      window.addEventListener('hashchange', openTarget);
+    </script>
   </body>
 </html>
