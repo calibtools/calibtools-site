@@ -133,6 +133,7 @@ These must never appear on the website, datasheets or marketing materials:
 - "certified" (unless part of: "CNAS-accredited", "DAkkS-accredited", "DAkkS-calibrated", "accredited third-party laboratory", or the certificate product description)
 - "days delivery" (we ship made-to-order in weeks, not days)
 - "Calibrate with Confidence" (superseded tagline — use `TAGLINE` from `src/lib/claims.ts`)
+- "Know your target to the micron" (superseded 2026-11-11: only the ceramic targets could back it up — use `TAGLINE`)
 - "Shipped fast" (superseded copy)
 - "DAkkS certificate", "DAkkS-certified", "certified by DAkkS" (the certificate is issued by a CNAS lab, not by DAkkS; our golden sample is DAkkS-calibrated)
 - "lab-grade" (vague, unverifiable)

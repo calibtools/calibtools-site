@@ -62,14 +62,14 @@ const featuredReviews = allReviews
   })
   .slice(0, 3);
 ---
-<Base title={TAGLINE} description={`${TAGLINE}. Calibration targets measured before they ship, plus free browser tools for your machine-vision work. Made to order.`}>
+<Base title="Camera calibration targets and tools" description={`${TAGLINE}. Measured before they ship, made to order. Free browser tools for your machine-vision work.`}>
 
   {/* ── Find a target ── */}
   <section id="top" class="container-x flex flex-col gap-8 pb-12 pt-10 md:gap-10 md:pb-14 md:pt-12">
     <div class="flex flex-col gap-8 lg:flex-row lg:items-end lg:gap-6">
       <div class="flex min-w-0 flex-col gap-4 lg:w-[58%]">
         <span class="section-no">Calibration targets and tools</span>
-        <h1 class="m-0 text-[32px] font-semibold leading-[1.12] md:text-[40px]" data-hero-h1>Calibration targets whose files, geometry and data agree.</h1>
+        <h1 class="m-0 text-[32px] font-semibold leading-[1.12] md:text-[40px]" data-hero-h1>{TAGLINE}.</h1>
         <p class="m-0 max-w-[640px] text-[17px] leading-[1.55] text-ink-muted md:text-[18px]">
           Checkerboard, ChArUco, AprilGrid, circle-grid and HALCON boards for OpenCV, Kalibr, ROS and HALCON. Each board is printed from the same geometry as the config files you download.
         </p>
