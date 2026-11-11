@@ -88,7 +88,8 @@ function parseOpencvJson(text: string): CalibConfig {
     rows: obj.rows,
     cols: obj.cols,
     square: obj.square_mm ?? obj.square ?? obj.squareSize,
-    marker: obj.marker_mm ?? obj.marker ?? obj.markerSize ?? 0,
+    // AprilGrid files give the gap as a ratio of the tag side; the config carries it in mm.
+    marker: obj.marker_mm ?? obj.marker ?? obj.markerSize ?? (obj.tag_gap_mm ?? 0),
     dict: obj.dictionary ?? obj.dict ?? 'DICT_6X6_250',
     startId: obj.start_id ?? obj.startId ?? 0,
   };
@@ -133,29 +134,22 @@ function parseKalibrYaml(text: string): CalibConfig {
 function parseRos2Yaml(text: string): CalibConfig {
   const v = yamlValues(text);
   const boardType = v['type'] ?? 'chessboard';
-  const innerRows = num(v['rows']);
-  const innerCols = num(v['cols']);
-  const squareM = num(v['square_size']);
-  const square = squareM * 1000;
+  const cols = num(v['cols']), rows = num(v['rows']);
+  const square = num(v['square_size']) * 1000;
+  const marker = v['marker_size'] ? num(v['marker_size']) * 1000 : 0;
+  const dict = v['dictionary'] ?? 'DICT_6X6_250';
+  const startId = v['start_id'] ? num(v['start_id']) : 0;
+  const rest = { square, marker, dict, startId };
 
-  let marker = 0;
-  let dict = 'DICT_6X6_250';
-  let startId = 0;
-  if (v['marker_size']) {
-    marker = num(v['marker_size']) * 1000;
+  // Files written before 2026-11-12 have no `size` line and give interior corners for every pattern.
+  const counted = v['size'] !== undefined;
+  if (boardType.includes('charuco')) {
+    return counted ? { type: 'ChArUco', rows, cols, ...rest } : { type: 'ChArUco', rows: rows + 1, cols: cols + 1, ...rest };
   }
-  if (v['dictionary']) dict = v['dictionary'];
-  if (v['start_id']) startId = num(v['start_id']);
-
-  let type: PatternSpec['type'] = 'Checkerboard';
-  if (boardType.includes('charuco')) type = 'ChArUco';
-
-  return {
-    type,
-    rows: innerRows + 1,
-    cols: innerCols + 1,
-    square, marker, dict, startId,
-  };
+  if (boardType === 'acircles') return { type: 'Asymmetric circles', rows, cols: cols * 2, ...rest };
+  if (boardType === 'circles') return { type: 'Symmetric circles', rows, cols, ...rest };
+  // chessboard: interior corners, so squares = +1
+  return { type: 'Checkerboard', rows: rows + 1, cols: cols + 1, ...rest };
 }
 
 // --- Helpers ---

@@ -5,7 +5,7 @@ import { exportPdf, exportTiledPdf } from '@/lib/exportPdf';
 import { exportPng } from '@/lib/exportPng';
 import { exportDxf } from '@/lib/exportDxf';
 import { matchCatalog, productUrlFor, specFromEntry, quoteSummary } from '@/lib/catalogPatterns';
-import { kalibrYaml, kalibrSupported, ros2Yaml, halconCode, halconSupported, opencvJson } from '@/lib/exportConfig';
+import { kalibrYaml, kalibrSupported, ros2Yaml, ros2Supported, halconCode, halconSupported, opencvJson } from '@/lib/exportConfig';
 import { exportZip } from '@/lib/exportZip';
 import { patternSummary } from '@/lib/brand';
 import { computeSetBoards, buildSetManifest, setBoardFilename } from '@/lib/exportSet';
@@ -447,7 +447,7 @@ export default function Generator({ initialSpec, heading = 'Pattern generator' }
                     { name: `${slug}.dxf`, desc: 'DXF for CNC/laser fabrication', data: dxf },
                     { name: `${slug}.opencv.json`, desc: 'OpenCV config', data: opencvJson(spec) },
                     ...(kalibrSupported(spec) ? [{ name: `${slug}.kalibr.yaml`, desc: 'Kalibr target config', data: kalibrYaml(spec) }] : []),
-                    { name: `${slug}.ros2.yaml`, desc: 'ROS 2 camera_calibration config', data: ros2Yaml(spec) },
+                    ...(ros2Supported(spec) ? [{ name: `${slug}.ros2.yaml`, desc: 'ROS 2 camera_calibration settings', data: ros2Yaml(spec) }] : []),
                     ...(halconSupported(spec) ? [{ name: `${slug}.halcon.txt`, desc: 'HALCON calibration object (HDevelop code)', data: halconCode(spec) }] : []),
                   ];
                   const blob = await exportZip({ slug, summary, files });
@@ -514,7 +514,7 @@ export default function Generator({ initialSpec, heading = 'Pattern generator' }
           <div className="flex flex-wrap gap-2 font-mono text-[13px]">
             <button type="button" className="rounded bg-ground-panel px-2.5 py-1.5" onClick={() => download(`${slug}.opencv.json`, opencvJson(spec), 'application/json')}>opencv.json</button>
             {kalibrSupported(spec) && <button type="button" className="rounded bg-ground-panel px-2.5 py-1.5" onClick={() => download(`${slug}.kalibr.yaml`, kalibrYaml(spec), 'text/yaml')}>kalibr.yaml</button>}
-            <button type="button" className="rounded bg-ground-panel px-2.5 py-1.5" onClick={() => download(`${slug}.ros2.yaml`, ros2Yaml(spec), 'text/yaml')}>ros2.yaml</button>
+            {ros2Supported(spec) && <button type="button" className="rounded bg-ground-panel px-2.5 py-1.5" onClick={() => download(`${slug}.ros2.yaml`, ros2Yaml(spec), 'text/yaml')}>ros2.yaml</button>}
             {halconSupported(spec) && <button type="button" className="rounded bg-ground-panel px-2.5 py-1.5" onClick={() => download(`${slug}.halcon.txt`, halconCode(spec), 'text/plain')}>halcon.txt</button>}
           </div>
           {spec.type === 'ChArUco' && <p className="m-0 font-sans text-xs text-ink-muted">Kalibr has no ChArUco target model. For camera–IMU calibration with Kalibr, use an <a href="/tools/generator/aprilgrid/">AprilGrid</a>.</p>}

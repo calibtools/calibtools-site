@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { kalibrYaml, kalibrSupported, ros2Yaml, halconCode, halconSupported, opencvJson } from './exportConfig';
+import { kalibrYaml, kalibrSupported, ros2Yaml, ros2Supported, ros2Unsupported, rosArucoDict, halconCode, halconSupported, opencvJson } from './exportConfig';
 import { innerCorners } from './patterns';
 import type { PatternSpec } from './patterns';
 import { markerForSquare } from './boardSizes';
@@ -54,28 +54,94 @@ describe('kalibrYaml', () => {
 });
 
 describe('ros2Yaml', () => {
-  it('uses inner corner count (rows-1 x cols-1)', () => {
+  // What --size counts comes from ros-perception/image_pipeline, camera_calibration (calibrator.py, cameracalibrator.py).
+  it('chessboard: interior corners, columns x rows', () => {
     const y = ros2Yaml(checker);
-    expect(y).toContain('rows: 6');
-    expect(y).toContain('cols: 9');
-  });
-
-  it('includes CLI usage comment', () => {
-    const y = ros2Yaml(checker);
-    expect(y).toContain('--size 9x6');
-    expect(y).toContain('--square 0.0250');
-  });
-
-  it('adds marker fields for ChArUco', () => {
-    const y = ros2Yaml(charuco);
-    expect(y).toContain('marker_size: 0.018000');
-    expect(y).toContain('dictionary: DICT_6X6_250');
-    expect(y).toContain('type: charuco');
-  });
-
-  it('square_size is in meters', () => {
-    const y = ros2Yaml(checker);
+    expect(y).toContain('type: chessboard');
+    expect(y).toContain('size: 9x6');
+    expect(y).toContain('--pattern chessboard --size 9x6 --square 0.0250');
     expect(y).toContain('square_size: 0.025000');
+  });
+
+  it('charuco: squares, columns x rows, with marker size and the dictionary key the calibrator takes', () => {
+    const y = ros2Yaml(charuco);
+    expect(y).toContain('type: charuco');
+    expect(y).toContain('size: 10x7');
+    expect(y).toContain('--pattern charuco --size 10x7 --square 0.0250 --charuco_marker_size 0.0180 --aruco_dict 6x6_250');
+    expect(y).toContain('marker_size: 0.018000');
+    expect(y).toContain('aruco_dict: 6x6_250');
+    expect(y).toContain('dictionary: DICT_6X6_250');
+  });
+
+  it('circles: number of circles, columns x rows, center-to-center spacing', () => {
+    const y = ros2Yaml({ ...checker, type: 'Symmetric circles', rows: 10, cols: 14, square: 25 });
+    expect(y).toContain('--pattern circles --size 14x10 --square 0.0250');
+  });
+
+  it('acircles: circles per row x rows, lattice pitch', () => {
+    const y = ros2Yaml({ ...checker, type: 'Asymmetric circles', rows: 11, cols: 8, square: 20 });
+    expect(y).toContain('--pattern acircles --size 4x11 --square 0.0200');
+  });
+
+  it('maps OpenCV dictionary names to the calibrator keys', () => {
+    expect(rosArucoDict('DICT_4X4_50')).toBe('4x4_50');
+    expect(rosArucoDict('DICT_7X7_1000')).toBe('7x7_1000');
+    expect(rosArucoDict('DICT_ARUCO_ORIGINAL')).toBe('aruco_orig');
+    expect(rosArucoDict('DICT_APRILTAG_36h11')).toBeNull();
+    expect(rosArucoDict('DICT_4X4_5X5')).toBeNull();
+  });
+
+  it('is not offered for targets the calibrator cannot use, and says why', () => {
+    const no = (over: Partial<PatternSpec>) => ros2Unsupported({ ...charuco, ...over });
+    expect(ros2Supported(checker)).toBe(true);
+    expect(ros2Supported(charuco)).toBe(true);
+    expect(no({ type: 'AprilGrid (Kalibr)' })).toMatch(/no pattern for AprilGrid/);
+    expect(no({ type: 'ArUco grid' })).toMatch(/no pattern/);
+    expect(no({ type: 'Marker sheet' })).toMatch(/no pattern/);
+    expect(no({ dict: 'DICT_APRILTAG_36h11' })).toMatch(/no dictionary/);
+    expect(no({ startId: 35 })).toMatch(/IDs from 0/);
+    expect(no({ rows: 6, legacyLayout: true })).toMatch(/legacy layout/);
+    expect(no({ rows: 7, legacyLayout: true })).toBeNull(); // odd rows: both layouts are the same board
+    expect(no({ type: 'Asymmetric circles', rows: 5, cols: 7 })).toMatch(/same number of circles/);
+    expect(no({ type: 'Symmetric circles', circleSpacingX: 20, circleSpacingY: 25 })).toMatch(/one spacing/);
+    expect(() => ros2Yaml({ ...charuco, type: 'AprilGrid (Kalibr)' })).toThrow();
+  });
+});
+
+describe('opencvJson carries what applies to the pattern type', () => {
+  const j = (s: PatternSpec) => JSON.parse(opencvJson(s));
+  it('checkerboard: interior-corner size, no marker or dictionary', () => {
+    const o = j(checker);
+    expect(o.opencv_pattern_size).toEqual([9, 6]);
+    expect(o).not.toHaveProperty('dictionary');
+    expect(o).not.toHaveProperty('marker_mm');
+  });
+  it('ChArUco: board size in squares, marker, dictionary, start ID', () => {
+    const o = j(charuco);
+    expect(o.opencv_board_size).toEqual([10, 7]);
+    expect(o).toMatchObject({ marker_mm: 18, dictionary: 'DICT_6X6_250', start_id: 0 });
+  });
+  it('AprilGrid: tag family, size, gap and ID order; no ArUco dictionary', () => {
+    const o = j({ ...aprilgrid, rows: 6, cols: 8, square: 35, tagSpacing: 0.3, dict: 'DICT_6X6_250' });
+    expect(o).toMatchObject({ tag_family: 'tag36h11', tag_size_mm: 35, tag_spacing: 0.3, tag_gap_mm: 10.5, border_bits: 2, start_id: 0, id_range: [0, 47] });
+    expect(o.id_order).toMatch(/bottom-left/);
+    expect(o.axes).toEqual({ frame: 'kalibr', origin: 'bottom-left' });
+    expect(o).not.toHaveProperty('dictionary');
+    expect(o).not.toHaveProperty('marker_mm');
+  });
+  it('circle grids: the pitch that is drawn, also when x and y differ', () => {
+    const o = j({ ...checker, type: 'Symmetric circles', rows: 7, cols: 12, square: 20, circleSpacingX: 22, circleSpacingY: 18, circleDiameter: 12 });
+    expect(o).toMatchObject({ square_mm: 22, spacing_y_mm: 18, circle_diameter_mm: 12, opencv_pattern_size: [12, 7] });
+    expect(o).not.toHaveProperty('dictionary');
+  });
+});
+
+describe('kalibrSupported', () => {
+  it('AprilGrid only as Kalibr can detect it: tag36h11 with a two-bit border', () => {
+    expect(kalibrSupported({ ...aprilgrid })).toBe(true);
+    expect(kalibrSupported({ ...aprilgrid, aprilFamily: '36h11', borderBits: 2 })).toBe(true);
+    expect(kalibrSupported({ ...aprilgrid, aprilFamily: '25h9' })).toBe(false);
+    expect(kalibrSupported({ ...aprilgrid, borderBits: 1 })).toBe(false);
   });
 });
 
