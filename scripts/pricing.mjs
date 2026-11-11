@@ -378,7 +378,7 @@ const PRODUCT_TITLES = {
 const PRODUCT_STORIES = {
   'aprilgrid-composite': '<p>AprilGrid composite board for Kalibr camera-IMU calibration. AprilTag 36h11 markers on rigid aluminum composite.</p>',
   'circlegrid-composite': '<p>Symmetric and asymmetric circle grid targets on rigid aluminum composite. For OpenCV and HALCON workflows.</p>',
-  'halcon-composite': '<p>HALCON calibration plate with MVTec mark layout on rigid aluminum composite. Ships with .descr description file.</p>',
+  'halcon-composite': '<p>HALCON calibration plate on rigid aluminum composite, in the layout that gen_caltab describes: equal black marks in a regular grid, inside a black frame with a triangular corner mark. The number of marks and their spacing are agreed with you before the plate is made; a .descr file in the same format comes with the plate.</p>',
 };
 const PRODUCT_TAGS = {
   'aprilgrid-composite': 'composite, aprilgrid, kalibr',
