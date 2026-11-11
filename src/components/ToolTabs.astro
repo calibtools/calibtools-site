@@ -2,7 +2,7 @@
 import { tools } from '@/lib/tools';
 interface Props { current: string }
 const { current } = Astro.props;
-/** Short labels that fit one row at 1280px; full names in aria-label. */
+/** Short labels that fit one row at 1280px; full names in the title attribute (the accessible name is the visible label). */
 const shortLabels: Record<string, string> = {
   generator: 'Generator', fov: 'FOV', wizard: 'Wizard', convert: 'Convert',
   check: 'Check', quality: 'Quality', capture: 'Capture',
@@ -10,7 +10,7 @@ const shortLabels: Record<string, string> = {
 ---
 <div class="container-x flex flex-wrap gap-2 pt-5 text-sm font-semibold">
   {tools.map((t) => (
-    <a href={t.href} aria-label={t.title} class={`rounded-full h-11 md:h-10 px-4 inline-flex items-center no-underline ${current === t.key ? 'bg-ink text-white hover:text-white' : 'bg-ground-panel text-ink hover:text-ink'}`}>
+    <a href={t.href} title={t.title} class={`rounded border h-11 md:h-10 px-4 inline-flex items-center no-underline ${current === t.key ? 'border-ink bg-ink text-white hover:text-white' : 'border-line-strong bg-sheet text-ink hover:text-ink hover:border-ink'}`}>
       {shortLabels[t.key] ?? t.title}
     </a>
   ))}
