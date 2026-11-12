@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
-import { PARTIAL_VIEW_CASES, PARTIAL_VIEW_VISIBLE, partialViewFigureSvg, usafFigureSvg, kalibrFrameFigureSvg, multiBoardFigureSvg, KALIBR_FIGURE_SPEC, MULTI_BOARD_SPECS, fillFigureSvg, fillRowsFromGuide, FILL_FIGURE_SPEC, printDefectFigureSvg, printDefectRowsFromGuide, PRINT_DEFECT_SCALE, hiddenErrorFigureSvg, hiddenErrorRowsFromGuide, HIDDEN_ERROR_SCALE, coverageFigureSvg, COVERAGE_VIEWS, handEyeFigureSvg, HAND_EYE_PANELS, detectionLimitsFigureSvg, detectionLimitsFromGuide, lidarCameraFigureSvg, LIDAR_SKETCH, type PartialViewData } from './guideFigures';
+import { PARTIAL_VIEW_CASES, PARTIAL_VIEW_VISIBLE, partialViewFigureSvg, usafFigureSvg, kalibrFrameFigureSvg, multiBoardFigureSvg, KALIBR_FIGURE_SPEC, MULTI_BOARD_SPECS, fillFigureSvg, fillRowsFromGuide, FILL_FIGURE_SPEC, printDefectFigureSvg, printDefectRowsFromGuide, PRINT_DEFECT_SCALE, detectionLimitsFigureSvg, detectionLimitsFromGuide, lidarCameraFigureSvg, LIDAR_SKETCH, hiddenErrorFigureSvg, hiddenErrorRowsFromGuide, HIDDEN_ERROR_SCALE, coverageFigureSvg, COVERAGE_VIEWS, handEyeFigureSvg, HAND_EYE_PANELS, type PartialViewData } from './guideFigures';
 import { idRange } from './idRange';
 import { patternExtent } from './pageLayout';
 import { charucoMarkers } from './renderCharuco';
@@ -253,6 +253,9 @@ describe('hand-eye figure', () => {
     }
     expect(md).toMatch(/Eye-in-hand\*\* — .*`T_cam2gripper`/);
     expect(md).toMatch(/Eye-to-hand\*\* — .*`T_cam2base`/);
+  });
+});
+
 describe('ChArUco detection limits figure', () => {
   const md = readFileSync('src/content/guides/corner-detection-troubleshooting.md', 'utf8');
   const d = detectionLimitsFromGuide(md);

@@ -324,6 +324,9 @@ export function handEyeFigureSvg(): string {
     }
   });
   const H = HAND_EYE_PANELS.length * ph;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" font-family="Geist, system-ui, sans-serif" role="img"><rect width="${W}" height="${H}" fill="#fff"/>${o}</svg>`;
+}
+
 /* ---- Corner detection guide: where ChArUco stops being found ---- */
 
 export interface PixelRow { pxPerSquare: number; pxPerBit: number; corners: number; checkerboard: string }
