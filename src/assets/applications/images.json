@@ -8,5 +8,6 @@
   "machine-vision-calibration": "Industrial camera on a column looking straight down at a checkerboard calibration board, with a bar light on each side.",
   "microscopy-metrology-calibration": "Glass dot-grid calibration target on the lit stage of a measuring microscope, under the objective.",
   "research-education-calibration": "A paper checkerboard with a curled corner taped to cardboard, next to a flat checkerboard calibration board, with a small camera on a tripod in front.",
-  "thermal-infrared-calibration": "The same checkerboard plate on a stand shown twice: in visible light on the left and as a thermal image on the right."
+  "thermal-infrared-calibration": "The same checkerboard plate on a stand shown twice: in visible light on the left and as a thermal image on the right.",
+  "vehicle-end-of-line-calibration": "Gray sedan on floor rails in a vehicle end-of-line bay, facing a large checkerboard calibration board fixed to a steel frame under strip lights."
 }
