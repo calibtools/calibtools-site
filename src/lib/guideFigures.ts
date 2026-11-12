@@ -326,3 +326,93 @@ export function handEyeFigureSvg(): string {
   const H = HAND_EYE_PANELS.length * ph;
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" font-family="Geist, system-ui, sans-serif" role="img"><rect width="${W}" height="${H}" fill="#fff"/>${o}</svg>`;
 }
+
+/* ---- Corner detection guide: where ChArUco stops being found ---- */
+
+export interface PixelRow { pxPerSquare: number; pxPerBit: number; corners: number; checkerboard: string }
+export interface BlurRow { sigma: number; small: number; large: number; checkerboard: string }
+
+/** The "Too few pixels" and "Blur" tables of the corner detection guide. */
+export function detectionLimitsFromGuide(markdown: string): { total: number; pixels: PixelRow[]; blur: BlurRow[]; smallBit: number; largeBit: number } {
+  const total = +markdown.match(/ChArUco corners \(of (\d+)\)/)![1];
+  const pixels = [...markdown.slice(markdown.indexOf('### Too few pixels'), markdown.indexOf('### Blur')).matchAll(/^\| (\d+) \| ([\d.]+) \| (\d+) \| \d+ \| ([^|]+?) \|$/gm)].map((m) => ({ pxPerSquare: +m[1], pxPerBit: +m[2], corners: +m[3], checkerboard: m[4] }));
+  const head = markdown.match(/\| Blur sigma \(px\) \| ([\d.]+) px\/bit: corners \| ([\d.]+) px\/bit: corners \|/)!;
+  const part = markdown.slice(markdown.indexOf('### Blur'), markdown.indexOf('### Tilt'));
+  const blur = [...part.matchAll(/^\| (\d+) \| (\d+) \| (\d+) \| ([^|]+?) \|$/gm)].map((m) => ({ sigma: +m[1], small: +m[2], large: +m[3], checkerboard: m[4] }));
+  return { total, pixels, blur, smallBit: +head[1], largeBit: +head[2] };
+}
+
+export function detectionLimitsFigureSvg(d: ReturnType<typeof detectionLimitsFromGuide>): string {
+  const W = 640, x0 = 200, barMax = 360, rowH = 30;
+  const bw = (v: number) => +(v / d.total * barMax).toFixed(1);
+  let o = '', y = 0;
+  const heading = (t: string, sub: string) => {
+    o += `<text x="20" y="${y + 28}" font-size="16" font-weight="600" fill="${INK}">${t}</text><text x="20" y="${y + 49}" font-size="13.5" fill="${INK}">${sub}</text>`;
+    y += 64;
+  };
+  const bar = (yy: number, v: number, color: string, h: number) => `<rect x="${x0}" y="${yy}" width="${barMax}" height="${h}" fill="#F4F3EF"/><rect x="${x0}" y="${yy}" width="${bw(v)}" height="${h}" fill="${color}"/><text x="${x0 + barMax + 8}" y="${yy + h / 2 + 5}" font-size="14" fill="${INK}" ${MONO}>${v}</text>`;
+  heading('Fewer pixels per marker bit', `ChArUco corners found, of ${d.total}`);
+  for (const r of d.pixels) {
+    o += `<text x="20" y="${y + 15}" font-size="14" fill="${INK}" ${MONO}>${r.pxPerBit.toFixed(1)} px per bit</text>` + bar(y, r.corners, INK, 18);
+    y += rowH;
+  }
+  y += 14;
+  o += `<line x1="20" y1="${y}" x2="${W - 20}" y2="${y}" stroke="${LINE}" stroke-width="0.8"/>`;
+  heading('More blur', `ChArUco corners found, of ${d.total}, at two bit sizes`);
+  y += 14;
+  o += `<rect x="${x0}" y="${y - 12}" width="12" height="12" fill="${INK}"/><text x="${x0 + 18}" y="${y - 1}" font-size="13" fill="${INK}" ${MONO}>${d.smallBit} px per bit</text><rect x="${x0 + 150}" y="${y - 12}" width="12" height="12" fill="${RED}"/><text x="${x0 + 168}" y="${y - 1}" font-size="13" fill="${INK}" ${MONO}>${d.largeBit} px per bit</text>`;
+  y += 12;
+  for (const r of d.blur) {
+    o += `<text x="20" y="${y + 20}" font-size="14" fill="${INK}" ${MONO}>blur sigma ${r.sigma} px</text>` + bar(y, r.small, INK, 13) + bar(y + 15, r.large, RED, 13);
+    y += 40;
+  }
+  const allFound = d.pixels.every((r) => r.checkerboard === 'found');
+  if (allFound) { o += `<text x="20" y="${y + 18}" font-size="13.5" fill="${INK}">The checkerboard was found in every row of the first test, down to ${Math.min(...d.pixels.map((r) => r.pxPerSquare))} px per square.</text>`; y += 30; }
+  const H = y + 6;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" font-family="Geist, system-ui, sans-serif" role="img"><rect width="${W}" height="${H}" fill="#fff"/>${o}</svg>`;
+}
+
+/* ---- LiDAR-camera guide: one target, two views of it ---- */
+
+/** Panel of the sketch, in figure pixels: four holes (one offset, so the layout is not symmetric) and a marker in each corner. */
+export const LIDAR_SKETCH = {
+  panel: { w: 270, h: 180 },
+  holes: [[92, 62], [178, 62], [92, 120], [190, 126]] as [number, number][],
+  holeR: 20,
+  marker: 34,
+  inset: 10,
+};
+
+export function lidarCameraFigureSvg(): string {
+  const { panel, holes, holeR, marker, inset } = LIDAR_SKETCH;
+  const W = 640, top = 64, xs = [25, 345];
+  let o = `<text x="${xs[0]}" y="26" font-size="16" font-weight="600" fill="${INK}">What the LiDAR sees</text><text x="${xs[0]}" y="47" font-size="13.5" fill="${INK}">Points on the panel, gaps at the holes</text>`;
+  o += `<text x="${xs[1]}" y="26" font-size="16" font-weight="600" fill="${INK}">What the camera sees</text><text x="${xs[1]}" y="47" font-size="13.5" fill="${INK}">Markers, and from their pose the holes</text>`;
+  // LiDAR side: scan lines of returns, none inside a hole
+  let dots = '';
+  for (let y = 6; y < panel.h; y += 9) for (let x = 5; x < panel.w; x += 7) {
+    if (holes.some(([hx, hy]) => Math.hypot(x - hx, y - hy) < holeR)) continue;
+    dots += `<circle cx="${xs[0] + x}" cy="${top + y}" r="1.3" fill="${INK}"/>`;
+  }
+  o += dots;
+  // camera side: the printed panel
+  o += `<rect x="${xs[1]}" y="${top}" width="${panel.w}" height="${panel.h}" fill="#fff" stroke="${INK}" stroke-width="1.5"/>`;
+  const corners: [number, number][] = [[inset, inset], [panel.w - inset - marker, inset], [inset, panel.h - inset - marker], [panel.w - inset - marker, panel.h - inset - marker]];
+  corners.forEach(([mx, my], i) => {
+    o += renderPatternSvg({ ...base, type: 'Marker sheet', rows: 1, cols: 1, square: marker, marker, dict: 'DICT_4X4_50', startId: i }, xs[1] + mx, top + my);
+  });
+  for (const [hx, hy] of holes) o += `<circle cx="${xs[1] + hx}" cy="${top + hy}" r="${holeR}" fill="#F4F3EF" stroke="${INK}" stroke-width="1.2"/>`;
+  // the same four centers in both views
+  xs.forEach((x0) => {
+    for (const [hx, hy] of holes) {
+      const cx = x0 + hx, cy = top + hy;
+      if (x0 === xs[0]) o += `<circle cx="${cx}" cy="${cy}" r="${holeR}" fill="none" stroke="${RED_TEXT}" stroke-width="1.4"/>`;
+      o += `<line x1="${cx - 6}" y1="${cy}" x2="${cx + 6}" y2="${cy}" stroke="${RED_TEXT}" stroke-width="1.6"/><line x1="${cx}" y1="${cy - 6}" x2="${cx}" y2="${cy + 6}" stroke="${RED_TEXT}" stroke-width="1.6"/>`;
+    }
+  });
+  const ty = top + panel.h + 30;
+  o += `<text x="${xs[0]}" y="${ty}" font-size="13.5" fill="${INK}">Circle fit around each gap</text><text x="${xs[1]}" y="${ty}" font-size="13.5" fill="${INK}">Hole positions from the board layout</text>`;
+  o += `<text x="${W / 2}" y="${ty + 34}" text-anchor="middle" font-size="14.5" fill="${INK}">The same four hole centers in both frames: a rigid fit gives <tspan ${MONO} fill="${RED_TEXT}">T_cam_lidar</tspan></text>`;
+  const H = ty + 50;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" font-family="Geist, system-ui, sans-serif" role="img"><rect width="${W}" height="${H}" fill="#fff"/>${o}</svg>`;
+}

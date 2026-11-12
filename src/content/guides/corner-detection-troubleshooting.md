@@ -110,6 +110,8 @@ Relaxed detector parameters (`minMarkerPerimeterRate`, smaller adaptive-threshol
 
 Blur scales with bit size: markers survive a Gaussian blur of roughly a third of a bit and fail at about half. The checkerboard tolerates blur more than five times larger. Defocus, motion blur and a cheap lens at full aperture all count.
 
+![ChArUco corners found out of 54 as the marker bits get smaller and as blur grows. All 54 at 2.2 px per bit, 3 at 1.4 px. With 2.7 px bits a blur of sigma 2 px leaves none; with 5.4 px bits it leaves 50.](../../assets/guides/charuco-detection-limits.svg)
+
 **Fix:** refocus at the working distance, shorten the exposure (add light rather than gain), hold the board still, and stop the lens down one or two steps.
 
 ### Tilt
