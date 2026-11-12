@@ -2,7 +2,7 @@
 title: "Camera calibration with OpenCV: step by step"
 description: "Calibrate a camera with OpenCV and Python: pick and size a target, capture good images, detect corners, run calibrateCamera and check the result."
 date: 2026-11-07
-updated: 2026-11-07
+updated: 2026-11-12
 readingTime: "12 min"
 keyRule: "Fill the image corners with board views, keep focus and zoom fixed, and judge the result by per-view error, not the overall RMS alone."
 related: ["calibration-target-size", "reprojection-error", "charuco-vs-checkerboard-vs-aprilgrid", "corner-detection-troubleshooting"]
@@ -13,6 +13,8 @@ faq:
     a: "15 to 30 sharp views is a good range. Coverage matters more than count: the board should appear in every part of the image, including the corners, at several tilts and distances."
   - q: "What is a good reprojection error?"
     a: "With a rigid board and a sharp lens, an RMS well under 0.5 px is common. Above 1 px usually points to blur, a bent or mis-sized target, or a few bad views. Check the per-view errors before trusting the number."
+  - q: "Why does calibrateCamera return bad results with my images?"
+    a: "Most often the views do not cover the frame: every board sits in the middle and faces the camera, so the corners of the image are never measured. The other usual causes are blurred or glary images, a board that is bent or whose square size was entered wrong, and one or two bad views. Look at the error of each view, not only the overall RMS."
   - q: "Should I use a checkerboard or ChArUco?"
     a: "ChArUco if the board will not always be fully in view, or for stereo and multi-camera rigs. A plain checkerboard works when every view shows the whole board."
   - q: "Can I calibrate with a board printed on paper?"
@@ -173,6 +175,22 @@ fs.release()
 ```
 
 To undistort a video stream, build the maps once with `cv2.getOptimalNewCameraMatrix` and `cv2.initUndistortRectifyMap`, then call `cv2.remap` on each frame.
+
+## When calibrateCamera returns bad results
+
+A calibration that runs without an error can still be wrong. Work through these in order; each one is quick to check.
+
+1. **Coverage.** Plot where the detected corners fall in the image. If the corners of the frame are empty, the distortion there is a guess. Add views at the edges and corners, tilted.
+
+2. **Sharpness.** Open the images at 100 %. Motion blur and glare move the detected corners; drop those views.
+
+3. **The board.** Measure one printed square and compare it with the size in your code. Lay a straightedge across the board: in [our test with a printed board](/guides/printed-target-costs-half-a-pixel/) a bow of 1 mm made the focal length 2.2 % short.
+
+4. **Per-view error.** Compute the reprojection error of each view. One view at three times the others is a bad view; remove it and calibrate again.
+
+5. **The model.** Stay with the five standard distortion coefficients unless the error grows toward the image edge with good coverage. More terms fit the same corners and extrapolate worse.
+
+The [reprojection error guide](/guides/reprojection-error/) shows how to do checks 4 and 5, and what a low RMS can hide.
 
 ## Common problems
 
