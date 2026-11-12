@@ -1,0 +1,57 @@
+{
+  "no": "Q-SAMPLE-0001",
+  "rev": "A",
+  "date": "2026-11-13",
+  "validUntil": "2026-12-13",
+  "reference": "Sample layout",
+  "watermark": "SAMPLE",
+  "currency": "USD",
+  "taxNote": "excl. import duties and taxes",
+  "intro": "Sample of the custom quotation layout. The figures on this page are placeholders, not an offer.",
+  "seller": {
+    "name": "Calib.Tools",
+    "address": ["1401 21st Street, Suite R", "Sacramento, CA 95811", "United States"],
+    "email": "hello@calib.tools"
+  },
+  "customer": { "name": "Sample Customer", "contact": "Vision systems", "address": ["Street 1", "00000 City", "Country"] },
+  "items": [
+    {
+      "partNo": "CUSTOM",
+      "description": "Backlit chrome-on-glass checkerboard target",
+      "spec": ["14 × 11 squares · 3 mm", "42 × 33 mm pattern · 130 inner corners"],
+      "qty": 1,
+      "unitPrice": 1.0,
+      "leadTime": "to be confirmed"
+    }
+  ],
+  "shipping": { "label": "Shipping (DAP)", "price": 0 },
+  "terms": {
+    "deliveryPayment": [
+      ["Incoterms", "DAP named place · Incoterms 2020. Import duties and taxes are paid by the customer."],
+      ["Payment", "to be confirmed"],
+      ["Warranty", "12 months from delivery against manufacturing defects. Custom targets cannot be returned."],
+      ["Lead time", "to be confirmed, counted from order confirmation"]
+    ],
+    "included": ["Dimensional inspection report (feature positions and overall size).", "Pattern definition file for the calibration software."]
+  },
+  "annex": {
+    "reference": "Specification as agreed by email",
+    "specs": [
+      ["Pattern", "Checkerboard, 14 × 11 squares"],
+      ["Square size", "3 mm"],
+      ["Pattern field", "42 × 33 mm"],
+      ["Inner corners", "13 × 10 = 130"],
+      ["Substrate", "Chrome on glass, for backlit use"],
+      ["Clear border", "3 mm each side + clamping edge"],
+      ["Pattern side", "Faces the camera"],
+      ["Feature position tolerance", "±2 µm"],
+      ["Overall size tolerance", "±0.05 mm"],
+      ["Flatness", "< 30 µm"]
+    ],
+    "notes": [
+      ["Release basis", "This annex lists the specification as confirmed with the customer. Manufacture starts after the order is confirmed against this quotation."],
+      ["Deliverables", "The target is supplied with a dimensional inspection report and the pattern definition file."]
+    ]
+  },
+  "signatory": { "name": "Calib.Tools", "title": "Customer Success" }
+}
