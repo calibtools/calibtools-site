@@ -19,6 +19,8 @@ export interface ManifestFileEntry {
   path: string;
   sha256: string;
   pages?: number;
+  /** First-page picture, with the hash of the PDF it was made from. */
+  thumb?: { path: string; pdfSha256: string };
 }
 
 /** Resolved datasheet record exposed to pages */
@@ -28,6 +30,8 @@ export interface DatasheetEntry {
   material: string;
   pages: number;
   url: string;
+  /** First page as a small picture; absent until docs:build has made one. */
+  thumbUrl?: string;
   /** Product name from the datasheet markdown frontmatter (e.g. "ChArUco Calibration Target, Aluminum Composite"). */
   name: string;
 }
@@ -68,6 +72,10 @@ function parseFamilyMaterial(code: string): { family: string; material: string }
   return { family: m[1], material: m[2] };
 }
 
+function publicUrl(path: string): string {
+  return path.startsWith('public/') ? `/${path.slice('public/'.length)}` : `/${path}`;
+}
+
 /** Load and cache all datasheet entries from the manifest. */
 export function getDatasheetManifest(): DatasheetEntry[] {
   if (_cache) return _cache;
@@ -87,7 +95,8 @@ export function getDatasheetManifest(): DatasheetEntry[] {
           family: fm.family,
           material: fm.material,
           pages: f.pages ?? 0,
-          url: f.path.startsWith('public/') ? `/${f.path.slice('public/'.length)}` : `/${f.path}`,
+          url: publicUrl(f.path),
+          thumbUrl: f.thumb ? publicUrl(f.thumb.path) : undefined,
           name: readDatasheetTitle(f.code),
         };
       });

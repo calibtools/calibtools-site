@@ -6,7 +6,9 @@
  * Usage: pnpm docs:build [--sample]
  */
 
-import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, statSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, statSync, mkdtempSync, rmSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
+import { tmpdir } from 'node:os';
 import { resolve, relative } from 'node:path';
 import { createHash } from 'node:crypto';
 
@@ -72,6 +74,28 @@ function sha256File(path) {
 
 // ── Main ────────────────────────────────────────────────────────────
 
+/**
+ * First page of a PDF as a small WebP for the files page.
+ * Needs pdftoppm (poppler), the same tool check-detection uses.
+ */
+async function renderThumb(pdfPath, thumbPath) {
+  const dir = mkdtempSync(resolve(tmpdir(), 'ct-thumb-'));
+  try {
+    const base = resolve(dir, 'p');
+    try {
+      execFileSync('pdftoppm', ['-png', '-f', '1', '-l', '1', '-scale-to-x', '720', '-scale-to-y', '-1', pdfPath, base], { stdio: 'pipe' });
+    } catch (err) {
+      throw new Error(`pdftoppm could not render ${relative(ROOT, pdfPath)} (is poppler installed?): ${err.message}`);
+    }
+    const png = readdirSync(dir).find((f) => f.endsWith('.png'));
+    if (!png) throw new Error(`pdftoppm wrote no page image for ${relative(ROOT, pdfPath)}`);
+    const { default: sharp } = await import('sharp');
+    await sharp(resolve(dir, png)).webp({ quality: 82 }).toFile(thumbPath);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+}
+
 async function main() {
   console.log('[docs:build] Starting...');
   if (watermark) console.log('[docs:build] Watermark:', watermark);
@@ -104,11 +128,15 @@ async function main() {
     try {
       const result = await buildDS({ code, outBase, watermark });
       const pdfPath = `${outBase}.pdf`;
+      const pdfSha = sha256File(pdfPath);
+      const thumbPath = `${outBase}-thumb.webp`;
+      await renderThumb(pdfPath, thumbPath);
       manifestFiles.push({
         code,
         path: relative(ROOT, pdfPath),
-        sha256: sha256File(pdfPath),
+        sha256: pdfSha,
         pages: result.pages,
+        thumb: { path: relative(ROOT, thumbPath), pdfSha256: pdfSha },
       });
       console.log(`  -> ${result.pages} pages`);
     } catch (err) {
