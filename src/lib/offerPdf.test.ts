@@ -84,8 +84,10 @@ describe('offer PDF', () => {
     (d as any).items = [];
     await expect(offerPdf(d, fonts())).rejects.toThrow('offer data: items');
   });
-  it('carries no personal name in the sample', () => {
+  it('signs the sample as the quotation signatory and names nobody else', () => {
     const d = sample();
-    expect(d.signatory.name).toBe('Calib.Tools');
+    expect(d.signatory).toEqual({ name: 'Kevin Lee', title: 'Customer Success' });
+    expect(d.seller.name).toBe('Calib.Tools');
+    expect(d.customer.name).toBe('Sample Customer');
   });
 });
