@@ -36,6 +36,7 @@ catalog pages from the Storefront API and links into the cart.
 
 ## Conventions
 - No personal names anywhere: not on the site, in copy, metadata, structured data, PDFs, review replies or docs. Sign as "Calib.Tools" or "Calib.Tools Engineering"; use role mailboxes (hello@, support@ …), never a personal address.
+  Exception — customer quotations (CT-QT, `/q/…` offer PDFs and their offer data): the signatory is "Kevin Lee", Customer Success, the name customer inquiries are answered under. No other personal name, and not on any other document or page.
 - Brand in prose = Calib.Tools; domain/URLs/logo stay lowercase calib.tools.
 - Logo: header and footer use only the framed wordmark, no ™ (`public/brand/wordmark-framed-light.svg` positive, `-dark.svg` negative; red dot, never mono). The C.T icon is the favicon only. See docs/brand/brand.md.
 - Spelling: US English (millimeters, aluminum, color, center, optimize, catalog). Code identifiers, API fields, URL slugs and quoted third-party text are left as they are.

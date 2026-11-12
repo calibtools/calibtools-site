@@ -27,5 +27,5 @@ are not listed in the email.
 
 ## Rules
 - Seller name and address come from the offer data. The footer is the shared contact line.
-- No personal names: the signatory is "Calib.Tools" with a role as title.
+- Signatory: "Kevin Lee", Customer Success. This is the one exception to the no-personal-names rule (see CLAUDE.md); no other name goes on the document.
 - To withdraw an offer, delete its metaobject; the link then answers 404.
