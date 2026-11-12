@@ -46,6 +46,9 @@ const SVG_ALLOW = [
   'src/lib/brand.test.ts',
   'src/lib/brand-overlay.test.ts',
   'src/lib/icons.test.ts',
+  // Generated figures: the SVG is the output, not an icon
+  'src/lib/guideFigures.ts',
+  'src/lib/usaf1951.ts',
   'src/docs/ctdoc.ts',
   'src/docs/ctpattern.ts',
   'src/docs/build/ct-ir.ts',

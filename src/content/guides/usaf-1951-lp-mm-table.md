@@ -27,6 +27,10 @@ Bars are arranged in **groups**, and each group has six **elements**. Each eleme
 
 From one element to the next, the spatial frequency rises by the sixth root of 2 (about 12 %). From one group to the next it doubles. Group numbers on common charts run from −2 to 7; high-resolution glass targets go to group 9.
 
+![USAF 1951 target, groups 0 to 3. Elements 2 to 6 of group 0 run down the left side and its element 1 sits at the bottom right; group 1 runs down the right side; groups 2 and 3 repeat the arrangement at a quarter of the size in the middle.](../../assets/guides/usaf-1951-groups-0-3.svg)
+
+Groups 0 to 3, drawn to scale: every bar has the width the formula below gives for its group and element. Even-numbered groups keep their first element at the bottom right and run the other five down the left side; the next pair of groups sits in the middle at a quarter of the size.
+
 ## Formula
 
 - **Resolution:** lp/mm = 2^(group + (element − 1) / 6)
