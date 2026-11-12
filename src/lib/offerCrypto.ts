@@ -30,14 +30,20 @@ export function newOfferId(): string {
   return Array.from(bytes, (b) => (b % 36).toString(36)).join('');
 }
 
+/** Deflate / inflate through the streams API (Workers, browsers, Node 18+). */
+async function pipe(bytes: Uint8Array<ArrayBuffer>, stream: CompressionStream | DecompressionStream): Promise<Uint8Array<ArrayBuffer>> {
+  const out = await new Response(new Blob([bytes]).stream().pipeThrough(stream)).arrayBuffer();
+  return new Uint8Array(out);
+}
+
 const importKey = (key: string, usage: KeyUsage) =>
   crypto.subtle.importKey('raw', fromB64url(key), 'AES-GCM', false, [usage]);
 
-/** Encrypt the JSON text of an offer. Returns the stored payload and the key for the link. */
+/** Compress and encrypt the JSON text of an offer. Returns the stored payload and the key for the link. */
 export async function encryptOffer(json: string): Promise<{ payload: string; key: string }> {
   const key = b64url(crypto.getRandomValues(new Uint8Array(32)));
   const iv = crypto.getRandomValues(new Uint8Array(12));
-  const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, await importKey(key, 'encrypt'), new TextEncoder().encode(json));
+  const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, await importKey(key, 'encrypt'), await pipe(new Uint8Array(new TextEncoder().encode(json).slice().buffer), new CompressionStream('deflate-raw')));
   return { payload: `v1.${b64url(iv)}.${b64url(new Uint8Array(ct))}`, key };
 }
 
@@ -47,7 +53,7 @@ export async function decryptOffer(payload: string, key: string): Promise<string
   if (parts.length !== 3 || parts[0] !== 'v1' || !isOfferKey(key)) return null;
   try {
     const pt = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: fromB64url(parts[1]) }, await importKey(key, 'decrypt'), fromB64url(parts[2]));
-    return new TextDecoder().decode(pt);
+    return new TextDecoder().decode(await pipe(new Uint8Array(pt), new DecompressionStream('deflate-raw')));
   } catch {
     return null;
   }
