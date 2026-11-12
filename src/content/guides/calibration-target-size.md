@@ -27,6 +27,10 @@ The right size for a calibration target is set by your camera, lens and working 
 
 In a typical calibration view the board should fill **about 60 % of the frame**, with some views pushing it to the edges and corners. At that size, each checker square should be at least **25 px** across and each marker bit at least **3 px**.
 
+Fill here means the board's width as a share of the frame width.
+
+![The same 14 by 9 ChArUco board in two camera frames: filling 20 % of the frame width, with 13 px undistortion error at the frame corners, and filling 60 %, with 1.4 px.](../../assets/guides/board-fill-20-vs-60.svg)
+
 Fill is what matters because the camera model is only constrained where the board puts corners. Distortion is strongest at the edges of the image, so a board that never reaches them leaves the distortion coefficients guessing out there.
 
 ## What the data shows
