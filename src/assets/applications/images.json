@@ -1,0 +1,12 @@
+{
+  "3d-vision-calibration": "3D scanner on a tripod projecting stripes onto a flat reference plate and a step block on an optical table.",
+  "adas-sensor-calibration": "Camera-LiDAR calibration board with four circular cutouts and four markers on a floor stand, in a hall in front of a car with a sensor on its roof.",
+  "drone-vio-slam-calibration": "Two hands moving a small drone in front of an AprilGrid calibration board fixed to a workshop wall.",
+  "robot-cell-calibration": "ChArUco calibration board on a tilted pedestal inside a fenced robot cell, with a camera mounted on the robot arm behind it.",
+  "robotics-calibration": "Small robot arm with a camera at its wrist looking down at a ChArUco calibration board on a table.",
+  "camera-module-lens-testing": "Camera module on a rail facing a Siemens star chart, with a light panel on each side.",
+  "machine-vision-calibration": "Industrial camera on a column looking straight down at a checkerboard calibration board, with a bar light on each side.",
+  "microscopy-metrology-calibration": "Glass dot-grid calibration target on the lit stage of a measuring microscope, under the objective.",
+  "research-education-calibration": "A paper checkerboard with a curled corner taped to cardboard, next to a flat checkerboard calibration board, with a small camera on a tripod in front.",
+  "thermal-infrared-calibration": "The same checkerboard plate on a stand shown twice: in visible light on the left and as a thermal image on the right."
+}

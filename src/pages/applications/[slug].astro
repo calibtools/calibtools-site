@@ -3,6 +3,8 @@ import Base from '@/layouts/Base.astro';
 import ProductCard from '@/components/ProductCard.astro';
 import { getCollection, getEntry } from 'astro:content';
 import { getProducts } from '@/lib/shopify';
+import { Image } from 'astro:assets';
+import { applicationImage } from '@/lib/applicationImages';
 
 export async function getStaticPaths() {
   const apps = await getCollection('applications');
@@ -22,6 +24,8 @@ for (const p of products) {
   const pc = await getEntry('products', p.handle);
   cardData.set(p.handle, { summary: pc?.data.summary, chips: pc?.data.chips });
 }
+
+const hero = applicationImage(entry.slug);
 
 const siteUrl = 'https://calib.tools';
 const url = `${siteUrl}/applications/${entry.slug}/`;
@@ -52,6 +56,16 @@ const jsonLd = [
     <h1 class="h-display m-0 max-w-[900px] text-[32px] md:text-[44px]">{d.title}</h1>
     <p class="m-0 max-w-[760px] text-lg leading-relaxed text-ink-muted">{d.summary}</p>
     <p class="m-0 text-[15px] font-semibold text-ink">{d.audience}</p>
+    {hero && (
+      <Image
+        src={hero.src}
+        alt={hero.alt}
+        widths={[480, 800, 1200, 1600]}
+        sizes="(max-width: 1100px) 100vw, 1040px"
+        loading="eager"
+        class="mt-2 block aspect-[16/9] h-auto w-full max-w-[1040px] border border-line object-cover"
+      />
+    )}
   </section>
 
   <div class="container-x flex flex-wrap gap-12 pb-16">

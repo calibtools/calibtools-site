@@ -99,31 +99,139 @@
     "handle": "charuco-ceramic",
     "file": "01-hero.webp",
     "kind": "ai",
-    "alt": "Calib.Tools 185 by 110 mm white ceramic 7 × 12 ChArUco calibration plate propped upright on a seamless white background."
+    "alt": "Calib.Tools white ceramic ChArUco calibration plate, 11 by 7 squares with DICT_6X6_250 markers, seen from straight above with a steel rule along its lower edge."
   },
   {
     "handle": "charuco-ceramic",
-    "file": "02-angle.webp",
+    "file": "02-edge.webp",
     "kind": "ai",
-    "alt": "Calib.Tools ceramic ChArUco calibration plate lying flat on white, photographed from the lower left to show its 4 mm ground edge and chamfer."
+    "alt": "Corner of the Calib.Tools ceramic ChArUco calibration plate seen from low down, showing the solid white edge of the plate."
   },
   {
     "handle": "charuco-ceramic",
-    "file": "03-detail.webp",
+    "file": "03-label.webp",
     "kind": "ai",
-    "alt": "Calib.Tools ceramic ChArUco calibration plate close-up of the bottom-left corner showing small ArUco markers and the laser-marked part number line."
+    "alt": "Lower edge of the Calib.Tools ceramic ChArUco calibration plate with the printed line that gives part number, pattern size, dictionary, start ID and serial number."
   },
   {
     "handle": "charuco-ceramic",
-    "file": "04-context.webp",
+    "file": "04-in-use.webp",
     "kind": "ai",
-    "alt": "Calib.Tools ceramic ChArUco calibration plate in a black kinematic mount on an optical table in front of a telecentric lens and machine vision camera."
+    "alt": "Calib.Tools ceramic ChArUco calibration plate lying on a granite base under a downward-facing industrial camera on a column stand."
   },
   {
-    "handle": "charuco-ceramic",
-    "file": "05-scale.webp",
+    "handle": "circlegrid-composite",
+    "file": "01-hero.webp",
     "kind": "ai",
-    "alt": "Calib.Tools ceramic 7 × 12 ChArUco calibration plate photographed from above on dark granite next to a steel ruler and a 1-euro coin."
+    "alt": "Calib.Tools 400 by 300 mm aluminum composite circle grid calibration board, 14 by 10 circles at 25 mm pitch, seen from straight above with a steel rule along its lower edge."
+  },
+  {
+    "handle": "circlegrid-composite",
+    "file": "02-edge.webp",
+    "kind": "ai",
+    "alt": "Corner of the Calib.Tools circle grid calibration board seen from low down, showing the 6 mm edge: white aluminum skins on a black core."
+  },
+  {
+    "handle": "circlegrid-composite",
+    "file": "03-label.webp",
+    "kind": "ai",
+    "alt": "Lower-left corner of the Calib.Tools circle grid calibration board with the printed line that gives part number, circle count, pitch and serial number."
+  },
+  {
+    "handle": "circlegrid-composite",
+    "file": "04-in-use.webp",
+    "kind": "ai",
+    "alt": "Calib.Tools circle grid calibration board standing on an optical table in a dim lab, facing a camera in the foreground."
+  },
+  {
+    "handle": "depth-camera-target",
+    "file": "01-hero.webp",
+    "kind": "ai",
+    "alt": "Flat matte gray board standing upright with a machined metal step block in front of it, the two parts of a depth camera target."
+  },
+  {
+    "handle": "hand-eye-calibration-kit",
+    "file": "01-hero.webp",
+    "kind": "ai",
+    "alt": "Hand-eye calibration kit laid out on white: a ChArUco calibration board, a black robot flange adapter plate, four screws and a clamp."
+  },
+  {
+    "handle": "lidar-camera-target",
+    "file": "01-hero.webp",
+    "kind": "ai",
+    "alt": "LiDAR-camera calibration target on a small tripod: a white board with four circular cutouts and an ArUco marker in each corner."
+  },
+  {
+    "handle": "line-scan-target",
+    "file": "01-hero.webp",
+    "kind": "ai",
+    "alt": "Long, narrow line-scan calibration strip with a row of slanted lines above a row of straight lines."
+  },
+  {
+    "handle": "multi-camera-target",
+    "file": "01-hero.webp",
+    "kind": "ai",
+    "alt": "Three ChArUco calibration boards mounted side by side on a black frame, each angled slightly, as a multi-camera target."
+  },
+  {
+    "handle": "nir-calibration-target",
+    "file": "01-hero.webp",
+    "kind": "ai",
+    "alt": "Checkerboard calibration target on a round-base stand, with a camera that has a ring of infrared LEDs around its lens in the foreground."
+  },
+  {
+    "handle": "radar-camera-target",
+    "file": "01-hero.webp",
+    "kind": "ai",
+    "alt": "ChArUco calibration board on a stand next to a metal trihedral corner reflector on its own stand."
+  },
+  {
+    "handle": "thermal-calibration-target",
+    "file": "01-hero.webp",
+    "kind": "ai",
+    "alt": "Thermal calibration target: a metal plate with a black checkerboard pattern on a stand, connected by a cable to a small control box."
+  },
+  {
+    "handle": "backlit-target",
+    "file": "01-hero.webp",
+    "kind": "ai",
+    "alt": "Backlit glass calibration target lying on a dark surface: a square glass plate with a grid of black dots, lit evenly from below."
+  },
+  {
+    "handle": "color-chart",
+    "file": "01-hero.webp",
+    "kind": "ai",
+    "alt": "Color chart with 24 patches in four rows, the bottom row running from white to dark gray, standing in an aluminum base."
+  },
+  {
+    "handle": "focus-siemens-star-chart",
+    "file": "01-hero.webp",
+    "kind": "ai",
+    "alt": "Siemens star focus chart: a white square board with black and white wedges meeting at the center, standing in a base."
+  },
+  {
+    "handle": "grayscale-oecf-chart",
+    "file": "01-hero.webp",
+    "kind": "ai",
+    "alt": "Gray step chart on a mid-gray board with two rows of neutral patches, one running from black to mid gray and one from mid gray to white."
+  },
+  {
+    "handle": "grid-distortion-target",
+    "file": "01-hero.webp",
+    "kind": "ai",
+    "alt": "Square glass distortion target with a regular grid of small dots, lying on a white cloth."
+  },
+  {
+    "handle": "resolution-chart",
+    "file": "01-hero.webp",
+    "kind": "ai",
+    "alt": "Camera resolution chart standing in a base, with slanted-edge squares, two Siemens stars, line-pair groups and a gray ramp."
+  },
+  {
+    "handle": "resolution-targets-glass",
+    "file": "01-hero.webp",
+    "kind": "ai",
+    "alt": "Glass resolution target with groups of three-bar line patterns in decreasing sizes, lying on a white cloth."
   },
   {
     "handle": "mounting-fixture",
