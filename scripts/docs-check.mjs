@@ -74,6 +74,32 @@ try {
   process.exit(1);
 }
 
+// ── Thumbnails: one per datasheet, made from the PDF that is committed ──
+
+const thumbErrors = [];
+for (const f of manifest.files ?? []) {
+  if (!f.code?.startsWith('CT-DS-')) continue;
+  const pdf = resolve(ROOT, f.path);
+  if (!f.thumb?.path || !existsSync(resolve(ROOT, f.thumb.path))) {
+    thumbErrors.push(`${f.code}: no first-page thumbnail`);
+    continue;
+  }
+  if (!existsSync(pdf)) {
+    thumbErrors.push(`${f.code}: PDF missing at ${f.path}`);
+    continue;
+  }
+  const pdfSha = createHash('sha256').update(readFileSync(pdf)).digest('hex');
+  if (pdfSha !== f.thumb.pdfSha256) {
+    thumbErrors.push(`${f.code}: thumbnail was made from a different PDF than the one committed`);
+  }
+}
+if (thumbErrors.length > 0) {
+  console.error('[docs:check] ERROR: datasheet thumbnails are missing or stale.');
+  for (const e of thumbErrors) console.error(`  ${e}`);
+  console.error('\nRun `pnpm docs:build` and commit the updated files.');
+  process.exit(1);
+}
+
 const currentHash = computeInputHash();
 const storedHash = manifest.inputHash;
 

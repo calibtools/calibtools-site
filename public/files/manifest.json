@@ -1,48 +1,76 @@
 {
-  "generated": "2026-11-11T19:15:44.699Z",
+  "generated": "2026-11-12T09:10:46.326Z",
   "inputHash": "cca42f205798e1af0cc3320bab19e82bb7703f6144b3b56fb4bc1259fa2771cf",
   "files": [
     {
       "code": "CT-DS-CHA-C",
       "path": "public/files/datasheets/CT-DS-CHA-C.pdf",
-      "sha256": "41b42746fc87798967d94046735d4cfb993844ffa47474a564eccf21018081e7",
-      "pages": 4
+      "sha256": "04fc483e5e7cdd12f72d26c4ed9e1ea0450331bb7b2f54952d3bc7bdbd2a48ea",
+      "pages": 4,
+      "thumb": {
+        "path": "public/files/datasheets/CT-DS-CHA-C-thumb.webp",
+        "pdfSha256": "04fc483e5e7cdd12f72d26c4ed9e1ea0450331bb7b2f54952d3bc7bdbd2a48ea"
+      }
     },
     {
       "code": "CT-DS-CHA-P",
       "path": "public/files/datasheets/CT-DS-CHA-P.pdf",
-      "sha256": "cbe494bbf77b2f534e9d1da8ac8b11afc69b14aa2f5e9796d8464f55cb55badd",
-      "pages": 3
+      "sha256": "54da9f4552a6252f55ba6f32b3e55a7caa3c176016389e805bd986d1a072dc0b",
+      "pages": 3,
+      "thumb": {
+        "path": "public/files/datasheets/CT-DS-CHA-P-thumb.webp",
+        "pdfSha256": "54da9f4552a6252f55ba6f32b3e55a7caa3c176016389e805bd986d1a072dc0b"
+      }
     },
     {
       "code": "CT-DS-CHT-P",
       "path": "public/files/datasheets/CT-DS-CHT-P.pdf",
-      "sha256": "bdf0da03f0ad5369e0747f72c6157391291c31bac667e693e4dbc582cc46bffe",
-      "pages": 3
+      "sha256": "af25bfae67a1c96edcbc34674034364eeabe05e2591fe75fc87a5fbad58f6863",
+      "pages": 3,
+      "thumb": {
+        "path": "public/files/datasheets/CT-DS-CHT-P-thumb.webp",
+        "pdfSha256": "af25bfae67a1c96edcbc34674034364eeabe05e2591fe75fc87a5fbad58f6863"
+      }
     },
     {
       "code": "CT-DS-APR-P",
       "path": "public/files/datasheets/CT-DS-APR-P.pdf",
-      "sha256": "0fff542a8c1c32bcd03e33c8e779db2325b45a1147bbb7e8cc91e70f56c38c5c",
-      "pages": 3
+      "sha256": "a7259cd54377c3d615e866f5441d9038787ed01704e7bc66a8175575a9cb59d0",
+      "pages": 3,
+      "thumb": {
+        "path": "public/files/datasheets/CT-DS-APR-P-thumb.webp",
+        "pdfSha256": "a7259cd54377c3d615e866f5441d9038787ed01704e7bc66a8175575a9cb59d0"
+      }
     },
     {
       "code": "CT-DS-CIR-P",
       "path": "public/files/datasheets/CT-DS-CIR-P.pdf",
-      "sha256": "a53eec94791a62701b01216b85411ea8ce33ac49f34c53f4235864d55a74cd09",
-      "pages": 3
+      "sha256": "15839092a76cf3731d630ef66d7f93667e26bf1e9a7c4868310d2d7e804a25bd",
+      "pages": 3,
+      "thumb": {
+        "path": "public/files/datasheets/CT-DS-CIR-P-thumb.webp",
+        "pdfSha256": "15839092a76cf3731d630ef66d7f93667e26bf1e9a7c4868310d2d7e804a25bd"
+      }
     },
     {
       "code": "CT-DS-HAL-P",
       "path": "public/files/datasheets/CT-DS-HAL-P.pdf",
-      "sha256": "2da14358079601e06b968ba41622552f1dcdf352f32a880a4eb7601936c9f055",
-      "pages": 3
+      "sha256": "dd13279dddfdfa2a7f4d57b081753ba9ea39020fdf0a6b58eef0e0a30859333c",
+      "pages": 3,
+      "thumb": {
+        "path": "public/files/datasheets/CT-DS-HAL-P-thumb.webp",
+        "pdfSha256": "dd13279dddfdfa2a7f4d57b081753ba9ea39020fdf0a6b58eef0e0a30859333c"
+      }
     },
     {
       "code": "CT-DS-ACC-A-FIX-14",
       "path": "public/files/datasheets/CT-DS-ACC-A-FIX-14.pdf",
-      "sha256": "5b78a213b97de1e5f94ee46cdeead6c51b03e689211f8e74eb6d2d2fbf64e398",
-      "pages": 1
+      "sha256": "bd706fa62bcc66fe58726bd4c1fc12e8ecd4d885f4cb6b9f141d09ff02907370",
+      "pages": 1,
+      "thumb": {
+        "path": "public/files/datasheets/CT-DS-ACC-A-FIX-14-thumb.webp",
+        "pdfSha256": "bd706fa62bcc66fe58726bd4c1fc12e8ecd4d885f4cb6b9f141d09ff02907370"
+      }
     }
   ]
 }

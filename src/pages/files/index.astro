@@ -22,6 +22,7 @@ const entries = getAllDatasheets();
           <table class="w-full border-collapse text-[15px]">
             <thead>
               <tr class="bg-brand-tint text-left">
+                <th class="py-3 pl-3 pr-0 font-bold text-brand-dark"><span class="sr-only">First page</span></th>
                 <th class="py-3 px-3 font-bold text-brand-dark">Code</th>
                 <th class="py-3 px-3 font-bold text-brand-dark">Product</th>
                 <th class="py-3 px-3 font-bold text-brand-dark text-right">Pages</th>
@@ -31,6 +32,13 @@ const entries = getAllDatasheets();
             <tbody>
               {entries.map((ds, i) => (
                 <tr class={`border-t border-line ${i % 2 === 1 ? 'bg-ground-alt' : ''}`}>
+                  <td class="py-3 pl-3 pr-0 align-middle">
+                    {ds.thumbUrl && (
+                      <a href={ds.url} class="block w-[56px] md:w-[72px]" aria-hidden="true" tabindex="-1">
+                        <img src={ds.thumbUrl} alt="" width="720" height="1019" loading="lazy" decoding="async" class="block h-auto w-full border border-line bg-white" />
+                      </a>
+                    )}
+                  </td>
                   <td class="py-3 px-3 spec">{ds.code}</td>
                   <td class="py-3 px-3">{ds.name}</td>
                   <td class="py-3 px-3 spec text-right">{ds.pages}</td>
