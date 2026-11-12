@@ -1,8 +1,14 @@
 ---
-seoTitle: "FOV calculator — field of view, focal length"
-seoDescription: "Camera field of view calculator: FOV angles, coverage and GSD from sensor, lens and distance. Find the focal length you need and size a calibration board."
+seoTitle: "Camera FOV calculator, field of view converter"
+seoDescription: "Free camera FOV calculator: field of view and coverage from sensor, focal length and distance, in mm and inches. Convert horizontal, vertical, diagonal FOV."
 h1: "Field of view calculator"
 faq:
+  - q: "How do I calculate field of view from focal length?"
+    a: "FOV = 2 × atan(sensor size ÷ (2 × focal length)). Use the sensor width for the horizontal angle, the height for the vertical angle and the diagonal for the diagonal angle. The width you see at a given distance is sensor width × distance ÷ focal length."
+  - q: "How do I convert horizontal FOV to vertical or diagonal FOV?"
+    a: "For a standard lens, tan(V ÷ 2) = tan(H ÷ 2) × height ÷ width. A 90° horizontal FOV on a 16:9 frame is 58.7° vertical and 97.9° diagonal. The FOV converter on this page does it for any aspect ratio, starting from any of the three angles."
+  - q: "What is the field of view of a 50 mm lens?"
+    a: "On a full-frame sensor (36 × 24 mm): 39.6° horizontal, 27.0° vertical and 46.8° diagonal. The same lens on a smaller sensor sees less: about 10.0° horizontal on a 2/3\" machine-vision sensor."
   - q: "What is GSD?"
     a: "Ground sample distance is the real-world size of one pixel at the working distance. Lower GSD means higher spatial resolution."
   - q: "How do I find my sensor dimensions?"
@@ -39,6 +45,10 @@ It works the other way too: enter the field you need to see and it returns the f
 
 **Target fill** — enter the board size you are considering. The calculator shows the recommended minimum distance to fill the given fraction of the frame.
 
+**FOV converter** — enter one angle from a camera or lens datasheet, say whether it is horizontal, vertical or diagonal, and pick the aspect ratio. The other two angles appear at once. It needs no sensor size or focal length.
+
+Coverage and distance are shown in millimeters and in inches or feet.
+
 ## Worked example
 
 2/3" sensor (IMX174, 1920 × 1200), 12 mm lens, 500 mm working distance: the field is about 365 × 275 mm and the GSD about 0.23 mm/px (the coarser of the two axes). The calculator recommends the 200 × 150 mm board at about 55 % fill, with roughly 109 pixels per square.
@@ -54,6 +64,30 @@ All results use the pinhole (rectilinear) model, which holds for standard machin
 - Focal length: f = sensor size × working distance ÷ coverage
 
 - GSD: GSD = coverage ÷ resolution (mm per pixel)
+
+- Converting angles: tan(V ÷ 2) = tan(H ÷ 2) × height ÷ width, and tan(D ÷ 2) = tan(H ÷ 2) × diagonal ÷ width
+
+## Field of view of common lenses
+
+Angles for a full-frame sensor (36 × 24 mm) and for a 2/3" machine-vision sensor (8.77 × 6.60 mm), from the formula above.
+
+| Focal length | Full frame, horizontal | Full frame, vertical | Full frame, diagonal |
+|---|---|---|---|
+| 16 mm | 96.7° | 73.7° | 107.0° |
+| 24 mm | 73.7° | 53.1° | 84.1° |
+| 35 mm | 54.4° | 37.8° | 63.4° |
+| 50 mm | 39.6° | 27.0° | 46.8° |
+| 85 mm | 23.9° | 16.1° | 28.6° |
+| 200 mm | 10.3° | 6.9° | 12.3° |
+
+| Focal length | 2/3" sensor, horizontal | 2/3" sensor, vertical |
+|---|---|---|
+| 8 mm | 57.5° | 44.8° |
+| 12 mm | 40.1° | 30.8° |
+| 16 mm | 30.7° | 23.3° |
+| 25 mm | 19.9° | 15.0° |
+| 35 mm | 14.3° | 10.8° |
+| 50 mm | 10.0° | 7.6° |
 
 ## Choosing a calibration board
 

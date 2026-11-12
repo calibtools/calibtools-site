@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
-import { calculateFov, minDistance } from './fov';
+import { calculateFov, minDistance, convertFov, formatLength, SENSOR_PRESETS, ASPECT_RATIOS } from './fov';
 
 describe('calculateFov', () => {
   // Reference: full frame 35mm sensor, 50mm lens
@@ -131,5 +131,94 @@ describe('home page example', () => {
     const r = calculateFov(8.77, 6.6, 12, 500, 1920, 1200);
     expect([r.hCoverage.toFixed(0), r.vCoverage.toFixed(0)]).toEqual(['365', '275']);
     expect(recommendBoard(r.hCoverage, r.vCoverage, r.gsd).board.label).toBe('200 × 150');
+  });
+});
+
+describe('convertFov', () => {
+  // Rectilinear lens: tan(angle / 2) is proportional to the sensor dimension it spans.
+  it('agrees with calculateFov for a full-frame 50 mm lens (3:2)', () => {
+    const ref = calculateFov(36, 24, 50, 1000, 6000, 4000);
+    const fromH = convertFov(ref.hFovDeg, 'horizontal', 3, 2);
+    expect(fromH.horizontal).toBeCloseTo(ref.hFovDeg, 6);
+    expect(fromH.vertical).toBeCloseTo(ref.vFovDeg, 6);
+    expect(fromH.diagonal).toBeCloseTo(ref.dFovDeg, 6);
+    const fromD = convertFov(ref.dFovDeg, 'diagonal', 3, 2);
+    expect(fromD.horizontal).toBeCloseTo(ref.hFovDeg, 6);
+    expect(fromD.vertical).toBeCloseTo(ref.vFovDeg, 6);
+    const fromV = convertFov(ref.vFovDeg, 'vertical', 3, 2);
+    expect(fromV.horizontal).toBeCloseTo(ref.hFovDeg, 6);
+  });
+
+  it('90° horizontal at 16:9 is 58.72° vertical and 97.85° diagonal', () => {
+    // tan(v/2) = tan(45°) × 9/16 = 0.5625 → v = 58.716°; tan(d/2) = √(16² + 9²)/16 = 1.14735 → d = 97.851°
+    const r = convertFov(90, 'horizontal', 16, 9);
+    expect(r.vertical).toBeCloseTo(58.716, 2);
+    expect(r.diagonal).toBeCloseTo(97.851, 2);
+  });
+
+  it('a square frame has equal horizontal and vertical angles', () => {
+    const r = convertFov(60, 'horizontal', 1, 1);
+    expect(r.vertical).toBeCloseTo(60, 9);
+    expect(r.diagonal).toBeGreaterThan(60);
+  });
+
+  it('returns NaN outside 0–180° or for a bad aspect ratio, never a wrong number', () => {
+    for (const bad of [convertFov(0, 'horizontal', 16, 9), convertFov(180, 'horizontal', 16, 9), convertFov(200, 'diagonal', 16, 9), convertFov(60, 'horizontal', 0, 9), convertFov(NaN, 'vertical', 4, 3)]) {
+      expect(Number.isNaN(bad.horizontal)).toBe(true);
+      expect(Number.isNaN(bad.vertical)).toBe(true);
+      expect(Number.isNaN(bad.diagonal)).toBe(true);
+    }
+  });
+
+  it('offers the common aspect ratios', () => {
+    expect(ASPECT_RATIOS.map((a) => a.label)).toEqual(['16:9', '4:3', '3:2', '1:1', '21:9']);
+  });
+});
+
+describe('formatLength', () => {
+  it('gives millimeters with inches below one meter', () => {
+    expect(formatLength(365.4)).toBe('365.4 mm (14.39 in)');
+    expect(formatLength(25.4)).toBe('25.4 mm (1.00 in)');
+  });
+  it('gives meters with feet from one meter up', () => {
+    expect(formatLength(1000)).toBe('1.00 m (3.28 ft)');
+    expect(formatLength(3048)).toBe('3.05 m (10.00 ft)');
+  });
+});
+
+describe('sensor presets', () => {
+  it('include the formats people outside machine vision search for', () => {
+    for (const name of ['1/2.3" (action camera, drone)', 'Micro Four Thirds', 'APS-C (Sony, Nikon, Fuji)']) expect(SENSOR_PRESETS[name]).toBeDefined();
+  });
+  it('keep the opening preset and end with Custom', () => {
+    expect(SENSOR_PRESETS['2/3" (IMX174)']).toEqual([8.77, 6.60, 1920, 1200]);
+    expect(Object.keys(SENSOR_PRESETS).at(-1)).toBe('Custom');
+  });
+  it('have plausible numbers: positive, wider than tall, sorted by sensor width', () => {
+    const rows = Object.entries(SENSOR_PRESETS).filter(([n]) => n !== 'Custom');
+    for (const [, [w, h, rw, rh]] of rows) { expect(w).toBeGreaterThan(h); expect(h).toBeGreaterThan(0); expect(rw).toBeGreaterThanOrEqual(rh); }
+    const widths = rows.map(([, v]) => v[0]);
+    expect(widths).toEqual([...widths].sort((a, b) => a - b));
+  });
+});
+
+describe('FOV page copy', () => {
+  const md = readFileSync('src/content/tools/fov.md', 'utf8');
+
+  it('lens table rows match the calculator', () => {
+    const rows = [...md.matchAll(/^\| (\d+) mm \| ([\d.]+)° \| ([\d.]+)° \|(?: ([\d.]+)° \|)?$/gm)];
+    expect(rows).toHaveLength(12);
+    for (const [, f, h, v, d] of rows) {
+      const fullFrame = d !== undefined;
+      const r = fullFrame ? calculateFov(36, 24, +f, 1000, 6000, 4000) : calculateFov(8.77, 6.6, +f, 1000, 1920, 1200);
+      expect(r.hFovDeg.toFixed(1)).toBe(h);
+      expect(r.vFovDeg.toFixed(1)).toBe(v);
+      if (fullFrame) expect(r.dFovDeg.toFixed(1)).toBe(d);
+    }
+  });
+
+  it('the converter example in the FAQ matches convertFov', () => {
+    const r = convertFov(90, 'horizontal', 16, 9);
+    expect(md).toContain(`${r.vertical.toFixed(1)}° vertical and ${r.diagonal.toFixed(1)}° diagonal`);
   });
 });
