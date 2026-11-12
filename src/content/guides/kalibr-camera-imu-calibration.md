@@ -47,6 +47,10 @@ tagSize: 0.030        # meters, outer edge of the black square
 tagSpacing: 0.3       # gap / tagSize
 ```
 
+![A 3 by 4 AprilGrid with tag IDs 0 to 3 in the bottom row and 8 to 11 at the top. The origin is the bottom-left corner of tag 0, x points right, y points up. tagSize is the side of one tag; the gap is tagSpacing times tagSize.](../../assets/guides/kalibr-aprilgrid-frame.svg)
+
+Kalibr finds each tag by its ID and expects ID 0 at the bottom left, IDs running left to right and then upward. A grid numbered from the top is a mirror image of that and will not calibrate. The target frame has its origin at the bottom-left corner of tag 0, with x to the right and y up.
+
 The [AprilGrid generator](/tools/generator/aprilgrid/) writes this file for whatever grid you print, and the [AprilGrid board](/targets/aprilgrid-composite/) ships to a stated tag size so the file matches the physical board.
 
 Tag size matters more than anything else in this file. A 1 % error in `tagSize` is a 1 % error in every distance Kalibr estimates. Measure a printed board with callipers across several tags and divide.

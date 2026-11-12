@@ -5,6 +5,7 @@
 import { renderPatternSvg, type PatternSpec } from './patterns';
 import { patternExtent } from './pageLayout';
 import { usaf1951, usaf1951Svg } from './usaf1951';
+import { aprilGridTags } from './renderAprilGrid';
 
 const base = { paper: 'A4', startId: 0, scaleBar: false, marker: 0, dict: 'DICT_6X6_250' } as const;
 
@@ -59,4 +60,56 @@ export function partialViewFigureSvg(data: PartialViewData): string {
 /** USAF 1951 target, groups 0 to 3, for the lp/mm guide. */
 export function usafFigureSvg(): string {
   return usaf1951Svg(usaf1951(0, 3, 1.5)).replace(/#000/g, INK);
+}
+
+const GREEN = '#00A651', RED_TEXT = '#B3000E', GREEN_TEXT = '#007A3D';
+const MONO = `font-family="'Geist Mono', ui-monospace, monospace"`;
+
+/** The AprilGrid of the Kalibr figure: small enough to label every tag. */
+export const KALIBR_FIGURE_SPEC: PatternSpec = { ...base, type: 'AprilGrid (Kalibr)', rows: 3, cols: 4, square: 40, tagSpacing: 0.3, aprilFamily: '36h11', borderBits: 2 };
+
+/** AprilGrid with tag IDs, Kalibr's origin and axes, and what tagSize and tagSpacing measure. Units: mm of the board. */
+export function kalibrFrameFigureSvg(): string {
+  const s = KALIBR_FIGURE_SPEC, tags = aprilGridTags(s);
+  const tag = s.square, gap = tag * s.tagSpacing!, { bw, bh } = patternExtent(s);
+  const ox = 34, oy = 30, W = ox + bw + 16, H = oy + bh + 40;
+  const r = (v: number) => +v.toFixed(3);
+  let o = renderPatternSvg(s, ox, oy);
+  // tag IDs under each tag
+  for (const t of tags) o += `<text x="${r(ox + t.x + tag / 2)}" y="${r(oy + t.y + tag + 8.6)}" text-anchor="middle" font-size="7.5" fill="${INK}" ${MONO}>${t.id}</text>`;
+  // tagSize over the top-left tag, the gap over the first gap
+  const dimY = oy - 8, tick = (x: number) => `<line x1="${r(x)}" y1="${dimY - 3}" x2="${r(x)}" y2="${dimY + 3}" stroke="${INK}" stroke-width="0.6"/>`;
+  o += `<line x1="${ox}" y1="${dimY}" x2="${ox + tag}" y2="${dimY}" stroke="${INK}" stroke-width="0.6"/>${tick(ox)}${tick(ox + tag)}`;
+  o += `<text x="${ox + tag / 2}" y="${dimY - 5}" text-anchor="middle" font-size="6.5" fill="${INK}" ${MONO}>tagSize</text>`;
+  o += `<line x1="${ox + tag}" y1="${dimY}" x2="${r(ox + tag + gap)}" y2="${dimY}" stroke="${RED_TEXT}" stroke-width="0.6"/>${tick(ox + tag + gap)}`;
+  o += `<text x="${r(ox + tag + gap + 3)}" y="${dimY - 5}" font-size="6.5" fill="${RED_TEXT}" ${MONO}>tagSpacing × tagSize</text>`;
+  // origin at the bottom-left corner of tag 0; x to the right, y up
+  const oxA = ox, oyA = oy + bh, axY = oyA + 24, axX = ox - 16, len = 46, h = 5;
+  o += `<line x1="${oxA}" y1="${axY}" x2="${oxA + len}" y2="${axY}" stroke="${RED}" stroke-width="1.6"/><path d="M${oxA + len - h} ${axY - h / 2}L${oxA + len} ${axY}L${oxA + len - h} ${axY + h / 2}" fill="none" stroke="${RED}" stroke-width="1.6"/>`;
+  o += `<text x="${oxA + len + 5}" y="${axY + 2.6}" font-size="7.5" font-weight="600" fill="${RED_TEXT}" ${MONO}>x</text>`;
+  o += `<line x1="${axX}" y1="${oyA}" x2="${axX}" y2="${oyA - len}" stroke="${GREEN}" stroke-width="1.6"/><path d="M${axX - h / 2} ${oyA - len + h}L${axX} ${oyA - len}L${axX + h / 2} ${oyA - len + h}" fill="none" stroke="${GREEN}" stroke-width="1.6"/>`;
+  o += `<text x="${axX}" y="${oyA - len - 4}" text-anchor="middle" font-size="7.5" font-weight="600" fill="${GREEN_TEXT}" ${MONO}>y</text>`;
+  o += `<line x1="${axX}" y1="${oyA}" x2="${oxA}" y2="${oyA}" stroke="${LINE}" stroke-width="0.5" stroke-dasharray="2 2"/><line x1="${oxA}" y1="${oyA}" x2="${oxA}" y2="${axY}" stroke="${LINE}" stroke-width="0.5" stroke-dasharray="2 2"/>`;
+  o += `<circle cx="${oxA}" cy="${oyA}" r="2.6" fill="${RED}" stroke="#fff" stroke-width="0.8"/>`;
+  o += `<text x="${oxA + len + 16}" y="${axY + 2.6}" font-size="6.5" fill="${MUTED}" ${MONO}>origin: bottom-left corner of tag 0</text>`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${r(W * 4)}" height="${r(H * 4)}" viewBox="0 0 ${r(W)} ${r(H)}" role="img"><rect width="${r(W)}" height="${r(H)}" fill="#fff"/>${o}</svg>`;
+}
+
+/** Boards of the multi-board figure: the same 7 × 10 ChArUco board four times, each starting where the last one ended. */
+export const MULTI_BOARD_SPECS: PatternSpec[] = [0, 1, 2, 3].map((i) => ({ ...base, type: 'ChArUco', rows: 7, cols: 10, square: 25, marker: 18, startId: i * 35 }));
+
+/** Four boards in a 2 × 2 arrangement with their marker ID ranges. */
+export function multiBoardFigureSvg(): string {
+  const cellW = 440, cellH = 372, W = 2 * cellW, H = 2 * cellH;
+  let o = '';
+  MULTI_BOARD_SPECS.forEach((s, i) => {
+    const { bw, bh } = patternExtent(s), k = 360 / bw;
+    const x0 = (i % 2) * cellW + (cellW - bw * k) / 2, y0 = Math.floor(i / 2) * cellH + 24;
+    const first = s.startId, last = s.startId + Math.floor((s.rows * s.cols) / 2) - 1;
+    o += `<g transform="translate(${x0} ${y0}) scale(${+k.toFixed(5)})"><rect x="-8" y="-8" width="${bw + 16}" height="${bh + 16}" fill="#fff" stroke="${LINE}" stroke-width="${+(1 / k).toFixed(3)}"/>${renderPatternSvg(s, 0, 0)}</g>`;
+    const cx = (i % 2) * cellW + cellW / 2, ty = y0 + bh * k + 44;
+    o += `<text x="${cx}" y="${ty}" text-anchor="middle" font-size="19" font-weight="600" fill="${INK}">Board ${i + 1}</text>`;
+    o += `<text x="${cx}" y="${ty + 26}" text-anchor="middle" font-size="17" fill="${INK}" ${MONO}>start ID ${first} · IDs ${first}–${last}</text>`;
+  });
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" font-family="Geist, system-ui, sans-serif" role="img"><rect width="${W}" height="${H}" fill="#fff"/>${o}</svg>`;
 }
