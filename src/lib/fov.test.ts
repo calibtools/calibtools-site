@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
-import { calculateFov, minDistance, recommendBoard } from './fov';
+import { calculateFov, minDistance } from './fov';
 
 describe('calculateFov', () => {
   // Reference: full frame 35mm sensor, 50mm lens
