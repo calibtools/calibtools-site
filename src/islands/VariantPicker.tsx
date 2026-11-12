@@ -12,24 +12,15 @@ import { LEAD_TIME, INSPECTION_CLAIM_SHORT } from '@/lib/claims';
 import { findCharucoSize, findAprilGridSize, markerCount } from '@/lib/boardSizes';
 import { entryForOptions, generatorUrlFor } from '@/lib/catalogPatterns';
 
-interface BoardSetImage {
-  src: string;
-  srcset: string;
-  width: number;
-  height: number;
-}
-
 interface Props {
   product: Product;
   /** Variant ID for the mounting fixture add-on. */
   fixtureVariantId?: string;
   /** Formatted price for the fixture add-on, e.g. "€39". */
   fixturePrice?: string;
-  /** Pre-optimised board set image (brand/home-set.png). */
-  boardSetImage?: BoardSetImage;
 }
 
-export default function VariantPicker({ product, fixtureVariantId, fixturePrice, boardSetImage }: Props) {
+export default function VariantPicker({ product, fixtureVariantId, fixturePrice }: Props) {
   // Init selections from URL query params or first variant's options
   const initSelections: Record<string, string> = {};
   if (product.variants.length > 0) {
@@ -363,19 +354,6 @@ export default function VariantPicker({ product, fixtureVariantId, fixturePrice,
                 setBoardStartIds([]);
               }} />
           </div>
-          {boardSetImage && boardCount >= 2 && (
-            <img
-              src={boardSetImage.src}
-              srcSet={boardSetImage.srcset}
-              sizes="(max-width: 640px) 100vw, 420px"
-              width={boardSetImage.width}
-              height={boardSetImage.height}
-              alt="Calib.Tools set of four ChArUco calibration boards with consecutive marker ID ranges arranged in a 2 by 2 grid, seen from above."
-              className="w-full rounded-lg"
-              loading="lazy"
-              decoding="async"
-            />
-          )}
           {boards && boards.length >= 2 && (
             <div className="rounded border border-line bg-ground-panel p-3 text-sm">
               {boards.map(b => (

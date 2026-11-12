@@ -271,12 +271,6 @@
   },
   {
     "handle": "brand",
-    "file": "home-set.webp",
-    "kind": "ai",
-    "alt": "Calib.Tools set of four ChArUco calibration boards with consecutive marker ID ranges arranged in a 2 by 2 grid, seen from above."
-  },
-  {
-    "handle": "brand",
     "file": "dark/hero-three-boards.webp",
     "kind": "ai",
     "alt": "Calib.Tools three calibration boards on a dark surface — a checkerboard, a ChArUco composite board and a ceramic ChArUco plate — with brand markings and coordinate axes in the margins."
