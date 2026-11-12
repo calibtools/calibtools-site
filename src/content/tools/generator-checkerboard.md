@@ -61,7 +61,9 @@ Patterns from this generator are free to use for any purpose: internal, educatio
 
 ## Paper or a rigid board?
 
-A paper print is fine for learning and quick checks. It bows and stretches, and that ends up in your calibration: see [why a printed target costs you 0.5 px](/guides/printed-target-costs-half-a-pixel/). For results you rely on, the [checkerboard on aluminum composite](/targets/checkerboard-composite/) stays flat and is measured before it ships.
+A paper print is fine for learning and quick checks. It bows and stretches, and that ends up in your calibration: see [why a printed target costs you 0.5 px](/guides/printed-target-costs-half-a-pixel/).
+
+For results you rely on, the [checkerboard on aluminum composite](/targets/checkerboard-composite/) stays flat and is measured before it ships.
 
 ## Related guides
 
