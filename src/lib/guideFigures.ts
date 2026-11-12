@@ -147,3 +147,36 @@ export function fillFigureSvg(rows: [FillRow, FillRow]): string {
 export function fillRowsFromGuide(markdown: string): FillRow[] {
   return [...markdown.matchAll(/^\| (\d+) % \| (\d+) \| [\d.]+ px \| [\d.]+ % \| ([\d.]+) px \|$/gm)].map((m) => ({ fill: +m[1], pxPerSquare: +m[2], cornerErrorPx: +m[3] }));
 }
+
+export interface PrintDefectRow { label: string; rms: number; edge: number }
+
+/** Rows of the first results table in the printed-target guide: scenario, RMS and edge error. */
+export function printDefectRowsFromGuide(markdown: string): PrintDefectRow[] {
+  return [...markdown.matchAll(/^\| ([^|]+?) \| ([\d.]+) \| [^|]+ \| [^|]+ \| ([\d.]+) \| [^|]+ \|$/gm)].map((m) => ({ label: m[1].replace(' (reference)', '').replace(' (60 mm pitch)', ''), rms: +m[2], edge: +m[3] }));
+}
+
+/** Largest RMS on the left scale and the two ends of the logarithmic right scale. */
+export const PRINT_DEFECT_SCALE = { rmsMax: 1.6, edgeMin: 1, edgeMax: 200, barMax: 232 };
+
+/**
+ * Two bars per scenario of the printed-target guide: what the calibration reports (RMS) beside how far
+ * the fitted model is off at the frame corners. Narrow on purpose so the labels stay readable on a phone.
+ */
+export function printDefectFigureSvg(rows: PrintDefectRow[]): string {
+  const { rmsMax, edgeMin, edgeMax, barMax } = PRINT_DEFECT_SCALE;
+  const W = 640, x1 = 20, x2 = 336, top = 88, rowH = 54, H = top + rows.length * rowH + 8;
+  const rmsW = (v: number) => +(Math.min(v, rmsMax) / rmsMax * barMax).toFixed(1);
+  const edgeW = (v: number) => +(Math.log(Math.max(v, edgeMin) / edgeMin) / Math.log(edgeMax / edgeMin) * barMax).toFixed(1);
+  let o = `<text x="${x1}" y="26" font-size="16" font-weight="600" fill="${INK}">Reprojection error</text><text x="${x1}" y="48" font-size="14" fill="${INK}">RMS in px, what you see</text>`;
+  o += `<text x="${x2}" y="26" font-size="16" font-weight="600" fill="${INK}">Model error at the frame corners</text><text x="${x2}" y="48" font-size="14" fill="${INK}">px, logarithmic scale, what you get</text>`;
+  // the 0.5 to 1.0 px band that the reprojection error guide marks as "something is wrong"
+  o += `<rect x="${x1 + rmsW(0.5)}" y="${top - 12}" width="${+(rmsW(1) - rmsW(0.5)).toFixed(1)}" height="${H - top + 4}" fill="#FBE9EA"/><text x="${x1 + rmsW(0.5) + 4}" y="${top - 16}" font-size="12" fill="${RED_TEXT}" ${MONO}>0.5–1.0 px</text>`;
+  rows.forEach((r, i) => {
+    const y = top + i * rowH;
+    o += `<text x="${x1}" y="${y + 14}" font-size="15" fill="${INK}">${r.label}</text>`;
+    o += `<rect x="${x1}" y="${y + 22}" width="${Math.max(rmsW(r.rms), 2)}" height="16" fill="${INK}"/><text x="${x1 + Math.max(rmsW(r.rms), 2) + 6}" y="${y + 35}" font-size="14" fill="${INK}" ${MONO}>${r.rms.toFixed(2)}</text>`;
+    o += `<rect x="${x2}" y="${y + 22}" width="${Math.max(edgeW(r.edge), 2)}" height="16" fill="${RED}"/><text x="${x2 + Math.max(edgeW(r.edge), 2) + 6}" y="${y + 35}" font-size="14" fill="${INK}" ${MONO}>${r.edge}</text>`;
+    if (i > 0) o += `<line x1="${x1}" y1="${y - 4}" x2="${W - 20}" y2="${y - 4}" stroke="${LINE}" stroke-width="0.6"/>`;
+  });
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" font-family="Geist, system-ui, sans-serif" role="img"><rect width="${W}" height="${H}" fill="#fff"/>${o}</svg>`;
+}
