@@ -82,6 +82,8 @@ Identical RMS. The extra parameters fit the same corners equally well and extrap
 
 The overall RMS moved by 0.07 px. The per-view errors told the story: fourteen views between 0.03 and 0.25 px, one at 0.60 px.
 
+![Reprojection error beside the true error at the frame corners for the three tests above. The RMS stays between 0.14 and 0.29 px while the true error ranges from 0.8 to 25 px.](../../assets/guides/rms-vs-true-error.svg)
+
 ## Check 1: error per view
 
 `calibrateCamera` returns the pose of every view, so you can compute the error per view yourself. One view far above the rest is a frame to drop: motion blur, the board moved, a reflection, a mis-detected ID.
