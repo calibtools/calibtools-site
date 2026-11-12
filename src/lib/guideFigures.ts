@@ -180,3 +180,149 @@ export function printDefectFigureSvg(rows: PrintDefectRow[]): string {
   });
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" font-family="Geist, system-ui, sans-serif" role="img"><rect width="${W}" height="${H}" fill="#fff"/>${o}</svg>`;
 }
+
+/* ---- Reprojection error guide: what the RMS hides ---- */
+
+export interface HiddenErrorRow { group: string; label: string; rms: number; edge: number }
+
+/** The three small tables under "What it hides": coverage, model complexity, one bad view. */
+export function hiddenErrorRowsFromGuide(markdown: string): HiddenErrorRow[] {
+  const part = markdown.slice(markdown.indexOf('## What it hides'), markdown.indexOf('## Check 1'));
+  const rows: HiddenErrorRow[] = [];
+  let group = '';
+  for (const line of part.split('\n')) {
+    const g = line.match(/^\*\*([^.*]+)\.\*\*/);
+    if (g) group = g[1];
+    const r = line.match(/^\| ([^|]+?) \| ([\d.]+) px \| ([\d.]+) px \|$/);
+    if (r) rows.push({ group, label: /^\d+ %$/.test(r[1]) ? `Board fills ${r[1]}` : /^k\d/.test(r[1]) ? r[1] : r[1][0].toUpperCase() + r[1].slice(1), rms: +r[2], edge: +r[3] });
+  }
+  return rows;
+}
+
+export const HIDDEN_ERROR_SCALE = { rmsMax: 0.3, edgeMin: 0.5, edgeMax: 30, barMax: 232 };
+
+/** Same layout as the printed-target figure: RMS on the left, true error at the frame corners on the right. */
+export function hiddenErrorFigureSvg(rows: HiddenErrorRow[]): string {
+  const { rmsMax, edgeMin, edgeMax, barMax } = HIDDEN_ERROR_SCALE;
+  const W = 640, x1 = 20, x2 = 336, rowH = 54, groupH = 34;
+  const rmsW = (v: number) => +(Math.min(v, rmsMax) / rmsMax * barMax).toFixed(1);
+  const edgeW = (v: number) => +(Math.log(Math.max(v, edgeMin) / edgeMin) / Math.log(edgeMax / edgeMin) * barMax).toFixed(1);
+  let o = `<text x="${x1}" y="26" font-size="16" font-weight="600" fill="${INK}">Reprojection error</text><text x="${x1}" y="48" font-size="14" fill="${INK}">RMS in px, what you see</text>`;
+  o += `<text x="${x2}" y="26" font-size="16" font-weight="600" fill="${INK}">True error at the frame corners</text><text x="${x2}" y="48" font-size="14" fill="${INK}">px, logarithmic scale, what you get</text>`;
+  let y = 64, last = '';
+  for (const r of rows) {
+    if (r.group !== last) {
+      o += `<line x1="${x1}" y1="${y + 6}" x2="${W - 20}" y2="${y + 6}" stroke="${INK}" stroke-width="1"/><text x="${x1}" y="${y + 27}" font-size="13" font-weight="600" letter-spacing="0.08em" fill="${MUTED}">${r.group.toUpperCase()}</text>`;
+      y += groupH; last = r.group;
+    }
+    o += `<text x="${x1}" y="${y + 14}" font-size="15" fill="${INK}">${r.label}</text>`;
+    o += `<rect x="${x1}" y="${y + 22}" width="${Math.max(rmsW(r.rms), 2)}" height="16" fill="${INK}"/><text x="${x1 + Math.max(rmsW(r.rms), 2) + 6}" y="${y + 35}" font-size="14" fill="${INK}" ${MONO}>${r.rms}</text>`;
+    o += `<rect x="${x2}" y="${y + 22}" width="${Math.max(edgeW(r.edge), 2)}" height="16" fill="${RED}"/><text x="${x2 + Math.max(edgeW(r.edge), 2) + 6}" y="${y + 35}" font-size="14" fill="${INK}" ${MONO}>${r.edge}</text>`;
+    y += rowH;
+  }
+  const H = y + 4;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" font-family="Geist, system-ui, sans-serif" role="img"><rect width="${W}" height="${H}" fill="#fff"/>${o}</svg>`;
+}
+
+/* ---- Camera calibration guide: where the board goes in the frame ---- */
+
+type Quad = [number, number][];
+
+/**
+ * Board outlines in a 16:10 frame, in frame fractions (x right, y down).
+ * Left: every view in the middle, facing the camera. Right: the corners and edges, tilted, one view running off the frame.
+ */
+export const COVERAGE_VIEWS: { centered: Quad[]; spread: Quad[] } = {
+  centered: [
+    [[0.36, 0.33], [0.62, 0.33], [0.62, 0.62], [0.36, 0.62]],
+    [[0.40, 0.36], [0.66, 0.36], [0.66, 0.65], [0.40, 0.65]],
+    [[0.33, 0.38], [0.59, 0.38], [0.59, 0.67], [0.33, 0.67]],
+    [[0.38, 0.30], [0.64, 0.30], [0.64, 0.59], [0.38, 0.59]],
+    [[0.42, 0.40], [0.68, 0.40], [0.68, 0.69], [0.42, 0.69]],
+  ],
+  spread: [
+    [[0.02, 0.04], [0.30, 0.08], [0.29, 0.40], [0.03, 0.44]],   // top left, turned
+    [[0.70, 0.03], [0.98, 0.06], [0.97, 0.42], [0.72, 0.36]],   // top right, turned the other way
+    [[0.03, 0.60], [0.31, 0.56], [0.33, 0.95], [0.02, 0.97]],   // bottom left
+    [[0.68, 0.62], [0.97, 0.58], [0.98, 0.96], [0.70, 0.93]],   // bottom right
+    [[0.34, 0.30], [0.66, 0.34], [0.66, 0.66], [0.34, 0.70]],   // middle, tilted
+    [[0.36, 0.02], [0.64, 0.02], [0.61, 0.24], [0.39, 0.24]],   // top edge, tipped back
+    [[0.84, 0.30], [1.08, 0.27], [1.08, 0.73], [0.84, 0.70]],   // runs off the right edge
+  ],
+};
+
+export function coverageFigureSvg(): string {
+  const W = 640, fw = 290, fh = fw / 1.6, top = 14, gap = 20, x0 = 20;
+  let o = '';
+  const panels: [Quad[], string, string][] = [
+    [COVERAGE_VIEWS.centered, 'Every view in the middle', 'The corners of the frame are never measured'],
+    [COVERAGE_VIEWS.spread, 'Corners, edges and tilt', 'The whole frame is measured'],
+  ];
+  panels.forEach(([views, title, sub], i) => {
+    const fx = x0 + i * (fw + gap);
+    o += `<clipPath id="cov${i}"><rect x="${fx}" y="${top}" width="${fw}" height="${fh}"/></clipPath>`;
+    o += `<rect x="${fx}" y="${top}" width="${fw}" height="${fh}" fill="#F4F3EF"/>`;
+    o += `<g clip-path="url(#cov${i})">` + views.map((q) => `<polygon points="${q.map(([x, y]) => `${+(fx + x * fw).toFixed(1)},${+(top + y * fh).toFixed(1)}`).join(' ')}" fill="${INK}" fill-opacity="0.10" stroke="${INK}" stroke-width="1.4"/>`).join('') + '</g>';
+    o += `<rect x="${fx}" y="${top}" width="${fw}" height="${fh}" fill="none" stroke="${INK}" stroke-width="1.5"/>`;
+    o += `<text x="${fx}" y="${top + fh + 26}" font-size="16" font-weight="600" fill="${INK}">${title}</text><text x="${fx}" y="${top + fh + 47}" font-size="13.5" fill="${INK}">${sub}</text>`;
+  });
+  const H = +(top + fh + 60).toFixed(1);
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" font-family="Geist, system-ui, sans-serif" role="img"><rect width="${W}" height="${H}" fill="#fff"/>${o}</svg>`;
+}
+
+/* ---- Hand-eye guide: the two arrangements ---- */
+
+/** Transform names in each panel; the last one is the unknown. Same names as the guide and OpenCV. */
+export const HAND_EYE_PANELS = [
+  { title: 'Eye-in-hand', sub: 'Camera on the robot, target fixed in the cell', known: ['T_gripper2base', 'T_target2cam'], unknown: 'T_cam2gripper' },
+  { title: 'Eye-to-hand', sub: 'Camera fixed, target on the robot', known: ['T_gripper2base', 'T_target2cam'], unknown: 'T_cam2base' },
+] as const;
+
+export function handEyeFigureSvg(): string {
+  const W = 640, ph = 300;
+  const arrow = (x1: number, y1: number, x2: number, y2: number, color: string, dash = false) => {
+    const a = Math.atan2(y2 - y1, x2 - x1), h = 9;
+    const p = (d: number) => `${+(x2 - h * Math.cos(a + d)).toFixed(1)},${+(y2 - h * Math.sin(a + d)).toFixed(1)}`;
+    return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color}" stroke-width="${dash ? 2 : 1.5}"${dash ? ' stroke-dasharray="6 4"' : ''}/><polygon points="${x2},${y2} ${p(0.4)} ${p(-0.4)}" fill="${color}"/>`;
+  };
+  const label = (x: number, y: number, t: string, color: string, anchor = 'start') => `<text x="${x}" y="${y}" font-size="13" fill="${color}" text-anchor="${anchor}" ${MONO}>${t}</text>`;
+  const board = (x: number, y: number, w: number, h: number) => {
+    let b = `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#fff" stroke="${INK}" stroke-width="1.5"/>`;
+    const n = 4, m = 3, cw = w / n, ch = h / m;
+    for (let r = 0; r < m; r++) for (let c = 0; c < n; c++) if ((r + c) % 2 === 0) b += `<rect x="${+(x + c * cw).toFixed(1)}" y="${+(y + r * ch).toFixed(1)}" width="${+cw.toFixed(1)}" height="${+ch.toFixed(1)}" fill="${INK}"/>`;
+    return b;
+  };
+  const camera = (x: number, y: number) => `<rect x="${x - 17}" y="${y - 12}" width="34" height="24" fill="#fff" stroke="${INK}" stroke-width="1.5"/><rect x="${x - 7}" y="${y + 12}" width="14" height="9" fill="${INK}"/>`;
+  // robot: base block, two links, flange
+  const robot = (bx: number, by: number, ex: number, ey: number, fx: number, fy: number) =>
+    `<rect x="${bx - 34}" y="${by}" width="68" height="26" fill="${INK}"/><polyline points="${bx},${by} ${ex},${ey} ${fx},${fy}" fill="none" stroke="${INK}" stroke-width="7" stroke-linejoin="round" stroke-linecap="round"/><circle cx="${bx}" cy="${by}" r="7" fill="#fff" stroke="${INK}" stroke-width="1.5"/><circle cx="${ex}" cy="${ey}" r="7" fill="#fff" stroke="${INK}" stroke-width="1.5"/><rect x="${fx - 15}" y="${fy - 5}" width="30" height="10" fill="#fff" stroke="${INK}" stroke-width="1.5"/>`;
+  let o = '';
+  HAND_EYE_PANELS.forEach((p, i) => {
+    const y0 = i * ph;
+    if (i > 0) o += `<line x1="20" y1="${y0}" x2="${W - 20}" y2="${y0}" stroke="${LINE}" stroke-width="0.8"/>`;
+    o += `<text x="20" y="${y0 + 30}" font-size="17" font-weight="600" fill="${INK}">${p.title}</text><text x="20" y="${y0 + 52}" font-size="14" fill="${INK}">${p.sub}</text>`;
+    const by = y0 + 256, bx = 120, ex = 190, ey = y0 + 120, fx = 300, fy = y0 + 150;
+    o += `<line x1="20" y1="${by + 26}" x2="${W - 20}" y2="${by + 26}" stroke="${INK}" stroke-width="1"/>`;
+    o += robot(bx, by, ex, ey, fx, fy);
+    o += label(bx, by + 21, 'base', '#fff', 'middle') + label(fx, fy - 12, 'gripper', INK, 'middle');
+    // gripper -> base (known, read from the controller)
+    o += arrow(fx - 18, fy + 14, bx + 26, by - 10, INK) + label(232, y0 + 228, p.known[0], INK);
+    if (i === 0) {
+      const cx = fx + 56, cy = fy + 22, tx = 480, ty = y0 + 222;
+      o += camera(cx, cy) + label(cx + 24, cy + 2, 'camera', INK);
+      o += board(tx, ty, 100, 40) + label(tx + 50, ty - 8, 'target', INK, 'middle');
+      o += arrow(tx + 40, ty - 22, cx + 12, cy + 26, INK) + label(456, y0 + 176, p.known[1], INK);
+      o += arrow(cx - 4, cy - 16, fx + 12, fy - 8, RED_TEXT, true) + label(cx + 6, cy - 26, p.unknown, RED_TEXT);
+    } else {
+      const cx = 548, cy = y0 + 96, tx = fx + 22, ty = fy - 14;
+      o += `<line x1="${cx}" y1="${cy - 12}" x2="${cx}" y2="${y0 + 66}" stroke="${INK}" stroke-width="3"/><line x1="${cx - 30}" y1="${y0 + 66}" x2="${cx + 30}" y2="${y0 + 66}" stroke="${INK}" stroke-width="3"/>`;
+      o += camera(cx, cy) + label(cx - 24, cy + 2, 'camera', INK, 'end');
+      o += board(tx, ty, 68, 28) + label(tx + 34, ty + 44, 'target', INK, 'middle');
+      o += arrow(tx + 74, ty + 10, cx - 22, cy + 22, INK) + label(tx + 96, ty + 46, p.known[1], INK);
+      // camera -> base, drawn as an elbow along the floor so it stays clear of the arm
+      o += `<line x1="${cx}" y1="${cy + 24}" x2="${cx}" y2="${by - 6}" stroke="${RED_TEXT}" stroke-width="2" stroke-dasharray="6 4"/>` + arrow(cx, by - 6, bx + 40, by - 6, RED_TEXT, true) + label(380, by - 16, p.unknown, RED_TEXT);
+    }
+  });
+  const H = HAND_EYE_PANELS.length * ph;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" font-family="Geist, system-ui, sans-serif" role="img"><rect width="${W}" height="${H}" fill="#fff"/>${o}</svg>`;
+}

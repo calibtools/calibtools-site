@@ -77,6 +77,8 @@ Then take 15 to 30 views and vary them deliberately:
 
 - For ChArUco, let the board run off the image edge in some views.
 
+![Two camera frames with board outlines. Left: five views that all sit in the middle of the frame. Right: seven views that reach the four corners and the edges, tilted, one running off the frame.](../../assets/guides/view-coverage.svg)
+
 ## 5. Detect the corners
 
 For a **ChArUco** board (OpenCV 4.7 and later), set up the board with the same geometry you printed. The board size is (columns, rows) in squares; sizes are in meters or millimeters, as long as you stay consistent:
