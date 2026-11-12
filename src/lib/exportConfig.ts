@@ -254,6 +254,10 @@ export function opencvJson(s: PatternSpec): string {
   }
   if (s.type === 'Checkerboard') obj.opencv_pattern_size = [s.cols - 1, s.rows - 1]; // findChessboardCorners: interior corners, (columns, rows)
   if (s.type === 'ChArUco') obj.opencv_board_size = [s.cols, s.rows]; // CharucoBoard: squares, (columns, rows)
+  if (s.type === 'ArUco grid') {
+    obj.opencv_board_size = [s.cols, s.rows]; // GridBoard: markers, (columns, rows)
+    obj.marker_separation_mm = Math.round((s.square - s.marker) * 1e6) / 1e6; // GridBoard markerSeparation; square_mm is the pitch
+  }
   if (s.type === 'AprilGrid (Kalibr)') {
     const ratio = s.tagSpacing ?? 0.3;
     obj.tag_family = `tag${s.aprilFamily ?? '36h11'}`;
@@ -282,7 +286,7 @@ export function opencvJson(s: PatternSpec): string {
   }
   if (s.finderMarkers) obj.marker = true;
   // OpenCV <= 4.5 ChArUco layout: call board.setLegacyPattern(True) in OpenCV >= 4.6. It only differs on boards with an even number of rows.
-  if (s.legacyLayout && (s.type === 'ChArUco' || s.type === 'ArUco grid')) obj.legacy_pattern = true;
+  if (s.legacyLayout && s.type === 'ChArUco') obj.legacy_pattern = true;
   if (s.radonCheckers) obj.radon = true;
   if (s.invert) obj.inverted = true;
   if (s.showAxes !== false) {

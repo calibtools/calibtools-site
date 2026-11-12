@@ -18,9 +18,11 @@ export function patternRows(s: PatternSpec): [label: string, value: string][] {
     rows.push(['Circles', `${s.rows} × ${s.cols}`], ['Spacing', mm(s.circleSpacingX ?? s.square)], ['Diameter', mm(s.circleDiameter ?? s.square * 0.56)]);
   } else if (s.type === 'Marker sheet') {
     rows.push(['Markers', `${s.rows} × ${s.cols}`], ['Marker size', mm(s.marker || s.square)], ['Dictionary', s.dict], ['First ID', String(s.startId)]);
+  } else if (s.type === 'ArUco grid') {
+    rows.push(['Markers', `${s.rows} × ${s.cols}`], ['Marker size', mm(s.marker)], ['Marker separation', mm(s.square - s.marker)], ['Dictionary', s.dict], ['First ID', String(s.startId)]);
   } else {
     rows.push(['Squares', `${s.rows} × ${s.cols}`], ['Square size', mm(s.square)]);
-    if (s.type === 'ChArUco' || s.type === 'ArUco grid') rows.push(['Marker size', mm(s.marker)], ['Dictionary', s.dict], ['First ID', String(s.startId)]);
+    if (s.type === 'ChArUco') rows.push(['Marker size', mm(s.marker)], ['Dictionary', s.dict], ['First ID', String(s.startId)]);
   }
   return rows;
 }

@@ -5,7 +5,7 @@
 import { svgOpen, svgClose, scaleBarSvg, axesSvg, cornerIdBadgeSvg, brandFooterSvg } from './svgLayers';
 import type { SvgContext } from './svgLayers';
 import { renderCheckerboardSvg } from './renderCheckerboard';
-import { renderCharucoSvg } from './renderCharuco';
+import { renderCharucoSvg, renderArucoGridSvg } from './renderCharuco';
 import { renderAprilGridSvg } from './renderAprilGrid';
 import { renderCirclesSvg } from './renderCircles';
 import { renderMarkerSheetSvg } from './renderMarkerSheet';
@@ -74,7 +74,8 @@ export function renderPatternSvg(s: PatternSpec, ox: number, oy: number): string
   if (s.type === 'Marker sheet') return renderMarkerSheetSvg(s, ox, oy);
   if (s.type.includes('circles') || s.type.includes('dots')) return renderCirclesSvg(s, ox, oy);
   if (s.type === 'AprilGrid (Kalibr)') return renderAprilGridSvg(s, ox, oy);
-  if (s.type === 'ChArUco' || s.type === 'ArUco grid') return renderCharucoSvg(s, ox, oy);
+  if (s.type === 'ChArUco') return renderCharucoSvg(s, ox, oy);
+  if (s.type === 'ArUco grid') return renderArucoGridSvg(s, ox, oy);
   return renderCheckerboardSvg(s, ox, oy);
 }
 
