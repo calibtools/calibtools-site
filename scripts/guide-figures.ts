@@ -9,7 +9,7 @@ import { writeFileSync, mkdirSync, readFileSync } from 'node:fs';
 import { Resvg } from '@resvg/resvg-js';
 import { renderPatternSvg } from '../src/lib/patterns';
 import { patternExtent } from '../src/lib/pageLayout';
-import { PARTIAL_VIEW_CASES, PARTIAL_VIEW_VISIBLE, PARTIAL_VIEW_MARGIN, partialViewFigureSvg, usafFigureSvg, kalibrFrameFigureSvg, multiBoardFigureSvg, type PartialViewData } from '../src/lib/guideFigures';
+import { PARTIAL_VIEW_CASES, PARTIAL_VIEW_VISIBLE, PARTIAL_VIEW_MARGIN, partialViewFigureSvg, usafFigureSvg, kalibrFrameFigureSvg, multiBoardFigureSvg, fillFigureSvg, fillRowsFromGuide, type PartialViewData } from '../src/lib/guideFigures';
 
 if (process.argv.includes('--pngs')) {
   const pxPerMm = 6, m = PARTIAL_VIEW_MARGIN;
@@ -30,5 +30,7 @@ if (process.argv.includes('--pngs')) {
   writeFileSync('src/assets/guides/usaf-1951-groups-0-3.svg', usafFigureSvg());
   writeFileSync('src/assets/guides/kalibr-aprilgrid-frame.svg', kalibrFrameFigureSvg());
   writeFileSync('src/assets/guides/multi-board-id-ranges.svg', multiBoardFigureSvg());
+  const fill = fillRowsFromGuide(readFileSync('src/content/guides/calibration-target-size.md', 'utf8'));
+  writeFileSync('src/assets/guides/board-fill-20-vs-60.svg', fillFigureSvg([fill.find((r) => r.fill === 20)!, fill.find((r) => r.fill === 60)!]));
   console.log('wrote src/assets/guides/*.svg');
 }
