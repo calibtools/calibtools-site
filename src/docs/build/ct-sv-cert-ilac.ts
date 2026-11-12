@@ -19,6 +19,7 @@ import {
   note,
   qr_block,
   type RenderResult,
+  G30,
 } from '../ctdoc';
 import { parseFrontMatter } from './ct-ds';
 
@@ -184,7 +185,7 @@ export async function buildILACCert(opts: {
   }
 
   // Push footer: disclaimer + QR block
-  page2 += `<div class="push" style="display:flex;justify-content:space-between;align-items:flex-end;border-top:.25mm solid #b3b3b3;padding-top:4mm">`;
+  page2 += `<div class="push" style="display:flex;justify-content:space-between;align-items:flex-end;border-top:.25mm solid ${G30};padding-top:4mm">`;
   page2 += note('Service terms subject to change; current revision at calib.tools.');
   page2 += `${qr_block(FILE_URL, 15)}</div>`;
 

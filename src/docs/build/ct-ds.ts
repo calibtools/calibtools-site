@@ -17,6 +17,10 @@ import {
   table,
   kv,
   qr_block,
+  G05,
+  G30,
+  G60,
+  G80,
   type RenderResult,
   type ColumnKind,
 } from '../ctdoc';
@@ -244,11 +248,11 @@ function chaCProductRendering(): string {
     mode: 'print', width_mm: 125,
   });
   const coord = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 38" width="43mm" height="27.2mm">
-      <rect x="9" y="7" width="40" height="24" fill="#fff" stroke="#666" stroke-width="0.45"/>
-      <rect x="13" y="11" width="32" height="16" fill="#f2f2f2" stroke="#b3b3b3" stroke-width="0.25" stroke-dasharray="1.1 1.1"/>
+      <rect x="9" y="7" width="40" height="24" fill="#fff" stroke="${G60}" stroke-width="0.45"/>
+      <rect x="13" y="11" width="32" height="16" fill="${G05}" stroke="${G30}" stroke-width="0.25" stroke-dasharray="1.1 1.1"/>
       <circle cx="13" cy="11" r="1" fill="#000"/>
       ${axes(13, 11, 12, 0.68)}
-      <text x="9" y="35" font-family="Geist Mono" font-size="2.6" fill="#333">(0, 0) \u00b7 pattern outer corner</text>
+      <text x="9" y="35" font-family="Geist Mono" font-size="2.6" fill="${G80}">(0, 0) \u00b7 pattern outer corner</text>
     </svg>`;
   const key = `<div class="small" style="line-height:1.43">
       ${tag('Coordinate system')}
@@ -308,7 +312,7 @@ function chaCKeySpecs(): string {
       <div class="small muted" style="line-height:1.22">${sub}</div></div>`
   );
   return (
-    `<div style="border-top:.35mm solid #000;border-bottom:.25mm solid #b3b3b3;display:grid;` +
+    `<div style="border-top:.35mm solid #000;border-bottom:.25mm solid ${G30};display:grid;` +
     `grid-template-columns:1fr 1.23fr 1.42fr 1fr">${parts.join('')}</div>`
   );
 }
@@ -426,16 +430,16 @@ function chaCDrawingSvg(): string {
   return `<figure style="margin:0">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="-37 -37 307 188" width="137mm" height="84mm">
         <rect x="0" y="0" width="${W}" height="${H}" fill="#fff" stroke="#000" stroke-width="0.55"/>
-        <rect x="${mx}" y="${my}" width="${patW}" height="${patH}" fill="#f2f2f2" stroke="#666" stroke-width="0.35" stroke-dasharray="2 1.3"/>
-        <path d="M0 5L5 0 M180 0L185 5 M0 105L5 110 M180 110L185 105" stroke="#333" stroke-width="0.5" fill="none"/>
-        <line x1="179" y1="7" x2="233" y2="-9" stroke="#666" stroke-width="0.25"/>
-        <text x="235" y="-10" font-family="Geist Mono" font-size="3.4" fill="#333">0.5 mm chamfer</text>
-        <text x="92.5" y="57" font-family="Geist Mono" font-size="4.6" fill="#666" text-anchor="middle">PATTERN AREA</text>
-        <text x="92.5" y="64" font-family="Geist Mono" font-size="3.6" fill="#666" text-anchor="middle">${patW} \u00d7 ${patH} mm</text>
-        <text x="92.5" y="106" font-family="Geist Mono" font-size="3.3" fill="#666" text-anchor="middle">${mx} mm white margin</text>
-        <text x="203" y="48" font-family="Geist Mono" font-size="3.3" fill="#666">SIDE SECTION</text>
-        <rect x="205" y="57" width="32" height="3" fill="#f2f2f2" stroke="#000" stroke-width="0.35"/>
-        <text x="221" y="69" font-family="Geist Mono" font-size="3.3" fill="#666" text-anchor="middle">no mounting holes</text>
+        <rect x="${mx}" y="${my}" width="${patW}" height="${patH}" fill="${G05}" stroke="${G60}" stroke-width="0.35" stroke-dasharray="2 1.3"/>
+        <path d="M0 5L5 0 M180 0L185 5 M0 105L5 110 M180 110L185 105" stroke="${G80}" stroke-width="0.5" fill="none"/>
+        <line x1="179" y1="7" x2="233" y2="-9" stroke="${G60}" stroke-width="0.25"/>
+        <text x="235" y="-10" font-family="Geist Mono" font-size="3.4" fill="${G80}">0.5 mm chamfer</text>
+        <text x="92.5" y="57" font-family="Geist Mono" font-size="4.6" fill="${G60}" text-anchor="middle">PATTERN AREA</text>
+        <text x="92.5" y="64" font-family="Geist Mono" font-size="3.6" fill="${G60}" text-anchor="middle">${patW} \u00d7 ${patH} mm</text>
+        <text x="92.5" y="106" font-family="Geist Mono" font-size="3.3" fill="${G60}" text-anchor="middle">${mx} mm white margin</text>
+        <text x="203" y="48" font-family="Geist Mono" font-size="3.3" fill="${G60}">SIDE SECTION</text>
+        <rect x="205" y="57" width="32" height="3" fill="${G05}" stroke="#000" stroke-width="0.35"/>
+        <text x="221" y="69" font-family="Geist Mono" font-size="3.3" fill="${G60}" text-anchor="middle">no mounting holes</text>
         ${dims}
       </svg>
       <figcaption>CT-DWG-CHA-C-185110 \u00b7 Rev A \u00b7 dimensions nominal unless stated.</figcaption>
@@ -558,7 +562,7 @@ function buildChaC(ds: DSParsed, watermark?: string): Doc {
     + genericRevisionTable(ds.revisionHistory)
     + section(8, 'Disclaimer')
     + p(disclaimer, 'statement')
-    + `<div class="push" style="display:flex;justify-content:space-between;align-items:flex-end;border-top:.25mm solid #b3b3b3;padding-top:4mm">`
+    + `<div class="push" style="display:flex;justify-content:space-between;align-items:flex-end;border-top:.25mm solid ${G30};padding-top:4mm">`
     + `<div class="small muted" style="max-width:94mm">Product configuration, lead time and regulatory statements remain subject to the confirmations identified in this datasheet.</div>`
     + `${qr_block(FILE_URL, 15)}</div>`;
   d.addPage(page4);
@@ -604,7 +608,7 @@ function buildGenericBoardDS(ds: DSParsed, watermark?: string): Doc {
           `<div class="tag" style="margin-bottom:.45mm">${lab}</div>` +
           `<div style="font-size:9.2pt;line-height:1.25">${mono(val)}</div></div>`
         );
-        page1 += `<div style="border-top:.35mm solid #000;border-bottom:.25mm solid #b3b3b3;display:grid;grid-template-columns:${cells.map(() => '1fr').join(' ')}">${parts.join('')}</div>`;
+        page1 += `<div style="border-top:.35mm solid #000;border-bottom:.25mm solid ${G30};display:grid;grid-template-columns:${cells.map(() => '1fr').join(' ')}">${parts.join('')}</div>`;
       }
     }
   }
@@ -647,7 +651,7 @@ function buildGenericBoardDS(ds: DSParsed, watermark?: string): Doc {
   }
   const disclaimer = 'Values are nominal unless stated as measured.';
   page3 += section(secN, 'Disclaimer') + p(disclaimer, 'statement');
-  page3 += `<div class="push" style="display:flex;justify-content:space-between;align-items:flex-end;border-top:.25mm solid #b3b3b3;padding-top:4mm">`;
+  page3 += `<div class="push" style="display:flex;justify-content:space-between;align-items:flex-end;border-top:.25mm solid ${G30};padding-top:4mm">`;
   page3 += `<div class="small muted" style="max-width:94mm">Product configuration, lead time and regulatory statements remain subject to the confirmations identified in this datasheet.</div>`;
   page3 += `${qr_block(FILE_URL, 15)}</div>`;
   d.addPage(page3);
@@ -696,7 +700,7 @@ function buildAccessoryDS(ds: DSParsed, watermark?: string): Doc {
     secN++;
   }
 
-  page1 += `<div class="push" style="display:flex;justify-content:space-between;align-items:flex-end;border-top:.25mm solid #b3b3b3;padding-top:4mm">`;
+  page1 += `<div class="push" style="display:flex;justify-content:space-between;align-items:flex-end;border-top:.25mm solid ${G30};padding-top:4mm">`;
   page1 += `<div class="small muted" style="max-width:94mm">Specifications subject to change.</div>`;
   page1 += `${qr_block(FILE_URL, 15)}</div>`;
   d.addPage(page1);

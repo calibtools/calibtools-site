@@ -3,6 +3,7 @@
  * Change here, both update.
  */
 
+import { DOC_COLORS } from '../lib/docColors';
 export const STAMP_DIAMETER = 32; // mm
 export const STAMP_R_OUTER = STAMP_DIAMETER / 2; // 16 mm
 export const STAMP_R_INNER = STAMP_R_OUTER - 1.8; // inner ring
@@ -12,4 +13,4 @@ export const STAMP_TEXT_RADIUS = (STAMP_R_OUTER + STAMP_R_INNER) / 2; // ≈ 15.
 export const STAMP_TOP_TEXT = 'CALIB.TOOLS';
 export const STAMP_BOTTOM_TEXT = 'DIMENSIONAL INSPECTION';
 export const STAMP_ROTATION = -6; // degrees
-export const STAMP_INK = '#333333'; // Gray 80
+export const STAMP_INK: string = DOC_COLORS.inkMuted;

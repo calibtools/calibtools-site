@@ -8,6 +8,7 @@ import {
   scale_bar,
   RED,
   GREEN,
+  G10,
 } from '../ctpattern';
 
 describe('corner_list', () => {
@@ -45,8 +46,8 @@ describe('board_svg', () => {
       sq: 20,
       mode: 'map',
     });
-    // map mode uses G10 (#E6E6E6) for squares instead of #000
-    expect(svg).toContain('#E6E6E6');
+    // map mode uses G10 (the light paper tone) for squares instead of #000
+    expect(svg).toContain(G10);
     // Should NOT contain black-filled square path in map mode
     expect(svg).not.toMatch(/fill="#000".*?<path/);
   });

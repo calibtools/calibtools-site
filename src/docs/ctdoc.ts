@@ -13,6 +13,7 @@
  *   await d.render('out/CT-IR/CT-IR-000311');
  */
 
+import { DOC_COLORS } from '../lib/docColors';
 import * as path from 'node:path';
 import * as fs from 'node:fs';
 import QRCode from 'qrcode';
@@ -26,15 +27,18 @@ import {
 import { CONTACT_LINE } from '../lib/reportConfig';
 
 // ----------------------------------------------------------------- brand colors (brand guidelines p. 05)
-export const BLACK = '#000000';
-export const WHITE = '#FFFFFF';
-export const RED = '#E60012';
-export const G80 = '#333333';
-export const G60 = '#666666';
-export const G30 = '#B3B3B3';
-export const G10 = '#E6E6E6';
-export const G05 = '#F2F2F2';
-export const AXIS_GREEN = '#00A651';
+export const BLACK: string = DOC_COLORS.black;
+export const WHITE: string = DOC_COLORS.white;
+export const RED: string = DOC_COLORS.red;
+export const RED_TEXT: string = DOC_COLORS.redText;
+export const RED_TINT: string = DOC_COLORS.redTint;
+// The names are from the Python reference; the values are the site's ink and paper tones.
+export const G80: string = DOC_COLORS.inkMuted;
+export const G60: string = DOC_COLORS.inkSoft;
+export const G30: string = DOC_COLORS.lineStrong;
+export const G10: string = DOC_COLORS.paperAlt;
+export const G05: string = DOC_COLORS.paper;
+export const AXIS_GREEN: string = DOC_COLORS.axisGreen;
 
 // ----------------------------------------------------------------- paper
 export const PAPER: Record<string, [number, number]> = {
@@ -115,7 +119,7 @@ ${zin}
 html, body { margin: 0; padding: 0; }
 body { font-family: 'Geist'; font-size: 10pt; line-height: 1.45; color: ${G80}; -webkit-print-color-adjust: exact; print-color-adjust: exact;
         font-variant-numeric: tabular-nums; }
-.page { width: ${W}mm; height: ${H}mm; position: relative; overflow: hidden; page-break-after: always; break-after: page; background: #fff; }
+.page { width: ${W}mm; height: ${H}mm; position: relative; overflow: hidden; page-break-after: always; break-after: page; background: ${WHITE}; }
 .page:last-child { page-break-after: auto; break-after: auto; }
 .hdr { position: absolute; top: ${HDR_TOP}mm; left: ${side}mm; right: ${side}mm; height: 6.6mm; display: flex; justify-content: space-between; align-items: center; }
 .hdr img { width: 28mm; height: auto; display: block; }
@@ -158,7 +162,7 @@ a { color: inherit; text-decoration: none; }
 
 /* tables */
 table.t { width: 100%; border-collapse: collapse; font-size: 9.5pt; line-height: 1.3; }
-table.t th { font-family: 'Geist Mono'; font-size: 7.3pt; font-weight: 500; color: ${G60}; text-transform: uppercase; letter-spacing: .05em; text-align: left;
+table.t th { font-family: 'Geist Mono'; font-size: 7.3pt; font-weight: 500; color: ${RED_TEXT}; background: ${RED_TINT}; text-transform: uppercase; letter-spacing: .05em; text-align: left;
               padding: 0.8mm 1.8mm 0.9mm; border-bottom: 0.3mm solid ${BLACK}; vertical-align: bottom; line-height: 1.2; }
 table.t td { padding: 0.8mm 1.8mm; vertical-align: top; color: ${BLACK}; }
 table.t tbody tr:nth-child(even) td { background: ${G10}; }
@@ -190,7 +194,7 @@ table.t.dense { font-size: 8pt; line-height: 1.2; } table.t.dense td { padding: 
 .result.strip .txt { font-size: 10pt; }
 .result .meta { font-family: 'Geist Mono'; font-size: 7.5pt; color: ${G60}; text-align: right; line-height: 1.5; }
 .result.fail .meta { color: ${G30}; }
-.result.fail { background: ${BLACK}; } .result.fail .lab { color: ${G30}; } .result.fail .word, .result.fail .txt { color: #fff; }
+.result.fail { background: ${BLACK}; } .result.fail .lab { color: ${G30}; } .result.fail .word, .result.fail .txt { color: ${WHITE}; }
 .result.pending { border-style: dashed; border-color: ${G60}; } .result.pending .word { color: ${G60}; }
 
 /* misc blocks */

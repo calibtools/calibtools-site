@@ -12,17 +12,18 @@
  * Ported from ctpattern.py — uses getArUcoDict + decodeMarkerBits instead of cv2.
  */
 
+import { DOC_COLORS } from '../lib/docColors';
 import { getArUcoDict, decodeMarkerBits } from '../lib/dicts/dicts';
 
 // ── Brand / drawing colors ──────────────────────────────────────────────────
-export const RED = '#E60012';
-export const GREEN = '#00A651';
-export const INK = '#282828';
-export const G80 = '#333333';
-export const G60 = '#666666';
-export const G30 = '#B3B3B3';
-export const G10 = '#E6E6E6';
-export const G05 = '#F2F2F2';
+export const RED: string = DOC_COLORS.red;
+export const GREEN: string = DOC_COLORS.axisGreen;
+export const INK: string = DOC_COLORS.ink;
+export const G80: string = DOC_COLORS.inkMuted;
+export const G60: string = DOC_COLORS.inkSoft;
+export const G30: string = DOC_COLORS.lineStrong;
+export const G10: string = DOC_COLORS.paperAlt;
+export const G05: string = DOC_COLORS.paper;
 
 // ── Corner list ──────────────────────────────────────────────────────────────
 
