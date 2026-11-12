@@ -7,7 +7,7 @@
  */
 import type { PatternSpec } from './patterns';
 import { opencvJson } from './exportConfig';
-import { charucoMarkers } from './renderCharuco';
+import { charucoMarkers, gridBoardMarkers } from './renderCharuco';
 import { aprilGridTags } from './renderAprilGrid';
 import { patternId } from './patternLink';
 
@@ -27,7 +27,8 @@ const num = (v: number) => String(Math.round(v * 1000) / 1000);
 /** id,row,col,x_mm,y_mm,size_mm for every marker; x and y are the marker's top-left corner from the pattern's top-left corner. Null for patterns without markers. */
 export function markerIdsCsv(spec: PatternSpec): string | null {
   const markers =
-    spec.type === 'ChArUco' || spec.type === 'ArUco grid' ? charucoMarkers(spec)
+    spec.type === 'ChArUco' ? charucoMarkers(spec)
+    : spec.type === 'ArUco grid' ? gridBoardMarkers(spec)
     : spec.type === 'AprilGrid (Kalibr)' ? aprilGridTags(spec)
     : null;
   if (!markers) return null;

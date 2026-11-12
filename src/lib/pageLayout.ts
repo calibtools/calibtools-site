@@ -339,9 +339,11 @@ export function computeGridReduction(
     const availW = pw - 2 * qz - 2 * PAGE_MARGIN;
     const availH = ph - 2 * qz - bbH - 2 * PAGE_MARGIN;
     // AprilGrid: n tags take n × (tag + gap) − gap. Other patterns: n × square.
-    const gap = spec.type === 'AprilGrid (Kalibr)' ? spec.square * (spec.tagSpacing ?? 0.3) : 0;
-    const maxCols = Math.floor((availW + gap) / (spec.square + gap));
-    const maxRows = Math.floor((availH + gap) / (spec.square + gap));
+    // ArUco grid: the pitch is spec.square and the last marker has no gap after it.
+    const gap = spec.type === 'AprilGrid (Kalibr)' ? spec.square * (spec.tagSpacing ?? 0.3) : spec.type === 'ArUco grid' ? spec.square - spec.marker : 0;
+    const step = spec.type === 'AprilGrid (Kalibr)' ? spec.square + gap : spec.square;
+    const maxCols = Math.floor((availW + gap) / step);
+    const maxRows = Math.floor((availH + gap) / step);
     const r = Math.min(spec.rows, Math.max(2, maxRows));
     const c = Math.min(spec.cols, Math.max(2, maxCols));
     if (r * c > bestRows * bestCols) {
@@ -420,6 +422,11 @@ export function patternExtent(spec: PatternSpec): { bw: number; bh: number; qzBa
     // Tags are spec.square wide with a gap between them: first tag edge to last tag edge.
     const gap = spec.square * (spec.tagSpacing ?? 0.3);
     return { bw: spec.cols * (spec.square + gap) - gap, bh: spec.rows * (spec.square + gap) - gap, qzBasis: spec.square };
+  }
+  if (spec.type === 'ArUco grid') {
+    // GridBoard: first marker edge to last marker edge; spec.square is the pitch.
+    const gap = spec.square - spec.marker;
+    return { bw: spec.cols * spec.square - gap, bh: spec.rows * spec.square - gap, qzBasis: spec.square };
   }
   if (spec.type.includes('circles') || spec.type.includes('dots')) {
     // One cell per circle; the pitch may differ between X and Y.

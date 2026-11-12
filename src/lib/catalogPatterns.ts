@@ -195,6 +195,8 @@ export function quoteSummary(s: PatternSpec): string {
       return `Checkerboard ${grid}, ${n(s.square)} mm squares`;
     case 'AprilGrid (Kalibr)':
       return `AprilGrid ${grid}, ${n(s.square)} mm tags, spacing ${n(s.tagSpacing ?? 0.3)}, tag${s.aprilFamily ?? '36h11'}`;
+    case 'ArUco grid':
+      return `ArUco grid ${grid}, ${n(s.marker)} mm markers, ${n(s.square - s.marker)} mm apart, ${s.dict}, start ID ${s.startId ?? 0}`;
     case 'Symmetric circles':
     case 'Asymmetric circles':
       return `${s.type} ${grid}, ⌀${n(s.circleDiameter ?? s.square * 0.56)} / ${n(s.square)} mm pitch`;

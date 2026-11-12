@@ -16,8 +16,8 @@ describe('expectedCount', () => {
     expect(expectedCount({ ...base, type: 'ChArUco' })).toBe(54);
   });
 
-  it('ArUco grid 7x10 → 35 markers (half of 70 squares)', () => {
-    expect(expectedCount({ ...base, type: 'ArUco grid' })).toBe(35);
+  it('ArUco grid 7x10 → 70 markers, one per cell (GridBoard)', () => {
+    expect(expectedCount({ ...base, type: 'ArUco grid' })).toBe(70);
   });
 
   it('AprilGrid 6x6 → 36 tags, one per cell', () => {

@@ -320,3 +320,40 @@ describe('ChArUco legacy layout (OpenCV <= 4.5)', () => {
     expect(renderCharucoSvg({ ...base, legacyLayout: true }, 0, 0)).not.toContain('<rect x="0" y="0" width="25" height="25" fill="#000"/>');
   });
 });
+
+describe('ArUco grid is cv.aruco.GridBoard', () => {
+  const grid: PatternSpec = { type: 'ArUco grid', rows: 5, cols: 7, square: 30, marker: 22, dict: 'DICT_6X6_250', paper: 'A4', startId: 0, scaleBar: false };
+  it('one marker per cell, IDs row by row from the top-left, markers `square` apart', async () => {
+    const { gridBoardMarkers, gridBoardSeparation } = await import('./renderCharuco');
+    const m = gridBoardMarkers(grid);
+    expect(m).toHaveLength(35);
+    expect(m[0]).toEqual({ id: 0, row: 0, col: 0, x: 0, y: 0, size: 22 });
+    expect(m[1]).toMatchObject({ id: 1, row: 0, col: 1, x: 30, y: 0 });
+    expect(m[7]).toMatchObject({ id: 7, row: 1, col: 0, x: 0, y: 30 });
+    expect(m[34]).toMatchObject({ id: 34, row: 4, col: 6, x: 180, y: 120 });
+    expect(gridBoardSeparation(grid)).toBe(8);
+    expect(gridBoardMarkers({ ...grid, startId: 100 })[0].id).toBe(100);
+  });
+  it('draws markers only: no full black squares, nothing outside first-to-last marker edge', async () => {
+    const { patternShapes } = await import('./patternShapes');
+    const { patternExtent } = await import('./pageLayout');
+    const shapes = patternShapes(grid).filter((s) => s.kind === 'rect') as { x: number; y: number; w: number; h: number; fill: string }[];
+    const e = patternExtent(grid);
+    expect(e).toMatchObject({ bw: 7 * 30 - 8, bh: 5 * 30 - 8 });
+    expect(shapes.some((s) => Math.abs(s.w - 30) < 1e-9)).toBe(false);
+    expect(shapes.filter((s) => s.fill === '#000' && Math.abs(s.w - 22) < 1e-9)).toHaveLength(35);
+    for (const s of shapes) {
+      expect(s.x).toBeGreaterThanOrEqual(-1e-9); expect(s.y).toBeGreaterThanOrEqual(-1e-9);
+      expect(s.x + s.w).toBeLessThanOrEqual(e.bw + 1e-9); expect(s.y + s.h).toBeLessThanOrEqual(e.bh + 1e-9);
+    }
+  });
+  it('ID range and config follow', async () => {
+    const { idRange } = await import('./idRange');
+    const { opencvJson, ros2Supported } = await import('./exportConfig');
+    expect(idRange(grid)).toEqual({ min: 0, max: 34, count: 35 });
+    const o = JSON.parse(opencvJson(grid));
+    expect(o).toMatchObject({ pattern: 'ArUco grid', opencv_board_size: [7, 5], marker_mm: 22, marker_separation_mm: 8, square_mm: 30, dictionary: 'DICT_6X6_250', start_id: 0, id_range: [0, 34] });
+    expect(o).not.toHaveProperty('legacy_pattern');
+    expect(ros2Supported(grid)).toBe(false);
+  });
+});

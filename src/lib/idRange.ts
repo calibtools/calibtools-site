@@ -2,8 +2,8 @@
  * Compute the marker/tag ID range for a pattern spec.
  * Returns null for patterns without markers (Checkerboard, circles).
  *
- * ChArUco / ArUco grid: floor(rows × cols / 2) markers (white squares only).
- * AprilGrid (Kalibr) / Marker sheet: rows × cols markers.
+ * ChArUco: floor(rows × cols / 2) markers (white squares only).
+ * ArUco grid (GridBoard) / AprilGrid (Kalibr) / Marker sheet: rows × cols markers.
  *
  * Matches cv::aruco::CharucoBoard and Kalibr AprilGrid ID assignment.
  */
@@ -18,12 +18,12 @@ export interface IdRangeResult {
 export function idRange(spec: PatternSpec): IdRangeResult | null {
   const { type, rows, cols, startId } = spec;
 
-  if (type === 'ChArUco' || type === 'ArUco grid') {
+  if (type === 'ChArUco') {
     const count = Math.floor((rows * cols) / 2);
     return { min: startId, max: startId + count - 1, count };
   }
 
-  if (type === 'AprilGrid (Kalibr)') {
+  if (type === 'AprilGrid (Kalibr)' || type === 'ArUco grid') {
     const count = rows * cols;
     return { min: startId, max: startId + count - 1, count };
   }

@@ -164,7 +164,7 @@ export default function Generator({ initialSpec, heading = 'Pattern generator' }
         <div className="grid grid-cols-2 gap-3">
           <label className="flex flex-col gap-2 text-[13px] font-semibold">Rows<input className={field} type="number" min={2} value={spec.rows} onChange={(e) => set('rows', +e.target.value)} /></label>
           <label className="flex flex-col gap-2 text-[13px] font-semibold">Columns<input className={field} type="number" min={2} value={spec.cols} onChange={(e) => set('cols', +e.target.value)} /></label>
-          <label className="flex flex-col gap-2 text-[13px] font-semibold">Square size (mm)<input className={field} type="number" min={1} value={spec.square} onChange={(e) => set('square', +e.target.value)} /></label>
+          <label className="flex flex-col gap-2 text-[13px] font-semibold">{spec.type === 'ArUco grid' ? 'Marker pitch (mm)' : 'Square size (mm)'}<input className={field} type="number" min={1} value={spec.square} onChange={(e) => set('square', +e.target.value)} /></label>
           <label className="flex flex-col gap-2 text-[13px] font-semibold">Marker size (mm)<input className={field} type="number" min={1} value={spec.marker} onChange={(e) => set('marker', +e.target.value)} /></label>
         </div>
         <label className="flex flex-col gap-2 text-[13px] font-semibold">Dictionary
@@ -218,7 +218,7 @@ export default function Generator({ initialSpec, heading = 'Pattern generator' }
             Corner ID badge (when start ID ≠ 0)
           </label>
         )}
-        {(spec.type === 'ChArUco' || spec.type === 'ArUco grid') && (
+        {spec.type === 'ChArUco' && (
           <label className="flex items-center gap-2.5 text-sm font-normal min-h-[44px] md:min-h-0">
             <input type="checkbox" className="h-[18px] w-[18px]"
               checked={spec.legacyLayout ?? false}
@@ -525,7 +525,7 @@ export default function Generator({ initialSpec, heading = 'Pattern generator' }
       <div className="flex min-w-0 flex-1 basis-[520px] flex-col gap-4">
         <div className="flex flex-wrap justify-between gap-3 text-sm text-ink-muted">
           {!compactInfo && (
-            <span>Preview · {spec.paper} {layout.orientation} · {spec.rows} × {spec.cols} {spec.type}, {isSheet ? `${spec.marker || spec.square} mm markers` : `${spec.square} mm squares`}{layout.usableGrid && !isSheet ? ` · ${layout.usableGrid}` : ''}</span>
+            <span>Preview · {spec.paper} {layout.orientation} · {spec.rows} × {spec.cols} {spec.type}, {isSheet ? `${spec.marker || spec.square} mm markers` : spec.type === 'ArUco grid' ? `${spec.marker} mm markers, ${+(spec.square - spec.marker).toFixed(2)} mm apart` : `${spec.square} mm squares`}{layout.usableGrid && !isSheet ? ` · ${layout.usableGrid}` : ''}</span>
           )}
           <span className="font-mono">Board {boardW} × {boardH} mm <span className="text-ink-soft">({mmToIn(boardW)} × {mmToIn(boardH)} in)</span> {isSheet ? '' : ` · ${corners} corners`} · {markers} {markers === 1 ? 'marker' : 'markers'}</span>
           {catalog.exact && (

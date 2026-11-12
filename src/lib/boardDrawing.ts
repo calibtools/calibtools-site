@@ -9,7 +9,7 @@
  * `data-mm`, the drawn length and boardSizes.ts.
  */
 import type { PatternSpec } from './patterns';
-import { renderCharucoSvg } from './renderCharuco';
+import { renderCharucoSvg, renderArucoGridSvg } from './renderCharuco';
 import { renderCheckerboardSvg } from './renderCheckerboard';
 import { renderAprilGridSvg, aprilGridTags } from './renderAprilGrid';
 import { renderCirclesSvg } from './renderCircles';
@@ -40,7 +40,7 @@ export interface BoardDrawingInput {
 /** Pattern types this module can draw. */
 const RENDERERS: Partial<Record<PatternSpec['type'], (s: PatternSpec, ox: number, oy: number) => string>> = {
   ChArUco: renderCharucoSvg,
-  'ArUco grid': renderCharucoSvg,
+  'ArUco grid': renderArucoGridSvg,
   Checkerboard: renderCheckerboardSvg,
   'AprilGrid (Kalibr)': renderAprilGridSvg,
   'Symmetric circles': renderCirclesSvg,
@@ -87,6 +87,17 @@ export function patternFrame(s: PatternSpec): PatternFrame {
       dimX: { from: sx / 2, to: sx / 2 + spanX, text: `${fmt(spanX)} = ${s.cols - 1} × ${fmt(sx)}` },
       dimY: { from: sy / 2, to: sy / 2 + spanY, text: `${fmt(spanY)} = ${s.rows - 1} × ${fmt(sy)}` },
       origin: { x: sx / 2, y: sy / 2 },
+    };
+  }
+  if (s.type === 'ArUco grid') {
+    // GridBoard: first marker edge to last marker edge.
+    const gap = s.square - s.marker, gw = s.cols * s.square - gap, gh = s.rows * s.square - gap;
+    const part = (n: number) => `${n} × ${fmt(s.marker)}${n > 1 ? ` + ${n - 1} × ${fmt(gap)}` : ''}`;
+    return {
+      box: { x: 0, y: 0, w: gw, h: gh },
+      dimX: { from: 0, to: gw, text: `${fmt(gw)} = ${part(s.cols)}` },
+      dimY: { from: 0, to: gh, text: `${fmt(gh)} = ${part(s.rows)}` },
+      origin: { x: 0, y: 0 },
     };
   }
   const w = s.cols * s.square, h = s.rows * s.square;

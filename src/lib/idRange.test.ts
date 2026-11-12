@@ -32,8 +32,8 @@ describe('idRange', () => {
     expect(idRange({ ...base, type: 'Symmetric circles' })).toBeNull();
   });
 
-  it('ArUco grid 5x8 startId=0 → {min:0, max:19, count:20}', () => {
-    expect(idRange({ ...base, type: 'ArUco grid', rows: 5, cols: 8 })).toEqual({ min: 0, max: 19, count: 20 });
+  it('ArUco grid 5x8 startId=0 → {min:0, max:39, count:40}: GridBoard has a marker in every cell', () => {
+    expect(idRange({ ...base, type: 'ArUco grid', rows: 5, cols: 8 })).toEqual({ min: 0, max: 39, count: 40 });
   });
 
   it('Marker sheet 2x3 startId=5 → {min:5, max:10, count:6}', () => {
