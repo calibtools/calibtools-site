@@ -51,6 +51,8 @@ Every number is the median of 30 random sets of views. "Edge error" is how far t
 
 Bow is the sag at the center of the 216 mm corner span, with the sheet bent around one axis like a page that will not lie flat. Dome is the same sag in both directions. Wavy is the cockle a sheet gets from heavy ink and humidity.
 
+![Two bars for each board defect: reprojection error and model error at the frame corners. Stretched prints leave the reprojection error near 0.1 px while the model is up to 9.7 px off; a 1 mm bow gives 0.79 px and 103 px.](../../assets/guides/print-defects-rms-vs-model-error.svg)
+
 Three different failures come out of this table.
 
 ## Scale: invisible in the calibration, visible in every measurement

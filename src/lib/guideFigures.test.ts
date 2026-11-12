@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
-import { PARTIAL_VIEW_CASES, PARTIAL_VIEW_VISIBLE, partialViewFigureSvg, usafFigureSvg, kalibrFrameFigureSvg, multiBoardFigureSvg, KALIBR_FIGURE_SPEC, MULTI_BOARD_SPECS, fillFigureSvg, fillRowsFromGuide, FILL_FIGURE_SPEC, type PartialViewData } from './guideFigures';
+import { PARTIAL_VIEW_CASES, PARTIAL_VIEW_VISIBLE, partialViewFigureSvg, usafFigureSvg, kalibrFrameFigureSvg, multiBoardFigureSvg, KALIBR_FIGURE_SPEC, MULTI_BOARD_SPECS, fillFigureSvg, fillRowsFromGuide, FILL_FIGURE_SPEC, printDefectFigureSvg, printDefectRowsFromGuide, PRINT_DEFECT_SCALE, type PartialViewData } from './guideFigures';
 import { idRange } from './idRange';
 import { patternExtent } from './pageLayout';
 import { charucoMarkers } from './renderCharuco';
@@ -132,5 +132,48 @@ describe('board fill figure', () => {
     const mean = implied.reduce((a, b) => a + b, 0) / implied.length;
     for (const w of implied) expect(Math.abs(w - mean) / mean).toBeLessThan(0.03);
     expect(md).toContain("Fill here means the board's width as a share of the frame width.");
+  });
+});
+
+describe('printed-target defects figure', () => {
+  const md = readFileSync('src/content/guides/printed-target-costs-half-a-pixel.md', 'utf8');
+  const rows = printDefectRowsFromGuide(md);
+
+  it('reads all eleven scenarios of the first results table', () => {
+    expect(rows.length).toBe(11);
+    expect(rows[0]).toEqual({ label: 'Flat and exact', rms: 0.07, edge: 1 });
+    expect(rows.find((r) => r.label === 'Bowed 1 mm')).toEqual({ label: 'Bowed 1 mm', rms: 0.79, edge: 103 });
+    expect(rows.find((r) => r.label === 'Stretched 0.5 % in one direction')).toEqual({ label: 'Stretched 0.5 % in one direction', rms: 0.13, edge: 9.7 });
+  });
+
+  it('the committed SVG is what the generator produces from the table', () => {
+    expect(readFileSync('src/assets/guides/print-defects-rms-vs-model-error.svg', 'utf8')).toBe(printDefectFigureSvg(rows));
+  });
+
+  it('every value fits its scale, so no bar is clipped', () => {
+    for (const r of rows) {
+      expect(r.rms).toBeLessThanOrEqual(PRINT_DEFECT_SCALE.rmsMax);
+      expect(r.edge).toBeGreaterThanOrEqual(PRINT_DEFECT_SCALE.edgeMin);
+      expect(r.edge).toBeLessThanOrEqual(PRINT_DEFECT_SCALE.edgeMax);
+    }
+  });
+
+  it('bar lengths follow the numbers: RMS linear, edge error logarithmic', () => {
+    const svg = printDefectFigureSvg(rows);
+    const ink = [...svg.matchAll(/<rect x="20" y="[\d.]+" width="([\d.]+)" height="16" fill="#141414"/g)].map((m) => +m[1]);
+    const red = [...svg.matchAll(/<rect x="336" y="[\d.]+" width="([\d.]+)" height="16" fill="#E60012"/g)].map((m) => +m[1]);
+    expect(ink.length).toBe(11);
+    expect(red.length).toBe(11);
+    const b1 = rows.findIndex((r) => r.label === 'Bowed 1 mm'), b2 = rows.findIndex((r) => r.label === 'Bowed 2 mm');
+    expect(ink[b2] / ink[b1]).toBeCloseTo(1.59 / 0.79, 1);
+    const { edgeMin, edgeMax, barMax } = PRINT_DEFECT_SCALE;
+    expect(red[b1]).toBeCloseTo((Math.log(103 / edgeMin) / Math.log(edgeMax / edgeMin)) * barMax, 0);
+  });
+
+  it('the alt text quotes numbers that are in the table', () => {
+    const alt = md.match(/!\[([^\]]+)\]\(\.\.\/\.\.\/assets\/guides\/print-defects/)![1];
+    expect(alt).toContain('9.7 px');
+    expect(alt).toContain('0.79 px');
+    expect(alt).toContain('103 px');
   });
 });
