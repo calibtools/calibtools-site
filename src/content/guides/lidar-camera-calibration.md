@@ -31,6 +31,8 @@ A LiDAR cannot see printed markers, and a camera cannot see depth edges. The usu
 
 Each placement of the target then gives you the hole centers in the LiDAR frame (from the cloud) and in the camera frame (from the marker pose and the known layout). A rigid fit across all placements gives `T_cam_lidar`.
 
+![The same four-hole panel twice. As the LiDAR sees it: rows of points with four circular gaps and a circle fitted around each. As the camera sees it: a marker in each corner and the four holes. The hole centers are marked in both.](../../assets/guides/lidar-camera-target-two-views.svg)
+
 ## 1. The target
 
 What matters in the target:

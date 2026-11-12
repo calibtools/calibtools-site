@@ -9,7 +9,7 @@ import { writeFileSync, mkdirSync, readFileSync } from 'node:fs';
 import { Resvg } from '@resvg/resvg-js';
 import { renderPatternSvg } from '../src/lib/patterns';
 import { patternExtent } from '../src/lib/pageLayout';
-import { PARTIAL_VIEW_CASES, PARTIAL_VIEW_VISIBLE, PARTIAL_VIEW_MARGIN, partialViewFigureSvg, usafFigureSvg, kalibrFrameFigureSvg, multiBoardFigureSvg, fillFigureSvg, fillRowsFromGuide, printDefectFigureSvg, printDefectRowsFromGuide, type PartialViewData } from '../src/lib/guideFigures';
+import { PARTIAL_VIEW_CASES, PARTIAL_VIEW_VISIBLE, PARTIAL_VIEW_MARGIN, partialViewFigureSvg, usafFigureSvg, kalibrFrameFigureSvg, multiBoardFigureSvg, fillFigureSvg, fillRowsFromGuide, printDefectFigureSvg, printDefectRowsFromGuide, detectionLimitsFigureSvg, detectionLimitsFromGuide, lidarCameraFigureSvg, type PartialViewData } from '../src/lib/guideFigures';
 
 if (process.argv.includes('--pngs')) {
   const pxPerMm = 6, m = PARTIAL_VIEW_MARGIN;
@@ -33,5 +33,7 @@ if (process.argv.includes('--pngs')) {
   const fill = fillRowsFromGuide(readFileSync('src/content/guides/calibration-target-size.md', 'utf8'));
   writeFileSync('src/assets/guides/board-fill-20-vs-60.svg', fillFigureSvg([fill.find((r) => r.fill === 20)!, fill.find((r) => r.fill === 60)!]));
   writeFileSync('src/assets/guides/print-defects-rms-vs-model-error.svg', printDefectFigureSvg(printDefectRowsFromGuide(readFileSync('src/content/guides/printed-target-costs-half-a-pixel.md', 'utf8'))));
+  writeFileSync('src/assets/guides/charuco-detection-limits.svg', detectionLimitsFigureSvg(detectionLimitsFromGuide(readFileSync('src/content/guides/corner-detection-troubleshooting.md', 'utf8'))));
+  writeFileSync('src/assets/guides/lidar-camera-target-two-views.svg', lidarCameraFigureSvg());
   console.log('wrote src/assets/guides/*.svg');
 }

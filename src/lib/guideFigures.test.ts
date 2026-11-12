@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
-import { PARTIAL_VIEW_CASES, PARTIAL_VIEW_VISIBLE, partialViewFigureSvg, usafFigureSvg, kalibrFrameFigureSvg, multiBoardFigureSvg, KALIBR_FIGURE_SPEC, MULTI_BOARD_SPECS, fillFigureSvg, fillRowsFromGuide, FILL_FIGURE_SPEC, printDefectFigureSvg, printDefectRowsFromGuide, PRINT_DEFECT_SCALE, type PartialViewData } from './guideFigures';
+import { PARTIAL_VIEW_CASES, PARTIAL_VIEW_VISIBLE, partialViewFigureSvg, usafFigureSvg, kalibrFrameFigureSvg, multiBoardFigureSvg, KALIBR_FIGURE_SPEC, MULTI_BOARD_SPECS, fillFigureSvg, fillRowsFromGuide, FILL_FIGURE_SPEC, printDefectFigureSvg, printDefectRowsFromGuide, PRINT_DEFECT_SCALE, detectionLimitsFigureSvg, detectionLimitsFromGuide, lidarCameraFigureSvg, LIDAR_SKETCH, type PartialViewData } from './guideFigures';
 import { idRange } from './idRange';
 import { patternExtent } from './pageLayout';
 import { charucoMarkers } from './renderCharuco';
@@ -175,5 +175,71 @@ describe('printed-target defects figure', () => {
     expect(alt).toContain('9.7 px');
     expect(alt).toContain('0.79 px');
     expect(alt).toContain('103 px');
+  });
+});
+
+describe('ChArUco detection limits figure', () => {
+  const md = readFileSync('src/content/guides/corner-detection-troubleshooting.md', 'utf8');
+  const d = detectionLimitsFromGuide(md);
+
+  it('reads the pixel and blur tables and nothing else', () => {
+    expect(d.total).toBe(54);
+    expect(d.pixels.map((r) => [r.pxPerSquare, r.pxPerBit, r.corners])).toEqual([[30, 2.7, 54], [24, 2.2, 54], [20, 1.8, 52], [16, 1.4, 3], [12, 1.1, 0], [8, 0.7, 0]]);
+    expect([d.smallBit, d.largeBit]).toEqual([2.7, 5.4]);
+    expect(d.blur.map((r) => [r.sigma, r.small, r.large])).toEqual([[0, 54, 54], [1, 46, 54], [2, 0, 50], [3, 0, 1], [6, 0, 0], [8, 0, 0]]);
+  });
+
+  it('the committed SVG is what the generator produces from the tables', () => {
+    expect(readFileSync('src/assets/guides/charuco-detection-limits.svg', 'utf8')).toBe(detectionLimitsFigureSvg(d));
+  });
+
+  it('no count exceeds the total, so no bar leaves its track', () => {
+    for (const r of d.pixels) expect(r.corners).toBeLessThanOrEqual(d.total);
+    for (const r of d.blur) { expect(r.small).toBeLessThanOrEqual(d.total); expect(r.large).toBeLessThanOrEqual(d.total); }
+  });
+
+  it('the checkerboard sentence is only drawn because every row of the first table says found', () => {
+    expect(d.pixels.every((r) => r.checkerboard === 'found')).toBe(true);
+    expect(detectionLimitsFigureSvg(d)).toContain('down to 8 px per square');
+  });
+
+  it('the alt text quotes numbers from the tables', () => {
+    const alt = md.match(/!\[([^\]]+)\]\(\.\.\/\.\.\/assets\/guides\/charuco-detection-limits/)![1];
+    for (const t of ['out of 54', 'All 54 at 2.2 px per bit', '3 at 1.4 px', 'With 2.7 px bits a blur of sigma 2 px leaves none', 'with 5.4 px bits it leaves 50']) expect(alt).toContain(t);
+  });
+});
+
+describe('LiDAR-camera figure', () => {
+  const svg = lidarCameraFigureSvg();
+  const { panel, holes, holeR, marker, inset } = LIDAR_SKETCH;
+
+  it('the committed SVG is what the generator produces', () => {
+    expect(readFileSync('src/assets/guides/lidar-camera-target-two-views.svg', 'utf8')).toBe(svg);
+  });
+
+  it('no LiDAR point is drawn inside a hole, and the hole centers are marked in both views', () => {
+    const pts = [...svg.matchAll(/<circle cx="([\d.]+)" cy="([\d.]+)" r="1.3"/g)].map((m) => [+m[1] - 25, +m[2] - 64]);
+    expect(pts.length).toBeGreaterThan(400);
+    for (const [x, y] of pts) for (const [hx, hy] of holes) expect(Math.hypot(x - hx, y - hy)).toBeGreaterThanOrEqual(holeR);
+    expect((svg.match(/stroke="#B3000E" stroke-width="1.6"/g) ?? []).length).toBe(holes.length * 2 * 2);
+  });
+
+  it('the hole layout is not symmetric under a half turn, as the guide asks for', () => {
+    const turned = holes.map(([x, y]) => [panel.w - x, panel.h - y]);
+    const same = turned.every(([x, y]) => holes.some(([hx, hy]) => Math.hypot(x - hx, y - hy) < 1));
+    expect(same).toBe(false);
+    expect(readFileSync('src/content/guides/lidar-camera-calibration.md', 'utf8')).toContain('An asymmetric hole layout');
+  });
+
+  it('holes stay clear of the markers and of the panel edge', () => {
+    const boxes = [[inset, inset], [panel.w - inset - marker, inset], [inset, panel.h - inset - marker], [panel.w - inset - marker, panel.h - inset - marker]];
+    for (const [hx, hy] of holes) {
+      expect(hx - holeR).toBeGreaterThan(0); expect(hx + holeR).toBeLessThan(panel.w);
+      expect(hy - holeR).toBeGreaterThan(0); expect(hy + holeR).toBeLessThan(panel.h);
+      for (const [bx, by] of boxes) {
+        const dx = Math.max(bx - hx, 0, hx - (bx + marker)), dy = Math.max(by - hy, 0, hy - (by + marker));
+        expect(Math.hypot(dx, dy)).toBeGreaterThan(holeR);
+      }
+    }
   });
 });
