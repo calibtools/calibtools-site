@@ -81,14 +81,48 @@ export const SENSOR_PRESETS: Record<string, [number, number, number, number]> = 
   '1/4" (OV7251)':     [3.60, 2.70, 640, 480],
   '1/3" (AR0330)':     [4.80, 3.60, 2304, 1536],
   '1/2.5" (IMX264)':   [5.70, 4.28, 2448, 2048],
+  '1/2.3" (action camera, drone)': [6.17, 4.55, 4000, 3000],
   '1/2" (IMX290)':     [6.46, 3.63, 1920, 1080],
   '1/1.8" (IMX178)':   [7.41, 4.94, 3072, 2048],
   '2/3" (IMX174)':     [8.77, 6.60, 1920, 1200],
   '1" (IMX253)':       [13.13, 8.76, 4096, 3000],
+  'Micro Four Thirds': [17.30, 13.00, 5184, 3888],
   'APS-C (Canon)':     [22.30, 14.90, 6000, 4000],
+  'APS-C (Sony, Nikon, Fuji)': [23.50, 15.60, 6000, 4000],
   'Full frame (35mm)': [36.00, 24.00, 6000, 4000],
   'Custom': [0, 0, 0, 0],
 };
+
+export type FovAxis = 'horizontal' | 'vertical' | 'diagonal';
+
+/** Aspect ratios offered by the FOV converter. */
+export const ASPECT_RATIOS: ReadonlyArray<{ label: string; w: number; h: number }> = [
+  { label: '16:9', w: 16, h: 9 },
+  { label: '4:3', w: 4, h: 3 },
+  { label: '3:2', w: 3, h: 2 },
+  { label: '1:1', w: 1, h: 1 },
+  { label: '21:9', w: 21, h: 9 },
+];
+
+/**
+ * Convert one field-of-view angle into the other two for a frame of aspect ratio w:h.
+ * Rectilinear (pinhole) lens: tan(angle / 2) is proportional to the length the angle spans
+ * (width, height or diagonal). Angles in degrees; NaN for input outside 0–180° or a bad ratio.
+ */
+export function convertFov(angleDeg: number, axis: FovAxis, aspectW: number, aspectH: number): Record<FovAxis, number> {
+  const nan = { horizontal: NaN, vertical: NaN, diagonal: NaN };
+  if (!(angleDeg > 0 && angleDeg < 180) || !(aspectW > 0) || !(aspectH > 0)) return nan;
+  const span: Record<FovAxis, number> = { horizontal: aspectW, vertical: aspectH, diagonal: Math.hypot(aspectW, aspectH) };
+  const t = Math.tan((angleDeg * Math.PI) / 360) / span[axis];
+  const to = (a: FovAxis) => rad2deg(2 * Math.atan(t * span[a]));
+  return { horizontal: to('horizontal'), vertical: to('vertical'), diagonal: to('diagonal') };
+}
+
+/** A length in mm, written with its US-unit value: "365.4 mm (14.39 in)", "1.20 m (3.94 ft)". */
+export function formatLength(mm: number): string {
+  if (mm >= 1000) return `${(mm / 1000).toFixed(2)} m (${(mm / 304.8).toFixed(2)} ft)`;
+  return `${mm.toFixed(1)} mm (${(mm / 25.4).toFixed(2)} in)`;
+}
 
 /**
  * Compute the minimum working distance for a target to fill a given

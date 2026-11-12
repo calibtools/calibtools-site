@@ -1,6 +1,6 @@
 ---
 seoTitle: "AprilTag generator — free tag36h11 PDF, SVG"
-seoDescription: "Generate AprilTag markers: tag36h11, tag25h9 and tag16h5. One tag or a sheet of IDs, print-exact PDF, SVG and PNG for apriltag, OpenCV and ROS. Free."
+seoDescription: "Free online AprilTag generator: tag36h11, tag25h9 and tag16h5. One tag or a sheet of IDs as a print-exact PDF, SVG or PNG. No sign-up, runs in your browser."
 h1: "AprilTag generator"
 faq:
   - q: "Which AprilTag family should I use?"

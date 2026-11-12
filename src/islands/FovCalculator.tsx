@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { ScanLine } from '@/lib/icons';
-import { calculateFov, minDistance, recommendBoard, requiredFocal, SENSOR_PRESETS, TARGET_FILL, type FovResult } from '@/lib/fov';
+import { calculateFov, convertFov, formatLength, minDistance, recommendBoard, requiredFocal, ASPECT_RATIOS, SENSOR_PRESETS, TARGET_FILL, type FovAxis, type FovResult } from '@/lib/fov';
 
 const PRESET_NAMES = Object.keys(SENSOR_PRESETS);
 
@@ -19,6 +19,9 @@ export default function FovCalculator({ heading = 'FOV calculator' }: { heading?
   const [targetH, setTargetH] = useState(175);
   const [wantW, setWantW] = useState(300);
   const [wantH, setWantH] = useState(0);
+  const [convAngle, setConvAngle] = useState(90);
+  const [convAxis, setConvAxis] = useState<FovAxis>('horizontal');
+  const [convRatio, setConvRatio] = useState('16:9');
 
   const applyPreset = (name: string) => {
     setPreset(name);
@@ -52,8 +55,14 @@ export default function FovCalculator({ heading = 'FOV calculator' }: { heading?
   );
   const genUrl = `/tools/generator/?type=ChArUco&rows=${rec.board.rows}&cols=${rec.board.cols}&square=${rec.board.square}&marker=${rec.board.marker}&dict=DICT_6X6_250`;
 
+  const conv = useMemo(() => {
+    const r = ASPECT_RATIOS.find((a) => a.label === convRatio);
+    return r ? convertFov(convAngle, convAxis, r.w, r.h) : convertFov(convAngle, convAxis, sensorW, sensorH);
+  }, [convAngle, convAxis, convRatio, sensorW, sensorH]);
+
   const fmt = (v: number, d = 1) => v.toFixed(d);
   const fmtMm = (v: number) => (v >= 1000 ? `${(v / 1000).toFixed(2)} m` : `${v.toFixed(1)} mm`);
+  const deg = (v: number) => (Number.isFinite(v) ? `${v.toFixed(1)}°` : '—');
 
   const field = 'w-full rounded border border-[#CFCFCF] bg-white px-3 py-[11px] text-[15px]';
 
@@ -140,6 +149,9 @@ export default function FovCalculator({ heading = 'FOV calculator' }: { heading?
             <ResultCard label="Height" value={fmtMm(fov.vCoverage)} />
             <ResultCard label="GSD" value={`${fov.gsd.toFixed(3)} mm/px`} />
           </div>
+          <p className="m-0 mt-4 font-mono text-[13px] text-ink-muted" data-us-units>
+            {formatLength(fov.hCoverage)} × {formatLength(fov.vCoverage)} at {formatLength(distance)}
+          </p>
         </div>
 
         {/* Visual diagram */}
@@ -199,6 +211,36 @@ export default function FovCalculator({ heading = 'FOV calculator' }: { heading?
             <a href={genUrl} className="rounded bg-ink px-4 py-2.5 text-sm font-semibold text-white no-underline hover:text-white inline-flex items-center">Print this pattern free</a>
             <a href={rec.productPath} className="rounded border border-ink px-4 py-2.5 text-sm font-semibold text-ink no-underline inline-flex items-center">Rigid board details</a>
           </div>
+        </div>
+
+        {/* FOV converter: one angle and an aspect ratio in, the other two angles out */}
+        <div className="card p-7" id="fov-converter">
+          <h2 className="m-0 mb-2 text-lg font-bold">FOV converter</h2>
+          <p className="m-0 mb-5 text-sm text-ink-muted">Know one angle from a datasheet? Convert between horizontal, vertical and diagonal field of view. No sensor or lens data needed.</p>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <label className="flex flex-col gap-2 text-[13px] font-semibold">Angle (°)
+              <input className={field} type="number" min={1} max={179} step={0.1} value={convAngle} onChange={(e) => setConvAngle(+e.target.value)} />
+            </label>
+            <label className="flex flex-col gap-2 text-[13px] font-semibold">It is the
+              <select className={field} value={convAxis} onChange={(e) => setConvAxis(e.target.value as FovAxis)}>
+                <option value="horizontal">Horizontal FOV</option>
+                <option value="vertical">Vertical FOV</option>
+                <option value="diagonal">Diagonal FOV</option>
+              </select>
+            </label>
+            <label className="flex flex-col gap-2 text-[13px] font-semibold">Aspect ratio
+              <select className={field} value={convRatio} onChange={(e) => setConvRatio(e.target.value)}>
+                {ASPECT_RATIOS.map((a) => <option key={a.label}>{a.label}</option>)}
+                <option value="sensor">Sensor above</option>
+              </select>
+            </label>
+          </div>
+          <div className="mt-5 grid grid-cols-3 gap-4" data-fov-converter-result>
+            <ResultCard label="Horizontal" value={deg(conv.horizontal)} />
+            <ResultCard label="Vertical" value={deg(conv.vertical)} />
+            <ResultCard label="Diagonal" value={deg(conv.diagonal)} />
+          </div>
+          <p className="m-0 mt-4 text-xs text-ink-muted">For standard (rectilinear) lenses. Fisheye lenses follow a different projection.</p>
         </div>
 
         <div className="card flex flex-wrap items-center justify-between gap-3 bg-ground-alt px-5 py-4">
