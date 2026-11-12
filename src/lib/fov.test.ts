@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { calculateFov, minDistance } from './fov';
+import { readFileSync } from 'node:fs';
+import { calculateFov, minDistance, recommendBoard } from './fov';
 
 describe('calculateFov', () => {
   // Reference: full frame 35mm sensor, 50mm lens
@@ -112,5 +113,23 @@ describe('recommendBoard', () => {
   it('flags markers too small to decode', () => {
     const rec = recommendBoard(4000, 3000, 2);
     expect(rec.decodable).toBe(false);
+  });
+});
+
+describe('home page example', () => {
+  const home = readFileSync('src/pages/index.astro', 'utf8');
+  const island = readFileSync('src/islands/FovCalculator.tsx', 'utf8');
+
+  it('the calculator opens with FOV_DEFAULTS and the home page computes its example from the same values', () => {
+    for (const k of ['preset', 'sensorW', 'sensorH', 'resW', 'resH', 'focal', 'distance']) expect(island).toContain(`useState(FOV_DEFAULTS.${k})`);
+    expect(home).toContain('calculateFov(fovIn.sensorW, fovIn.sensorH, fovIn.focal, fovIn.distance, fovIn.resW, fovIn.resH)');
+    expect(home).toContain('recommendBoard(fovOut.hCoverage, fovOut.vCoverage, fovOut.gsd)');
+    expect(home).toContain('<FovDiagram fov={fovOut}');
+  });
+
+  it('the opening example is a 365 × 275 mm field with a 200 × 150 mm board', () => {
+    const r = calculateFov(8.77, 6.6, 12, 500, 1920, 1200);
+    expect([r.hCoverage.toFixed(0), r.vCoverage.toFixed(0)]).toEqual(['365', '275']);
+    expect(recommendBoard(r.hCoverage, r.vCoverage, r.gsd).board.label).toBe('200 × 150');
   });
 });

@@ -1,4 +1,6 @@
 ---
+import { FOV_DEFAULTS, FovDiagram } from '@/islands/FovCalculator';
+import { calculateFov, recommendBoard } from '@/lib/fov';
 import Base from '@/layouts/Base.astro';
 import NewsletterForm from '@/islands/NewsletterForm';
 import { tools } from '@/lib/tools';
@@ -20,6 +22,11 @@ const guides = allGuides.filter(isReady).slice(0, 3);
 
 /* Three tools on the home page */
 const featuredTools = tools.slice(0, 3);
+
+/* The field-of-view calculator's opening example, computed by the tool's own code at build time */
+const fovIn = FOV_DEFAULTS;
+const fovOut = calculateFov(fovIn.sensorW, fovIn.sensorH, fovIn.focal, fovIn.distance, fovIn.resW, fovIn.resH);
+const fovBoard = recommendBoard(fovOut.hCoverage, fovOut.vCoverage, fovOut.gsd);
 
 /* Part numbers → product pages, for the "Have a part number?" box */
 const pnIndex = partNumberIndex(partNumbersCsv);
@@ -112,6 +119,14 @@ const featuredReviews = allReviews
         <h2 class="m-0 text-[24px] font-semibold md:text-[28px]">Size the board before you buy it</h2>
         <p class="m-0 max-w-[400px] text-[15px] leading-relaxed text-ink-muted">Seven tools that run in your browser. No images or calibration files leave your computer.</p>
         <a href="/tools/" class="text-[14px] font-medium underline decoration-1 underline-offset-[3px]">All tools</a>
+        <a href="/tools/fov/" class="mt-2 flex max-w-[400px] flex-col gap-3 border border-line-strong bg-sheet p-4 text-ink no-underline hover:border-ink hover:text-ink">
+          <span class="spec-label">Field-of-view calculator · {fovIn.preset.replace(/ \(.*\)$/, '')} sensor, {fovIn.focal} mm lens, {fovIn.distance} mm away</span>
+          <FovDiagram fov={fovOut} distance={fovIn.distance} focal={fovIn.focal} />
+          <dl class="m-0 grid grid-cols-2 gap-3 border-t border-line pt-3">
+            <div class="flex flex-col gap-1"><dt class="spec-label">Field of view</dt><dd class="m-0 font-mono text-[15px] font-semibold">{fovOut.hCoverage.toFixed(0)} × {fovOut.vCoverage.toFixed(0)} mm</dd></div>
+            <div class="flex flex-col gap-1"><dt class="spec-label">Suggested board</dt><dd class="m-0 font-mono text-[15px] font-semibold">{fovBoard.board.label} mm</dd></div>
+          </dl>
+        </a>
       </div>
       <ol class="m-0 flex list-none flex-col border-t border-line-strong p-0 lg:w-[58%]">
         {featuredTools.map((t) => (
