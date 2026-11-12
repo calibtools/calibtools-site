@@ -249,3 +249,21 @@ describe('opencv.json for circle grids', () => {
     expect(cfg.circle_diameter_mm).toBe(10.08);
   });
 });
+
+describe('generator pages lead on to the boards', () => {
+  const PRODUCTS = readdirSync(resolve('src/assets/products'));
+  const pages = readdirSync(TOOLS_DIR).filter((f) => /^generator(-[a-z]+)?\.md$/.test(f));
+
+  it('finds the seven generator pages', () => {
+    expect(pages.length).toBe(7);
+  });
+
+  for (const file of pages) {
+    it(`${file} links to at least one product page, and every product link exists`, () => {
+      const raw = readFileSync(resolve(TOOLS_DIR, file), 'utf-8');
+      const handles = [...raw.matchAll(/\]\(\/targets\/([a-z0-9-]+)\/\)/g)].map((m) => m[1]);
+      expect(handles.length).toBeGreaterThan(0);
+      for (const h of handles) expect(PRODUCTS).toContain(h);
+    });
+  }
+});
