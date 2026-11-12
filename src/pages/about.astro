@@ -41,14 +41,11 @@ const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: 'About' }]);
           <li><strong>Measured before it ships.</strong> {INSPECTION_CLAIM}.</li>
           <li><strong>Files that match the board.</strong> Marker ID ranges, config files and drawings come from the same data as the target itself.</li>
         </ul>
-        <figure class="m-0 flex flex-col gap-2">
-          <div class="grid grid-cols-1 gap-2 sm:grid-cols-3">
+        <div class="grid grid-cols-1 gap-2 sm:grid-cols-3">
             <Image src={caliperImg} alt="A digital caliper lying across the squares of a checkerboard calibration board." widths={[240, 480, 720]} sizes="(max-width: 640px) 100vw, 240px" class="block aspect-[3/2] h-auto w-full border border-line object-cover" />
             <Image src={flatnessImg} alt="A hand sliding a feeler gauge under a steel straightedge that rests across a checkerboard calibration board on a granite plate." widths={[240, 480, 720]} sizes="(max-width: 640px) 100vw, 240px" class="block aspect-[3/2] h-auto w-full border border-line object-cover" />
             <Image src={benchImg} alt="A ChArUco calibration board lying on the granite table of a bridge-type measuring machine." widths={[240, 480, 720]} sizes="(max-width: 640px) 100vw, 240px" class="block aspect-[3/2] h-auto w-full border border-line object-cover" />
-          </div>
-          <figcaption class="text-[13px] text-ink-muted">The checks, illustrated: pitch, flatness and corner positions. These pictures are illustrations, not photographs of an order.</figcaption>
-        </figure>
+        </div>
       </section>
 
       <section class="flex flex-col gap-3">
