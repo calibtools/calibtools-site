@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
-import { PARTIAL_VIEW_CASES, PARTIAL_VIEW_VISIBLE, partialViewFigureSvg, usafFigureSvg, type PartialViewData } from './guideFigures';
+import { PARTIAL_VIEW_CASES, PARTIAL_VIEW_VISIBLE, partialViewFigureSvg, usafFigureSvg, kalibrFrameFigureSvg, multiBoardFigureSvg, KALIBR_FIGURE_SPEC, MULTI_BOARD_SPECS, type PartialViewData } from './guideFigures';
+import { idRange } from './idRange';
 import { patternExtent } from './pageLayout';
 import { charucoMarkers } from './renderCharuco';
 import { innerCorners } from './patterns';
@@ -15,6 +16,12 @@ describe('guide figures are the files this code writes', () => {
   });
   it('USAF 1951 figure', () => {
     expect(readFileSync('src/assets/guides/usaf-1951-groups-0-3.svg', 'utf8')).toBe(usafFigureSvg());
+  });
+  it('Kalibr AprilGrid frame figure', () => {
+    expect(readFileSync('src/assets/guides/kalibr-aprilgrid-frame.svg', 'utf8')).toBe(kalibrFrameFigureSvg());
+  });
+  it('multi-board ID ranges figure', () => {
+    expect(readFileSync('src/assets/guides/multi-board-id-ranges.svg', 'utf8')).toBe(multiBoardFigureSvg());
   });
 });
 
@@ -58,5 +65,40 @@ describe('partial-view detection data', () => {
     expect(md).toContain(`${ap} of ${PARTIAL_VIEW_CASES[2].total} tag corners`);
     expect(md).toContain(`${ap / 4} tags, ${ap} corners`);
     expect(md).toContain(`OpenCV ${data.opencv.split('.').slice(0, 2).join('.')}`);
+  });
+});
+
+describe('Kalibr frame figure', () => {
+  const svg = kalibrFrameFigureSvg();
+  const tags = aprilGridTags(KALIBR_FIGURE_SPEC);
+  it('labels every tag with its ID, 0 in the bottom row and the highest in the top row', () => {
+    const labels = [...svg.matchAll(/<text x="([\d.]+)" y="([\d.]+)" text-anchor="middle" font-size="7.5"[^>]*>(\d+)<\/text>/g)].map((m) => ({ x: +m[1], y: +m[2], id: +m[3] }));
+    expect(labels.map((l) => l.id).sort((a, b) => a - b)).toEqual(tags.map((t) => t.id));
+    const y = (id: number) => labels.find((l) => l.id === id)!.y, x = (id: number) => labels.find((l) => l.id === id)!.x;
+    expect(y(0)).toBeGreaterThan(y(4)); expect(y(4)).toBeGreaterThan(y(8)); // upward
+    expect(x(1)).toBeGreaterThan(x(0)); expect(y(1)).toBe(y(0));           // left to right
+  });
+  it('puts the origin dot on the bottom-left corner of tag 0', () => {
+    const dot = /<circle cx="([\d.]+)" cy="([\d.]+)" r="2.6"/.exec(svg)!;
+    const t0 = /class="tag-bg"/.test(svg) ? [...svg.matchAll(/<rect x="([\d.]+)" y="([\d.]+)" width="40" height="40" class="tag-bg"/g)].map((m) => ({ x: +m[1], y: +m[2] })) : [];
+    const lowestLeft = t0.sort((a, b) => b.y - a.y || a.x - b.x)[0];
+    expect(+dot[1]).toBeCloseTo(lowestLeft.x, 6);
+    expect(+dot[2]).toBeCloseTo(lowestLeft.y + 40, 6);
+  });
+});
+
+describe('multi-board figure', () => {
+  it('shows ranges that follow from the boards and do not overlap', () => {
+    const svg = multiBoardFigureSvg();
+    let next = 0;
+    MULTI_BOARD_SPECS.forEach((s, i) => {
+      const r = idRange(s)!;
+      expect(r.min).toBe(next); next = r.max + 1;
+      expect(svg).toContain(`>Board ${i + 1}<`);
+      expect(svg).toContain(`start ID ${r.min} · IDs ${r.min}–${r.max}<`);
+    });
+    expect(next).toBeLessThanOrEqual(250); // fits DICT_6X6_250
+    const md = readFileSync('src/content/guides/multi-board-marker-ids.md', 'utf8');
+    expect(md).toContain('board 4 uses 105 to 139');
   });
 });

@@ -17,7 +17,7 @@ faq:
     a: "DICT_6X6_250 supports up to 250 markers (7 boards of 35). For larger rigs, use DICT_7X7_1000."
 ---
 
-![Calib.Tools set of four ChArUco calibration boards with consecutive marker ID ranges arranged in a 2 by 2 grid, seen from above.](../../assets/products/brand/home-set.webp)
+![Four 7 by 10 ChArUco boards with consecutive marker ID ranges: board 1 uses IDs 0 to 34, board 2 uses 35 to 69, board 3 uses 70 to 104, board 4 uses 105 to 139.](../../assets/guides/multi-board-id-ranges.svg)
 
 ## Why boards in one rig need distinct ID ranges
 
