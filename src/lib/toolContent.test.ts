@@ -3,7 +3,8 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { specFromParams } from './patternLink';
 import { computeLayout, PAPERS } from './pageLayout';
-import { getAprilFamily } from './dicts/dicts';
+import { getAprilFamily, dictMarkerCount } from './dicts/dicts';
+import { GENERATOR_DEFAULT } from './patternLink';
 import type { PatternSpec } from './patterns';
 
 /**
@@ -104,5 +105,87 @@ describe('AprilTag generator page', () => {
     expect((1400 * 100) / 2000).toBe(70);
     expect(70 / 8).toBeCloseTo(8.75, 2);
     expect(md).toContain('is 70 px wide, a little under 9 px per cell');
+  });
+});
+
+/** Ready-made links of a generator page: text, query and the spec they produce on that page. */
+function readyMade(file: string, slug: string, page: PatternSpec) {
+  const md = readFileSync(resolve(TOOLS_DIR, file), 'utf-8');
+  const re = new RegExp(`- \\[([^\\]]+)\\]\\(\\/tools\\/generator\\/${slug}\\/\\?([^)]+)\\)`, 'g');
+  return { md, links: [...md.matchAll(re)].map((m) => ({ text: m[1], spec: { ...page, ...specFromParams(new URLSearchParams(m[2])) } as PatternSpec })) };
+}
+const fitsOn = (spec: PatternSpec, paper: string) => computeLayout({ ...spec, paper }, ...PAPERS[paper]).fit === 'single';
+
+describe('ArUco generator page', () => {
+  const page: PatternSpec = { ...GENERATOR_DEFAULT, type: 'Marker sheet', rows: 1, cols: 1, square: 120, marker: 100, dict: 'DICT_6X6_250', startId: 0 };
+  const { md, links } = readyMade('generator-aruco.md', 'aruco', page);
+
+  it('has four ready-made sheets that fit one A4 and one Letter page, with IDs inside the dictionary', () => {
+    expect(links.length).toBe(4);
+    for (const { text, spec } of links) {
+      expect(fitsOn(spec, 'A4'), text).toBe(true);
+      expect(fitsOn(spec, 'Letter'), text).toBe(true);
+      expect(spec.startId! + spec.rows * spec.cols).toBeLessThanOrEqual(dictMarkerCount(spec.dict)!);
+    }
+  });
+
+  it('the link text names the dictionary, count and size the link sets', () => {
+    const words: Record<string, number> = { One: 1, Six: 6, Twelve: 12, 'Twenty-four': 24 };
+    for (const { text, spec } of links) {
+      const m = text.match(/^(One|Six|Twelve|Twenty-four) (DICT_\w+) markers?, IDs? [^,]+, (\d+) mm$/)!;
+      expect(m, text).not.toBeNull();
+      expect(spec.rows * spec.cols).toBe(words[m[1]]);
+      expect(spec.dict).toBe(m[2]);
+      expect(spec.marker).toBe(+m[3]);
+    }
+  });
+
+  it('marker counts in the dictionary table match the data', () => {
+    for (const m of md.matchAll(/^\| (DICT_\w+) \| \d × \d \| (\d+) \|/gm)) expect(dictMarkerCount(m[1]), m[1]).toBe(+m[2]);
+  });
+});
+
+describe('ChArUco and checkerboard generator pages', () => {
+  const cases = [
+    { file: 'generator-charuco.md', slug: 'charuco', astro: "initialSpec={{ type: 'ChArUco', rows: 7, cols: 10, square: 20, marker: 15, dict: 'DICT_6X6_250' }}", page: { ...GENERATOR_DEFAULT, type: 'ChArUco', rows: 7, cols: 10, square: 20, marker: 15, dict: 'DICT_6X6_250' } as PatternSpec },
+    { file: 'generator-checkerboard.md', slug: 'checkerboard', astro: "initialSpec={{ type: 'Checkerboard', rows: 7, cols: 10, square: 20 }}", page: { ...GENERATOR_DEFAULT, type: 'Checkerboard', rows: 7, cols: 10, square: 20 } as PatternSpec },
+  ];
+  for (const c of cases) {
+    const { links } = readyMade(c.file, c.slug, c.page);
+
+    it(`${c.slug}: the page opens with a board that fits one A4 and one Letter page`, () => {
+      expect(readFileSync(resolve(`src/pages/tools/generator/${c.slug}.astro`), 'utf-8')).toContain(c.astro);
+      expect(fitsOn(c.page, 'A4')).toBe(true);
+      expect(fitsOn(c.page, 'Letter')).toBe(true);
+    });
+
+    it(`${c.slug}: every ready-made board fits the paper its link text names, with the grid and square size it names`, () => {
+      expect(links.length).toBe(4);
+      for (const { text, spec } of links) {
+        const m = text.match(/^(\d+) × (\d+) squares, (\d+) mm(?:, (DICT_\w+))?: one (A4 or Letter|A3 or Tabloid|A3|Tabloid) page$/)!;
+        expect(m, text).not.toBeNull();
+        expect([spec.rows, spec.cols, spec.square]).toEqual([+m[1], +m[2], +m[3]]);
+        if (m[4]) expect(spec.dict).toBe(m[4]);
+        for (const paper of m[5].split(' or ')) expect(fitsOn(spec, paper), `${text} on ${paper}`).toBe(true);
+      }
+    });
+  }
+
+  it('the main generator page also opens with a board that fits one A4 and one Letter page', () => {
+    expect(readFileSync(resolve('src/pages/tools/generator.astro'), 'utf-8')).toContain('initialSpec={{ square: 20, marker: 15 }}');
+    const spec = { ...GENERATOR_DEFAULT, square: 20, marker: 15 };
+    expect(fitsOn(spec, 'A4')).toBe(true);
+    expect(fitsOn(spec, 'Letter')).toBe(true);
+  });
+
+  it('a 7 × 10 board of 25 mm squares does not fit A4, as the ChArUco page says', () => {
+    expect(fitsOn({ ...GENERATOR_DEFAULT }, 'A4')).toBe(false);
+  });
+
+  it('the checkerboard example passes the inner corners of a 7 × 10 board, columns first', () => {
+    const md = readFileSync(resolve(TOOLS_DIR, 'generator-checkerboard.md'), 'utf-8');
+    expect(md).toContain('findChessboardCornersSB(gray, (9, 6))');
+    expect((10 - 1) * (7 - 1)).toBe(54);
+    expect(md).toContain('holds the 54 inner corners');
   });
 });

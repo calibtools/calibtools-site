@@ -34,6 +34,17 @@ Generate ArUco fiducial markers for OpenCV pose estimation, robot localization a
 
 5. **Download** the PDF and print at 100 % (no "fit to page"). Check the 100 mm scale bar with a ruler.
 
+## Ready-made sheets
+
+Each link opens the generator with the sheet filled in. All of them fit on one A4 or Letter page at 100 %.
+
+- [One DICT_6X6_250 marker, ID 0, 100 mm](/tools/generator/aruco/?rows=1&cols=1&marker=100&dict=DICT_6X6_250&startId=0)
+- [Six DICT_4X4_50 markers, IDs 0 to 5, 60 mm](/tools/generator/aruco/?rows=3&cols=2&marker=60&dict=DICT_4X4_50&startId=0)
+- [Twelve DICT_5X5_100 markers, IDs 0 to 11, 40 mm](/tools/generator/aruco/?rows=4&cols=3&marker=40&dict=DICT_5X5_100&startId=0)
+- [Twenty-four DICT_6X6_250 markers, IDs 0 to 23, 30 mm](/tools/generator/aruco/?rows=6&cols=4&marker=30&dict=DICT_6X6_250&startId=0)
+
+Change the start ID to continue a set: a second sheet of six starts at ID 6.
+
 ## Supported dictionaries
 
 | Dictionary | Bits | Markers | Good for |
