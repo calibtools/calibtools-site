@@ -4,6 +4,7 @@ import { resolve } from 'node:path';
 import { specFromParams } from './patternLink';
 import { computeLayout, PAPERS } from './pageLayout';
 import { getAprilFamily, dictMarkerCount } from './dicts/dicts';
+import { kalibrYaml, opencvJson } from './exportConfig';
 import { GENERATOR_DEFAULT } from './patternLink';
 import type { PatternSpec } from './patterns';
 
@@ -187,5 +188,64 @@ describe('ChArUco and checkerboard generator pages', () => {
     expect(md).toContain('findChessboardCornersSB(gray, (9, 6))');
     expect((10 - 1) * (7 - 1)).toBe(54);
     expect(md).toContain('holds the 54 inner corners');
+  });
+});
+
+describe('AprilGrid and circle grid generator pages', () => {
+  const ag: PatternSpec = { ...GENERATOR_DEFAULT, type: 'AprilGrid (Kalibr)', rows: 6, cols: 6, square: 20, dict: 'DICT_APRILTAG_36h11' };
+  const ci: PatternSpec = { ...GENERATOR_DEFAULT, type: 'Asymmetric circles', rows: 11, cols: 8, square: 18 };
+
+  it('both pages open with a grid that fits one A4 and one Letter page', () => {
+    expect(readFileSync(resolve('src/pages/tools/generator/aprilgrid.astro'), 'utf-8')).toContain("initialSpec={{ type: 'AprilGrid (Kalibr)', rows: 6, cols: 6, square: 20, dict: 'DICT_APRILTAG_36h11' }}");
+    expect(readFileSync(resolve('src/pages/tools/generator/circles.astro'), 'utf-8')).toContain("initialSpec={{ type: 'Asymmetric circles', rows: 11, cols: 8, square: 18 }}");
+    for (const spec of [ag, ci]) { expect(fitsOn(spec, 'A4')).toBe(true); expect(fitsOn(spec, 'Letter')).toBe(true); }
+  });
+
+  it('AprilGrid: every ready-made grid has the tag count and size its text names and fits the paper it names', () => {
+    const { links } = readyMade('generator-aprilgrid.md', 'aprilgrid', ag);
+    expect(links.length).toBe(3);
+    for (const { text, spec } of links) {
+      const m = text.match(/^(\d+) × (\d+) tags, (\d+) mm: one (A4 or Letter|A3 or Tabloid) page$/)!;
+      expect(m, text).not.toBeNull();
+      expect([spec.rows, spec.cols, spec.square]).toEqual([+m[1], +m[2], +m[3]]);
+      for (const paper of m[4].split(' or ')) expect(fitsOn(spec, paper), `${text} on ${paper}`).toBe(true);
+    }
+  });
+
+  it('AprilGrid: the YAML in the text is what the generator writes for the opening grid', () => {
+    const md = readFileSync(resolve(TOOLS_DIR, 'generator-aprilgrid.md'), 'utf-8');
+    const yaml = kalibrYaml(ag);
+    expect(yaml).toContain("target_type: 'aprilgrid'");
+    expect(yaml).toMatch(/tagRows: 6\ntagCols: 6\ntagSize: 0\.020*\ntagSpacing: 0\.30*\n/);
+    expect(md).toContain("target_type: 'aprilgrid'\ntagRows: 6\ntagCols: 6\ntagSize: 0.02\ntagSpacing: 0.3\n");
+    expect(yaml).toContain('first ID at the bottom-left tag');
+  });
+
+  it('circles: every ready-made grid has the layout, counts and spacing its text names and fits the paper it names', () => {
+    const { links } = readyMade('generator-circles.md', 'circles', ci);
+    expect(links.length).toBe(3);
+    for (const { text, spec } of links) {
+      const m = text.match(/^(Asymmetric|Symmetric), (\d+) × (\d+) circles, (\d+) mm spacing: one (A4 or Letter|A3 or Tabloid) page$/)!;
+      expect(m, text).not.toBeNull();
+      expect(spec.type).toBe(`${m[1]} circles`);
+      // the text and OpenCV both give circles per row first, then rows
+      expect((JSON.parse(opencvJson(spec)) as { opencv_pattern_size: number[] }).opencv_pattern_size).toEqual([+m[2], +m[3]]);
+      expect(spec.square).toBe(+m[4]);
+      for (const paper of m[5].split(' or ')) expect(fitsOn(spec, paper), `${text} on ${paper}`).toBe(true);
+    }
+  });
+
+  it('circles: the OpenCV example passes the size the generator writes for the opening grid', () => {
+    const md = readFileSync(resolve(TOOLS_DIR, 'generator-circles.md'), 'utf-8');
+    const cfg = JSON.parse(opencvJson(ci)) as { opencv_pattern_size: number[]; opencv_flag: string };
+    expect(cfg.opencv_pattern_size).toEqual([4, 11]);
+    expect(md).toContain(`findCirclesGrid(gray, (4, 11), flags=cv2.${cfg.opencv_flag})`);
+  });
+});
+
+describe('opencv.json for circle grids', () => {
+  it('writes the circle diameter without floating-point noise', () => {
+    const cfg = JSON.parse(opencvJson({ ...GENERATOR_DEFAULT, type: 'Asymmetric circles', rows: 11, cols: 8, square: 18 })) as { circle_diameter_mm: number };
+    expect(cfg.circle_diameter_mm).toBe(10.08);
   });
 });
