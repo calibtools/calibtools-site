@@ -8,7 +8,7 @@
 import { getEntry } from 'astro:content';
 import { Image } from 'astro:assets';
 import compositeImg from '@/assets/categories/composite-boards.webp';
-import ceramicImg from '@/assets/products/charuco-ceramic/01-hero.webp';
+import ceramicImg from '@/assets/categories/ceramic-glass.webp';
 import lidarIqImg from '@/assets/categories/lidar-image-quality.webp';
 import multiSensorImg from '@/assets/categories/multi-sensor.webp';
 import mountsImg from '@/assets/products/mounting-fixture/01-hero.webp';
@@ -26,7 +26,7 @@ const outlines: Record<string, { svg: string; caption: string }> = {
 
 const images: Record<string, { src: ImageMetadata; alt: string }> = {
   'composite-boards': { src: compositeImg, alt: '400 by 300 mm aluminum composite ChArUco board CT-CHA-P-400X300-D6 standing on a small stand, seen from the front left.' },
-  'ceramic-glass': { src: ceramicImg, alt: 'White ceramic ChArUco calibration plate seen from straight above, with a steel rule along its lower edge.' },
+  'ceramic-glass': { src: ceramicImg, alt: '150 by 100 mm white ceramic ChArUco plate lying flat, seen from the front left, with a steel rule along its front edge.' },
   'lidar-image-quality': { src: lidarIqImg, alt: 'Three square matte reflectance panels side by side: dark gray, mid gray and near white.' },
   'multi-sensor': { src: multiSensorImg, alt: 'Example layout of a LiDAR-camera target: a square panel with four ArUco markers and four circular holes cut through it.' },
   'mounts-accessories': { src: mountsImg, alt: 'Calib.Tools CT-ACC-M-FIX14 mounting fixture with two black anodized edge clamps and red thumb screws.' },
