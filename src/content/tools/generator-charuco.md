@@ -25,11 +25,22 @@ The PDF prints at 1:1 with a 100 mm scale bar, so you can check the printed size
 
 ## How to use it
 
-Set the grid in squares (7 × 10 is a good default), the square and marker sizes in millimeters, and the ArUco dictionary. A marker about 70–75 % of the square works well.
+Set the grid in squares (7 × 10 is a good default), the square and marker sizes in millimeters, and the ArUco dictionary. The page opens with a 7 × 10 board of 20 mm squares, which fits one A4 or Letter page. A marker about 70–75 % of the square works well.
 
 Download the PDF and print at 100 % ("actual size"). Measure the scale bar and one square, then use the measured square size in your code.
 
 Not sure how big the board should be? The [FOV calculator](/tools/fov/) recommends a board size for your camera, lens and working distance.
+
+## Ready-made boards
+
+Each link opens the generator with the board filled in.
+
+- [7 × 10 squares, 20 mm, DICT_6X6_250: one A4 or Letter page](/tools/generator/charuco/?rows=7&cols=10&square=20&marker=15&dict=DICT_6X6_250)
+- [5 × 7 squares, 25 mm, DICT_6X6_250: one A4 or Letter page](/tools/generator/charuco/?rows=5&cols=7&square=25&marker=18&dict=DICT_6X6_250)
+- [7 × 10 squares, 25 mm, DICT_6X6_250: one A3 page](/tools/generator/charuco/?rows=7&cols=10&square=25&marker=18&dict=DICT_6X6_250&paper=A3)
+- [7 × 10 squares, 25 mm, DICT_6X6_250: one Tabloid page](/tools/generator/charuco/?rows=7&cols=10&square=25&marker=18&dict=DICT_6X6_250&paper=Tabloid)
+
+The page keeps a white margin of one square around the pattern, because the detector needs it. That is why a 7 × 10 board of 25 mm squares, 250 × 175 mm, does not fit an A4 page.
 
 ## Files you get
 

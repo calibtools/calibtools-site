@@ -21,7 +21,7 @@ const jsonLd = toolJsonLd(entry.data.h1, '/tools/generator/', entry.data.seoDesc
     <a href="/tools/generator/apriltag/" class="rounded-full border border-line px-3.5 py-2 no-underline text-ink hover:text-brand hover:border-brand">AprilTag</a>
   </nav>
   <div class="container-x py-7 md:pb-16">
-    <Generator client:load />
+    <Generator client:load initialSpec={{ square: 20, marker: 15 }} />
   </div>
   <ToolContent Content={Content} faq={entry.data.faq} />
 </Base>

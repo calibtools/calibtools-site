@@ -33,6 +33,8 @@ This guide covers both arrangements with OpenCV and Python: what to record, how 
 
 Both are solved by the same function. The only difference is which robot transform you feed it, and what the result means.
 
+![Two sketches of a robot arm. Eye-in-hand: the camera sits on the gripper, the target is fixed, and the unknown is T_cam2gripper. Eye-to-hand: the camera is fixed, the target is on the gripper, and the unknown is T_cam2base.](../../assets/guides/hand-eye-arrangements.svg)
+
 ## What the solver needs
 
 For every robot pose you record two transforms:

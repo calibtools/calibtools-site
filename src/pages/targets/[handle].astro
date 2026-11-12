@@ -23,7 +23,6 @@ import Stars from '@/components/Stars';
 import Rating from '@/components/Rating.astro';
 import { getReviewsForProduct, summarize } from '@/lib/reviews';
 import { getImage, Picture } from 'astro:assets';
-import homeSetImage from '@/assets/products/brand/home-set.webp';
 import { compositeToleranceAtSize, thermalExpansion, FLATNESS_EXPLAINER, ceramicVsCompositeRatio } from '@/lib/specExplainers';
 import pkgOpenImage from '@/assets/products/packaging/CT-PK-M_open.webp';
 import pkgExplodedImage from '@/assets/products/packaging/CT-PK-M_exploded.webp';
@@ -213,23 +212,7 @@ for (const entry of catalogImages) {
 
 const hasLocalImages = galleryImages.length > 0;
 
-// Board set image
 const isBoardProduct = handle?.includes('charuco') || handle?.includes('checkerboard');
-let boardSetImageData: { src: string; srcset: string; width: number; height: number } | undefined;
-if (isBoardProduct) {
-  const boardSetVariants = await Promise.all(
-    [480, 800].map(async (w) => {
-      const result = await getImage({ src: homeSetImage, width: w, format: 'webp' });
-      return { w, src: result.src };
-    }),
-  );
-  boardSetImageData = {
-    src: boardSetVariants[boardSetVariants.length - 1].src,
-    srcset: boardSetVariants.map((v) => `${v.src} ${v.w}w`).join(', '),
-    width: homeSetImage.width,
-    height: homeSetImage.height,
-  };
-}
 
 // Placeholder render
 let placeholderSvg = '';
@@ -563,7 +546,6 @@ const quickLinks = hasLongform
           product={product}
           fixtureVariantId={fixtureVariantId}
           fixturePrice={fixturePrice}
-          boardSetImage={boardSetImageData}
         />
       )}
     </div>

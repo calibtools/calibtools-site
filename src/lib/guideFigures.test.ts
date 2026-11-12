@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
-import { PARTIAL_VIEW_CASES, PARTIAL_VIEW_VISIBLE, partialViewFigureSvg, usafFigureSvg, kalibrFrameFigureSvg, multiBoardFigureSvg, KALIBR_FIGURE_SPEC, MULTI_BOARD_SPECS, fillFigureSvg, fillRowsFromGuide, FILL_FIGURE_SPEC, printDefectFigureSvg, printDefectRowsFromGuide, PRINT_DEFECT_SCALE, detectionLimitsFigureSvg, detectionLimitsFromGuide, lidarCameraFigureSvg, LIDAR_SKETCH, type PartialViewData } from './guideFigures';
+import { PARTIAL_VIEW_CASES, PARTIAL_VIEW_VISIBLE, partialViewFigureSvg, usafFigureSvg, kalibrFrameFigureSvg, multiBoardFigureSvg, KALIBR_FIGURE_SPEC, MULTI_BOARD_SPECS, fillFigureSvg, fillRowsFromGuide, FILL_FIGURE_SPEC, printDefectFigureSvg, printDefectRowsFromGuide, PRINT_DEFECT_SCALE, hiddenErrorFigureSvg, hiddenErrorRowsFromGuide, HIDDEN_ERROR_SCALE, coverageFigureSvg, COVERAGE_VIEWS, handEyeFigureSvg, HAND_EYE_PANELS, detectionLimitsFigureSvg, detectionLimitsFromGuide, lidarCameraFigureSvg, LIDAR_SKETCH, type PartialViewData } from './guideFigures';
 import { idRange } from './idRange';
 import { patternExtent } from './pageLayout';
 import { charucoMarkers } from './renderCharuco';
@@ -178,6 +178,81 @@ describe('printed-target defects figure', () => {
   });
 });
 
+describe('reprojection error figure: what the RMS hides', () => {
+  const md = readFileSync('src/content/guides/reprojection-error.md', 'utf8');
+  const rows = hiddenErrorRowsFromGuide(md);
+
+  it('reads the six rows of the three tables, with their group', () => {
+    expect(rows).toEqual([
+      { group: 'Coverage', label: 'Board fills 20 %', rms: 0.29, edge: 13 },
+      { group: 'Coverage', label: 'Board fills 60 %', rms: 0.14, edge: 1.4 },
+      { group: 'Model complexity', label: 'k1 k2 p1 p2 k3', rms: 0.144, edge: 0.8 },
+      { group: 'Model complexity', label: 'Rational + thin prism', rms: 0.143, edge: 25 },
+      { group: 'One bad view', label: 'All 15 views', rms: 0.22, edge: 3.6 },
+      { group: 'One bad view', label: 'Bad view removed', rms: 0.15, edge: 0.8 },
+    ]);
+  });
+
+  it('the committed SVG is what the generator produces from the tables', () => {
+    expect(readFileSync('src/assets/guides/rms-vs-true-error.svg', 'utf8')).toBe(hiddenErrorFigureSvg(rows));
+  });
+
+  it('every value fits its scale and the alt text states the real ranges', () => {
+    for (const r of rows) {
+      expect(r.rms).toBeLessThanOrEqual(HIDDEN_ERROR_SCALE.rmsMax);
+      expect(r.edge).toBeGreaterThanOrEqual(HIDDEN_ERROR_SCALE.edgeMin);
+      expect(r.edge).toBeLessThanOrEqual(HIDDEN_ERROR_SCALE.edgeMax);
+    }
+    const alt = md.match(/!\[([^\]]+)\]\(\.\.\/\.\.\/assets\/guides\/rms-vs-true-error/)![1];
+    const rms = rows.map((r) => r.rms), edge = rows.map((r) => r.edge);
+    expect(alt).toContain(`between ${Math.min(...rms).toFixed(2)} and ${Math.max(...rms)} px`);
+    expect(alt).toContain(`from ${Math.min(...edge)} to ${Math.max(...edge)} px`);
+  });
+});
+
+describe('view coverage figure', () => {
+  const inside = ([x, y]: [number, number]) => x >= 0 && x <= 1 && y >= 0 && y <= 1;
+
+  it('the committed SVG is what the generator produces', () => {
+    expect(readFileSync('src/assets/guides/view-coverage.svg', 'utf8')).toBe(coverageFigureSvg());
+  });
+
+  it('left: every view stays in the middle; right: all four frame corners are reached and one view runs off the frame', () => {
+    const { centered, spread } = COVERAGE_VIEWS;
+    for (const q of centered) for (const [x, y] of q) { expect(x).toBeGreaterThan(0.25); expect(x).toBeLessThan(0.75); expect(y).toBeGreaterThan(0.25); expect(y).toBeLessThan(0.75); }
+    const pts = spread.flat();
+    for (const [cx, cy] of [[0, 0], [1, 0], [0, 1], [1, 1]]) expect(pts.some(([x, y]) => Math.hypot(x - cx, y - cy) < 0.08), `corner ${cx},${cy}`).toBe(true);
+    expect(spread.filter((q) => !q.every(inside)).length).toBe(1);
+  });
+
+  it('the alt text counts the views that are drawn', () => {
+    const md = readFileSync('src/content/guides/opencv-camera-calibration.md', 'utf8');
+    const alt = md.match(/!\[([^\]]+)\]\(\.\.\/\.\.\/assets\/guides\/view-coverage/)![1];
+    expect(COVERAGE_VIEWS.centered.length).toBe(5);
+    expect(COVERAGE_VIEWS.spread.length).toBe(7);
+    expect(alt).toContain('five views');
+    expect(alt).toContain('seven views');
+  });
+});
+
+describe('hand-eye figure', () => {
+  const md = readFileSync('src/content/guides/hand-eye-calibration-opencv.md', 'utf8');
+  const svg = handEyeFigureSvg();
+
+  it('the committed SVG is what the generator produces', () => {
+    expect(readFileSync('src/assets/guides/hand-eye-arrangements.svg', 'utf8')).toBe(svg);
+  });
+
+  it('uses the transform names of the guide, with the unknown of each arrangement', () => {
+    expect(HAND_EYE_PANELS.map((p) => p.unknown)).toEqual(['T_cam2gripper', 'T_cam2base']);
+    for (const p of HAND_EYE_PANELS) {
+      for (const name of [...p.known, p.unknown]) {
+        expect(md).toContain('`' + name + '`');
+        expect(svg).toContain('>' + name + '<');
+      }
+    }
+    expect(md).toMatch(/Eye-in-hand\*\* — .*`T_cam2gripper`/);
+    expect(md).toMatch(/Eye-to-hand\*\* — .*`T_cam2base`/);
 describe('ChArUco detection limits figure', () => {
   const md = readFileSync('src/content/guides/corner-detection-troubleshooting.md', 'utf8');
   const d = detectionLimitsFromGuide(md);
