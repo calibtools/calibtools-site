@@ -83,6 +83,10 @@ With OpenCV, use `cv2.aruco.DICT_APRILTAG_36h11` and the default one-bit border.
 
 Tags from this generator are free to use for any purpose: internal, educational or commercial, including products and client work. No sign-up and no attribution needed.
 
+## Paper or a rigid board?
+
+Printed tags are fine for localization and quick tests. For camera calibration, where the tag positions have to be known to a fraction of a millimeter, use a rigid board: the [AprilGrid composite board](/targets/aprilgrid-composite/) carries tag36h11 tags in the Kalibr layout.
+
 ## Related
 
 - Calibrating a camera and IMU with Kalibr? Use the [AprilGrid generator](/tools/generator/aprilgrid/).

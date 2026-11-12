@@ -73,6 +73,10 @@ For pose, use the printed marker size in meters or millimeters consistently in `
 
 Markers from this generator are free to use for any purpose: internal, educational or commercial, including products and client work. No sign-up and no attribution needed.
 
+## Paper or a rigid board?
+
+Printed markers are fine for pose estimation and quick tests. For camera calibration, where the marker positions have to be known to a fraction of a millimeter, use a rigid board: the [ChArUco composite board](/targets/charuco-composite/) combines ArUco markers with chessboard corners.
+
 ## Related
 
 - Need a calibration board rather than single markers? Use the [ChArUco generator](/tools/generator/charuco/).

@@ -46,6 +46,16 @@ Config files are generated for OpenCV JSON and ROS 2 YAML, Kalibr YAML for the p
 
 A common stereo rig setup: select ChArUco, 7 × 10, 25 mm squares, 18 mm markers, DICT_6X6_250, A3 page. Click PDF (1:1), print on A3 without scaling, and verify the 100 mm scale bar with a ruler. Download the `opencv.json` config and pass it to `cv2.aruco.CharucoBoard`.
 
+## Paper or a rigid board?
+
+A printed sheet is fine for a first test. Paper stretches with humidity and does not stay flat, and office printers scale slightly. For repeatable results, use a rigid board made to the same pattern:
+
+- [Checkerboard composite board](/targets/checkerboard-composite/)
+- [ChArUco composite board](/targets/charuco-composite/) and [ChArUco ceramic target](/targets/charuco-ceramic/)
+- [AprilGrid composite board](/targets/aprilgrid-composite/)
+- [Circle grid composite board](/targets/circlegrid-composite/)
+- [HALCON-style composite board](/targets/halcon-composite/)
+
 ## Related guides
 
 - [ChArUco vs checkerboard vs AprilGrid](/guides/charuco-vs-checkerboard-vs-aprilgrid/) — which pattern for which job
