@@ -29,16 +29,20 @@ export interface PartialViewData { opencv: string; visible: number; pxPerMm: num
 
 const INK = '#141414', MUTED = '#4A4A47', RED = '#E60012', LINE = '#A8A59C';
 
-/** Three boards with their right part outside the camera frame, and the points OpenCV still returns. */
+/**
+ * Three boards with their right part outside the camera frame, and the points OpenCV still returns.
+ * One board per row, 640 wide, so the counts stay readable on a phone.
+ */
 export function partialViewFigureSvg(data: PartialViewData): string {
-  const panelW = 380, gap = 30, W = 3 * panelW + 2 * gap, top = 16, boardH = 230, H = top + boardH + 78;
+  const W = 640, boardW = 330, rowH = 232, top = 8, H = top + PARTIAL_VIEW_CASES.length * rowH;
   const r = (v: number) => +v.toFixed(2);
   let out = '';
   PARTIAL_VIEW_CASES.forEach((c, i) => {
     const { bw, bh } = patternExtent(c.spec);
     const res = data.results.find((x) => x.key === c.key)!;
-    const s = Math.min((panelW - 40) / bw, (boardH - 40) / bh); // px per mm
-    const x0 = i * (panelW + gap) + (panelW - bw * s) / 2, y0 = top + (boardH - bh * s) / 2;
+    const s = Math.min((boardW - 40) / bw, (rowH - 52) / bh); // px per mm
+    const rowY = top + i * rowH;
+    const x0 = 20 + 14, y0 = rowY + (rowH - bh * s) / 2;
     const cut = x0 + bw * s * data.visible;                      // right edge of the camera frame
     const frameX = x0 - 14, frameY = y0 - 14, frameH = bh * s + 28;
     const id = `pv${i}`;
@@ -48,11 +52,11 @@ export function partialViewFigureSvg(data: PartialViewData): string {
     out += `<g clip-path="url(#${id}out)" opacity="0.16">${board}</g><g clip-path="url(#${id}in)">${board}</g>`;
     out += `<rect x="${r(frameX)}" y="${r(frameY)}" width="${r(cut - frameX)}" height="${r(frameH)}" fill="none" stroke="${INK}" stroke-width="1.5"/>`;
     out += `<line x1="${r(cut)}" y1="${r(frameY - 6)}" x2="${r(cut)}" y2="${r(frameY + frameH + 6)}" stroke="${INK}" stroke-width="1.5" stroke-dasharray="5 4"/>`;
-    for (const [px, py] of res.points) out += `<circle cx="${r(x0 + px * s)}" cy="${r(y0 + py * s)}" r="3.2" fill="${RED}" stroke="#fff" stroke-width="0.8"/>`;
-    const cx = i * (panelW + gap) + panelW / 2, ty = top + boardH + 30;
-    out += `<text x="${cx}" y="${ty}" text-anchor="middle" font-size="17" font-weight="600" fill="${INK}">${c.label}</text>`;
-    out += `<text x="${cx}" y="${ty + 24}" text-anchor="middle" font-size="15" fill="${res.points.length ? INK : MUTED}" font-family="'Geist Mono', ui-monospace, monospace">${res.points.length} of ${c.total} ${c.unit}</text>`;
-    if (i > 0) out += `<line x1="${i * (panelW + gap) - gap / 2}" y1="${top}" x2="${i * (panelW + gap) - gap / 2}" y2="${H - 10}" stroke="${LINE}" stroke-width="1"/>`;
+    for (const [px, py] of res.points) out += `<circle cx="${r(x0 + px * s)}" cy="${r(y0 + py * s)}" r="3" fill="${RED}" stroke="#fff" stroke-width="0.8"/>`;
+    const tx = boardW + 44, ty = rowY + rowH / 2 - 6;
+    out += `<text x="${tx}" y="${ty}" font-size="17" font-weight="600" fill="${INK}">${c.label}</text>`;
+    out += `<text x="${tx}" y="${ty + 26}" font-size="15" fill="${res.points.length ? INK : MUTED}" font-family="'Geist Mono', ui-monospace, monospace">${res.points.length} of ${c.total} ${c.unit}</text>`;
+    if (i > 0) out += `<line x1="20" y1="${rowY}" x2="${W - 20}" y2="${rowY}" stroke="${LINE}" stroke-width="1"/>`;
   });
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" font-family="Geist, system-ui, sans-serif" role="img"><rect width="${W}" height="${H}" fill="#fff"/>${out}</svg>`;
 }
@@ -125,7 +129,7 @@ export interface FillRow { fill: number; pxPerSquare: number; cornerErrorPx: num
  * The frame is drawn 16:10; only the board's share of the width is to scale.
  */
 export function fillFigureSvg(rows: [FillRow, FillRow]): string {
-  const fw = 430, fh = fw / 1.6, gap = 60, W = 2 * fw + gap + 40, H = fh + 96, top = 14;
+  const fw = 290, fh = fw / 1.6, gap = 20, W = 2 * fw + gap + 40, H = fh + 104, top = 14; // 640 wide, readable on a phone
   const { bw, bh } = patternExtent(FILL_FIGURE_SPEC);
   let o = '';
   rows.forEach((row, i) => {
@@ -136,9 +140,10 @@ export function fillFigureSvg(rows: [FillRow, FillRow]): string {
     // width bracket under the board
     const y = top + fh - 16;
     o += `<line x1="${+bx.toFixed(2)}" y1="${y}" x2="${+(bx + bw * k).toFixed(2)}" y2="${y}" stroke="${RED_TEXT}" stroke-width="1.2"/><line x1="${+bx.toFixed(2)}" y1="${y - 5}" x2="${+bx.toFixed(2)}" y2="${y + 5}" stroke="${RED_TEXT}" stroke-width="1.2"/><line x1="${+(bx + bw * k).toFixed(2)}" y1="${y - 5}" x2="${+(bx + bw * k).toFixed(2)}" y2="${y + 5}" stroke="${RED_TEXT}" stroke-width="1.2"/>`;
-    const cx = fx + fw / 2, ty = top + fh + 30;
-    o += `<text x="${cx}" y="${ty}" text-anchor="middle" font-size="18" font-weight="600" fill="${INK}">Board fills ${row.fill} % of the frame width</text>`;
-    o += `<text x="${cx}" y="${ty + 26}" text-anchor="middle" font-size="15" fill="${INK}" ${MONO}>${row.pxPerSquare} px per square · ${row.cornerErrorPx} px error at the frame corners</text>`;
+    const ty = top + fh + 28;
+    o += `<text x="${fx}" y="${ty}" font-size="15.5" font-weight="600" fill="${INK}">Board fills ${row.fill} % of the frame width</text>`;
+    o += `<text x="${fx}" y="${ty + 24}" font-size="13.5" fill="${INK}" ${MONO}>${row.pxPerSquare} px per square</text>`;
+    o += `<text x="${fx}" y="${ty + 44}" font-size="13.5" fill="${INK}" ${MONO}>${row.cornerErrorPx} px error at the frame corners</text>`;
   });
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${+H.toFixed(1)}" viewBox="0 0 ${W} ${+H.toFixed(1)}" font-family="Geist, system-ui, sans-serif" role="img"><rect width="${W}" height="${+H.toFixed(1)}" fill="#fff"/>${o}</svg>`;
 }

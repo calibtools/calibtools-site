@@ -115,8 +115,7 @@ describe('board fill figure', () => {
   it('is the file this code writes, with the table\'s numbers', () => {
     const svg = fillFigureSvg(pair);
     expect(readFileSync('src/assets/guides/board-fill-20-vs-60.svg', 'utf8')).toBe(svg);
-    expect(svg).toContain('28 px per square · 13 px error at the frame corners');
-    expect(svg).toContain('83 px per square · 1.4 px error at the frame corners');
+    for (const t of ['>28 px per square<', '>13 px error at the frame corners<', '>83 px per square<', '>1.4 px error at the frame corners<']) expect(svg).toContain(t);
   });
   it('draws the board at the stated share of the frame width', () => {
     const svg = fillFigureSvg(pair);
@@ -320,4 +319,18 @@ describe('LiDAR-camera figure', () => {
       }
     }
   });
+});
+
+describe('guide figures stay readable on a phone', () => {
+  // A guide column on a phone is about 340 px wide; text below 6.5 px there is hard to read.
+  const narrow = ['partial-view-detection', 'board-fill-20-vs-60', 'print-defects-rms-vs-model-error', 'rms-vs-true-error', 'view-coverage', 'hand-eye-arrangements', 'charuco-detection-limits', 'lidar-camera-target-two-views'];
+  for (const name of narrow) {
+    it(name, () => {
+      const svg = readFileSync(`src/assets/guides/${name}.svg`, 'utf8');
+      const width = +svg.match(/viewBox="0 0 ([\d.]+) /)![1];
+      const sizes = [...svg.matchAll(/font-size="([\d.]+)"/g)].map((m) => +m[1]);
+      expect(width).toBeLessThanOrEqual(640);
+      expect(Math.min(...sizes) * (340 / width)).toBeGreaterThanOrEqual(6.3);
+    });
+  }
 });
