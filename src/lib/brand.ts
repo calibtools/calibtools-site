@@ -72,7 +72,10 @@ export function patternSummary(opts: PatternSummaryOpts): string {
     const gap = Math.round(square * (opts.tagSpacing ?? 0.3) * 1000) / 1000;
     return `${type} ${grid} \u00B7 ${square} mm tags, ${gap} mm gap \u00B7 tag${opts.aprilFamily ?? '36h11'} \u00B7 IDs ${first}\u2013${first + rows * cols - 1}`;
   }
-  const hasMarker = marker !== undefined && marker > 0;
+  // Only patterns that carry markers name a marker size, a dictionary and IDs. A checkerboard or a circle grid
+  // made in the generator still has those fields filled from the page's starting values; they are not part of it.
+  const hasMarkers = type === 'ChArUco' || type === 'ArUco grid' || type === 'Marker sheet';
+  const hasMarker = hasMarkers && marker !== undefined && marker > 0;
   const hasDict = dict !== undefined && dict !== '';
 
   if (hasMarker && hasDict) {
@@ -82,8 +85,11 @@ export function patternSummary(opts: PatternSummaryOpts): string {
       paper: '', startId: startId ?? 0, scaleBar: false,
     });
     const idStr = range ? `IDs ${range.min}\u2013${range.max}` : `id ${startId ?? 0}`;
-    return `${type} ${grid} · ${square}/${marker} mm · ${dict} · ${idStr}`;
+    // A marker sheet has no squares: its one size is the marker.
+    const size = type === 'Marker sheet' ? `${marker} mm` : `${square}/${marker} mm`;
+    return `${type} ${grid} · ${size} · ${dict} · ${idStr}`;
   }
+  if (type.includes('circles') || type.includes('dots')) return `${type} ${grid} · ${square} mm spacing`;
   return `${type} ${grid} · ${square} mm`;
 }
 
