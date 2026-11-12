@@ -3,6 +3,12 @@ import Base from '@/layouts/Base.astro';
 import { breadcrumbLd } from '@/lib/seo';
 import { INSPECTION_CLAIM, CONTACT_EMAIL } from '@/lib/claims';
 import { VISION, MISSION, ONE_LINER } from '@/lib/brand';
+import { Image } from 'astro:assets';
+import workspaceImg from '@/assets/about/workspace.webp';
+import benchImg from '@/assets/about/inspection-bench.webp';
+import caliperImg from '@/assets/about/check-caliper.webp';
+import flatnessImg from '@/assets/about/check-flatness.webp';
+const imgSizes = '(max-width: 760px) 100vw, 720px';
 const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: 'About' }]);
 ---
 <Base title="About Calib.Tools" description={ONE_LINER} jsonLd={bcLd}>
@@ -25,6 +31,7 @@ const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: 'About' }]);
       <section class="flex flex-col gap-3">
         <h2>What we make</h2>
         <p>ChArUco, checkerboard, AprilGrid, circle grid and HALCON targets on aluminum composite and ceramic, from palm-sized boards for microscope optics to 800&nbsp;&times;&nbsp;600&nbsp;mm boards for robot cells. Every pattern follows OpenCV conventions, and every target has a datasheet with its real tolerances.</p>
+        <Image src={workspaceImg} alt="A ChArUco board and a checkerboard calibration board leaning against the wall on a workbench by a window, next to a small industrial camera on a tripod and a closed laptop." widths={[480, 720, 1440]} sizes={imgSizes} class="block h-auto w-full border border-line" />
       </section>
 
       <section class="flex flex-col gap-3">
@@ -34,6 +41,14 @@ const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: 'About' }]);
           <li><strong>Measured before it ships.</strong> {INSPECTION_CLAIM}.</li>
           <li><strong>Files that match the board.</strong> Marker ID ranges, config files and drawings come from the same data as the target itself.</li>
         </ul>
+        <figure class="m-0 flex flex-col gap-2">
+          <div class="grid grid-cols-1 gap-2 sm:grid-cols-3">
+            <Image src={caliperImg} alt="A digital caliper lying across the squares of a checkerboard calibration board." widths={[240, 480, 720]} sizes="(max-width: 640px) 100vw, 240px" class="block aspect-[3/2] h-auto w-full border border-line object-cover" />
+            <Image src={flatnessImg} alt="A hand sliding a feeler gauge under a steel straightedge that rests across a checkerboard calibration board on a granite plate." widths={[240, 480, 720]} sizes="(max-width: 640px) 100vw, 240px" class="block aspect-[3/2] h-auto w-full border border-line object-cover" />
+            <Image src={benchImg} alt="A ChArUco calibration board lying on the granite table of a bridge-type measuring machine." widths={[240, 480, 720]} sizes="(max-width: 640px) 100vw, 240px" class="block aspect-[3/2] h-auto w-full border border-line object-cover" />
+          </div>
+          <figcaption class="text-[13px] text-ink-muted">The checks, illustrated: pitch, flatness and corner positions. These pictures are illustrations, not photographs of an order.</figcaption>
+        </figure>
       </section>
 
       <section class="flex flex-col gap-3">
