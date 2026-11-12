@@ -4,14 +4,17 @@ import { calculateFov, minDistance, recommendBoard, requiredFocal, SENSOR_PRESET
 
 const PRESET_NAMES = Object.keys(SENSOR_PRESETS);
 
+/** What the calculator shows when it opens. The home page draws its example from the same values. */
+export const FOV_DEFAULTS = { preset: '2/3" (IMX174)', sensorW: 8.77, sensorH: 6.60, resW: 1920, resH: 1200, focal: 12, distance: 500 };
+
 export default function FovCalculator({ heading = 'FOV calculator' }: { heading?: string } = {}) {
-  const [preset, setPreset] = useState('2/3" (IMX174)');
-  const [sensorW, setSensorW] = useState(8.77);
-  const [sensorH, setSensorH] = useState(6.60);
-  const [resW, setResW] = useState(1920);
-  const [resH, setResH] = useState(1200);
-  const [focal, setFocal] = useState(12);
-  const [distance, setDistance] = useState(500);
+  const [preset, setPreset] = useState(FOV_DEFAULTS.preset);
+  const [sensorW, setSensorW] = useState(FOV_DEFAULTS.sensorW);
+  const [sensorH, setSensorH] = useState(FOV_DEFAULTS.sensorH);
+  const [resW, setResW] = useState(FOV_DEFAULTS.resW);
+  const [resH, setResH] = useState(FOV_DEFAULTS.resH);
+  const [focal, setFocal] = useState(FOV_DEFAULTS.focal);
+  const [distance, setDistance] = useState(FOV_DEFAULTS.distance);
   const [targetW, setTargetW] = useState(250);
   const [targetH, setTargetH] = useState(175);
   const [wantW, setWantW] = useState(300);
@@ -217,10 +220,10 @@ function ResultCard({ label, value, pixel }: { label: string; value: string; pix
   );
 }
 
-function FovDiagram({ fov, distance, focal }: { fov: FovResult; distance: number; focal: number }) {
+export function FovDiagram({ fov, distance, focal }: { fov: FovResult; distance: number; focal: number }) {
   const w = 320, h = 180;
   const lensX = 40;
-  const farX = w - 20;
+  const farX = w - 56; // room for the coverage label right of the cone
   const midY = h / 2;
   const halfAngleRad = (fov.hFovDeg / 2) * (Math.PI / 180);
   const spread = Math.min((farX - lensX) * Math.tan(halfAngleRad) * 0.4, midY - 10);
