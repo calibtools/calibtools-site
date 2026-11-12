@@ -1,3 +1,4 @@
+import { generatorFields } from '@/lib/generatorFields';
 import { useEffect, useMemo, useState } from 'react';
 import { Grid2X2 } from '@/lib/icons';
 import { checkerboardSvg, type PatternSpec } from '@/lib/patterns';
@@ -82,6 +83,7 @@ export default function Generator({ initialSpec, heading = 'Pattern generator' }
   const { pw, ph } = layout;
   const svg = useMemo(() => checkerboardSvg(spec, pw, ph, layout), [spec, pw, ph, layout]);
   const set = <K extends keyof PatternSpec>(k: K, v: PatternSpec[K]) => setSpec((s) => ({ ...s, [k]: v }));
+  const fields = generatorFields(spec.type, spec.aprilFamily);
   const ext = patternExtent(spec);
   const boardW = Math.round(ext.bw * 10) / 10, boardH = Math.round(ext.bh * 10) / 10;
   const catalog = useMemo(() => matchCatalog(spec), [spec]);
@@ -164,12 +166,18 @@ export default function Generator({ initialSpec, heading = 'Pattern generator' }
         <div className="grid grid-cols-2 gap-3">
           <label className="flex flex-col gap-2 text-[13px] font-semibold">Rows<input className={field} type="number" min={2} value={spec.rows} onChange={(e) => set('rows', +e.target.value)} /></label>
           <label className="flex flex-col gap-2 text-[13px] font-semibold">Columns<input className={field} type="number" min={2} value={spec.cols} onChange={(e) => set('cols', +e.target.value)} /></label>
-          <label className="flex flex-col gap-2 text-[13px] font-semibold">{spec.type === 'ArUco grid' ? 'Marker pitch (mm)' : 'Square size (mm)'}<input className={field} type="number" min={1} value={spec.square} onChange={(e) => set('square', +e.target.value)} /></label>
-          <label className="flex flex-col gap-2 text-[13px] font-semibold">Marker size (mm)<input className={field} type="number" min={1} value={spec.marker} onChange={(e) => set('marker', +e.target.value)} /></label>
+          {fields.sizeLabel && (
+            <label className="flex flex-col gap-2 text-[13px] font-semibold">{fields.sizeLabel}<input className={field} type="number" min={1} value={spec.square} onChange={(e) => set('square', +e.target.value)} /></label>
+          )}
+          {fields.marker && (
+            <label className="flex flex-col gap-2 text-[13px] font-semibold">Marker size (mm)<input className={field} type="number" min={1} value={spec.marker} onChange={(e) => set('marker', +e.target.value)} /></label>
+          )}
         </div>
-        <label className="flex flex-col gap-2 text-[13px] font-semibold">Dictionary
-          <select className={field} value={spec.dict} onChange={(e) => set('dict', e.target.value)}>{DICTS.map((d) => <option key={d}>{d}</option>)}</select>
-        </label>
+        {fields.dictionary && (
+          <label className="flex flex-col gap-2 text-[13px] font-semibold">Dictionary
+            <select className={field} value={spec.dict} onChange={(e) => set('dict', e.target.value)}>{DICTS.map((d) => <option key={d}>{d}</option>)}</select>
+          </label>
+        )}
         <div className="grid grid-cols-2 gap-3">
           <label className="flex flex-col gap-2 text-[13px] font-semibold">Page / board
             <select className={field} value={spec.paper} onChange={(e) => set('paper', e.target.value)}>{Object.keys(PAPERS).map((p) => <option key={p}>{p}</option>)}</select>
@@ -181,7 +189,9 @@ export default function Generator({ initialSpec, heading = 'Pattern generator' }
               <option value="landscape">Landscape</option>
             </select>
           </label>
-          <label className="flex flex-col gap-2 text-[13px] font-semibold">Start ID<input className={field} type="number" min={0} value={spec.startId} onChange={(e) => set('startId', +e.target.value)} /></label>
+          {fields.startId && (
+            <label className="flex flex-col gap-2 text-[13px] font-semibold">Start ID<input className={field} type="number" min={0} value={spec.startId} onChange={(e) => set('startId', +e.target.value)} /></label>
+          )}
         </div>
         <label className="flex items-center gap-2.5 text-sm font-normal min-h-[44px] md:min-h-0">
           <input type="checkbox" className="h-[18px] w-[18px]"
