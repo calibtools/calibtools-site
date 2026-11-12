@@ -22,6 +22,12 @@ import {
 import { patternShapes, fillRgb, shapeBox, type Shape } from './patternShapes';
 import { patternExtent, type PageLayout } from './pageLayout';
 import { isKalibrFrame, scaleBarTop, axesOffset } from './renderAprilGrid';
+import { DOC_COLORS, hexToUnitRgb } from './docColors';
+
+/** Footer text tones, the site's three inks. */
+const TEXT_MUTED = rgb(...hexToUnitRgb(DOC_COLORS.inkMuted));
+const TEXT_SOFT = rgb(...hexToUnitRgb(DOC_COLORS.inkSoft));
+const TEXT_FAINT = rgb(...hexToUnitRgb(DOC_COLORS.lineStrong));
 
 /** Conversion factor: millimeters → PDF points. */
 export const MM = 72 / 25.4;
@@ -97,7 +103,7 @@ export async function exportPdf({ spec, pw: rawPw, ph: rawPh, fontBytes, layout 
     // Label text — use Geist Mono
     const fontSize = 2.6 * MM;
     const [tx, ty] = pt(ox, sbY + 4);
-    page.drawText('100 mm scale check', { x: tx, y: ty, size: fontSize, font: fontMono, color: rgb(0.2, 0.2, 0.2) });
+    page.drawText('100 mm scale check', { x: tx, y: ty, size: fontSize, font: fontMono, color: TEXT_MUTED });
 
     scaleBarBottom = sbY + 4 + 2.6; // sbY + label offset + approx text height
   }
@@ -148,11 +154,11 @@ export async function exportPdf({ spec, pw: rawPw, ph: rawPh, fontBytes, layout 
     const fs = 2.47 * MM; // 7 pt
 
     const [tx, ty] = pt(b.textX, b.textY);
-    page.drawText(summary, { x: tx, y: ty, size: fs, font: fontMono, color: rgb(0.2, 0.2, 0.2) });
+    page.drawText(summary, { x: tx, y: ty, size: fs, font: fontMono, color: TEXT_MUTED });
     const [tx2, ty2] = pt(b.textX, b.textY + b.textLineH);
-    page.drawText(provenance, { x: tx2, y: ty2, size: fs, font: fontMono, color: rgb(0.4, 0.4, 0.4) });
+    page.drawText(provenance, { x: tx2, y: ty2, size: fs, font: fontMono, color: TEXT_SOFT });
     const [tx3, ty3] = pt(b.textX, b.textY + 2 * b.textLineH);
-    page.drawText(PRINT_NOTE, { x: tx3, y: ty3, size: fs, font: fontMono, color: rgb(0.6, 0.6, 0.6) });
+    page.drawText(PRINT_NOTE, { x: tx3, y: ty3, size: fs, font: fontMono, color: TEXT_FAINT });
   } else if (fullFooterY + 14 < ph) {
     // Tier 1: Full footer — wordmark + parameter + provenance + print note
     drawWordmark(ox, fullFooterY, 5);
@@ -171,7 +177,7 @@ export async function exportPdf({ spec, pw: rawPw, ph: rawPh, fontBytes, layout 
     const paramYPt = pageH - (fullFooterY + 5 + 2) * MM;
     page.drawText(paramText, {
       x: textCentreX - paramW / 2, y: paramYPt, size: paramFontSize, font: fontMono,
-      color: rgb(0.2, 0.2, 0.2),
+      color: TEXT_MUTED,
     });
 
     // Provenance line
@@ -179,7 +185,7 @@ export async function exportPdf({ spec, pw: rawPw, ph: rawPh, fontBytes, layout 
     const provYPt = paramYPt - 3.2 * MM;
     page.drawText(provenance, {
       x: textCentreX - provW / 2, y: provYPt, size: provFontSize, font: fontMono,
-      color: rgb(0.4, 0.4, 0.4),
+      color: TEXT_SOFT,
     });
 
     // Print note
@@ -187,7 +193,7 @@ export async function exportPdf({ spec, pw: rawPw, ph: rawPh, fontBytes, layout 
     const noteYPt = provYPt - 2.8 * MM;
     page.drawText(PRINT_NOTE, {
       x: textCentreX - noteW / 2, y: noteYPt, size: noteFontSize, font: fontMono,
-      color: rgb(0.6, 0.6, 0.6),
+      color: TEXT_FAINT,
     });
   } else {
     // Tier 2: Compact one-line footer
@@ -202,7 +208,7 @@ export async function exportPdf({ spec, pw: rawPw, ph: rawPh, fontBytes, layout 
       const [tx, ty] = pt(ox + wmWidth + 2, compactY + 3 * 0.7);
       page.drawText(compactText, {
         x: tx, y: ty, size: compactFontSize, font: fontMono,
-        color: rgb(0.4, 0.4, 0.4),
+        color: TEXT_SOFT,
       });
     } else {
       // Tier 3: Warning text — never silently omit
@@ -213,7 +219,7 @@ export async function exportPdf({ spec, pw: rawPw, ph: rawPh, fontBytes, layout 
       const warningYPt = pageH - (ph - 2) * MM;
       page.drawText(warningText, {
         x: warningXPt, y: warningYPt, size: warningFontSize, font: fontMono,
-        color: rgb(0.6, 0.6, 0.6),
+        color: TEXT_FAINT,
       });
     }
   }
@@ -232,8 +238,8 @@ export async function exportPdf({ spec, pw: rawPw, ph: rawPh, fontBytes, layout 
     const axOx = ax?.originX ?? ox - axesOffset(spec).x;
     const axOy = ax?.originY ?? (isKalibr ? oy + bh + axesOffset(spec).y : oy - axesOffset(spec).y);
 
-    const xColor = rgb(230 / 255, 0, 18 / 255); // #E60012
-    const yColor = rgb(...AXIS_Y_RGB); // #00A651, as printed on the boards
+    const xColor = rgb(...hexToUnitRgb(DOC_COLORS.red));
+    const yColor = rgb(...AXIS_Y_RGB); // as printed on the boards
 
     // X arrow: pointing right
     const xEnd = axOx + arrowLen;
@@ -289,7 +295,7 @@ export async function exportPdf({ spec, pw: rawPw, ph: rawPh, fontBytes, layout 
     const caption = isKalibr ? 'Kalibr frame \u00B7 origin bottom-left' : 'OpenCV frame \u00B7 origin top-left';
     const captionFontSize = 1.8 * MM;
     const [capX, capY] = pt(axOx + 3, axOy + (isKalibr ? 3 : -2));
-    page.drawText(caption, { x: capX, y: capY, size: captionFontSize, font: fontMono, color: rgb(0.4, 0.4, 0.4) });
+    page.drawText(caption, { x: capX, y: capY, size: captionFontSize, font: fontMono, color: TEXT_SOFT });
   }
 
   // --- PDF metadata ---
@@ -403,15 +409,15 @@ export async function exportTiledPdf({ spec, tiling, fontBytes }: TiledPdfOption
       const labelY = tilePh - PAGE_MARGIN - bbH + 2;
       const [lx, ly] = pt(tilePw - PAGE_MARGIN, labelY);
       const labelW = fontMono.widthOfTextAtSize(label, fs);
-      page.drawText(label, { x: lx - labelW, y: ly, size: fs, font: fontMono, color: rgb(0.4, 0.4, 0.4) });
+      page.drawText(label, { x: lx - labelW, y: ly, size: fs, font: fontMono, color: TEXT_SOFT });
 
       // Parameter + provenance on every sheet
       const textX = PAGE_MARGIN;
       const textY = tilePh - PAGE_MARGIN - bbH + 2;
       const [tx, ty] = pt(textX, textY);
-      page.drawText(summary, { x: tx, y: ty, size: fs, font: fontMono, color: rgb(0.2, 0.2, 0.2) });
+      page.drawText(summary, { x: tx, y: ty, size: fs, font: fontMono, color: TEXT_MUTED });
       const [tx2, ty2] = pt(textX, textY + BRAND_LINE_SPACING);
-      page.drawText(provenance, { x: tx2, y: ty2, size: fs, font: fontMono, color: rgb(0.4, 0.4, 0.4) });
+      page.drawText(provenance, { x: tx2, y: ty2, size: fs, font: fontMono, color: TEXT_SOFT });
 
       // Wordmark on sheet 1 only
       if (sheetNum === 1) {
@@ -431,11 +437,11 @@ export async function exportTiledPdf({ spec, tiling, fontBytes }: TiledPdfOption
 
         // Assembly note on sheet 1
         const [ax, ay] = pt(textX, textY + 2 * BRAND_LINE_SPACING);
-        page.drawText(TILE_ASSEMBLY_NOTE, { x: ax, y: ay, size: fs, font: fontMono, color: rgb(0.6, 0.6, 0.6) });
+        page.drawText(TILE_ASSEMBLY_NOTE, { x: ax, y: ay, size: fs, font: fontMono, color: TEXT_FAINT });
       } else {
         // Print note on non-sheet-1 pages
         const [tx3, ty3] = pt(textX, textY + 2 * BRAND_LINE_SPACING);
-        page.drawText(PRINT_NOTE, { x: tx3, y: ty3, size: fs, font: fontMono, color: rgb(0.6, 0.6, 0.6) });
+        page.drawText(PRINT_NOTE, { x: tx3, y: ty3, size: fs, font: fontMono, color: TEXT_FAINT });
       }
     }
   }

@@ -10,6 +10,7 @@ import { BRAND_NAME, SITE_URL, CONTACT_EMAIL, PRINT_NOTE, APP_VERSION } from './
 import { patternSummary, brandLine } from './brand';
 import { idRange } from './idRange';
 import type { PatternSpec } from './patterns';
+import { DOC_COLORS, hexToUnitRgb } from './docColors';
 
 // Re-export for convenience
 export { BRAND_NAME, SITE_URL, CONTACT_EMAIL, PRINT_NOTE, APP_VERSION };
@@ -107,5 +108,5 @@ export function wordmarkSvgGroup(opts: {
  * Y-axis green, the one printed on the boards and used in datasheets and line drawings (DESIGN.md `green-y`).
  * The generator's SVG, PDF and DXF previously used a different green (#1BA55A).
  */
-export const AXIS_Y_HEX = '#00A651';
-export const AXIS_Y_RGB: [number, number, number] = [0, 166 / 255, 81 / 255];
+export const AXIS_Y_HEX = DOC_COLORS.axisGreen;
+export const AXIS_Y_RGB: [number, number, number] = hexToUnitRgb(DOC_COLORS.axisGreen);
