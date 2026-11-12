@@ -314,3 +314,38 @@ describe('marker-size consistency with boardSizes.ts', () => {
     expect(CHA_C_MD).not.toMatch(/0\.72[–-]0\.75/);
   });
 });
+
+describe('Ordering section keeps its notes and sub-headings', () => {
+  const load = (code: string) => _parseDatasheet(readFileSync(resolve(process.cwd(), `docs/datasheets/${code}.md`), 'utf-8'));
+
+  it('ChArUco composite: the table says "see below" and the note that explains {DICT} follows it', () => {
+    const blocks = load('CT-DS-CHA-P').orderingBlocks;
+    expect(blocks.map((b) => b.kind)).toEqual(['table', 'note', 'note']);
+    const table = blocks[0] as { kind: 'table'; rows: string[][] };
+    expect(table.rows[0]).toContain('see below');
+    const note = blocks[1] as { kind: 'note'; text: string };
+    for (const t of ['{DICT}', 'DICT_6X6_250', 'DICT_5X5_100', 'DICT_4X4_50']) expect(note.text).toContain(t);
+  });
+
+  it('circle grid: two tables, each under its own sub-heading, and no header row parsed as data', () => {
+    const blocks = load('CT-DS-CIR-P').orderingBlocks;
+    expect(blocks.slice(0, 4).map((b) => b.kind)).toEqual(['heading', 'table', 'heading', 'table']);
+    expect((blocks[0] as { text: string }).text).toBe('Symmetric (SYM)');
+    expect((blocks[2] as { text: string }).text).toBe('Asymmetric (ASYM)');
+    for (const b of blocks) if (b.kind === 'table') for (const r of b.rows) expect(r[0]).toMatch(/^CT-CIR-P-/);
+  });
+
+  it('every board datasheet has at least one note under its ordering table', () => {
+    for (const code of ['CT-DS-CHA-P', 'CT-DS-CHT-P', 'CT-DS-APR-P', 'CT-DS-CIR-P', 'CT-DS-HAL-P']) {
+      const blocks = load(code).orderingBlocks;
+      expect(blocks.some((b) => b.kind === 'note'), code).toBe(true);
+      expect(blocks.some((b) => b.kind === 'table'), code).toBe(true);
+    }
+  });
+
+  it('the first table is still what the rest of the code reads as the ordering table', () => {
+    const ds = load('CT-DS-CHA-P');
+    expect(ds.ordering!.rows.length).toBe(5);
+    expect(ds.ordering!.headers[0]).toBe('Part number');
+  });
+});

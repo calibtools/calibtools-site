@@ -41,11 +41,47 @@ export interface DSFrontMatter {
   material: string;
 }
 
+export type OrderingBlock =
+  | { kind: 'heading'; text: string }
+  | { kind: 'table'; headers: string[]; rows: string[][] }
+  | { kind: 'note'; text: string };
+
+/** Split the Ordering section into its sub-headings, tables and note paragraphs, in order. */
+export function parseOrderingBlocks(section: string): OrderingBlock[] {
+  const blocks: OrderingBlock[] = [];
+  let table: string[] = [];
+  let para: string[] = [];
+  const flush = () => {
+    if (table.length) {
+      const t = parseMarkdownTable(table.join('\n'));
+      if (t) blocks.push({ kind: 'table', ...t });
+      table = [];
+    }
+    if (para.length) {
+      blocks.push({ kind: 'note', text: para.join(' ') });
+      para = [];
+    }
+  };
+  for (const raw of section.split('\n')) {
+    const line = raw.trim();
+    if (line.startsWith('## ')) continue;
+    if (line.startsWith('### ')) { flush(); blocks.push({ kind: 'heading', text: line.slice(4).trim() }); continue; }
+    if (line.startsWith('|')) { if (para.length) flush(); table.push(line); continue; }
+    if (line === '') { flush(); continue; }
+    if (table.length) flush();
+    para.push(line);
+  }
+  flush();
+  return blocks;
+}
+
 export interface DSParsed {
   meta: DSFrontMatter;
   body: string;
   positioning: string;
   ordering: { headers: string[]; rows: string[][] } | null;
+  /** The Ordering section in document order: sub-headings, tables and the notes under them. */
+  orderingBlocks: OrderingBlock[];
   specGroups: { title: string; rows: [string, string, string?][] }[];
   deliverables: [string, string][] | null;
   compliance: string | null;
@@ -145,8 +181,11 @@ export function parseDatasheet(md: string): DSParsed {
   // Ordering table
   const orderingSection = extractSection(body, '## Ordering');
   let ordering: DSParsed['ordering'] = null;
+  let orderingBlocks: OrderingBlock[] = [];
   if (orderingSection) {
-    ordering = parseMarkdownTable(orderingSection);
+    orderingBlocks = parseOrderingBlocks(orderingSection);
+    const first = orderingBlocks.find((b) => b.kind === 'table');
+    ordering = first && first.kind === 'table' ? { headers: first.headers, rows: first.rows } : null;
   }
 
   // Specifications
@@ -210,7 +249,7 @@ export function parseDatasheet(md: string): DSParsed {
     revisionHistory = parseMarkdownTable(revSection);
   }
 
-  return { meta, body, positioning, ordering, specGroups, deliverables, compliance, revisionHistory };
+  return { meta, body, positioning, ordering, orderingBlocks, specGroups, deliverables, compliance, revisionHistory };
 }
 
 // ── Datasheet file loader ────────────────────────────────────────────
@@ -464,6 +503,15 @@ function genericSpecTable(group: DSParsed['specGroups'][0]): string {
   );
 }
 
+/** The whole Ordering section: each table with its sub-heading above and its notes below. */
+function genericOrdering(blocks: OrderingBlock[]): string {
+  return blocks.map((b) => {
+    if (b.kind === 'table') return genericOrderingTable({ headers: b.headers, rows: b.rows });
+    if (b.kind === 'heading') return `<p class="small" style="font-weight:600;margin:1.6mm 0 .6mm">${mono(b.text)}</p>`;
+    return p(mono(b.text), 'small');
+  }).join('');
+}
+
 function genericOrderingTable(ordering: DSParsed['ordering']): string {
   if (!ordering) return '';
   const cols: [string, ColumnKind][] = ordering.headers.map((h): [string, ColumnKind] => [h, 't']);
@@ -583,9 +631,9 @@ function buildGenericBoardDS(ds: DSParsed, watermark?: string): Doc {
   );
 
   // Page 1: positioning + ordering + key specs
-  let page1 = p(ds.positioning);
+  let page1 = p(mono(ds.positioning));
   if (ds.ordering) {
-    page1 += section(1, 'Ordering') + genericOrderingTable(ds.ordering);
+    page1 += section(1, 'Ordering') + genericOrdering(ds.orderingBlocks);
   }
   // Key specs from first spec group
   const specGroups = ds.specGroups.filter((g) => g.title !== 'Deliverables');
@@ -672,7 +720,7 @@ function buildAccessoryDS(ds: DSParsed, watermark?: string): Doc {
   );
 
   // Page 1: positioning + specs
-  let page1 = p(ds.positioning);
+  let page1 = p(mono(ds.positioning));
   let secN = 1;
   for (const group of ds.specGroups) {
     page1 += section(secN, group.title === 'Specifications' ? 'Specifications' : `Specifications \u00b7 ${group.title.toLowerCase()}`);
