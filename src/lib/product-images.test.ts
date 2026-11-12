@@ -17,13 +17,12 @@ const PRODUCTS_DIR = resolve(__dirname, '../assets/products');
 describe('getProductImages', () => {
   it('returns images for checkerboard-composite in images.json order', () => {
     const images = getProductImages('checkerboard-composite');
-    expect(images.length).toBe(5);
+    expect(images.length).toBe(4);
     expect(images.map((i) => i.file)).toEqual([
       '01-hero.webp',
-      '02-angle.webp',
-      '03-detail.webp',
-      '04-context.webp',
-      '05-scale.webp',
+      '02-edge.webp',
+      '03-label.webp',
+      '04-in-use.webp',
     ]);
   });
 
@@ -60,6 +59,8 @@ describe('handlesWithImages', () => {
     const handles = handlesWithImages();
     expect(handles).toContain('checkerboard-composite');
     expect(handles).toContain('charuco-composite');
+    expect(handles).toContain('aprilgrid-composite');
+    expect(handles).toContain('halcon-composite');
     expect(handles).toContain('charuco-ceramic');
     expect(handles).toContain('mounting-fixture');
     expect(handles).toContain('certificate-ilac');

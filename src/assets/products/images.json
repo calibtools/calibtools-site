@@ -3,61 +3,97 @@
     "handle": "checkerboard-composite",
     "file": "01-hero.webp",
     "kind": "ai",
-    "alt": "Calib.Tools 300 by 240 mm white aluminum composite checkerboard calibration board standing upright at a slight angle on a seamless white background."
+    "alt": "Calib.Tools 400 by 300 mm aluminum composite checkerboard calibration board, 15 by 11 squares of 25 mm, seen from straight above with a steel rule along its lower edge."
   },
   {
     "handle": "checkerboard-composite",
-    "file": "02-angle.webp",
+    "file": "02-edge.webp",
     "kind": "ai",
-    "alt": "Calib.Tools checkerboard calibration board lying flat on white, photographed from the lower left to show its 3 mm edge and matte surface."
+    "alt": "Corner of the Calib.Tools checkerboard calibration board seen from low down, showing the 6 mm edge: white aluminum skins on a black core."
   },
   {
     "handle": "checkerboard-composite",
-    "file": "03-detail.webp",
+    "file": "03-label.webp",
     "kind": "ai",
-    "alt": "Calib.Tools checkerboard calibration board close-up of the bottom-left corner showing the last black squares and the printed part number line in the white margin."
+    "alt": "Lower-left corner of the Calib.Tools checkerboard calibration board with the printed line that gives part number, pattern size and serial number."
   },
   {
     "handle": "checkerboard-composite",
-    "file": "04-context.webp",
+    "file": "04-in-use.webp",
     "kind": "ai",
-    "alt": "Calib.Tools checkerboard calibration board held in a clamp on a tripod facing an industrial camera on an optical breadboard in a machine vision lab."
-  },
-  {
-    "handle": "checkerboard-composite",
-    "file": "05-scale.webp",
-    "kind": "ai",
-    "alt": "Calib.Tools checkerboard calibration board photographed from above next to a 300 mm steel ruler and a 1-euro coin for scale."
+    "alt": "Calib.Tools checkerboard calibration board standing on a workbench in front of a camera on a small tripod."
   },
   {
     "handle": "charuco-composite",
     "file": "01-hero.webp",
     "kind": "ai",
-    "alt": "Calib.Tools 300 by 240 mm white aluminum composite ChArUco calibration board standing upright at a slight angle on a seamless white background."
+    "alt": "Calib.Tools 400 by 300 mm aluminum composite ChArUco calibration board, 12 by 9 squares of 30 mm with 22 mm DICT_6X6_250 markers, seen from straight above with a steel rule along its lower edge."
   },
   {
     "handle": "charuco-composite",
-    "file": "02-angle.webp",
+    "file": "02-edge.webp",
     "kind": "ai",
-    "alt": "Calib.Tools ChArUco calibration board lying flat on white, photographed from the lower left to show its 3 mm edge and matte surface."
+    "alt": "Corner of the Calib.Tools ChArUco calibration board seen from low down, showing the 6 mm edge: white aluminum skins on a black core."
   },
   {
     "handle": "charuco-composite",
-    "file": "03-detail.webp",
+    "file": "03-label.webp",
     "kind": "ai",
-    "alt": "Calib.Tools ChArUco calibration board close-up of the bottom-left corner with ArUco markers and the printed part number line."
+    "alt": "Lower-left corner of the Calib.Tools ChArUco calibration board with the printed line that gives part number, pattern size, dictionary, start ID and serial number."
   },
   {
     "handle": "charuco-composite",
-    "file": "04-context.webp",
+    "file": "04-in-use.webp",
     "kind": "ai",
-    "alt": "Calib.Tools ChArUco calibration board on a black aluminum frame in front of a stereo camera pair in a robotics lab with a collaborative robot arm behind."
+    "alt": "Calib.Tools ChArUco calibration board held upright on an optical table in front of two industrial cameras."
   },
   {
-    "handle": "charuco-composite",
-    "file": "05-scale.webp",
+    "handle": "aprilgrid-composite",
+    "file": "01-hero.webp",
     "kind": "ai",
-    "alt": "Calib.Tools ChArUco calibration board photographed from above next to a 300 mm steel ruler and a 1-euro coin for scale."
+    "alt": "Calib.Tools 400 by 300 mm aluminum composite AprilGrid calibration board, 8 by 6 tags of the tag36h11 family in the Kalibr layout with ID 0 at the bottom left, seen from straight above with a steel rule along its lower edge."
+  },
+  {
+    "handle": "aprilgrid-composite",
+    "file": "02-edge.webp",
+    "kind": "ai",
+    "alt": "Corner of the Calib.Tools AprilGrid calibration board seen from low down, showing the 6 mm edge: white aluminum skins on a black core."
+  },
+  {
+    "handle": "aprilgrid-composite",
+    "file": "03-label.webp",
+    "kind": "ai",
+    "alt": "Lower-left corner of the Calib.Tools AprilGrid calibration board with the X and Y axis mark and the printed line that gives part number and pattern size."
+  },
+  {
+    "handle": "aprilgrid-composite",
+    "file": "04-in-use.webp",
+    "kind": "ai",
+    "alt": "Calib.Tools AprilGrid calibration board fixed to a wall while a camera with an IMU is moved by hand in front of it."
+  },
+  {
+    "handle": "halcon-composite",
+    "file": "01-hero.webp",
+    "kind": "ai",
+    "alt": "Calib.Tools aluminum composite HALCON calibration plate with 9 by 7 round marks inside a black frame that has a triangle in its top-left corner, seen from straight above with a steel rule along its lower edge."
+  },
+  {
+    "handle": "halcon-composite",
+    "file": "02-edge.webp",
+    "kind": "ai",
+    "alt": "Corner of the Calib.Tools HALCON calibration plate seen from low down, showing the 6 mm edge: white aluminum skins on a black core."
+  },
+  {
+    "handle": "halcon-composite",
+    "file": "03-corner.webp",
+    "kind": "ai",
+    "alt": "Close-up of the frame corner with the black triangle that tells HALCON which way round the plate is."
+  },
+  {
+    "handle": "halcon-composite",
+    "file": "04-in-use.webp",
+    "kind": "ai",
+    "alt": "Calib.Tools HALCON calibration plate lying under a downward-facing industrial camera between two bar lights."
   },
   {
     "handle": "charuco-ceramic",
