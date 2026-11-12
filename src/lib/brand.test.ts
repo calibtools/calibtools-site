@@ -186,3 +186,27 @@ describe('patternSummary with ID ranges', () => {
     expect(s).not.toContain('ID');
   });
 });
+
+describe('patternSummary names only what the pattern has', () => {
+  // What the generator holds when someone switches the pattern type: marker, dictionary and start ID stay filled.
+  const leftovers = { rows: 7, cols: 10, square: 25, marker: 18, dict: 'DICT_6X6_250', startId: 0 };
+
+  it('a checkerboard has no marker size, dictionary or ID', () => {
+    expect(patternSummary({ ...leftovers, type: 'Checkerboard' })).toBe('Checkerboard 7×10 · 25 mm');
+  });
+
+  it('circle grids and HALCON-style dots give their spacing only', () => {
+    expect(patternSummary({ ...leftovers, type: 'Asymmetric circles' })).toBe('Asymmetric circles 7×10 · 25 mm spacing');
+    expect(patternSummary({ ...leftovers, type: 'Symmetric circles' })).toBe('Symmetric circles 7×10 · 25 mm spacing');
+    expect(patternSummary({ ...leftovers, type: 'HALCON-style dots' })).toBe('HALCON-style dots 7×10 · 25 mm spacing');
+  });
+
+  it('a marker sheet gives the marker size, not a square size', () => {
+    expect(patternSummary({ type: 'Marker sheet', rows: 3, cols: 2, square: 120, marker: 60, dict: 'DICT_APRILTAG_36h11', startId: 0 })).toBe('Marker sheet 3×2 · 60 mm · DICT_APRILTAG_36h11 · IDs 0–5');
+  });
+
+  it('ChArUco and ArUco grid keep marker size, dictionary and IDs', () => {
+    expect(patternSummary({ ...leftovers, type: 'ChArUco' })).toBe('ChArUco 7×10 · 25/18 mm · DICT_6X6_250 · IDs 0–34');
+    expect(patternSummary({ ...leftovers, type: 'ArUco grid' })).toBe('ArUco grid 7×10 · 25/18 mm · DICT_6X6_250 · IDs 0–69');
+  });
+});
