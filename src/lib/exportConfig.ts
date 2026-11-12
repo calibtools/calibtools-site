@@ -275,7 +275,7 @@ export function opencvJson(s: PatternSpec): string {
   if (s.type === 'Asymmetric circles' && s.cols % 2 === 0) obj.opencv_pattern_size = [s.cols / 2, s.rows];
   if (circles) {
     if (sy !== sx) obj.spacing_y_mm = sy;
-    obj.circle_diameter_mm = s.circleDiameter ?? s.square * 0.56;
+    obj.circle_diameter_mm = +(s.circleDiameter ?? s.square * 0.56).toFixed(4); // 18 × 0.56 is 10.08, not 10.080000000000002
   }
   if (s.type === 'Symmetric circles' || s.type === 'Asymmetric circles') {
     obj.opencv_flag = s.type === 'Symmetric circles' ? 'CALIB_CB_SYMMETRIC_GRID' : 'CALIB_CB_ASYMMETRIC_GRID';
