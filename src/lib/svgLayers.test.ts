@@ -25,8 +25,8 @@ describe('axesSvg', () => {
     expect(axesSvg(makeCtx())).toContain('#E60012');
   });
 
-  it('Y arrow uses green #1BA55A', () => {
-    expect(axesSvg(makeCtx())).toContain('#1BA55A');
+  it('Y arrow uses the board green #00A651', () => {
+    expect(axesSvg(makeCtx())).toContain('#00A651');
   });
 
   it('returns empty string when showAxes is false', () => {
@@ -43,7 +43,7 @@ describe('axesSvg', () => {
   it('monochrome mode uses #000 instead of colors and dashed Y', () => {
     const svg = axesSvg(makeCtx({ monochromeAxes: true }));
     expect(svg).not.toContain('#E60012');
-    expect(svg).not.toContain('#1BA55A');
+    expect(svg).not.toContain('#00A651');
     expect(svg).toContain('#000');
     expect(svg).toContain('stroke-dasharray');
   });

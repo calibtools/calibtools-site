@@ -17,6 +17,7 @@ import {
   WORDMARK_FRAME_RECTS,
   WORDMARK_DOT_RECT,
   WORDMARK_VB,
+  AXIS_Y_RGB,
 } from './exportBrand';
 import { patternShapes, fillRgb, shapeBox, type Shape } from './patternShapes';
 import { patternExtent, type PageLayout } from './pageLayout';
@@ -232,7 +233,7 @@ export async function exportPdf({ spec, pw: rawPw, ph: rawPh, fontBytes, layout 
     const axOy = ax?.originY ?? (isKalibr ? oy + bh + axesOffset(spec).y : oy - axesOffset(spec).y);
 
     const xColor = rgb(230 / 255, 0, 18 / 255); // #E60012
-    const yColor = rgb(27 / 255, 165 / 255, 90 / 255); // #1BA55A
+    const yColor = rgb(...AXIS_Y_RGB); // #00A651, as printed on the boards
 
     // X arrow: pointing right
     const xEnd = axOx + arrowLen;

@@ -135,9 +135,9 @@ async function run() {
     errors.push('PDF: missing X-axis red color operator (0.9019... 0 0.0706... rg)');
   }
 
-  // Y-axis color: 1BA55A = rgb(0.1059..., 0.6471..., 0.3529...)
-  if (!pdfContent.includes('0.10588235294117647 0.6470588235294118 0.35294117647058826 rg')) {
-    errors.push('PDF: missing Y-axis green color operator (0.1059... 0.6471... 0.3529... rg)');
+  // Y-axis color: 00A651 = rgb(0, 0.6510..., 0.3176...)
+  if (!pdfContent.includes('0 0.6509803921568628 0.3176470588235294 rg')) {
+    errors.push('PDF: missing Y-axis green color operator (0 0.6510... 0.3176... rg)');
   }
 
   // Wordmark path data: the first letter C path contains "383" as a coordinate
@@ -175,7 +175,7 @@ async function run() {
   // XY axes group with correct colors
   if (!svg.includes('id="calibtools-axes"')) errors.push('SVG: missing axes group');
   if (!svg.includes('#E60012')) errors.push('SVG: missing X-axis red color #E60012');
-  if (!svg.includes('#1BA55A')) errors.push('SVG: missing Y-axis green color #1BA55A');
+  if (!svg.includes('#00A651')) errors.push('SVG: missing Y-axis green color #00A651');
 
   // Embedded font
   if (!svg.includes('@font-face') || !svg.includes("font-family:'Geist Mono'")) {

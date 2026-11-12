@@ -16,10 +16,11 @@ import { renderCirclesSvg } from './renderCircles';
 import { CATALOG, specFromEntry } from './catalogPatterns';
 import { GENERATOR_DEFAULT } from './patternLink';
 import { ALL_CHARUCO_SIZES } from './boardSizes';
+import { AXIS_Y_HEX } from './exportBrand';
 
 const INK = '#141414';
 const RED = '#E60012';
-const GREEN = '#00A651';
+const GREEN = AXIS_Y_HEX;
 const MONO = "'Geist Mono', ui-monospace, monospace";
 
 const r2 = (v: number) => Math.round(v * 100) / 100;

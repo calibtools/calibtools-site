@@ -10,6 +10,7 @@ import {
   PRINT_NOTE,
   SITE_URL,
   wordmarkSvgGroup,
+  AXIS_Y_HEX,
 } from './exportBrand';
 import { GEIST_MONO_WOFF2_B64 } from './geistMonoBase64';
 import type { BrandGeometry, AxesGeometry } from './pageLayout';
@@ -54,7 +55,7 @@ export function scaleBarSvg(ctx: SvgContext): string {
 
 /**
  * Coordinate-frame axes group.
- * X = brand red #E60012 pointing right, Y = green #1BA55A pointing down (OpenCV).
+ * X = brand red #E60012 pointing right, Y = green #00A651 pointing down (OpenCV).
  * For Kalibr preset: origin bottom-left, Y up.
  * Axes in quiet zone, start >= 0.5 square from first pattern square.
  * Arrowhead <= 3 mm. Shaft 0.4 mm.
@@ -79,7 +80,7 @@ export function axesSvg(ctx: SvgContext): string {
   const originY = ax ? ax.originY : (isKalibr ? oy + bh + off.y : oy - off.y);
 
   const xColor = mono ? '#000' : '#E60012';
-  const yColor = mono ? '#000' : '#1BA55A';
+  const yColor = mono ? '#000' : AXIS_Y_HEX;
   const yDash = mono ? ' stroke-dasharray="2,1.5"' : '';
 
   const parts: string[] = [];
