@@ -136,8 +136,8 @@ describe('exportPdf', () => {
     }
     // X-axis E60012
     expect(stream).toContain('0.9019607843137255 0 0.07058823529411765 rg');
-    // Y-axis 1BA55A
-    expect(stream).toContain('0.10588235294117647 0.6470588235294118 0.35294117647058826 rg');
+    // Y-axis 00A651, the green printed on the boards
+    expect(stream).toContain('0 0.6509803921568628 0.3176470588235294 rg');
   });
 
   it('content stream contains wordmark path coordinate 383 (letter C)', async () => {
