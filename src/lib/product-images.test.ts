@@ -62,6 +62,8 @@ describe('handlesWithImages', () => {
     expect(handles).toContain('aprilgrid-composite');
     expect(handles).toContain('halcon-composite');
     expect(handles).toContain('charuco-ceramic');
+    expect(handles).toContain('circlegrid-composite');
+    expect(handles).toContain('resolution-chart');
     expect(handles).toContain('mounting-fixture');
     expect(handles).toContain('certificate-ilac');
     expect(handles).toContain('brand');
