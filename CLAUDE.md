@@ -20,6 +20,7 @@ catalog pages from the Storefront API and links into the cart.
 - `pnpm test` (vitest) and `pnpm check` (astro check) must pass before a merge; CI runs both on every PR.
   Locally, run what the change can break: content, copy or images only → the related test file and
   `node scripts/check-prose.mjs`; components, pages or styles → related tests and `pnpm check`;
+  a row of cards (new or changed) → build, then `node scripts/check-card-rows.mjs` (DESIGN.md §3 Card rows);
   `src/lib/**`, exports, PDF or docs build → the full suite, a build and `npx tsx scripts/check-exports.mjs`.
 - Batch: changes on one theme within half a day go in one PR, one commit per change. Geometry, export
   and download fixes ship on their own.
