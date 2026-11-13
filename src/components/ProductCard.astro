@@ -35,9 +35,11 @@ const {
 const from = formatCardPrice(rawFrom);
 const displaySummary = summary || sub || '';
 ---
-<a href={href} data-card class="card bracket flex flex-col text-ink no-underline hover:text-ink hover:border-ink">
-  {/* No picture, no box: an empty frame is a placeholder (DESIGN.md §8.6) */}
-  {(drawing || localImage || image) && (
+<!-- Six shared rows (image, label, title, copy, chips, price) so cards in one row line up whatever wraps
+     or is missing: DESIGN.md §3 "Card rows". A row with nothing to show stays, empty. -->
+<a href={href} data-card class="card bracket rows-6 gap-y-1.5 text-ink no-underline hover:text-ink hover:border-ink">
+  {/* No picture, no box: an empty frame is a placeholder (DESIGN.md §8.6). The row itself stays. */}
+  {(drawing || localImage || image) ? (
   <div class="aspect-[4/3] border-b border-line bg-sheet flex items-center justify-center overflow-hidden font-mono text-xs text-ink-soft">
     {drawing ? (
       <div class="fit-svg flex h-full w-full items-center justify-center p-4" set:html={drawing} />
@@ -54,19 +56,13 @@ const displaySummary = summary || sub || '';
       <img src={image} alt="" class="h-full w-full object-cover" loading="lazy" />
     ) : null}
   </div>
-  )}
-  <div class="flex flex-col gap-1.5 p-5">
-    {drawing && drawingCaption && <span class="spec-label">{drawingCaption}</span>}
+  ) : <div></div>}
+  <span class="spec-label px-5 pt-3.5">{drawing && drawingCaption ? drawingCaption : ''}</span>
+  <div class="flex flex-col gap-1.5 px-5">
     <strong class="text-[17px] leading-snug">{title}</strong>
     {reviewCount > 0 && <Rating average={rating} count={reviewCount} size={12} />}
-    {displaySummary && <span class="text-sm text-ink-muted line-clamp-2">{displaySummary}</span>}
-    {chips && chips.length > 0 && (
-      <span class="text-[12px] font-mono text-ink-muted">{chips.join(' · ')}</span>
-    )}
-    {from ? (
-      <span class="font-mono text-[14px] font-semibold text-ink">from {from}</span>
-    ) : (
-      <span class="font-mono text-[14px] font-semibold text-ink">quote</span>
-    )}
   </div>
+  <span class="px-5 text-sm text-ink-muted line-clamp-2">{displaySummary}</span>
+  <span class="px-5 text-[12px] font-mono text-ink-muted">{chips && chips.length > 0 ? chips.join(' · ') : ''}</span>
+  <span class="self-end px-5 pb-5 font-mono text-[14px] font-semibold text-ink">{from ? `from ${from}` : 'quote'}</span>
 </a>

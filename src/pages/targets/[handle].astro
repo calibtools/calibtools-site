@@ -519,11 +519,11 @@ const quickLinks = hasLongform
       {keySpecs.length > 0 && (
         <dl class:list={['m-0 grid grid-cols-1 gap-px border border-line bg-line sm:grid-cols-2', keySpecs.length === 1 ? 'sm:grid-cols-1' : keySpecs.length === 2 ? 'md:grid-cols-2' : keySpecs.length === 3 ? 'md:grid-cols-3' : 'md:grid-cols-4']}>
           {keySpecs.map((ks) => (
-            <div class="row-span-2 grid grid-rows-subgrid gap-y-1 bg-sheet p-3">
+            <div class="rows-3 gap-y-1 bg-sheet p-3">
               <dt class="spec-label">{ks.label}</dt>
-              <dd class="m-0 flex flex-col gap-1">
+              <dd class="contents">
                 <span class="font-mono text-[16px] font-medium leading-snug text-ink">{splitSpecValue(ks.value).value}</span>
-                {splitSpecValue(ks.value).cond && <span class="spec-cond">{splitSpecValue(ks.value).cond}</span>}
+                <span class="spec-cond">{splitSpecValue(ks.value).cond ?? ''}</span>
               </dd>
             </div>
           ))}
@@ -578,7 +578,7 @@ const quickLinks = hasLongform
         <h2 class="m-0 pb-3 font-mono text-[12px] uppercase tracking-[0.16em] text-brand-dark">On this page</h2>
         <ol class="m-0 grid list-none grid-cols-2 gap-x-8 gap-y-1 p-0 lg:grid-cols-3">
           {quickLinks.map((l, i) => (
-            <li><a href={l.href} class="flex min-h-[32px] items-center gap-3 text-[15px] text-ink no-underline hover:text-brand-dark">{l.text}</a></li>
+            <li><a href={l.href} class="flex min-h-[32px] items-start gap-3 py-1 text-[15px] text-ink no-underline hover:text-brand-dark">{l.text}</a></li>
           ))}
         </ol>
       </div>
@@ -750,7 +750,7 @@ const quickLinks = hasLongform
             </div>
           )}
           <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div class="flex flex-col gap-2 text-[15px]">
+            <div class="rows-2 gap-y-2 text-[15px]">
               <strong class="text-[13px] uppercase tracking-[0.08em] text-ink-muted">In the box</strong>
               <ul class="m-0 flex flex-col gap-1.5 pl-4 text-[15px]">
                 {quoteOnly ? (
@@ -771,14 +771,14 @@ const quickLinks = hasLongform
                     <li>Edge label with serial number</li>
                   </>
                 )}
+                {isBoardProduct && (
+                  <li class="-ml-4 list-none pt-1 text-[14px] leading-relaxed text-ink-muted">
+                    Self-locking mailer with closed-cell foam inserts. Box size S/M/L by board size.
+                  </li>
+                )}
               </ul>
-              {isBoardProduct && (
-                <p class="m-0 text-[14px] leading-relaxed text-ink-muted">
-                  Self-locking mailer with closed-cell foam inserts. Box size S/M/L by board size.
-                </p>
-              )}
             </div>
-            <div class="flex flex-col gap-2 text-[15px]">
+            <div class="rows-2 gap-y-2 text-[15px]">
               <strong class="text-[13px] uppercase tracking-[0.08em] text-ink-muted">Digital files</strong>
               <ul class="m-0 flex flex-col gap-1.5 pl-4 text-[15px]">
                 {digitalFiles(handle!).map((f) => <li>{f}</li>)}

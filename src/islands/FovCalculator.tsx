@@ -73,32 +73,32 @@ export default function FovCalculator({ heading = 'FOV calculator' }: { heading?
         <h1 className="m-0 flex items-center gap-3 text-[26px] font-extrabold tracking-[-0.02em]"><ScanLine size={24} strokeWidth={1.6} className="text-brand" aria-hidden="true" />{heading}</h1>
         <p className="m-0 text-sm leading-relaxed text-ink-muted">Calculate field of view, coverage and GSD for your camera and lens, find the focal length for a given field, and size a calibration board.</p>
 
-        <label className="flex flex-col gap-2 text-[13px] font-semibold">Sensor preset
+        <label className="rows-2 gap-y-2 text-[13px] font-semibold">Sensor preset
           <select className={field} value={preset} onChange={(e) => applyPreset(e.target.value)}>
             {PRESET_NAMES.map((p) => <option key={p}>{p}</option>)}
           </select>
         </label>
 
         <div className="grid grid-cols-2 gap-3">
-          <label className="flex flex-col gap-2 text-[13px] font-semibold">Sensor width (mm)
+          <label className="rows-2 gap-y-2 text-[13px] font-semibold">Sensor width (mm)
             <input className={field} type="number" min={0.1} step={0.01} value={sensorW} onChange={(e) => { setSensorW(+e.target.value); setPreset('Custom'); }} />
           </label>
-          <label className="flex flex-col gap-2 text-[13px] font-semibold">Sensor height (mm)
+          <label className="rows-2 gap-y-2 text-[13px] font-semibold">Sensor height (mm)
             <input className={field} type="number" min={0.1} step={0.01} value={sensorH} onChange={(e) => { setSensorH(+e.target.value); setPreset('Custom'); }} />
           </label>
-          <label className="flex flex-col gap-2 text-[13px] font-semibold">Resolution W (px)
+          <label className="rows-2 gap-y-2 text-[13px] font-semibold">Resolution W (px)
             <input className={field} type="number" min={1} value={resW} onChange={(e) => { setResW(+e.target.value); setPreset('Custom'); }} />
           </label>
-          <label className="flex flex-col gap-2 text-[13px] font-semibold">Resolution H (px)
+          <label className="rows-2 gap-y-2 text-[13px] font-semibold">Resolution H (px)
             <input className={field} type="number" min={1} value={resH} onChange={(e) => { setResH(+e.target.value); setPreset('Custom'); }} />
           </label>
         </div>
 
-        <label className="flex flex-col gap-2 text-[13px] font-semibold">Focal length (mm)
+        <label className="rows-2 gap-y-2 text-[13px] font-semibold">Focal length (mm)
           <input className={field} type="number" min={1} step={0.5} value={focal} onChange={(e) => setFocal(+e.target.value)} />
         </label>
 
-        <label className="flex flex-col gap-2 text-[13px] font-semibold">Working distance (mm)
+        <label className="rows-2 gap-y-2 text-[13px] font-semibold">Working distance (mm)
           <input className={field} type="number" min={1} value={distance} onChange={(e) => setDistance(+e.target.value)} />
         </label>
 
@@ -106,10 +106,10 @@ export default function FovCalculator({ heading = 'FOV calculator' }: { heading?
           <span className="text-[13px] font-semibold">Lens finder (optional)</span>
           <p className="m-0 mb-3 text-xs text-ink-muted">Enter the field you need to see at the working distance. Leave height at 0 to size by width only.</p>
           <div className="grid grid-cols-2 gap-3">
-            <label className="flex flex-col gap-2 text-[13px] font-semibold">Field width (mm)
+            <label className="rows-2 gap-y-2 text-[13px] font-semibold">Field width (mm)
               <input className={field} type="number" min={1} value={wantW} onChange={(e) => setWantW(+e.target.value)} />
             </label>
-            <label className="flex flex-col gap-2 text-[13px] font-semibold">Field height (mm)
+            <label className="rows-2 gap-y-2 text-[13px] font-semibold">Field height (mm)
               <input className={field} type="number" min={0} value={wantH} onChange={(e) => setWantH(+e.target.value)} />
             </label>
           </div>
@@ -119,10 +119,10 @@ export default function FovCalculator({ heading = 'FOV calculator' }: { heading?
           <span className="text-[13px] font-semibold">Target fill (optional)</span>
           <p className="m-0 mb-3 text-xs text-ink-muted">Enter your calibration target size to get a recommended distance.</p>
           <div className="grid grid-cols-2 gap-3">
-            <label className="flex flex-col gap-2 text-[13px] font-semibold">Target width (mm)
+            <label className="rows-2 gap-y-2 text-[13px] font-semibold">Target width (mm)
               <input className={field} type="number" min={1} value={targetW} onChange={(e) => setTargetW(+e.target.value)} />
             </label>
-            <label className="flex flex-col gap-2 text-[13px] font-semibold">Target height (mm)
+            <label className="rows-2 gap-y-2 text-[13px] font-semibold">Target height (mm)
               <input className={field} type="number" min={1} value={targetH} onChange={(e) => setTargetH(+e.target.value)} />
             </label>
           </div>
@@ -218,17 +218,17 @@ export default function FovCalculator({ heading = 'FOV calculator' }: { heading?
           <h2 className="m-0 mb-2 text-lg font-bold">FOV converter</h2>
           <p className="m-0 mb-5 text-sm text-ink-muted">Know one angle from a datasheet? Convert between horizontal, vertical and diagonal field of view. No sensor or lens data needed.</p>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-            <label className="flex flex-col gap-2 text-[13px] font-semibold">Angle (°)
+            <label className="rows-2 gap-y-2 text-[13px] font-semibold">Angle (°)
               <input className={field} type="number" min={1} max={179} step={0.1} value={convAngle} onChange={(e) => setConvAngle(+e.target.value)} />
             </label>
-            <label className="flex flex-col gap-2 text-[13px] font-semibold">It is the
+            <label className="rows-2 gap-y-2 text-[13px] font-semibold">It is the
               <select className={field} value={convAxis} onChange={(e) => setConvAxis(e.target.value as FovAxis)}>
                 <option value="horizontal">Horizontal FOV</option>
                 <option value="vertical">Vertical FOV</option>
                 <option value="diagonal">Diagonal FOV</option>
               </select>
             </label>
-            <label className="flex flex-col gap-2 text-[13px] font-semibold">Aspect ratio
+            <label className="rows-2 gap-y-2 text-[13px] font-semibold">Aspect ratio
               <select className={field} value={convRatio} onChange={(e) => setConvRatio(e.target.value)}>
                 {ASPECT_RATIOS.map((a) => <option key={a.label}>{a.label}</option>)}
                 <option value="sensor">Sensor above</option>
@@ -255,7 +255,7 @@ export default function FovCalculator({ heading = 'FOV calculator' }: { heading?
 /** `pixel`: the value is a count of camera pixels, set in Geist Pixel (DESIGN.md: pixels and millimeters use different faces). */
 function ResultCard({ label, value, pixel }: { label: string; value: string; pixel?: boolean }) {
   return (
-    <div className="flex flex-col gap-1 rounded-lg bg-ground-panel p-4">
+    <div className="rows-2 gap-y-1 rounded-lg bg-ground-panel p-4">
       <span className="text-xs font-medium text-ink-muted">{label}</span>
       <span className={pixel ? 'font-pixel text-xl' : 'font-mono text-lg font-bold'} data-unit={pixel ? 'px' : undefined}>{value}</span>
     </div>

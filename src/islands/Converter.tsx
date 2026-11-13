@@ -69,7 +69,7 @@ export default function Converter() {
   };
 
   return (
-    <section className="flex flex-wrap gap-8">
+    <section className="flex flex-wrap gap-8" data-rows="layout">
       {/* Input panel */}
       <div className="flex min-w-0 flex-1 basis-[400px] flex-col gap-4">
         <div className="card p-7">

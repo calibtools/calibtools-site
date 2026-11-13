@@ -128,7 +128,7 @@ export default function CaptureAssistant() {
   const progress = captures.length / GUIDED_POSES.length;
 
   return (
-    <section className="flex flex-wrap gap-8">
+    <section className="flex flex-wrap gap-8" data-rows="layout">
       {/* Camera + controls */}
       <div className="flex min-w-0 flex-1 basis-[520px] flex-col gap-4">
         <div className="card p-7">

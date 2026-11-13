@@ -158,31 +158,31 @@ export default function Generator({ initialSpec, heading = 'Pattern generator' }
         <h1 className="m-0 flex items-center gap-3 text-[26px] font-extrabold tracking-[-0.02em]"><Grid2X2 size={24} strokeWidth={1.6} className="text-brand" aria-hidden="true" />{heading}</h1>
         <p className="m-0 text-sm leading-relaxed text-ink-muted">Runs in your browser. Nothing is uploaded.</p>
 
-        <label className="flex flex-col gap-2 text-[13px] font-semibold">Pattern
+        <label className="rows-2 gap-y-2 text-[13px] font-semibold">Pattern
           <select className={field} value={spec.type} onChange={(e) => set('type', e.target.value as PatternSpec['type'])}>
             {visiblePatterns.map((p) => <option key={p}>{p}</option>)}
           </select>
         </label>
         <div className="grid grid-cols-2 gap-3">
-          <label className="flex flex-col gap-2 text-[13px] font-semibold">Rows<input className={field} type="number" min={2} value={spec.rows} onChange={(e) => set('rows', +e.target.value)} /></label>
-          <label className="flex flex-col gap-2 text-[13px] font-semibold">Columns<input className={field} type="number" min={2} value={spec.cols} onChange={(e) => set('cols', +e.target.value)} /></label>
+          <label className="rows-2 gap-y-2 text-[13px] font-semibold">Rows<input className={field} type="number" min={2} value={spec.rows} onChange={(e) => set('rows', +e.target.value)} /></label>
+          <label className="rows-2 gap-y-2 text-[13px] font-semibold">Columns<input className={field} type="number" min={2} value={spec.cols} onChange={(e) => set('cols', +e.target.value)} /></label>
           {fields.sizeLabel && (
-            <label className="flex flex-col gap-2 text-[13px] font-semibold">{fields.sizeLabel}<input className={field} type="number" min={1} value={spec.square} onChange={(e) => set('square', +e.target.value)} /></label>
+            <label className="rows-2 gap-y-2 text-[13px] font-semibold">{fields.sizeLabel}<input className={field} type="number" min={1} value={spec.square} onChange={(e) => set('square', +e.target.value)} /></label>
           )}
           {fields.marker && (
-            <label className="flex flex-col gap-2 text-[13px] font-semibold">Marker size (mm)<input className={field} type="number" min={1} value={spec.marker} onChange={(e) => set('marker', +e.target.value)} /></label>
+            <label className="rows-2 gap-y-2 text-[13px] font-semibold">Marker size (mm)<input className={field} type="number" min={1} value={spec.marker} onChange={(e) => set('marker', +e.target.value)} /></label>
           )}
         </div>
         {fields.dictionary && (
-          <label className="flex flex-col gap-2 text-[13px] font-semibold">Dictionary
+          <label className="rows-2 gap-y-2 text-[13px] font-semibold">Dictionary
             <select className={field} value={spec.dict} onChange={(e) => set('dict', e.target.value)}>{DICTS.map((d) => <option key={d}>{d}</option>)}</select>
           </label>
         )}
         <div className="grid grid-cols-2 gap-3">
-          <label className="flex flex-col gap-2 text-[13px] font-semibold">Page / board
+          <label className="rows-2 gap-y-2 text-[13px] font-semibold">Page / board
             <select className={field} value={spec.paper} onChange={(e) => set('paper', e.target.value)}>{Object.keys(PAPERS).map((p) => <option key={p}>{p}</option>)}</select>
           </label>
-          <label className="flex flex-col gap-2 text-[13px] font-semibold">Orientation
+          <label className="rows-2 gap-y-2 text-[13px] font-semibold">Orientation
             <select className={field} value={orientation} onChange={(e) => setOrientation(e.target.value as Orientation)}>
               <option value="auto">Auto</option>
               <option value="portrait">Portrait</option>
@@ -190,7 +190,7 @@ export default function Generator({ initialSpec, heading = 'Pattern generator' }
             </select>
           </label>
           {fields.startId && (
-            <label className="flex flex-col gap-2 text-[13px] font-semibold">Start ID<input className={field} type="number" min={0} value={spec.startId} onChange={(e) => set('startId', +e.target.value)} /></label>
+            <label className="rows-2 gap-y-2 text-[13px] font-semibold">Start ID<input className={field} type="number" min={0} value={spec.startId} onChange={(e) => set('startId', +e.target.value)} /></label>
           )}
         </div>
         <label className="flex items-center gap-2.5 text-sm font-normal min-h-[44px] md:min-h-0">
@@ -239,7 +239,7 @@ export default function Generator({ initialSpec, heading = 'Pattern generator' }
 
         {spec.type === 'AprilGrid (Kalibr)' && (
           <>
-            <label className="flex flex-col gap-2 text-[13px] font-semibold">Tag family
+            <label className="rows-2 gap-y-2 text-[13px] font-semibold">Tag family
               <select className={field} value={spec.aprilFamily ?? '36h11'}
                 onChange={(e) => set('aprilFamily', e.target.value)}>
                 <option value="16h5">16h5 (30 tags)</option>
@@ -248,21 +248,23 @@ export default function Generator({ initialSpec, heading = 'Pattern generator' }
               </select>
             </label>
             <div className="grid grid-cols-2 gap-3">
-              <label className="flex flex-col gap-2 text-[13px] font-semibold">Border bits
+              <label className="rows-3 gap-y-2 text-[13px] font-semibold">Border bits
                 <select className={field} value={spec.borderBits ?? 2}
                   onChange={(e) => set('borderBits', +e.target.value)}>
                   <option value={1}>1 (AprilTag 3)</option>
                   <option value={2}>2</option>
                 </select>
+                {/* empty: keeps the hint row of the field beside it (DESIGN.md §3 Card rows) */}
+                <span className="text-[12px] font-normal text-ink-muted"></span>
               </label>
-              <label className="flex flex-col gap-2 text-[13px] font-semibold">Tag spacing
+              <label className="rows-3 gap-y-2 text-[13px] font-semibold">Tag spacing
                 <input className={field} type="number" min={0.05} max={1} step={0.05}
                   value={spec.tagSpacing ?? 0.3}
                   onChange={(e) => set('tagSpacing', +e.target.value)} />
                 <span className="text-[12px] font-normal text-ink-muted">{((spec.tagSpacing ?? 0.3) * spec.square).toFixed(1)} mm</span>
               </label>
             </div>
-            <label className="flex flex-col gap-2 text-[13px] font-semibold">Specify tag IDs
+            <label className="rows-3 gap-y-2 text-[13px] font-semibold">Specify tag IDs
               <span className="text-[12px] font-normal text-ink-muted">Start ID, or comma/range list (e.g. 0-9,15,20-24)</span>
               <input className={field} type="text" placeholder={String(spec.startId)}
                 value={spec.tagIdList ?? ''}
@@ -298,7 +300,7 @@ export default function Generator({ initialSpec, heading = 'Pattern generator' }
 
         {spec.type === 'Marker sheet' && (
           <>
-            <label className="flex flex-col gap-2 text-[13px] font-semibold">Tag family (optional)
+            <label className="rows-2 gap-y-2 text-[13px] font-semibold">Tag family (optional)
               <select className={field} value={spec.aprilFamily ?? ''}
                 onChange={(e) => set('aprilFamily', e.target.value || undefined)}>
                 <option value="">Use ArUco dictionary</option>
@@ -308,7 +310,7 @@ export default function Generator({ initialSpec, heading = 'Pattern generator' }
               </select>
             </label>
             {spec.aprilFamily && (
-              <label className="flex flex-col gap-2 text-[13px] font-semibold">Border bits
+              <label className="rows-2 gap-y-2 text-[13px] font-semibold">Border bits
                 <select className={field} value={spec.borderBits ?? 2}
                   onChange={(e) => set('borderBits', +e.target.value)}>
                   <option value={1}>1 (AprilTag 3)</option>
@@ -316,7 +318,7 @@ export default function Generator({ initialSpec, heading = 'Pattern generator' }
                 </select>
               </label>
             )}
-            <label className="flex flex-col gap-2 text-[13px] font-semibold">Specify tag IDs
+            <label className="rows-3 gap-y-2 text-[13px] font-semibold">Specify tag IDs
               <span className="text-[12px] font-normal text-ink-muted">Start ID, or comma/range list (e.g. 0-9,15,20-24)</span>
               <input className={field} type="text" placeholder={String(spec.startId)}
                 value={spec.tagIdList ?? ''}
@@ -337,17 +339,17 @@ export default function Generator({ initialSpec, heading = 'Pattern generator' }
 
         {(spec.type === 'Symmetric circles' || spec.type === 'Asymmetric circles' || spec.type === 'HALCON-style dots') && (
           <div className="grid grid-cols-2 gap-3">
-            <label className="flex flex-col gap-2 text-[13px] font-semibold">Circle diameter (mm)
+            <label className="rows-2 gap-y-2 text-[13px] font-semibold">Circle diameter (mm)
               <input className={field} type="number" min={1} step={0.5}
                 value={spec.circleDiameter ?? +(spec.square * 0.56).toFixed(1)}
                 onChange={(e) => set('circleDiameter', +e.target.value)} />
             </label>
-            <label className="flex flex-col gap-2 text-[13px] font-semibold">X spacing (mm)
+            <label className="rows-2 gap-y-2 text-[13px] font-semibold">X spacing (mm)
               <input className={field} type="number" min={1}
                 value={spec.circleSpacingX ?? spec.square}
                 onChange={(e) => set('circleSpacingX', +e.target.value)} />
             </label>
-            <label className="flex flex-col gap-2 text-[13px] font-semibold">Y spacing (mm)
+            <label className="rows-2 gap-y-2 text-[13px] font-semibold">Y spacing (mm)
               <input className={field} type="number" min={1}
                 value={spec.circleSpacingY ?? spec.square}
                 onChange={(e) => set('circleSpacingY', +e.target.value)} />
@@ -374,12 +376,12 @@ export default function Generator({ initialSpec, heading = 'Pattern generator' }
 
         {spec.type === 'PuzzleBoard' && (
           <div className="grid grid-cols-2 gap-3">
-            <label className="flex flex-col gap-2 text-[13px] font-semibold">Offset X
+            <label className="rows-2 gap-y-2 text-[13px] font-semibold">Offset X
               <input className={field} type="number" min={0}
                 value={spec.puzzleOffsetX ?? 0}
                 onChange={(e) => set('puzzleOffsetX', Math.max(0, +e.target.value))} />
             </label>
-            <label className="flex flex-col gap-2 text-[13px] font-semibold">Offset Y
+            <label className="rows-2 gap-y-2 text-[13px] font-semibold">Offset Y
               <input className={field} type="number" min={0}
                 value={spec.puzzleOffsetY ?? 0}
                 onChange={(e) => set('puzzleOffsetY', Math.max(0, +e.target.value))} />
@@ -398,7 +400,7 @@ export default function Generator({ initialSpec, heading = 'Pattern generator' }
 
         {(spec.type === 'ChArUco' || spec.type === 'ArUco grid' || spec.type === 'AprilGrid (Kalibr)') && (
           <div className="flex flex-col gap-3 border-t border-line pt-4">
-            <label className="flex flex-col gap-2 text-[13px] font-semibold">Number of boards
+            <label className="rows-2 gap-y-2 text-[13px] font-semibold">Number of boards
               <input className={field} type="number" min={1} max={16}
                 value={boardCount}
                 onChange={(e) => {

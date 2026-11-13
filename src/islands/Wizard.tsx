@@ -138,16 +138,16 @@ function SetupStep({ onUse, onSkip }: {
       <h2 className="m-0 mb-1 text-lg font-bold">Camera setup (optional)</h2>
       <p className="m-0 mb-4 text-sm text-ink-muted">Add your sensor, lens and working distance to size the squares for your setup.</p>
       <div className="flex flex-col gap-3">
-        <label className="flex flex-col gap-2 text-[13px] font-semibold">Sensor
+        <label className="rows-2 gap-y-2 text-[13px] font-semibold">Sensor
           <select className={field} value={preset} onChange={(e) => setPreset(e.target.value)}>
             {PRESET_NAMES.map((n) => <option key={n}>{n}</option>)}
           </select>
         </label>
         <div className="grid grid-cols-2 gap-3">
-          <label className="flex flex-col gap-2 text-[13px] font-semibold">Focal length (mm)
+          <label className="rows-2 gap-y-2 text-[13px] font-semibold">Focal length (mm)
             <input className={field} type="number" min={1} step={0.5} value={focal} onChange={(e) => setFocal(+e.target.value)} />
           </label>
-          <label className="flex flex-col gap-2 text-[13px] font-semibold">Working distance (mm)
+          <label className="rows-2 gap-y-2 text-[13px] font-semibold">Working distance (mm)
             <input className={field} type="number" min={1} value={distance} onChange={(e) => setDistance(+e.target.value)} />
           </label>
         </div>

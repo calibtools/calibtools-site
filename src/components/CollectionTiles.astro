@@ -1,7 +1,7 @@
 ---
 /**
  * Category tiles (home and /targets/): rows on phones, tiles from md.
- * From md each tile is a subgrid over five shared rows (image, label, title, description, price), so the
+ * From md each tile takes five shared rows, `md:rows-5` (image, label, title, description, price), so the
  * same line of text sits at the same height in every tile of a row, whatever wraps or is missing.
  * Board outlines are drawn to scale, and only for collections whose sizes are in boardSizes.ts.
  * Category images: the board faces are the generated patterns composited into the scene, not drawn by the image
@@ -53,7 +53,7 @@ const tiles = await Promise.all(collections.map(async (c) => {
 ---
 <div class="grid grid-cols-1 border-t border-line md:grid-cols-3 md:gap-6 md:border-t-0 lg:grid-cols-5">
   {tiles.map((t) => (
-    <a href={`/targets/collection/${t.handle}/`} data-card class="group flex items-center justify-between gap-4 border-b border-line py-4 text-ink no-underline hover:text-ink md:card md:bracket md:row-span-5 md:grid md:grid-rows-subgrid md:items-start md:justify-normal md:gap-x-0 md:gap-y-3 md:border-b md:p-5 md:hover:border-ink">
+    <a href={`/targets/collection/${t.handle}/`} data-card class="group flex items-center justify-between gap-4 border-b border-line py-4 text-ink no-underline hover:text-ink md:card md:bracket md:rows-5 md:items-start md:justify-normal md:gap-x-0 md:gap-y-3 md:border-b md:p-5 md:hover:border-ink">
       {t.image
         ? <Image src={t.image.src} alt={t.image.alt} widths={[160, 320, 640]} sizes="(min-width: 1024px) 200px, (min-width: 768px) 30vw, 84px" class="aspect-[3/2] w-[84px] shrink-0 bg-ground-panel object-cover md:w-full" loading="lazy" />
         : <div class="aspect-[3/2] w-[84px] shrink-0 items-end md:flex md:w-full [&>svg]:hidden md:[&>svg]:block" set:html={t.outline?.svg ?? ''} />}
