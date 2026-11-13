@@ -1,12 +1,9 @@
 ---
 import Base from '@/layouts/Base.astro';
 import ProductCard from '@/components/ProductCard.astro';
+import { productCardVisual } from '@/lib/productCardVisual';
 import CollectionTiles from '@/components/CollectionTiles.astro';
-import { drawingForPartNumber, representativePartNumber } from '@/lib/boardDrawing';
-import type { ImageMetadata } from 'astro';
 import { getCollections, getProducts } from '@/lib/shopify';
-import { getProductImages } from '@/lib/product-images';
-import { getImageMetadata } from '@/lib/productImageImports';
 import { breadcrumbLd } from '@/lib/seo';
 import { getEntry } from 'astro:content';
 import { getReviewsForProduct, summarize } from '@/lib/reviews';
@@ -14,25 +11,6 @@ const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: 'Calibration targ
 
 const collections = await getCollections();
 const products = await getProducts();
-
-// Build hero image map for all products
-const heroImageMap = new Map<string, ImageMetadata>();
-for (const p of products) {
-  const images = getProductImages(p.handle);
-  const hero = images.find((img) => img.file === '01-hero.webp');
-  if (hero) {
-    const meta = getImageMetadata(hero.handle, hero.file);
-    if (meta) heroImageMap.set(p.handle, meta);
-  }
-}
-
-/* Line drawing for products we can draw from catalog geometry (one representative stock board each) */
-const drawings = new Map<string, { svg: string; pn: string }>();
-for (const p of products) {
-  const pn = representativePartNumber(p.handle);
-  const svg = pn ? drawingForPartNumber(pn, { dimensions: false }) : undefined;
-  if (pn && svg) drawings.set(p.handle, { svg, pn });
-}
 
 // Build review + content data for cards
 const cardDataMap = new Map<string, { rating: number; count: number; summary?: string; chips?: string[] }>();
@@ -68,9 +46,7 @@ for (const p of products) {
         </div>
         <div class="grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-6 lg:grid-cols-4">
           {products.map((p) => {
-            const localHero = heroImageMap.get(p.handle);
             const cd = cardDataMap.get(p.handle);
-            const dr = drawings.get(p.handle);
             return (
               <ProductCard
                 href={p.url}
@@ -78,10 +54,7 @@ for (const p of products) {
                 summary={cd?.summary}
                 sub={p.description}
                 from={p.priceFrom}
-                localImage={localHero}
-                image={!localHero ? p.image : undefined}
-                drawing={dr?.svg}
-                drawingCaption={dr?.pn}
+                {...productCardVisual(p.handle, p.image)}
                 rating={cd?.rating}
                 reviewCount={cd?.count}
                 chips={cd?.chips}

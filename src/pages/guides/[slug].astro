@@ -1,6 +1,7 @@
 ---
 import Base from '@/layouts/Base.astro';
 import ProductCard from '@/components/ProductCard.astro';
+import { productCardVisual } from '@/lib/productCardVisual';
 import { ArrowRight, FileText, ExternalLink } from 'lucide-astro';
 import { getCollection, getEntry } from 'astro:content';
 import { getProducts } from '@/lib/shopify';
@@ -175,8 +176,7 @@ const jsonLdItems = [articleLd, breadcrumbLd, ...(faqLd ? [faqLd] : [])];
                   summary={cd?.summary}
                   sub={p.description}
                   from={p.priceFrom}
-                  image={p.image}
-                  placeholder={p.title}
+                  {...productCardVisual(p.handle, p.image)}
                   rating={cd?.rating}
                   reviewCount={cd?.count}
                   chips={cd?.chips}
