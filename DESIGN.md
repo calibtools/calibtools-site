@@ -80,16 +80,26 @@ Each major section starts with: a plain-word label (Mono 12) + 40 × 3 red rule 
 | Title block | PDFs, drawings and packaging labels only (issuer · document number · rev · date · scale). Not on web pages: page codes and build revisions mean nothing to a visitor (§7a) |
 | Origin + axes | red dot at the origin, red X arrow right, green Y arrow down, as printed on the boards. At most once per page |
 
-### Card rows
+### Card rows (side-by-side blocks)
 
-Cards that sit side by side are read across as well as down, so the same line of content sits at the same height in every card of a row: label with label, title with title, copy with copy, price or action with price or action. Text that wraps to a different number of lines, or a line that one card does not have, must not push the lines below it out of step.
+Blocks that sit side by side are read across as well as down, so the same line of content sits at the same height in every block of a row: label with label, title with title, copy with copy, price or action with price or action. This holds for any content, not only for today's copy: a title that wraps to three lines, or a line that one block does not have, must not push the lines below it out of step.
 
-- Build a row of cards as shared rows, not as separate stacks. The grid holds the cards; each card spans one row per content line and takes the grid's rows (`row-span-N grid grid-rows-subgrid`, N = number of content lines: image, label, title, copy, price). A wrapper inside a card that groups lines for the phone layout becomes `contents` at the width where the cards stand side by side.
-- Do not line cards up with `flex flex-col` plus `mt-auto`: that pins only the last line and leaves every line above it to float.
-- Every card in a row has the same lines in the same order. A line with nothing to show stays in the markup, empty, and keeps its row; it is not left out.
-- The price or action line sits on the bottom edge (`self-end`). A card that ends in a paragraph or a list may end where its text ends.
-- Rows on phones (one card per line) are free of this rule.
-- Checked by `node scripts/check-card-rows.mjs` after a build, at 1280, 900 and 768 px on every page; CI fails on a difference above 1 px. Examples: `CollectionTiles.astro`, `ToolCard.astro`, the key-spec strip in `targets/[handle].astro`.
+It applies to every row of alike blocks: category tiles, tool cards, spec cells, result cells, footer columns, form fields that share a line.
+
+- One way to build it: the parent is a grid, and every block carries `rows-N` (`src/styles/global.css`), N = its content lines (image, label, title, copy, price). The block then takes the grid's rows instead of stacking its own. Set the gap between lines with `gap-y-*` on the block. With a breakpoint: `md:rows-5`.
+- A wrapper inside a block that groups lines for the phone layout becomes `contents` at the width where the blocks stand side by side.
+- Do not build such a block with `flex flex-col`, and do not line it up with `mt-auto`: that pins only the last line and leaves every line above it to float. It can look right with today's copy and break with the next product.
+- Every block in a row has the same lines in the same order. A line with nothing to show stays in the markup, empty, and keeps its row.
+- The price or action line sits on the bottom edge (`self-end`). A block that ends in a paragraph or a list may end where its text ends.
+- A part that can appear later inside a line (a form error under an input) goes in a wrapper with that line, so the row count does not change.
+- Form fields that share a line follow the same rule: caption, control and hint are lines. A field without a hint keeps an empty hint line when the field beside it has one.
+- Blocks stacked one per line (phones) are free of this rule.
+
+- Two page columns with different jobs (a tool's work area beside its side panel) are a layout, not a row of blocks. Mark the container `data-rows="layout"` and say why in the PR; the check skips it.
+
+Checked by `node scripts/check-card-rows.mjs` after a build: every page, six widths (1920, 1280, 1024, 768, 640, 390) and once with web fonts blocked; with the copy as built, and again with one block's text made long (the longest title and description in the store) and then empty. It reports lines that start more than 1 px apart, blocks in one row with a different number of lines, and a price or action line off the bottom edge. It fails CI in Chromium; Firefox and WebKit run the same check and report.
+
+What the check does not see, so review still has to: blocks with different tags or mostly different classes, table rows (cells are centered by default), content behind a closed `details`, a menu or the cart drawer, results that appear only after an upload, and the dark theme of the tools.
 
 Icons: only where they speed up recognition (download, file type, tolerance class). Tolerance icons use GD&T symbols (⏥ flatness, ⌖ position, ⊥ perpendicularity). No decorative icon next to every heading.
 
@@ -144,7 +154,30 @@ A page fails if any of these is true:
 12. It uses a gradient, glow or blur.
 13. Motion that does not show a real process.
 14. Home or category pages with no human or working context (once photos exist).
-15. Cards in one row whose labels, titles, copy or prices start at different heights (§3 Card rows).
+15. Blocks in one row whose labels, titles, copy or prices start at different heights, or would with a longer title or an empty line (§3 Card rows).
+
+## 8a. Which check holds which rule
+
+A rule with no check is held by review only; it is listed so that nobody assumes otherwise.
+
+| Rule | Held by | Blocks a merge |
+|---|---|---|
+| §2 Contrast of text tokens on their grounds | `tests/unit/contrast-tokens.test.ts`, `contrast-guard.test.ts`; Lighthouse color-contrast | yes |
+| §2 No gradients, shadows, backdrop blur, dark pages | `tests/unit/style-guard.test.ts` | yes |
+| §2 Pixel values in Geist Pixel, never for headings or labels | `tests/unit/style-guard.test.ts` | yes |
+| §2 Tokens instead of raw hex; red ≤ 3 % of a viewport; type scale; weights | review | no |
+| §3 Card rows (side-by-side blocks) | `scripts/check-card-rows.mjs` | yes in Chromium; reported in Firefox and WebKit |
+| §3 Button, badge, table and other component specs | `scripts/measure-buttons.mjs`, `measure-nav.mjs` (run by hand); review | no |
+| §4 Drawings match board sizes | `src/lib/boardDrawing.test.ts` | yes |
+| §4 No AI renders or stock photos | review | no |
+| §5 Motion | review | no |
+| §6 Banned words and phrases, paragraph length | `scripts/check-prose.mjs`, `tests/claims-blacklist.test.ts` | yes |
+| §6 Paired slogans, triplets, one dash per paragraph | review | no |
+| §7a Nothing a visitor has to decode | review | no |
+| §8 No placeholders | `scripts/check-placeholders.mjs` | yes |
+| §9 No personal names | `tests/claims-blacklist.test.ts` (list in the `BLOCKED_NAMES` secret) | yes |
+| Whole-page look against a baseline (four pages, 1440 and 390 px) | `tests/visual/pages.spec.ts` | no, reported |
+| Accessibility ≥ 95 | `scripts/lighthouse-check.mjs` | yes |
 
 ## 9. Not to change
 
