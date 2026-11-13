@@ -1,6 +1,8 @@
 ---
 import Base from '@/layouts/Base.astro';
 import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
+import { applicationImage } from '@/lib/applicationImages';
 import { breadcrumbLd } from '@/lib/seo';
 const apps = (await getCollection('applications')).sort((a, b) => a.data.order - b.data.order);
 const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: 'Applications' }]);
@@ -11,12 +13,19 @@ const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: 'Applications' }]
     <h1 class="h-display m-0 text-[36px] md:text-[48px]">Targets by application.</h1>
     <p class="m-0 max-w-[760px] text-lg leading-relaxed text-ink-muted">What each field needs to calibrate, the problems engineers run into, and which targets and free tools fit.</p>
     <div class="grid grid-cols-1 border-t border-line md:grid-cols-2 md:gap-x-10">
-      {apps.map((a) => (
-        <a href={`/applications/${a.slug}/`} class="flex flex-col gap-1 border-b border-line py-5 md:rows-2 md:gap-y-1 text-ink no-underline hover:text-ink">
-          <span class="text-lg font-semibold">{a.data.title}</span>
-          <span class="text-[15px] text-ink-muted">{a.data.audience}</span>
-        </a>
-      ))}
+      {apps.map((a) => {
+        const img = applicationImage(a.slug);
+        return (
+          /* Picture beside title and audience. Side by side from md: the two text lines share rows (DESIGN.md §3 Card rows). */
+          <a href={`/applications/${a.slug}/`} class="group grid grid-cols-[104px_1fr] gap-x-4 gap-y-1 border-b border-line py-5 text-ink no-underline hover:text-ink md:rows-2 md:grid-cols-[144px_1fr] md:gap-x-5">
+            {img
+              ? <Image src={img.src} alt={img.alt} widths={[160, 320]} sizes="(min-width: 768px) 144px, 104px" class="row-span-2 aspect-[3/2] w-full self-start bg-ground-panel object-cover" loading="lazy" />
+              : <span class="row-span-2"></span>}
+            <span class="text-lg font-semibold leading-snug group-hover:text-brand-dark">{a.data.title}</span>
+            <span class="text-[15px] text-ink-muted">{a.data.audience}</span>
+          </a>
+        );
+      })}
     </div>
   </section>
 </Base>
