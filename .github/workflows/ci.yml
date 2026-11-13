@@ -63,7 +63,8 @@ jobs:
       - name: Side-by-side rows (Firefox, WebKit)
         id: rows-other
         continue-on-error: true
-        run: node scripts/check-card-rows.mjs --engines firefox,webkit
+        # Two widths (desktop and tablet) keep this step near two minutes; Chromium above runs all six
+        run: node scripts/check-card-rows.mjs --engines firefox,webkit --widths 1280,768
       - name: Side-by-side rows (Firefox, WebKit) warning
         if: steps.rows-other.outcome == 'failure'
         run: echo "::warning::Side-by-side rows differ in Firefox or WebKit, or an engine did not start. See the step log."

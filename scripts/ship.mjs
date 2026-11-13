@@ -64,7 +64,7 @@ if (!pr) {
 console.log(`PR #${pr}`);
 
 const head = await gh([`repos/${REPO}/pulls/${pr}`, '--jq', '.head.sha']);
-const res = await waitChecks(head, CHECKS, 12);
+const res = await waitChecks(head, CHECKS, 20); /* CI runs about 11 minutes */
 const failed = res.filter((r) => r.conclusion !== 'success');
 if (failed.length) {
   console.log(`NOT MERGED — ${failed.map((r) => `${r.name}: ${r.conclusion}`).join(', ')}`);
