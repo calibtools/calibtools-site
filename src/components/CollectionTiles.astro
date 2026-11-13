@@ -1,6 +1,8 @@
 ---
 /**
  * Category tiles (home and /targets/): rows on phones, tiles from md.
+ * From md each tile is a subgrid over five shared rows (image, label, title, description, price), so the
+ * same line of text sits at the same height in every tile of a row, whatever wraps or is missing.
  * Board outlines are drawn to scale, and only for collections whose sizes are in boardSizes.ts.
  * Category images: the board faces are the generated patterns composited into the scene, not drawn by the image
  * model; a collection without an image shows its outline instead.
@@ -51,16 +53,16 @@ const tiles = await Promise.all(collections.map(async (c) => {
 ---
 <div class="grid grid-cols-1 border-t border-line md:grid-cols-3 md:gap-6 md:border-t-0 lg:grid-cols-5">
   {tiles.map((t) => (
-    <a href={`/targets/collection/${t.handle}/`} data-card class="group flex items-center justify-between gap-4 border-b border-line py-4 text-ink no-underline hover:text-ink md:card md:bracket md:flex-col md:items-stretch md:justify-start md:gap-3 md:border-b md:p-5 md:hover:border-ink">
+    <a href={`/targets/collection/${t.handle}/`} data-card class="group flex items-center justify-between gap-4 border-b border-line py-4 text-ink no-underline hover:text-ink md:card md:bracket md:row-span-5 md:grid md:grid-rows-subgrid md:items-start md:justify-normal md:gap-x-0 md:gap-y-3 md:border-b md:p-5 md:hover:border-ink">
       {t.image
         ? <Image src={t.image.src} alt={t.image.alt} widths={[160, 320, 640]} sizes="(min-width: 1024px) 200px, (min-width: 768px) 30vw, 84px" class="aspect-[3/2] w-[84px] shrink-0 bg-ground-panel object-cover md:w-full" loading="lazy" />
         : <div class="aspect-[3/2] w-[84px] shrink-0 items-end md:flex md:w-full [&>svg]:hidden md:[&>svg]:block" set:html={t.outline?.svg ?? ''} />}
       <span class="spec-label hidden md:block">{t.outline ? t.outline.caption : t.countLabel}</span>
-      <div class="flex min-w-0 flex-1 flex-col gap-1 md:flex-none md:gap-2">
+      <div class="flex min-w-0 flex-1 flex-col gap-1 md:contents">
         <strong class="text-[17px] leading-tight md:text-[20px]">{t.title}</strong>
         <span class="text-[14px] leading-snug text-ink-muted">{t.description}</span>
       </div>
-      <span class="shrink-0 font-mono text-[14px] font-semibold md:mt-auto md:pt-2">{t.price ? `from ${t.price}` : 'quote'}</span>
+      <span class="shrink-0 font-mono text-[14px] font-semibold md:self-end md:pt-2">{t.price ? `from ${t.price}` : 'quote'}</span>
     </a>
   ))}
 </div>
