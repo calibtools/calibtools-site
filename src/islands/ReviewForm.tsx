@@ -151,13 +151,13 @@ export default function ReviewForm({ token: tokenProp }: Props) {
         </div>
       </fieldset>
 
-      <label className="flex flex-col gap-1.5 text-[13px] font-semibold">
+      <label className="rows-2 gap-y-1.5 text-[13px] font-semibold">
         Title
         <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} maxLength={120}
           className="rounded border border-line bg-ground px-3 py-2.5 text-[15px] text-ink" placeholder="Summarize your experience" />
       </label>
 
-      <label className="flex flex-col gap-1.5 text-[13px] font-semibold">
+      <label className="rows-3 gap-y-1.5 text-[13px] font-semibold">
         Review *
         <textarea value={body} onChange={(e) => setBody(e.target.value)} minLength={40} rows={4}
           className="rounded border border-line bg-ground px-3 py-2.5 text-[15px] text-ink" placeholder="How did you use this target? What worked well?" />
@@ -165,30 +165,30 @@ export default function ReviewForm({ token: tokenProp }: Props) {
       </label>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <label className="flex flex-col gap-1.5 text-[13px] font-semibold">
+        <label className="rows-2 gap-y-1.5 text-[13px] font-semibold">
           Camera
           <input type="text" value={camera} onChange={(e) => setCamera(e.target.value)} maxLength={60}
             className="rounded border border-line bg-ground px-3 py-2.5 text-[15px] text-ink" placeholder="e.g. FLIR BFS-U3-51S5C" />
         </label>
-        <label className="flex flex-col gap-1.5 text-[13px] font-semibold">
+        <label className="rows-2 gap-y-1.5 text-[13px] font-semibold">
           Lens / FOV
           <input type="text" value={lensOrFov} onChange={(e) => setLensOrFov(e.target.value)} maxLength={60}
             className="rounded border border-line bg-ground px-3 py-2.5 text-[15px] text-ink" placeholder="e.g. 8 mm / 90&deg;" />
         </label>
-        <label className="flex flex-col gap-1.5 text-[13px] font-semibold">
+        <label className="rows-2 gap-y-1.5 text-[13px] font-semibold">
           Software
           <input type="text" value={software} onChange={(e) => setSoftware(e.target.value)} maxLength={60}
             className="rounded border border-line bg-ground px-3 py-2.5 text-[15px] text-ink" placeholder="e.g. OpenCV 4.9" />
         </label>
       </div>
 
-      <label className="flex flex-col gap-1.5 text-[13px] font-semibold">
+      <label className="rows-2 gap-y-1.5 text-[13px] font-semibold">
         Display name
         <input type="text" value={displayName} onChange={(e) => setDisplayName(e.target.value)} maxLength={40}
           className="rounded border border-line bg-ground px-3 py-2.5 text-[15px] text-ink" placeholder="Defaults to your initials" />
       </label>
 
-      <label className="flex flex-col gap-1.5 text-[13px] font-semibold">
+      <label className="rows-2 gap-y-1.5 text-[13px] font-semibold">
         Company type (optional)
         <select value={companyType} onChange={(e) => setCompanyType(e.target.value)}
           className="h-10 rounded border border-line bg-ground px-2.5 text-[15px] text-ink">

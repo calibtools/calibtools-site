@@ -81,21 +81,21 @@ export default function DetectionCheck() {
         <h1 className="m-0 flex items-center gap-3 text-[26px] font-extrabold tracking-[-0.02em]"><ScanSearch size={24} strokeWidth={1.6} className="text-brand" aria-hidden="true" />Detection check</h1>
         <p className="m-0 text-sm leading-relaxed text-ink-muted">Upload a photo of your printed pattern and verify that OpenCV can detect all corners.</p>
 
-        <label className="flex flex-col gap-2 text-[13px] font-semibold">Pattern
+        <label className="rows-2 gap-y-2 text-[13px] font-semibold">Pattern
           <select className={field} value={spec.type} onChange={(e) => set('type', e.target.value as PatternSpec['type'])}>
             {PATTERNS.map((p) => <option key={p}>{p}</option>)}
           </select>
         </label>
         <div className="grid grid-cols-2 gap-3">
-          <label className="flex flex-col gap-2 text-[13px] font-semibold">Rows
+          <label className="rows-2 gap-y-2 text-[13px] font-semibold">Rows
             <input className={field} type="number" min={2} value={spec.rows} onChange={(e) => set('rows', +e.target.value)} />
           </label>
-          <label className="flex flex-col gap-2 text-[13px] font-semibold">Columns
+          <label className="rows-2 gap-y-2 text-[13px] font-semibold">Columns
             <input className={field} type="number" min={2} value={spec.cols} onChange={(e) => set('cols', +e.target.value)} />
           </label>
         </div>
         {(spec.type === 'ChArUco' || spec.type === 'ArUco grid' || spec.type === 'AprilGrid (Kalibr)') && (
-          <label className="flex flex-col gap-2 text-[13px] font-semibold">Dictionary
+          <label className="rows-2 gap-y-2 text-[13px] font-semibold">Dictionary
             <select className={field} value={spec.dict} onChange={(e) => set('dict', e.target.value)}>
               {DICTS.map((d) => <option key={d}>{d}</option>)}
             </select>

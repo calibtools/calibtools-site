@@ -57,18 +57,22 @@ const countries = countryOptions();
           <p id="q-material-err" class="m-0 hidden text-sm text-brand-dark"></p>
         </fieldset>
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-[140px_1fr]">
-          <div class="flex flex-col gap-1.5">
+          <div class="rows-2 gap-y-1.5">
             <label for="q-quantity" class="label" id="q-quantity-label">Quantity</label>
-            <input id="q-quantity" name="quantity" type="number" min="1" max="9999" step="1" required inputmode="numeric" class="input" />
-            <p id="q-quantity-err" class="m-0 hidden text-sm text-brand-dark"></p>
+            <div class="flex flex-col gap-1.5">
+              <input id="q-quantity" name="quantity" type="number" min="1" max="9999" step="1" required inputmode="numeric" class="input" />
+              <p id="q-quantity-err" class="m-0 hidden text-sm text-brand-dark"></p>
+            </div>
           </div>
-          <div class="flex flex-col gap-1.5">
+          <div class="rows-2 gap-y-1.5">
             <label for="q-country" class="label">Delivery country</label>
-            <select id="q-country" name="country" required class="input">
-              <option value="">Choose…</option>
-              {countries.map((c) => <option value={c.code}>{c.name}</option>)}
-            </select>
-            <p id="q-country-err" class="m-0 hidden text-sm text-brand-dark"></p>
+            <div class="flex flex-col gap-1.5">
+              <select id="q-country" name="country" required class="input">
+                <option value="">Choose…</option>
+                {countries.map((c) => <option value={c.code}>{c.name}</option>)}
+              </select>
+              <p id="q-country-err" class="m-0 hidden text-sm text-brand-dark"></p>
+            </div>
           </div>
         </div>
         <div class="flex flex-col gap-1.5">

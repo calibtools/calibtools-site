@@ -312,3 +312,15 @@
   flex-shrink: 0;
   white-space: nowrap;
 }
+
+@layer utilities {
+  /* Side-by-side blocks share their rows (DESIGN.md §3 "Card rows"). Put rows-N on every block of the row,
+     N = its content lines (image, label, title, copy, price …); the parent must be a grid. The same line
+     then starts at the same height in every block, whatever wraps or is empty. Set the gap between lines
+     with gap-y-* on the block. Works with breakpoints: md:rows-5. */
+  .rows-2 { display: grid; grid-template-rows: subgrid; grid-row: span 2; }
+  .rows-3 { display: grid; grid-template-rows: subgrid; grid-row: span 3; }
+  .rows-4 { display: grid; grid-template-rows: subgrid; grid-row: span 4; }
+  .rows-5 { display: grid; grid-template-rows: subgrid; grid-row: span 5; }
+  .rows-6 { display: grid; grid-template-rows: subgrid; grid-row: span 6; }
+}

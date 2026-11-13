@@ -28,11 +28,12 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ steps.pw-version.outputs.version }}
+          key: playwright-3engines-${{ runner.os }}-${{ steps.pw-version.outputs.version }}
 
-      - name: Install Playwright Chromium
+      # Firefox and WebKit are for the side-by-side check only; everything else runs in Chromium
+      - name: Install Playwright browsers
         if: steps.pw-cache.outputs.cache-hit != 'true'
-        run: pnpm exec playwright install chromium
+        run: pnpm exec playwright install chromium firefox webkit
 
       # System libraries come from the Ubuntu package mirrors, which the runners could not
       # reach for hours on 2026-11-11. The runner image already carries what Chromium needs,
@@ -41,7 +42,7 @@ jobs:
       - name: Install Playwright system deps (best effort)
         continue-on-error: true
         timeout-minutes: 4
-        run: pnpm exec playwright install-deps chromium
+        run: pnpm exec playwright install-deps chromium firefox webkit
 
       - run: pnpm test
         env:
@@ -52,9 +53,20 @@ jobs:
           SKIP_STOREFRONT_CHECK: '1'
           SKIP_SPECS_CHECK: '1'
 
-      # Cards in one row keep the same line at the same height (DESIGN.md §3 Card rows): fails
-      - name: Card rows
+      # Blocks side by side keep the same line at the same height, with today's copy and with one
+      # block's text made long or empty (DESIGN.md §3 Card rows): fails
+      - name: Side-by-side rows (Chromium)
         run: node scripts/check-card-rows.mjs
+
+      # Same check in the other two engines: reported, not blocking, because WebKit needs system
+      # libraries from the Ubuntu mirrors and their outage must not stop a merge.
+      - name: Side-by-side rows (Firefox, WebKit)
+        id: rows-other
+        continue-on-error: true
+        run: node scripts/check-card-rows.mjs --engines firefox,webkit
+      - name: Side-by-side rows (Firefox, WebKit) warning
+        if: steps.rows-other.outcome == 'failure'
+        run: echo "::warning::Side-by-side rows differ in Firefox or WebKit, or an engine did not start. See the step log."
 
       # Accessibility >= 95 and no color-contrast failures (fails); performance >= 90 (warning)
       - name: Lighthouse

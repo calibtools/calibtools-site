@@ -5,7 +5,7 @@ import { footerGroups } from '@/lib/nav';
 <footer class="border-t border-line">
   <div class="container-x grid grid-cols-2 gap-[var(--nav-space-8)] py-[var(--nav-space-10)] md:grid-cols-4 md:py-[var(--nav-space-12)]">
     {footerGroups.map((group) => (
-      <div class="flex flex-col">
+      <div class="rows-2 gap-y-0">
         <span class="font-mono text-[length:var(--nav-text-sm)] font-bold uppercase tracking-[0.10em] text-ink mb-[var(--nav-space-4)]">{group.heading}</span>
         <div class="flex flex-col gap-[var(--nav-space-3)]">
           {group.items.map((item) => (
