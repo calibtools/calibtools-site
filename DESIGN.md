@@ -110,6 +110,7 @@ line drawing generated from geometry → detection overlay (OpenCV corners and I
 
 - Line drawings come from `src/lib/boardDrawing.ts`, which uses the shared pattern renderers. Never hand-draw a pattern or a dimension.
   Each dimension line carries `data-mm`; `boardDrawing.test.ts` compares it with `boardSizes.ts` and with the drawn length (≤ 0.01 mm).
+- On tiles and cards the product fills the frame: in at least one direction it covers three quarters of the picture. A tile is 84 px wide on a phone, so a product that floats in empty ground cannot be read. Crop the picture; do not shrink the product. Held by `tests/unit/category-image-fill.test.ts` for the category tiles.
 - **Banned**: AI renders (floating boards, reflections, black voids), stock photos, images that do not match the product.
 
 ## 5. Motion
