@@ -80,6 +80,17 @@ Each major section starts with: a plain-word label (Mono 12) + 40 × 3 red rule 
 | Title block | PDFs, drawings and packaging labels only (issuer · document number · rev · date · scale). Not on web pages: page codes and build revisions mean nothing to a visitor (§7a) |
 | Origin + axes | red dot at the origin, red X arrow right, green Y arrow down, as printed on the boards. At most once per page |
 
+### Card rows
+
+Cards that sit side by side are read across as well as down, so the same line of content sits at the same height in every card of a row: label with label, title with title, copy with copy, price or action with price or action. Text that wraps to a different number of lines, or a line that one card does not have, must not push the lines below it out of step.
+
+- Build a row of cards as shared rows, not as separate stacks. The grid holds the cards; each card spans one row per content line and takes the grid's rows (`row-span-N grid grid-rows-subgrid`, N = number of content lines: image, label, title, copy, price). A wrapper inside a card that groups lines for the phone layout becomes `contents` at the width where the cards stand side by side.
+- Do not line cards up with `flex flex-col` plus `mt-auto`: that pins only the last line and leaves every line above it to float.
+- Every card in a row has the same lines in the same order. A line with nothing to show stays in the markup, empty, and keeps its row; it is not left out.
+- The price or action line sits on the bottom edge (`self-end`). A card that ends in a paragraph or a list may end where its text ends.
+- Rows on phones (one card per line) are free of this rule.
+- Checked by `node scripts/check-card-rows.mjs` after a build, at 1280, 900 and 768 px on every page; CI fails on a difference above 1 px. Examples: `CollectionTiles.astro`, `ToolCard.astro`, the key-spec strip in `targets/[handle].astro`.
+
 Icons: only where they speed up recognition (download, file type, tolerance class). Tolerance icons use GD&T symbols (⏥ flatness, ⌖ position, ⊥ perpendicularity). No decorative icon next to every heading.
 
 ## 4. Images
@@ -133,6 +144,7 @@ A page fails if any of these is true:
 12. It uses a gradient, glow or blur.
 13. Motion that does not show a real process.
 14. Home or category pages with no human or working context (once photos exist).
+15. Cards in one row whose labels, titles, copy or prices start at different heights (§3 Card rows).
 
 ## 9. Not to change
 

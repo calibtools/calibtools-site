@@ -52,6 +52,10 @@ jobs:
           SKIP_STOREFRONT_CHECK: '1'
           SKIP_SPECS_CHECK: '1'
 
+      # Cards in one row keep the same line at the same height (DESIGN.md §3 Card rows): fails
+      - name: Card rows
+        run: node scripts/check-card-rows.mjs
+
       # Accessibility >= 95 and no color-contrast failures (fails); performance >= 90 (warning)
       - name: Lighthouse
         run: node scripts/lighthouse-check.mjs
