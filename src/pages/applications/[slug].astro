@@ -1,6 +1,7 @@
 ---
 import Base from '@/layouts/Base.astro';
 import ProductCard from '@/components/ProductCard.astro';
+import { productCardVisual } from '@/lib/productCardVisual';
 import { getCollection, getEntry } from 'astro:content';
 import { getProducts } from '@/lib/shopify';
 import { Image } from 'astro:assets';
@@ -122,7 +123,7 @@ const jsonLd = [
       {products.map((p) => {
         const cd = cardData.get(p.handle);
         return (
-          <ProductCard href={p.url} title={p.title} summary={cd?.summary} sub={p.description} from={p.priceFrom} image={p.image} placeholder={p.title} chips={cd?.chips} />
+          <ProductCard href={p.url} title={p.title} summary={cd?.summary} sub={p.description} from={p.priceFrom} {...productCardVisual(p.handle, p.image)} chips={cd?.chips} />
         );
       })}
     </div>

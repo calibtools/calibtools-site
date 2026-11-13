@@ -172,7 +172,7 @@
   .prose-calib table { @apply w-full border-collapse text-[15px]; }
   .prose-calib thead tr { @apply bg-brand-tint; }
   .prose-calib th { @apply p-3 text-left font-mono text-[13px] font-medium text-brand-dark; }
-  .prose-calib a { @apply underline decoration-1 underline-offset-[3px]; }
+  .prose-calib a:not([class]) { @apply underline decoration-1 underline-offset-[3px]; }
   .prose-calib ul { @apply m-0 flex list-disc flex-col gap-2 pl-6 text-[17px] leading-[1.65]; }
   .prose-calib ol { @apply m-0 flex list-decimal flex-col gap-2 pl-6 text-[17px] leading-[1.65]; }
   .prose-calib li { @apply pl-1; }

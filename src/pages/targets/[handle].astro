@@ -6,6 +6,7 @@ import type { GalleryImageData } from '@/islands/ImageGallery';
 import DownloadPicker from '@/islands/DownloadPicker';
 import MobileBottomCluster from '@/islands/MobileBottomCluster';
 import ProductCard from '@/components/ProductCard.astro';
+import { productCardVisual } from '@/lib/productCardVisual';
 import { getProducts, getProductByHandle } from '@/lib/shopify';
 import { kalibrYaml, kalibrSupported, ros2Yaml, ros2Supported, halconCode, halconSupported } from '@/lib/exportConfig';
 import { checkerboardSvg, type PatternSpec } from '@/lib/patterns';
@@ -919,8 +920,7 @@ const quickLinks = hasLongform
               summary={cd?.summary}
               sub={p.description}
               from={p.priceFrom}
-              image={p.image}
-              placeholder={p.title}
+              {...productCardVisual(p.handle, p.image)}
               rating={cd?.rating}
               reviewCount={cd?.count}
               chips={cd?.chips}
