@@ -162,6 +162,12 @@
     "alt": "LiDAR-camera calibration target on a small tripod: a white board with four circular cutouts and an ArUco marker in each corner."
   },
   {
+    "handle": "reflectance-panel",
+    "file": "01-hero.webp",
+    "kind": "ai",
+    "alt": "Three square matte LiDAR reflectance panels side by side: dark gray (10 %), mid gray (50 %) and near white (90 %)."
+  },
+  {
     "handle": "line-scan-target",
     "file": "01-hero.webp",
     "kind": "ai",
