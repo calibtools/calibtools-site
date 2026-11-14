@@ -73,7 +73,7 @@ Pattern area is centered with a white quiet zone ≥ 1 circle pitch on all sides
 | | |
 |---|---|
 | Measurement | Every board is measured before it ships (dimensional, flatness, visual) |
-| Files | `.opencv.json`, `.kalibr.yaml` (symmetric only), `.dxf` |
+| Files | `.opencv.json`, `.kalibr.yaml` (symmetric only), `.ros2.yaml`, `.dxf` |
 | Documents | this datasheet, CT-UM-GEN user manual |
 | Lead time | Made to order · ships in 2–3 weeks |
 | Options | Logo print (-L) · hard case (CT-ACC-M-CSE400) · custom NRE |
