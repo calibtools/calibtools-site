@@ -131,6 +131,17 @@ export const footerGroups: FooterGroup[] = [
     ],
   },
   {
+    heading: 'Generators',
+    items: [
+      { label: 'Checkerboard generator', href: '/tools/generator/checkerboard/' },
+      { label: 'ChArUco generator', href: '/tools/generator/charuco/' },
+      { label: 'AprilGrid generator', href: '/tools/generator/aprilgrid/' },
+      { label: 'Circle grid generator', href: '/tools/generator/circles/' },
+      { label: 'ArUco marker generator', href: '/tools/generator/aruco/' },
+      { label: 'AprilTag generator', href: '/tools/generator/apriltag/' },
+    ],
+  },
+  {
     heading: 'Support',
     items: [
       { label: 'FAQ', href: '/faq/' },

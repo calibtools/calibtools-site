@@ -5,6 +5,7 @@ import ToolContent from '@/components/ToolContent.astro';
 import Generator from '@/islands/Generator';
 import { getEntry } from 'astro:content';
 import { toolJsonLd } from '@/lib/toolJsonLd';
+import { PAGE_SPECS } from '@/lib/readyMade';
 
 const entry = (await getEntry('tools', 'generator-checkerboard'))!;
 const { Content } = await entry.render();
@@ -13,7 +14,7 @@ const jsonLd = toolJsonLd(entry.data.h1, '/tools/generator/checkerboard/', entry
 <Base title={entry.data.seoTitle} section="tools" description={entry.data.seoDescription} jsonLd={jsonLd}>
   <ToolTabs current="generator" />
   <div class="container-x py-7 md:pb-16">
-    <Generator client:load heading={entry.data.h1} initialSpec={{ type: 'Checkerboard', rows: 7, cols: 10, square: 20 }} />
+    <Generator client:load heading={entry.data.h1} initialSpec={PAGE_SPECS.checkerboard} />
     <p class="mt-6 text-[15px] text-ink-muted">
       Printing your own pattern has accuracy limits — see <a href="/files/datasheets/CT-DS-CHT-P.pdf" class="text-brand-dark font-medium">feature tolerance and flatness in the datasheet</a>.
       For the highest corner accuracy, the <a href="/targets/checkerboard-composite/" class="text-brand-dark font-medium">checkerboard aluminum composite board</a> is UV-printed with ±0.3 mm tolerances and is measured before it ships.

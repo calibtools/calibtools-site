@@ -29,11 +29,11 @@ Generate symmetric and asymmetric circle grid calibration patterns. Circle grids
 
 ## Ready-made grids
 
-Each link opens the generator with the grid filled in.
+The name opens the generator with the grid filled in. The PDF links download the same file, ready to print at 100 % ("actual size").
 
-- [Asymmetric, 4 × 11 circles, 18 mm spacing: one A4 or Letter page](/tools/generator/circles/?type=Asymmetric+circles&rows=11&cols=8&square=18)
-- [Asymmetric, 4 × 11 circles, 25 mm spacing: one A3 or Tabloid page](/tools/generator/circles/?type=Asymmetric+circles&rows=11&cols=8&square=25&paper=A3)
-- [Symmetric, 10 × 7 circles, 20 mm spacing: one A4 or Letter page](/tools/generator/circles/?type=Symmetric+circles&rows=7&cols=10&square=20)
+- [Asymmetric, 4 × 11 circles, 18 mm spacing: one A4 or Letter page](/tools/generator/circles/?type=Asymmetric+circles&rows=11&cols=8&square=18) · PDF: [A4](/files/patterns/asymmetric-circles-11x8-18mm-a4.pdf), [Letter](/files/patterns/asymmetric-circles-11x8-18mm-letter.pdf)
+- [Asymmetric, 4 × 11 circles, 25 mm spacing: one A3 or Tabloid page](/tools/generator/circles/?type=Asymmetric+circles&rows=11&cols=8&square=25&paper=A3) · PDF: [A3](/files/patterns/asymmetric-circles-11x8-25mm-a3.pdf), [Tabloid](/files/patterns/asymmetric-circles-11x8-25mm-tabloid.pdf)
+- [Symmetric, 10 × 7 circles, 20 mm spacing: one A4 or Letter page](/tools/generator/circles/?type=Symmetric+circles&rows=7&cols=10&square=20) · PDF: [A4](/files/patterns/symmetric-circles-7x10-20mm-a4.pdf), [Letter](/files/patterns/symmetric-circles-7x10-20mm-letter.pdf)
 
 ## Detect it with OpenCV
 

@@ -40,12 +40,12 @@ Generate AprilTag fiducial markers for robot localization, drone landing pads an
 
 ## Ready-made sheets
 
-Each link opens the generator with the sheet filled in. All of them fit on one A4 or Letter page at 100 %.
+The name opens the generator with the sheet filled in. The PDF links download the same file, ready to print at 100 % ("actual size"). All of them fit on one A4 or Letter page at 100 %.
 
-- [One tag36h11 tag, ID 0, 100 mm](/tools/generator/apriltag/?rows=1&cols=1&marker=100&startId=0)
-- [Six tag36h11 tags, IDs 0 to 5, 60 mm](/tools/generator/apriltag/?rows=3&cols=2&marker=60&startId=0)
-- [Twelve tag36h11 tags, IDs 0 to 11, 40 mm](/tools/generator/apriltag/?rows=4&cols=3&marker=40&startId=0)
-- [Twenty-four tag36h11 tags, IDs 0 to 23, 30 mm](/tools/generator/apriltag/?rows=6&cols=4&marker=30&startId=0)
+- [One tag36h11 tag, ID 0, 100 mm](/tools/generator/apriltag/?rows=1&cols=1&marker=100&startId=0) · PDF: [A4](/files/patterns/apriltag-tag36h11-id-0-100mm-a4.pdf), [Letter](/files/patterns/apriltag-tag36h11-id-0-100mm-letter.pdf)
+- [Six tag36h11 tags, IDs 0 to 5, 60 mm](/tools/generator/apriltag/?rows=3&cols=2&marker=60&startId=0) · PDF: [A4](/files/patterns/apriltag-tag36h11-ids-0-5-60mm-a4.pdf), [Letter](/files/patterns/apriltag-tag36h11-ids-0-5-60mm-letter.pdf)
+- [Twelve tag36h11 tags, IDs 0 to 11, 40 mm](/tools/generator/apriltag/?rows=4&cols=3&marker=40&startId=0) · PDF: [A4](/files/patterns/apriltag-tag36h11-ids-0-11-40mm-a4.pdf), [Letter](/files/patterns/apriltag-tag36h11-ids-0-11-40mm-letter.pdf)
+- [Twenty-four tag36h11 tags, IDs 0 to 23, 30 mm](/tools/generator/apriltag/?rows=6&cols=4&marker=30&startId=0) · PDF: [A4](/files/patterns/apriltag-tag36h11-ids-0-23-30mm-a4.pdf), [Letter](/files/patterns/apriltag-tag36h11-ids-0-23-30mm-letter.pdf)
 
 Change the start ID to continue a set: a second sheet of six starts at ID 6.
 

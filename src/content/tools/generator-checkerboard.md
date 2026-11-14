@@ -33,12 +33,12 @@ The config files give the grid for OpenCV, Kalibr, ROS 2 and HALCON.
 
 ## Ready-made boards
 
-Each link opens the generator with the board filled in.
+The name opens the generator with the board filled in. The PDF links download the same file, ready to print at 100 % ("actual size").
 
-- [7 × 10 squares, 20 mm: one A4 or Letter page](/tools/generator/checkerboard/?rows=7&cols=10&square=20)
-- [6 × 9 squares, 22 mm: one A4 or Letter page](/tools/generator/checkerboard/?rows=6&cols=9&square=22)
-- [7 × 10 squares, 25 mm: one A3 or Tabloid page](/tools/generator/checkerboard/?rows=7&cols=10&square=25&paper=A3)
-- [7 × 10 squares, 30 mm: one A3 page](/tools/generator/checkerboard/?rows=7&cols=10&square=30&paper=A3)
+- [7 × 10 squares, 20 mm: one A4 or Letter page](/tools/generator/checkerboard/?rows=7&cols=10&square=20) · PDF: [A4](/files/patterns/checkerboard-7x10-20mm-a4.pdf), [Letter](/files/patterns/checkerboard-7x10-20mm-letter.pdf)
+- [6 × 9 squares, 22 mm: one A4 or Letter page](/tools/generator/checkerboard/?rows=6&cols=9&square=22) · PDF: [A4](/files/patterns/checkerboard-6x9-22mm-a4.pdf), [Letter](/files/patterns/checkerboard-6x9-22mm-letter.pdf)
+- [7 × 10 squares, 25 mm: one A3 or Tabloid page](/tools/generator/checkerboard/?rows=7&cols=10&square=25&paper=A3) · PDF: [A3](/files/patterns/checkerboard-7x10-25mm-a3.pdf), [Tabloid](/files/patterns/checkerboard-7x10-25mm-tabloid.pdf)
+- [7 × 10 squares, 30 mm: one A3 page](/tools/generator/checkerboard/?rows=7&cols=10&square=30&paper=A3) · PDF: [A3](/files/patterns/checkerboard-7x10-30mm-a3.pdf)
 
 The page keeps a white margin of one square around the pattern, because the detector needs it.
 

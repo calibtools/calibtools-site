@@ -16,3 +16,6 @@ docs/superpowers/
 test-results/
 playwright-report/
 out/
+
+# Ready-made pattern PDFs, written by scripts/pattern-pdfs.ts in prebuild
+public/files/patterns/

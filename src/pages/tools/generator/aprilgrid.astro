@@ -5,6 +5,7 @@ import ToolContent from '@/components/ToolContent.astro';
 import Generator from '@/islands/Generator';
 import { getEntry } from 'astro:content';
 import { toolJsonLd } from '@/lib/toolJsonLd';
+import { PAGE_SPECS } from '@/lib/readyMade';
 
 const entry = (await getEntry('tools', 'generator-aprilgrid'))!;
 const { Content } = await entry.render();
@@ -13,7 +14,7 @@ const jsonLd = toolJsonLd(entry.data.h1, '/tools/generator/aprilgrid/', entry.da
 <Base title={entry.data.seoTitle} section="tools" description={entry.data.seoDescription} jsonLd={jsonLd}>
   <ToolTabs current="generator" />
   <div class="container-x py-7 md:pb-16">
-    <Generator client:load heading={entry.data.h1} initialSpec={{ type: 'AprilGrid (Kalibr)', rows: 6, cols: 6, square: 20, dict: 'DICT_APRILTAG_36h11' }} />
+    <Generator client:load heading={entry.data.h1} initialSpec={PAGE_SPECS.aprilgrid} />
     <p class="mt-6 text-[15px] text-ink-muted">
       Printing your own pattern has accuracy limits — see <a href="/files/datasheets/CT-DS-CHA-P.pdf" class="text-brand-dark font-medium">feature tolerance and flatness in the composite datasheet</a>.
       The <a href="/targets/aprilgrid-composite/" class="text-brand-dark font-medium">AprilGrid aluminum composite board</a> is UV-printed with controlled tolerances, is measured before it ships; the Kalibr YAML for it comes from this generator.
