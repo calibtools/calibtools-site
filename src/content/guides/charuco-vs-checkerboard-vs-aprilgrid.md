@@ -1,6 +1,6 @@
 ---
 title: "ChArUco vs checkerboard vs AprilGrid"
-description: "Checkerboard, ChArUco, AprilGrid and circle grids compared: partial views, wide lenses, odd and even counts, square and marker size, and which software reads which pattern."
+description: "Checkerboard, ChArUco, AprilGrid and circle grids compared: partial views, wide lenses, odd and even counts, square size and which software reads each."
 date: 2026-10-22
 updated: 2026-11-15
 readingTime: "8 min"
