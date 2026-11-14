@@ -17,7 +17,8 @@
     "check": "astro check",
     "test": "vitest run",
     "page-views": "node scripts/page-views.mjs",
-    "scan:live": "node scripts/live-scan.mjs"
+    "scan:live": "node scripts/live-scan.mjs",
+    "images:check": "node scripts/check-image-batch.mjs"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.12",
