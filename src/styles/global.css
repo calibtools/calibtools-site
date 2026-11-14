@@ -109,6 +109,8 @@
   /* Even line lengths in headings (no lone last word), no one-word last line in running text */
   h1, h2, h3, h4 { text-wrap: balance; }
   p, li, dd, figcaption { text-wrap: pretty; }
+  /* Table cells start at the top, so the first line of every cell in a row sits at the same height */
+  tr { vertical-align: top; }
 }
 
 @layer components {

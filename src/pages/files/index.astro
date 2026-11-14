@@ -31,8 +31,8 @@ const entries = getAllDatasheets();
             </thead>
             <tbody>
               {entries.map((ds, i) => (
-                <tr class={`border-t border-line ${i % 2 === 1 ? 'bg-ground-alt' : ''}`}>
-                  <td class="py-3 pl-3 pr-0 align-middle">
+                <tr class={`border-t border-line align-middle ${i % 2 === 1 ? 'bg-ground-alt' : ''}`}>
+                  <td class="py-3 pl-3 pr-0">
                     {ds.thumbUrl && (
                       <a href={ds.url} class="block w-[56px] md:w-[72px]" aria-hidden="true" tabindex="-1">
                         <img src={ds.thumbUrl} alt="" width="720" height="1019" loading="lazy" decoding="async" class="block h-auto w-full border border-line bg-white" />
