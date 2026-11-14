@@ -96,15 +96,17 @@ export default function MobileBottomCluster({ mode, defaultPrice }: Props) {
   };
 
   return (
-    <div data-mobile-cluster className={`fixed bottom-3 right-3 z-30 flex flex-col items-end gap-2 md:hidden transition-opacity ${hidden ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+    // Full-width opaque bar on phones: content scrolls behind it instead of being covered by floating
+    // buttons. It fades out when the footer comes into view (Base.astro), so nothing stays hidden under it.
+    <div data-mobile-cluster className={`fixed inset-x-0 bottom-0 z-30 flex items-center gap-2 border-t border-line bg-ground px-5 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] md:hidden transition-opacity ${hidden ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
       {/* Cart button */}
       <button
         type="button"
         onClick={openCart}
-        className="relative flex h-12 w-12 items-center justify-center rounded border border-ink bg-ink"
+        className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded border border-ink bg-ink"
         aria-label={`Cart${count > 0 ? ` (${count} items)` : ''}`}
       >
-        <ShoppingCart size={20} strokeWidth={1.6} color="white" aria-hidden="true" />
+        <ShoppingCart size={18} strokeWidth={1.6} color="white" aria-hidden="true" />
         {count > 0 && (
           <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-brand px-1 text-[12px] font-bold text-white">
             {count}
@@ -116,7 +118,7 @@ export default function MobileBottomCluster({ mode, defaultPrice }: Props) {
       {mode === 'shop' ? (
         <a
           href="/targets/"
-          className="btn-md btn-primary"
+          className="btn-md btn-primary flex-1"
         >
           Shop targets
         </a>
@@ -125,7 +127,7 @@ export default function MobileBottomCluster({ mode, defaultPrice }: Props) {
           type="button"
           onClick={handleAddToCart}
           disabled={busy || !variantId || !available}
-          className="btn-md btn-primary disabled:opacity-50"
+          className="btn-md btn-primary flex-1 disabled:opacity-50"
         >
           {busy ? 'Adding\u2026' : `Add to cart \u00B7 ${price}`}
         </button>
