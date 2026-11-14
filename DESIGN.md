@@ -105,13 +105,14 @@ Icons: only where they speed up recognition (download, file type, tolerance clas
 
 ## 4. Images
 
-Order of preference: real photo (hands, setting, scale reference) → macro edge photo with scale bar →
-line drawing generated from geometry → detection overlay (OpenCV corners and IDs on a real or labeled synthetic image).
+Site pictures are AI-generated until real photos exist (decided 2026-11-11), including inspection and unboxing scenes.
+What makes a picture usable is that it matches the text beside it exactly: the right product, pattern, material and setting.
+Line drawings generated from geometry and detection overlays (OpenCV corners and IDs) are used where the exact geometry matters.
 
 - Line drawings come from `src/lib/boardDrawing.ts`, which uses the shared pattern renderers. Never hand-draw a pattern or a dimension.
   Each dimension line carries `data-mm`; `boardDrawing.test.ts` compares it with `boardSizes.ts` and with the drawn length (≤ 0.01 mm).
 - On tiles and cards the product fills the frame: in at least one direction it covers three quarters of the picture. A tile is 84 px wide on a phone, so a product that floats in empty ground cannot be read. Crop the picture; do not shrink the product. Held by `tests/unit/category-image-fill.test.ts` for the category tiles.
-- **Banned**: AI renders (floating boards, reflections, black voids), stock photos, images that do not match the product.
+- **Banned**: images that do not match the text or the product, the AI look (floating boards, glossy reflections, black voids), stock photos.
 
 ## 5. Motion
 
@@ -141,7 +142,7 @@ standard names (OpenCV, DICT_5X5_100) are fine: the reader uses them.
 ## 8. Pre-merge checklist (AI-feel)
 
 A page fails if any of these is true:
-1. It has an AI render or an image with no sense of scale.
+1. It has an image that does not match its text, has the AI look (floating board, reflections, black void), or has no sense of scale.
 2. It uses the dark template skeleton (black ground, red mono eyebrow, 800-weight headline, solid + ghost buttons).
 3. It has rounded shadowed cards with a line icon and "Learn more →".
 4. A heading is a paired slogan or a triplet.
@@ -170,7 +171,7 @@ A rule with no check is held by review only; it is listed so that nobody assumes
 | §3 Card rows (side-by-side blocks) | `scripts/check-card-rows.mjs` | yes in Chromium; reported in Firefox and WebKit |
 | §3 Button, badge, table and other component specs | `scripts/measure-buttons.mjs`, `measure-nav.mjs` (run by hand); review | no |
 | §4 Drawings match board sizes | `src/lib/boardDrawing.test.ts` | yes |
-| §4 No AI renders or stock photos | review | no |
+| §4 Images match their text; no AI look, no stock photos | review | no |
 | §5 Motion | review | no |
 | §6 Banned words and phrases, paragraph length | `scripts/check-prose.mjs`, `tests/claims-blacklist.test.ts` | yes |
 | §6 Paired slogans, triplets, one dash per paragraph | review | no |
