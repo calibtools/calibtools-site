@@ -135,3 +135,21 @@ describe('ordering tables for every pattern (C6)', () => {
     expect(d.orderingRows[0].partNumber).toBe('CT-CHA-P-200X150-{DICT}');
   });
 });
+
+describe('spec values are plain text, and file lists match the exporters', () => {
+  const files = (handle: string) =>
+    getProductData(handle, {})!.specGroups.flatMap((g) => g.rows).find((r) => r.label === 'Files')?.value ?? '';
+  it('drops markdown code marks', () => {
+    for (const h of ['charuco-composite', 'aprilgrid-composite', 'circlegrid-composite', 'halcon-composite']) {
+      expect(files(h)).not.toContain('`');
+    }
+  });
+  it('lists no ROS 2 file for AprilGrid (ROS camera_calibration has no AprilGrid model)', () => {
+    expect(files('aprilgrid-composite')).not.toContain('.ros2.yaml');
+    expect(files('aprilgrid-composite')).toContain('.kalibr.yaml');
+  });
+  it('lists the ROS 2 file for the circle grid and no Kalibr file for ChArUco', () => {
+    expect(files('circlegrid-composite')).toContain('.ros2.yaml');
+    expect(files('charuco-composite')).not.toContain('.kalibr.yaml');
+  });
+});

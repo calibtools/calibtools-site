@@ -196,7 +196,8 @@ function parseSpecGroups(body: string): SpecGroup[] {
     const tableRows = parseMarkdownTable(block);
     const rows: SpecRow[] = tableRows
       .filter((r) => r.length >= 2 && r[0].trim())
-      .map((r) => ({ label: r[0].trim(), value: r[1].trim() }));
+      // Spec cells are shown as plain text: drop markdown code marks (`.dxf` -> .dxf)
+      .map((r) => ({ label: r[0].trim(), value: r[1].trim().replace(/`([^`]*)`/g, '$1') }));
     if (rows.length > 0) {
       groups.push({ title: h3Positions[i].title, rows });
     }
