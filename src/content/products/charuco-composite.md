@@ -104,7 +104,7 @@ Every board is measured before it ships: dimensions, flatness and a visual check
 
 Each board comes with `.opencv.json`, `.ros2.yaml`, a HALCON point tuple (`.halcon.txt`) and a `.dxf` of the pattern. The [OpenCV calibration guide](/guides/opencv-camera-calibration/) shows how to load the board file and run the calibration.
 
-Before you order, print a paper copy with the [pattern generator](/tools/generator/) to test detection. Once the board arrives, the [capture assistant](/tools/capture/) guides you through the poses.
+Before you order, print a paper copy with the [ChArUco generator](/tools/generator/charuco/) to test detection. Once the board arrives, the [capture assistant](/tools/capture/) guides you through the poses.
 
 The [detection check](/tools/check/) shows what the detector finds in a photo, and the [quality analyzer](/tools/quality/) scores coverage and reprojection error. Need the result in another format? Use the [format converter](/tools/convert/).
 

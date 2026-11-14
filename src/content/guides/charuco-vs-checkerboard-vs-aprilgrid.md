@@ -2,7 +2,7 @@
 title: "ChArUco vs checkerboard vs AprilGrid"
 description: "Three patterns cover almost every calibration job. Which one depends on board visibility, lens width, and your software."
 date: 2026-10-22
-updated: 2026-10-22
+updated: 2026-11-15
 readingTime: "8 min"
 related: ["corner-detection-troubleshooting", "calibration-target-size", "opencv-camera-calibration"]
 products: ["charuco-composite", "checkerboard-composite", "aprilgrid-composite", "circlegrid-composite"]
@@ -16,6 +16,16 @@ sampleFiles: []
 | [Checkerboard](/targets/checkerboard-composite/) | Single camera, full board always in view, highest corner accuracy | Board gets cut off at the image edge; multi-camera rigs |
 | [ChArUco](/targets/charuco-composite/) | Stereo and multi-camera, wide lenses, partial views; OpenCV native | Very low resolution where markers can't be decoded |
 | [AprilGrid](/targets/aprilgrid-composite/) | Camera–IMU calibration with Kalibr; robotics stacks built on AprilTag | Pure OpenCV pipelines (less tooling than ChArUco) |
+
+## Try each one on paper first
+
+Print a page of each and point your camera at it before you buy a board. Every generator writes a PDF at 1:1 in millimeters:
+
+- [Checkerboard generator](/tools/generator/checkerboard/), or the ready-made [7 × 10, 20 mm A4 PDF](/files/patterns/checkerboard-7x10-20mm-a4.pdf)
+- [ChArUco generator](/tools/generator/charuco/), or the ready-made [7 × 10, 20 mm A4 PDF](/files/patterns/charuco-7x10-20mm-6x6-250-a4.pdf)
+- [AprilGrid generator](/tools/generator/aprilgrid/), or the ready-made [6 × 6, 20 mm A4 PDF](/files/patterns/aprilgrid-6x6-20mm-a4.pdf)
+
+Print at 100 % ("actual size") and measure one square before you enter its size in your code.
 
 ## Why partial views matter more than you think
 
