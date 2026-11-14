@@ -1,79 +1,78 @@
 name: CI
-# One run per change: pull requests, and pushes to main (not both for the same commit)
+# One run per change: pull requests, and pushes to main (not both for the same commit).
+# Jobs run in parallel where they can: unit tests beside the build, and the checks that need the
+# built site beside each other. The job named "build" is the gate scripts/ship.mjs waits for: it
+# passes only when every blocking job passed.
 on:
   pull_request:
   push:
     branches: [main]
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
-  build:
+  unit:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+        with: { python: 'true' }
+      - run: pnpm test
+        env:
+          BLOCKED_NAMES: ${{ secrets.BLOCKED_NAMES }}
+      - run: pnpm check
+
+  compile:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+        with: { python: 'true' }
+      - run: pnpm build
+        env:
+          SKIP_STOREFRONT_CHECK: '1'
+          SKIP_SPECS_CHECK: '1'
+      - uses: actions/upload-artifact@v4
+        with: { name: dist, path: dist, retention-days: 1, include-hidden-files: true }
+
+  # Blocks side by side keep the same line at the same height, with today's copy and with one
+  # block's text made long or empty (DESIGN.md §3 Card rows): fails
+  rows:
+    needs: compile
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+        with: { browsers: chromium }
+      - uses: actions/download-artifact@v4
+        with: { name: dist, path: dist }
+      - name: Side-by-side rows (Chromium)
+        run: node scripts/check-card-rows.mjs
+
+  # Accessibility >= 95 and no color-contrast failures (fails); performance >= 90 (warning)
+  lighthouse:
+    needs: compile
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+        with: { browsers: chromium }
+      - uses: actions/download-artifact@v4
+        with: { name: dist, path: dist }
+      - run: node scripts/lighthouse-check.mjs
+
+  # Screenshot comparison: reported, not blocking. Baselines live in tests/visual/__screenshots__.
+  visual:
+    needs: compile
     runs-on: ubuntu-24.04
     permissions:
       contents: write   # to commit new screenshot baselines to the pull request branch
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
-        with: { node-version: 22, cache: pnpm }
-      - name: Install Python packages
-        run: pip install Pillow opencv-python-headless numpy
-
-      - run: pnpm install --frozen-lockfile
-
-      - name: Get Playwright version
-        id: pw-version
-        run: echo "version=$(node -e "console.log(require('./node_modules/@playwright/test/package.json').version)")" >> "$GITHUB_OUTPUT"
-
-      - name: Cache Playwright browsers
-        id: pw-cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-3engines-${{ runner.os }}-${{ steps.pw-version.outputs.version }}
-
-      # Firefox and WebKit are for the side-by-side check only; everything else runs in Chromium
-      - name: Install Playwright browsers
-        if: steps.pw-cache.outputs.cache-hit != 'true'
-        run: pnpm exec playwright install chromium firefox webkit
-
-      # System libraries come from the Ubuntu package mirrors, which the runners could not
-      # reach for hours on 2026-11-11. The runner image already carries what Chromium needs,
-      # so this step is bounded and may fail without failing the run; the tests that follow
-      # start the browser and fail on their own if a library is really missing.
-      - name: Install Playwright system deps (best effort)
-        continue-on-error: true
-        timeout-minutes: 4
-        run: pnpm exec playwright install-deps chromium firefox webkit
-
-      - run: pnpm test
-        env:
-          BLOCKED_NAMES: ${{ secrets.BLOCKED_NAMES }}
-      - run: pnpm check
-      - run: pnpm build
-        env:
-          SKIP_STOREFRONT_CHECK: '1'
-          SKIP_SPECS_CHECK: '1'
-
-      # Blocks side by side keep the same line at the same height, with today's copy and with one
-      # block's text made long or empty (DESIGN.md §3 Card rows): fails
-      - name: Side-by-side rows (Chromium)
-        run: node scripts/check-card-rows.mjs
-
-      # Same check in the other two engines: reported, not blocking, because WebKit needs system
-      # libraries from the Ubuntu mirrors and their outage must not stop a merge.
-      - name: Side-by-side rows (Firefox, WebKit)
-        id: rows-other
-        continue-on-error: true
-        # Two widths (desktop and tablet) keep this step near two minutes; Chromium above runs all six
-        run: node scripts/check-card-rows.mjs --engines firefox,webkit --widths 1280,768
-      - name: Side-by-side rows (Firefox, WebKit) warning
-        if: steps.rows-other.outcome == 'failure'
-        run: echo "::warning::Side-by-side rows differ in Firefox or WebKit, or an engine did not start. See the step log."
-
-      # Accessibility >= 95 and no color-contrast failures (fails); performance >= 90 (warning)
-      - name: Lighthouse
-        run: node scripts/lighthouse-check.mjs
-
-      # Screenshot comparison: reported, not blocking. Baselines live in tests/visual/__screenshots__.
+      - uses: ./.github/actions/setup
+        with: { browsers: chromium }
+      - uses: actions/download-artifact@v4
+        with: { name: dist, path: dist }
       - name: Screenshot comparison
         id: visual
         continue-on-error: true
@@ -109,3 +108,36 @@ jobs:
             test-results
           if-no-files-found: ignore
           retention-days: 14
+
+  # Same rows check in Firefox and WebKit, after a merge only: reported, not blocking, because WebKit
+  # needs system libraries from the Ubuntu mirrors and their outage must not stop a merge.
+  rows-engines:
+    if: github.event_name == 'push'
+    needs: compile
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+        with: { browsers: firefox webkit }
+      - uses: actions/download-artifact@v4
+        with: { name: dist, path: dist }
+      - name: Side-by-side rows (Firefox, WebKit)
+        id: rows-other
+        continue-on-error: true
+        run: node scripts/check-card-rows.mjs --engines firefox,webkit --widths 1280,768
+      - name: Warning
+        if: steps.rows-other.outcome == 'failure'
+        run: echo "::warning::Side-by-side rows differ in Firefox or WebKit, or an engine did not start. See the step log."
+
+  # Gate for scripts/ship.mjs: one check named "build" that passes only when every blocking job passed
+  build:
+    if: always()
+    needs: [unit, compile, rows, lighthouse, visual]
+    runs-on: ubuntu-24.04
+    steps:
+      - name: All blocking jobs passed
+        env:
+          RESULTS: ${{ join(needs.*.result, ' ') }}
+        run: |
+          echo "unit, compile, rows, lighthouse, visual: $RESULTS"
+          for r in $RESULTS; do [ "$r" = success ] || exit 1; done

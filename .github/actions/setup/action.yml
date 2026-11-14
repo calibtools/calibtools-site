@@ -1,0 +1,41 @@
+name: Set up
+description: pnpm + Node + dependencies, and Playwright browsers when asked
+inputs:
+  browsers:
+    description: Space-separated Playwright browsers to install (empty = none)
+    default: ''
+  python:
+    description: Install the Python packages the build and tests use
+    default: 'false'
+runs:
+  using: composite
+  steps:
+    - uses: pnpm/action-setup@v4
+    - uses: actions/setup-node@v4
+      with: { node-version: 22, cache: pnpm }
+    - if: inputs.python == 'true'
+      shell: bash
+      run: pip install Pillow opencv-python-headless numpy
+    - shell: bash
+      run: pnpm install --frozen-lockfile
+    - if: inputs.browsers != ''
+      id: pw
+      shell: bash
+      run: |
+        echo "version=$(node -e "console.log(require('./node_modules/@playwright/test/package.json').version)")" >> "$GITHUB_OUTPUT"
+        echo "key=$(echo '${{ inputs.browsers }}' | tr ' ' '-')" >> "$GITHUB_OUTPUT"
+    - if: inputs.browsers != ''
+      id: pw-cache
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/ms-playwright
+        key: playwright-${{ steps.pw.outputs.key }}-${{ runner.os }}-${{ steps.pw.outputs.version }}
+    - if: inputs.browsers != '' && steps.pw-cache.outputs.cache-hit != 'true'
+      shell: bash
+      run: pnpm exec playwright install ${{ inputs.browsers }}
+    # System libraries come from the Ubuntu mirrors, which the runners could not reach for hours on
+    # 2026-11-11. The runner image already carries what Chromium needs, so this is bounded and may fail;
+    # the steps that follow start the browser and fail on their own if a library is really missing.
+    - if: inputs.browsers != ''
+      shell: bash
+      run: timeout 240 pnpm exec playwright install-deps ${{ inputs.browsers }} || echo "::notice::playwright install-deps skipped"
