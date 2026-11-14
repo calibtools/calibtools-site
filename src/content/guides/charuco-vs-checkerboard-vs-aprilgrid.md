@@ -1,5 +1,5 @@
 ---
-title: "ChArUco vs checkerboard vs AprilGrid: which calibration pattern"
+title: "ChArUco vs checkerboard vs AprilGrid"
 description: "Checkerboard, ChArUco, AprilGrid and circle grids compared: partial views, wide lenses, odd and even counts, square and marker size, and which software reads which pattern."
 date: 2026-10-22
 updated: 2026-11-15

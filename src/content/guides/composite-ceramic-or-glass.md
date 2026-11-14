@@ -1,5 +1,5 @@
 ---
-title: "Calibration target substrates: composite, ceramic or glass"
+title: "Calibration target substrates compared"
 description: "Flatness, thermal expansion, glare, size and cost of aluminum composite, ceramic and glass calibration targets compared, and how to tell which one you need."
 date: 2026-10-22
 updated: 2026-11-15

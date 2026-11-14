@@ -1,5 +1,5 @@
 ---
-title: "Reprojection error in camera calibration: what it tells you"
+title: "Reprojection error: what it tells you"
 description: "Reprojection error explained: how RMS is computed, what counts as good, why a low value can hide a wrong model, and the per-view and radius checks that show it."
 date: 2026-11-07
 updated: 2026-11-15
