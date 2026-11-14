@@ -36,12 +36,12 @@ Generate ArUco fiducial markers for OpenCV pose estimation, robot localization a
 
 ## Ready-made sheets
 
-Each link opens the generator with the sheet filled in. All of them fit on one A4 or Letter page at 100 %.
+The name opens the generator with the sheet filled in. The PDF links download the same file, ready to print at 100 % ("actual size"). All of them fit on one A4 or Letter page at 100 %.
 
-- [One DICT_6X6_250 marker, ID 0, 100 mm](/tools/generator/aruco/?rows=1&cols=1&marker=100&dict=DICT_6X6_250&startId=0)
-- [Six DICT_4X4_50 markers, IDs 0 to 5, 60 mm](/tools/generator/aruco/?rows=3&cols=2&marker=60&dict=DICT_4X4_50&startId=0)
-- [Twelve DICT_5X5_100 markers, IDs 0 to 11, 40 mm](/tools/generator/aruco/?rows=4&cols=3&marker=40&dict=DICT_5X5_100&startId=0)
-- [Twenty-four DICT_6X6_250 markers, IDs 0 to 23, 30 mm](/tools/generator/aruco/?rows=6&cols=4&marker=30&dict=DICT_6X6_250&startId=0)
+- [One DICT_6X6_250 marker, ID 0, 100 mm](/tools/generator/aruco/?rows=1&cols=1&marker=100&dict=DICT_6X6_250&startId=0) · PDF: [A4](/files/patterns/aruco-6x6-250-id-0-100mm-a4.pdf), [Letter](/files/patterns/aruco-6x6-250-id-0-100mm-letter.pdf)
+- [Six DICT_4X4_50 markers, IDs 0 to 5, 60 mm](/tools/generator/aruco/?rows=3&cols=2&marker=60&dict=DICT_4X4_50&startId=0) · PDF: [A4](/files/patterns/aruco-4x4-50-ids-0-5-60mm-a4.pdf), [Letter](/files/patterns/aruco-4x4-50-ids-0-5-60mm-letter.pdf)
+- [Twelve DICT_5X5_100 markers, IDs 0 to 11, 40 mm](/tools/generator/aruco/?rows=4&cols=3&marker=40&dict=DICT_5X5_100&startId=0) · PDF: [A4](/files/patterns/aruco-5x5-100-ids-0-11-40mm-a4.pdf), [Letter](/files/patterns/aruco-5x5-100-ids-0-11-40mm-letter.pdf)
+- [Twenty-four DICT_6X6_250 markers, IDs 0 to 23, 30 mm](/tools/generator/aruco/?rows=6&cols=4&marker=30&dict=DICT_6X6_250&startId=0) · PDF: [A4](/files/patterns/aruco-6x6-250-ids-0-23-30mm-a4.pdf), [Letter](/files/patterns/aruco-6x6-250-ids-0-23-30mm-letter.pdf)
 
 Change the start ID to continue a set: a second sheet of six starts at ID 6.
 

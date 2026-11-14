@@ -1,3 +1,4 @@
+import { PAGE_SPECS } from './readyMade';
 import { describe, it, expect } from 'vitest';
 import { readFileSync, readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -61,8 +62,8 @@ describe('AprilTag generator page', () => {
   const links = [...md.matchAll(/\]\(\/tools\/generator\/apriltag\/\?([^)]+)\)/g)].map((m) => m[1]);
 
   it('the starting spec here matches the page', () => {
-    const astro = readFileSync(resolve('src/pages/tools/generator/apriltag.astro'), 'utf-8');
-    expect(astro).toContain("type: 'Marker sheet', rows: 1, cols: 1, square: 120, marker: 100, dict: 'DICT_APRILTAG_36h11', aprilFamily: '36h11', borderBits: 1, startId: 0");
+    expect(readFileSync(resolve('src/pages/tools/generator/apriltag.astro'), 'utf-8')).toContain('initialSpec={PAGE_SPECS.apriltag}');
+    expect({ ...GENERATOR_DEFAULT, ...PAGE_SPECS.apriltag }).toEqual(page);
   });
 
   it('has four ready-made sheets, each on one A4 and one Letter page, with IDs inside the family', () => {
@@ -148,14 +149,15 @@ describe('ArUco generator page', () => {
 
 describe('ChArUco and checkerboard generator pages', () => {
   const cases = [
-    { file: 'generator-charuco.md', slug: 'charuco', astro: "initialSpec={{ type: 'ChArUco', rows: 7, cols: 10, square: 20, marker: 15, dict: 'DICT_6X6_250' }}", page: { ...GENERATOR_DEFAULT, type: 'ChArUco', rows: 7, cols: 10, square: 20, marker: 15, dict: 'DICT_6X6_250' } as PatternSpec },
-    { file: 'generator-checkerboard.md', slug: 'checkerboard', astro: "initialSpec={{ type: 'Checkerboard', rows: 7, cols: 10, square: 20 }}", page: { ...GENERATOR_DEFAULT, type: 'Checkerboard', rows: 7, cols: 10, square: 20 } as PatternSpec },
+    { file: 'generator-charuco.md', slug: 'charuco', astro: 'initialSpec={PAGE_SPECS.charuco}', page: { ...GENERATOR_DEFAULT, type: 'ChArUco', rows: 7, cols: 10, square: 20, marker: 15, dict: 'DICT_6X6_250' } as PatternSpec },
+    { file: 'generator-checkerboard.md', slug: 'checkerboard', astro: 'initialSpec={PAGE_SPECS.checkerboard}', page: { ...GENERATOR_DEFAULT, type: 'Checkerboard', rows: 7, cols: 10, square: 20 } as PatternSpec },
   ];
   for (const c of cases) {
     const { links } = readyMade(c.file, c.slug, c.page);
 
     it(`${c.slug}: the page opens with a board that fits one A4 and one Letter page`, () => {
       expect(readFileSync(resolve(`src/pages/tools/generator/${c.slug}.astro`), 'utf-8')).toContain(c.astro);
+      expect({ ...GENERATOR_DEFAULT, ...PAGE_SPECS[c.slug as 'charuco' | 'checkerboard'] }).toEqual(c.page);
       expect(fitsOn(c.page, 'A4')).toBe(true);
       expect(fitsOn(c.page, 'Letter')).toBe(true);
     });
@@ -196,8 +198,8 @@ describe('AprilGrid and circle grid generator pages', () => {
   const ci: PatternSpec = { ...GENERATOR_DEFAULT, type: 'Asymmetric circles', rows: 11, cols: 8, square: 18 };
 
   it('both pages open with a grid that fits one A4 and one Letter page', () => {
-    expect(readFileSync(resolve('src/pages/tools/generator/aprilgrid.astro'), 'utf-8')).toContain("initialSpec={{ type: 'AprilGrid (Kalibr)', rows: 6, cols: 6, square: 20, dict: 'DICT_APRILTAG_36h11' }}");
-    expect(readFileSync(resolve('src/pages/tools/generator/circles.astro'), 'utf-8')).toContain("initialSpec={{ type: 'Asymmetric circles', rows: 11, cols: 8, square: 18 }}");
+    expect({ ...GENERATOR_DEFAULT, ...PAGE_SPECS.aprilgrid }).toEqual(ag);
+    expect({ ...GENERATOR_DEFAULT, ...PAGE_SPECS.circles }).toEqual(ci);
     for (const spec of [ag, ci]) { expect(fitsOn(spec, 'A4')).toBe(true); expect(fitsOn(spec, 'Letter')).toBe(true); }
   });
 

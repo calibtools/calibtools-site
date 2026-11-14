@@ -33,12 +33,12 @@ Not sure how big the board should be? The [FOV calculator](/tools/fov/) recommen
 
 ## Ready-made boards
 
-Each link opens the generator with the board filled in.
+The name opens the generator with the board filled in. The PDF links download the same file, ready to print at 100 % ("actual size").
 
-- [7 × 10 squares, 20 mm, DICT_6X6_250: one A4 or Letter page](/tools/generator/charuco/?rows=7&cols=10&square=20&marker=15&dict=DICT_6X6_250)
-- [5 × 7 squares, 25 mm, DICT_6X6_250: one A4 or Letter page](/tools/generator/charuco/?rows=5&cols=7&square=25&marker=18&dict=DICT_6X6_250)
-- [7 × 10 squares, 25 mm, DICT_6X6_250: one A3 page](/tools/generator/charuco/?rows=7&cols=10&square=25&marker=18&dict=DICT_6X6_250&paper=A3)
-- [7 × 10 squares, 25 mm, DICT_6X6_250: one Tabloid page](/tools/generator/charuco/?rows=7&cols=10&square=25&marker=18&dict=DICT_6X6_250&paper=Tabloid)
+- [7 × 10 squares, 20 mm, DICT_6X6_250: one A4 or Letter page](/tools/generator/charuco/?rows=7&cols=10&square=20&marker=15&dict=DICT_6X6_250) · PDF: [A4](/files/patterns/charuco-7x10-20mm-6x6-250-a4.pdf), [Letter](/files/patterns/charuco-7x10-20mm-6x6-250-letter.pdf)
+- [5 × 7 squares, 25 mm, DICT_6X6_250: one A4 or Letter page](/tools/generator/charuco/?rows=5&cols=7&square=25&marker=18&dict=DICT_6X6_250) · PDF: [A4](/files/patterns/charuco-5x7-25mm-6x6-250-a4.pdf), [Letter](/files/patterns/charuco-5x7-25mm-6x6-250-letter.pdf)
+- [7 × 10 squares, 25 mm, DICT_6X6_250: one A3 page](/tools/generator/charuco/?rows=7&cols=10&square=25&marker=18&dict=DICT_6X6_250&paper=A3) · PDF: [A3](/files/patterns/charuco-7x10-25mm-6x6-250-a3.pdf)
+- [7 × 10 squares, 25 mm, DICT_6X6_250: one Tabloid page](/tools/generator/charuco/?rows=7&cols=10&square=25&marker=18&dict=DICT_6X6_250&paper=Tabloid) · PDF: [Tabloid](/files/patterns/charuco-7x10-25mm-6x6-250-tabloid.pdf)
 
 The page keeps a white margin of one square around the pattern, because the detector needs it. That is why a 7 × 10 board of 25 mm squares, 250 × 175 mm, does not fit an A4 page.
 

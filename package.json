@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
-    "prebuild": "node scripts/check-prose.mjs && tsx scripts/check-part-numbers.ts && node scripts/verify-storefront.mjs && node scripts/validate-product-images.mjs && tsx scripts/generate-placeholders.ts && node scripts/docs-check.mjs",
+    "prebuild": "node scripts/check-prose.mjs && tsx scripts/check-part-numbers.ts && node scripts/verify-storefront.mjs && node scripts/validate-product-images.mjs && tsx scripts/generate-placeholders.ts && node scripts/docs-check.mjs && tsx scripts/pattern-pdfs.ts",
     "docs:build": "tsx scripts/docs-build.mjs",
     "halcon:plate": "tsx scripts/halcon-plate.ts",
     "guides:figures": "tsx scripts/guide-figures.ts",
@@ -18,7 +18,8 @@
     "test": "vitest run",
     "page-views": "node scripts/page-views.mjs",
     "scan:live": "node scripts/live-scan.mjs",
-    "images:check": "node scripts/check-image-batch.mjs"
+    "images:check": "node scripts/check-image-batch.mjs",
+    "patterns:pdfs": "tsx scripts/pattern-pdfs.ts"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.12",

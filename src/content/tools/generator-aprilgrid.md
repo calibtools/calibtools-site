@@ -33,11 +33,11 @@ Generate AprilGrid calibration targets compatible with ETH ASL's Kalibr calibrat
 
 ## Ready-made grids
 
-Each link opens the generator with the grid filled in.
+The name opens the generator with the grid filled in. The PDF links download the same file, ready to print at 100 % ("actual size").
 
-- [6 × 6 tags, 20 mm: one A4 or Letter page](/tools/generator/aprilgrid/?rows=6&cols=6&square=20)
-- [6 × 6 tags, 26 mm: one A3 or Tabloid page](/tools/generator/aprilgrid/?rows=6&cols=6&square=26&paper=A3)
-- [4 × 6 tags, 25 mm: one A4 or Letter page](/tools/generator/aprilgrid/?rows=4&cols=6&square=25)
+- [6 × 6 tags, 20 mm: one A4 or Letter page](/tools/generator/aprilgrid/?rows=6&cols=6&square=20) · PDF: [A4](/files/patterns/aprilgrid-6x6-20mm-a4.pdf), [Letter](/files/patterns/aprilgrid-6x6-20mm-letter.pdf)
+- [6 × 6 tags, 26 mm: one A3 or Tabloid page](/tools/generator/aprilgrid/?rows=6&cols=6&square=26&paper=A3) · PDF: [A3](/files/patterns/aprilgrid-6x6-26mm-a3.pdf), [Tabloid](/files/patterns/aprilgrid-6x6-26mm-tabloid.pdf)
+- [4 × 6 tags, 25 mm: one A4 or Letter page](/tools/generator/aprilgrid/?rows=4&cols=6&square=25) · PDF: [A4](/files/patterns/aprilgrid-4x6-25mm-a4.pdf), [Letter](/files/patterns/aprilgrid-4x6-25mm-letter.pdf)
 
 The page keeps a white margin of one tag around the pattern, because the detector needs it.
 
