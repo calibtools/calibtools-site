@@ -1,8 +1,8 @@
 ---
-title: "Composite, ceramic or glass substrate"
+title: "Calibration target substrates: composite, ceramic or glass"
 description: "Flatness, thermal expansion, glare, size and cost of aluminum composite, ceramic and glass calibration targets compared, and how to tell which one you need."
 date: 2026-10-22
-updated: 2026-11-11
+updated: 2026-11-15
 readingTime: "9 min"
 keyRule: "Compare the target's tolerance with the size of one pixel on the board. If the tolerance is a fraction of a pixel, composite is enough; if it spans several pixels and you need measurement-grade results, go to ceramic. Choose glass when you need backlighting."
 related: ["printed-target-costs-half-a-pixel", "calibration-target-size", "reprojection-error", "charuco-vs-checkerboard-vs-aprilgrid"]
@@ -112,6 +112,20 @@ Composite boards run from 200 × 150 mm to 800 × 600 mm as standard and up to 1
 For fields of view beyond about 1.3 m, several boards with distinct marker IDs work better than one huge panel; see the [multi-board guide](/guides/multi-board-marker-ids/).
 
 Ceramic stops at 230 × 140 mm. Glass is quoted per job; at about 2.5 g/cm³, a 3 mm glass plate weighs about 7.6 kg/m², close to composite, but it needs more care in handling and shipping.
+
+## Other substrates you may come across
+
+Most calibration targets are one of the three above. Five others appear for special jobs:
+
+| Substrate | What it is for | What to watch |
+|---|---|---|
+| Honeycomb aluminum | Boards over about 1 m that stay flat without a frame | Heavier panels, higher cost; check how the pattern is applied |
+| Carbon fiber | Very stiff and light, with almost no thermal expansion | Price; the pattern is usually printed, so tolerance is print-limited |
+| Acrylic | Backlit targets: it diffuses light from behind | Expands about three times as much as aluminum composite and creeps under load |
+| Thermal target materials | Infrared cameras: the pattern has to differ in emissivity or temperature, not just in color | Needs heating or a heat source; see the [thermal calibration target](/targets/thermal-calibration-target/) |
+| Retro-reflective film | Cameras with a ring light on the lens axis | Bright only near the optical axis; the film's own edges limit accuracy |
+
+For a backlit pattern with micron accuracy, use glass; see the [backlit target](/targets/backlit-target/).
 
 ## Which one
 

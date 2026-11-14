@@ -1,8 +1,8 @@
 ---
-title: "What reprojection error really tells you"
+title: "Reprojection error in camera calibration: what it tells you"
 description: "Reprojection error explained: how RMS is computed, what counts as good, why a low value can hide a wrong model, and the per-view and radius checks that show it."
 date: 2026-11-07
-updated: 2026-11-07
+updated: 2026-11-15
 readingTime: "12 min"
 keyRule: "RMS is measured only where the board was. Look at the error per view and per image radius, and verify the model where it will be used, not where it was fitted."
 related: ["calibration-target-size", "opencv-camera-calibration", "printed-target-costs-half-a-pixel"]

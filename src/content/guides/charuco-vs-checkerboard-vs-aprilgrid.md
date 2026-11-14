@@ -1,6 +1,6 @@
 ---
-title: "ChArUco vs checkerboard vs AprilGrid"
-description: "Three patterns cover almost every calibration job. Which one depends on board visibility, lens width, and your software."
+title: "ChArUco vs checkerboard vs AprilGrid: which calibration pattern"
+description: "Checkerboard, ChArUco, AprilGrid and circle grids compared: partial views, wide lenses, odd and even counts, square and marker size, and which software reads which pattern."
 date: 2026-10-22
 updated: 2026-11-15
 readingTime: "8 min"
@@ -40,3 +40,39 @@ The figure is a measurement, not a sketch. Each board was rendered with 45 % of 
 
 ## Picking square and marker size
 
+Start from the field of view. The board should cover about half of the image at your working distance; the [target size guide](/guides/calibration-target-size/) and the [FOV calculator](/tools/fov/) work out the board size for your camera and lens.
+
+Then check the smallest feature in pixels:
+
+- **Checkerboard**: a square should span at least 10 to 15 px at the far end of your working range, so the corner detector has edges to work with.
+- **ChArUco and AprilGrid**: the marker decides. A DICT_6X6 marker is 8 cells across with its border, a tag36h11 tag 8 cells with a one-cell border (10 with Kalibr's two-cell border). Each cell needs about 3 to 5 px to decode reliably.
+- **Marker to square ratio**: 0.7 to 0.75 on ChArUco. Smaller markers leave more white around them for the corner detector; larger ones decode from farther away.
+
+More squares give more points per image, but smaller squares fail first when the board is far, tilted or out of focus. Pick the largest square that still gives you at least 6 × 9 inner corners on the board.
+
+## Odd and even counts: avoid a board that looks the same upside down
+
+A checkerboard with an even number of squares in both directions looks identical after a 180° turn. The detector then cannot tell which corner is the origin, and stereo or multi-camera calibration gets corners matched the wrong way round between views.
+
+Use one odd and one even count, such as 7 × 10 squares (6 × 9 inner corners). ChArUco and AprilGrid do not have this problem: every marker carries its own ID.
+
+## Circle grids
+
+Circle grids are the fourth common pattern. The detector fits each dot, so every edge pixel contributes and the centers are less noisy than corners in a blurry image.
+
+- **Symmetric grid**: looks the same after a 180° turn, like an even checkerboard. Fine for a single camera, ambiguous for stereo.
+- **Asymmetric grid**: every other row shifted by half a pitch. Its orientation is unique, so it is the one to use for stereo.
+- **Bias**: a tilted circle images as an ellipse, and the center of that ellipse is not exactly the image of the circle's center. The error grows with dot size and tilt. Keep dots small relative to the field of view and avoid steep angles.
+
+OpenCV finds them with `findCirclesGrid`. The [circle grid generator](/tools/generator/circles/) draws both kinds.
+
+## Which software reads which pattern
+
+| Pattern | OpenCV | Kalibr | ROS 2 camera_calibration |
+|---|---|---|---|
+| Checkerboard | Yes | Yes | Yes |
+| ChArUco | Yes | No | Yes |
+| AprilGrid | Tags only, no board class | Yes | No |
+| Circle grid | Yes | Yes | Yes |
+
+If your pipeline is OpenCV, ChArUco is the safe default. For camera–IMU work in Kalibr, AprilGrid. For the highest corner accuracy with the whole board always in view, a plain checkerboard.
