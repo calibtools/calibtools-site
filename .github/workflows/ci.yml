@@ -16,7 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
-        with: { python: 'true' }
+        with: { python: 'true', browsers: chromium }   # customer-PDF tests render in Chromium
       - run: pnpm test
         env:
           BLOCKED_NAMES: ${{ secrets.BLOCKED_NAMES }}
