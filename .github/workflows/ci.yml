@@ -28,6 +28,14 @@ jobs:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
         with: { python: 'true' }
+      # Optimized images (about 900 variants) took 130 s of every build. Astro keeps them in its
+      # cache folder and reuses a variant when the source and settings are unchanged.
+      - name: Cache optimized images
+        uses: actions/cache@v4
+        with:
+          path: node_modules/.astro
+          key: astro-assets-${{ runner.os }}-${{ hashFiles('src/assets/**', 'public/**/*.webp', 'astro.config.mjs', 'pnpm-lock.yaml') }}
+          restore-keys: astro-assets-${{ runner.os }}-
       - run: pnpm build
         env:
           SKIP_STOREFRONT_CHECK: '1'
