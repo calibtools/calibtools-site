@@ -123,12 +123,14 @@ test.describe('Navigation — Mobile drawer', () => {
     }
   });
 
-  test('mobile: Shop targets visible in floating bottom cluster', async ({ page }) => {
+  test('mobile: bottom bar spans the full width with cart and Shop targets', async ({ page }) => {
     await page.goto('/');
-    // The MobileBottomCluster island contains Shop targets
-    // Just verify it renders on mobile
-    const main = page.locator('main');
-    await expect(main).toBeVisible();
+    const bar = page.locator('[data-mobile-cluster]');
+    await expect(bar.getByRole('link', { name: 'Shop targets' })).toBeVisible();
+    const b = (await bar.boundingBox())!;
+    expect(Math.round(b.x)).toBe(0);
+    expect(Math.round(b.width)).toBe(390);
+    await expect(bar.getByRole('button', { name: /^Cart/ })).toBeVisible();
   });
 });
 
