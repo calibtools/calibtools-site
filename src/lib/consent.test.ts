@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { regionFor, defaultChoice, parseChoice, serializeChoice, effectiveChoice, bannerNeeded, consentMode, STORAGE_KEY } from './consent';
+import { regionFor, defaultChoice, parseChoice, serializeChoice, effectiveChoice, bannerNeeded, consentMode, shopifyConsent, STORAGE_KEY } from './consent';
 import { cleanTagIds, anyTagConfigured, tagsToLoad, TAG_LABELS } from './tags';
 import { readFileSync } from 'node:fs';
 
@@ -36,6 +36,13 @@ describe('choice', () => {
     expect(consentMode({ v: 1, analytics: true, marketing: false, t: 1 })).toEqual({
       analytics_storage: 'granted', ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied',
     });
+  });
+});
+
+describe('checkout follows the choice', () => {
+  it('maps to Shopify\'s four categories', () => {
+    expect(shopifyConsent({ v: 1, analytics: true, marketing: false, t: 1 })).toEqual({ analytics: true, marketing: false, preferences: true, sale_of_data: false });
+    expect(shopifyConsent({ v: 1, analytics: false, marketing: false, t: 1 })).toEqual({ analytics: false, marketing: false, preferences: false, sale_of_data: false });
   });
 });
 
