@@ -116,7 +116,10 @@ describe('ORGANIZATION_LD', () => {
       const inPublic = existsSync(resolve(PUBLIC, asFile));
       const inDist = existsSync(resolve(DIST, asFile));
       const isDir = existsSync(resolve(DIST, asFile, 'index.html'));
-      expect(inPublic || inDist || isDir, `${url} → ${asFile} must exist in public/ or dist/`).toBe(true);
+      // A page route (e.g. /returns/) counts too, so the test does not depend on a prior build
+      const route = asFile.replace(/\/$/, '');
+      const isPage = route !== '' && (existsSync(resolve(__dirname, '../pages', `${route}.astro`)) || existsSync(resolve(__dirname, '../pages', route, 'index.astro')));
+      expect(inPublic || inDist || isDir || isPage, `${url} → ${asFile} must exist in public/, dist/ or src/pages/`).toBe(true);
     }
   });
 });
