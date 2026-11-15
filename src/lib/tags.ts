@@ -58,3 +58,12 @@ export const TAG_IDS: TagIds = cleanTagIds({
   linkedin: import.meta.env.PUBLIC_LINKEDIN_PARTNER_ID,
   hubspot: import.meta.env.PUBLIC_HUBSPOT_ID,
 });
+
+/**
+ * Shopify's Customer Privacy API. Loaded only after a visitor has made a choice, to pass that choice
+ * to the checkout on the shop domain. It sets Shopify's `_tracking_consent` cookie for calib.tools.
+ */
+export const SHOPIFY_CONSENT_SCRIPT = 'https://cdn.shopify.com/shopifycloud/consent-tracking-api/v0.2/consent-tracking-api.js';
+export const CHECKOUT_DOMAIN = 'shop.calib.tools';
+export const STOREFRONT_DOMAIN = 'calib.tools';
+export const STOREFRONT_TOKEN: string = import.meta.env.PUBLIC_SHOPIFY_STOREFRONT_TOKEN ?? '';

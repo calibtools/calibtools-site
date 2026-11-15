@@ -29,8 +29,8 @@
   </div>
 </div>
 <script>
-  import { STORAGE_KEY, regionFor, parseChoice, serializeChoice, effectiveChoice, bannerNeeded, consentMode, type Choice, type Region } from '@/lib/consent';
-  import { TAG_IDS, tagsToLoad } from '@/lib/tags';
+  import { STORAGE_KEY, SHOPIFY_SYNC_KEY, shopifyConsent, regionFor, parseChoice, serializeChoice, effectiveChoice, bannerNeeded, consentMode, type Choice, type Region } from '@/lib/consent';
+  import { TAG_IDS, tagsToLoad, SHOPIFY_CONSENT_SCRIPT, CHECKOUT_DOMAIN, STOREFRONT_DOMAIN, STOREFRONT_TOKEN } from '@/lib/tags';
 
   const el = document.getElementById('ct-consent')!;
   const gpc = (navigator as Navigator & { globalPrivacyControl?: boolean }).globalPrivacyControl === true;
@@ -76,6 +76,28 @@
     }
   }
 
+  /** Pass an explicit choice on to Shopify once, so the checkout on the shop domain follows it. */
+  function syncShopify(c: Choice) {
+    try {
+      if (!STOREFRONT_TOKEN || localStorage.getItem(SHOPIFY_SYNC_KEY) === String(c.t)) return;
+    } catch { return; }
+    type Privacy = { setTrackingConsent: (o: Record<string, unknown>, cb: (r?: { error?: unknown }) => void) => void };
+    const send = () => {
+      const api = (window as Window & { Shopify?: { customerPrivacy?: Privacy } }).Shopify?.customerPrivacy;
+      api?.setTrackingConsent(
+        { ...shopifyConsent(c), headlessStorefront: true, checkoutRootDomain: CHECKOUT_DOMAIN, storefrontRootDomain: STOREFRONT_DOMAIN, storefrontAccessToken: STOREFRONT_TOKEN },
+        (r) => { if (!r?.error) { try { localStorage.setItem(SHOPIFY_SYNC_KEY, String(c.t)); } catch { /* next page tries again */ } } },
+      );
+    };
+    if (document.querySelector('script[data-ct-tag="shopify-consent"]')) { send(); return; }
+    const s = document.createElement('script');
+    s.async = true;
+    s.src = SHOPIFY_CONSENT_SCRIPT;
+    s.dataset.ctTag = 'shopify-consent';
+    s.onload = send;
+    document.head.appendChild(s);
+  }
+
   function show(region: Region, current: Choice) {
     el.querySelectorAll<HTMLElement>('[data-consent-us]').forEach((n) => { n.hidden = region !== 'us'; });
     el.querySelectorAll<HTMLInputElement>('[data-consent-box]').forEach((b) => { b.checked = current[b.dataset.consentBox as 'analytics' | 'marketing']; });
@@ -92,12 +114,12 @@
     if (!c.analytics) dropAnalyticsCookies();
     // Scripts that already ran cannot be unloaded: start clean when something was switched off
     if (had && tagsToLoad(TAG_IDS, c).length < loaded.size) location.reload();
-    else apply(c);
+    else { apply(c); syncShopify(c); }
   }
 
   async function start(reopen = false) {
     const stored = read();
-    if (stored && !reopen) { apply(effectiveChoice(stored, gpc)); return; }
+    if (stored && !reopen) { apply(effectiveChoice(stored, gpc)); syncShopify(effectiveChoice(stored, gpc)); return; }
     const current = effectiveChoice(stored, gpc);
     if (!reopen) apply(current);
     let country = '';

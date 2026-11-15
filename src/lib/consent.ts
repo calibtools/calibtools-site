@@ -56,3 +56,14 @@ export function consentMode(c: Choice): Record<'analytics_storage' | 'ad_storage
   const m: Granted = c.marketing ? 'granted' : 'denied';
   return { analytics_storage: a, ad_storage: m, ad_user_data: m, ad_personalization: m };
 }
+
+/**
+ * The same choice for Shopify's Customer Privacy API, so the checkout on shop.calib.tools follows it.
+ * Shopify has two more categories: preferences follows analytics, sale of data follows marketing.
+ */
+export function shopifyConsent(c: Choice): Record<'analytics' | 'marketing' | 'preferences' | 'sale_of_data', boolean> {
+  return { analytics: c.analytics, marketing: c.marketing, preferences: c.analytics, sale_of_data: c.marketing };
+}
+
+/** localStorage key holding the timestamp of the last choice passed on to Shopify. */
+export const SHOPIFY_SYNC_KEY = 'ct-consent-shopify';
