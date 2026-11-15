@@ -126,3 +126,9 @@ export const faqGroups: FaqGroup[] = [
     ],
   },
 ];
+
+/** Anchor id for one question, so other pages can link straight to it: /faq/#q-what-is-the-lead-time */
+export function faqItemId(question: string): string {
+  const slug = question.toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60).replace(/-+$/, '');
+  return `q-${slug}`;
+}

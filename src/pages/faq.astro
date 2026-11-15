@@ -1,7 +1,7 @@
 ---
 import Base from '@/layouts/Base.astro';
 import { breadcrumbLd } from '@/lib/seo';
-import { faqGroups } from '@/lib/faq-groups';
+import { faqGroups, faqItemId } from '@/lib/faq-groups';
 
 const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: 'FAQ' }]);
 
@@ -29,7 +29,7 @@ const faqLd = {
           <h2 class="mt-0 mb-4 font-mono text-[13px] uppercase tracking-[0.08em] text-ink-soft">{group.heading}</h2>
           <div class="flex flex-col gap-0 border border-line rounded-lg overflow-hidden">
             {group.items.map((item, i) => (
-              <details class:list={['group', i > 0 && 'border-t border-line']}>
+              <details id={faqItemId(item.question)} class:list={['group scroll-mt-24', i > 0 && 'border-t border-line']}>
                 <summary class="flex cursor-pointer items-center justify-between gap-4 px-5 py-4 text-[15px] font-semibold select-none hover:bg-ground-alt [&::-webkit-details-marker]:hidden list-none">
                   <span>{item.question}</span>
                   <svg class="h-4 w-4 shrink-0 text-ink-soft transition-transform group-open:rotate-180" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6l4 4 4-4" /></svg>
