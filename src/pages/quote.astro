@@ -98,6 +98,7 @@ const countries = countryOptions();
     </div>
   </div>
   <script>
+    import { track } from '@/lib/track';
     import { checkWorkEmail, WORK_EMAIL_MESSAGE } from '@/lib/workEmail';
     import { mountTurnstile, TURNSTILE_SITE_KEY } from '@/lib/turnstileClient';
     import { patternIdFromPath, specFromLink } from '@/lib/patternLink';
@@ -155,6 +156,7 @@ const countries = countryOptions();
             emailSent: Boolean(data.customerEmailSent),
           };
           try { sessionStorage.setItem('ct-quote', JSON.stringify(card)); } catch { /* private mode */ }
+          track('generate_lead', { material: card.material, country: card.country, from_generator: Boolean(card.pattern) });
           window.location.href = `/quote/sent/?q=${encodeURIComponent(data.id)}`;
           return;
         } else {
