@@ -32,7 +32,11 @@ const lastUpdated = new Date().toISOString().slice(0, 10);
 
       <h2>Customer accounts</h2>
       <p>Signing in is optional. Sign-in runs through Shopify customer accounts: you enter your email on a Shopify page and receive a one-time code; there is no password. Your account, quotes and orders are kept by Shopify.</p>
-      <p>After you sign in, and only then, we set one cookie on calib.tools: <code>ct_session</code>. It is first-party, HttpOnly (page scripts cannot read it) and holds the encrypted Shopify sign-in tokens that keep you signed in for up to 14 days. It is not used for tracking and is deleted when you sign out.</p>
+      <p>Signing in uses two first-party cookies on calib.tools. Both are HttpOnly (page scripts cannot read them) and neither is used for tracking:</p>
+      <ul class="ml-5 flex flex-col gap-2 text-[15px] list-disc">
+        <li><code>ct_login</code>: set when you click Sign in and deleted when you come back from Shopify, at most 10 minutes. It holds a random value that makes sure sign-in completes in the browser that started it.</li>
+        <li><code>ct_session</code>: set after you sign in. It holds the encrypted Shopify sign-in tokens that keep you signed in for up to 14 days and is deleted when you sign out.</li>
+      </ul>
       <p>Patterns you save from the generator are stored on your Shopify customer record as a list of generator links with the names you give them. You can remove them on your account page at any time.</p>
 
       <h2>Quote requests</h2>

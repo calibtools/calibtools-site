@@ -6,9 +6,11 @@
  * cookie, and the saved-patterns list stored on the customer's Shopify record
  * (metafield calibtools.saved_patterns, JSON).
  *
- * Privacy (CLAUDE.md, /privacy/): no cookie before sign-in. The login state travels inside
- * the OAuth `state` parameter, encrypted, so the only cookie is the session cookie set after
- * a successful sign-in. It is HttpOnly, first-party and holds the encrypted Shopify tokens.
+ * Cookies (CLAUDE.md, /privacy/), both first-party and HttpOnly:
+ *  - ct_login: set when sign-in starts, 10 minutes, path /api/account/. A random value that is
+ *    also sealed into the OAuth `state`, so the callback only completes in the browser that
+ *    started the sign-in (login CSRF). Cleared by the callback.
+ *  - ct_session: set after a successful sign-in; holds the encrypted Shopify tokens.
  */
 import { patternId, specFromLink } from './patternLink';
 
@@ -24,6 +26,7 @@ export const SCOPE = 'openid email customer-account-api:full';
 export const CALLBACK_PATH = '/api/account/callback';
 export const ACCOUNT_PATH = '/account/';
 export const SESSION_COOKIE = 'ct_session';
+export const LOGIN_COOKIE = 'ct_login';
 /** How long the browser keeps the session cookie; the refresh token keeps the session alive within it. */
 export const SESSION_MAX_AGE_S = 14 * 24 * 3600;
 export const STATE_TTL_MS = 10 * 60 * 1000;
@@ -86,18 +89,22 @@ export async function open<T = unknown>(secret: string, purpose: string, token: 
 
 // ── login state ─────────────────────────────────────────────────────────────
 
-export interface LoginState { v: string; n: string; r: string; t: number }
+/** v: PKCE verifier, n: nonce, b: browser binding (also in the ct_login cookie), r: return path, t: issued (ms). */
+export interface LoginState { v: string; n: string; b: string; r: string; t: number }
 
 export async function newLoginState(secret: string, returnTo: string | null, now = Date.now()) {
   const verifier = randomToken();
   const nonce = randomToken();
-  const state = await seal(secret, 'state', { v: verifier, n: nonce, r: safeReturnTo(returnTo), t: now } satisfies LoginState);
-  return { state, verifier, nonce };
+  const binding = randomToken();
+  const state = await seal(secret, 'state', { v: verifier, n: nonce, b: binding, r: safeReturnTo(returnTo), t: now } satisfies LoginState);
+  return { state, verifier, nonce, binding };
 }
 
-export async function checkLoginState(secret: string, state: string, now = Date.now()): Promise<LoginState | null> {
+/** The decrypted state if it is fresh and was started in this browser (binding equals the ct_login cookie). */
+export async function checkLoginState(secret: string, state: string, binding: string, now = Date.now()): Promise<LoginState | null> {
   const s = await open<LoginState>(secret, 'state', state);
-  if (!s || typeof s.v !== 'string' || typeof s.n !== 'string' || typeof s.t !== 'number') return null;
+  if (!s || typeof s.v !== 'string' || typeof s.n !== 'string' || typeof s.b !== 'string' || typeof s.t !== 'number') return null;
+  if (!binding || binding !== s.b) return null;
   if (now - s.t > STATE_TTL_MS || s.t > now + 60_000) return null;
   return { ...s, r: safeReturnTo(s.r) };
 }
@@ -167,6 +174,16 @@ const COOKIE_ATTRS = 'HttpOnly; Secure; SameSite=Lax';
 
 export function sessionCookie(value: string, maxAge = SESSION_MAX_AGE_S): string {
   return `${SESSION_COOKIE}=${value}; Path=/; Max-Age=${maxAge}; ${COOKIE_ATTRS}`;
+}
+
+export const LOGIN_COOKIE_PATH = '/api/account/';
+
+export function loginCookie(value: string): string {
+  return `${LOGIN_COOKIE}=${value}; Path=${LOGIN_COOKIE_PATH}; Max-Age=${STATE_TTL_MS / 1000}; ${COOKIE_ATTRS}`;
+}
+
+export function clearLoginCookie(): string {
+  return `${LOGIN_COOKIE}=; Path=${LOGIN_COOKIE_PATH}; Max-Age=0; ${COOKIE_ATTRS}`;
 }
 
 export function clearSessionCookie(): string {

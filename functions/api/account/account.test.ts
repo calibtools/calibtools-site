@@ -38,10 +38,10 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllGlobals());
 
 describe('login', () => {
-  it('redirects to Shopify with PKCE and sets no cookie', async () => {
+  it('redirects to Shopify with PKCE and sets only the 10-minute login cookie', async () => {
     const res = await run(login, new Request(`${ORIGIN}/api/account/login?return=/tools/generator/?rows=7`));
     expect(res.status).toBe(302);
-    expect(res.headers.get('Set-Cookie')).toBeNull();
+    expect(res.headers.get('Set-Cookie')).toMatch(/^ct_login=[A-Za-z0-9_-]{43}; Path=\/api\/account\/; Max-Age=600; HttpOnly; Secure; SameSite=Lax$/);
     const u = new URL(res.headers.get('Location')!);
     expect(`${u.origin}${u.pathname}`).toBe(AUTHORIZE_URL);
     expect(u.searchParams.get('redirect_uri')).toBe(`${ORIGIN}/api/account/callback`);
@@ -58,35 +58,42 @@ describe('callback', () => {
   async function startLogin(ret = '/tools/generator/?rows=7') {
     const res = await run(login, new Request(`${ORIGIN}/api/account/login?return=${encodeURIComponent(ret)}`));
     const u = new URL(res.headers.get('Location')!);
-    return { state: u.searchParams.get('state')!, nonce: u.searchParams.get('nonce')!, challenge: u.searchParams.get('code_challenge')! };
+    const cookie = res.headers.get('Set-Cookie')!.split(';')[0];
+    return { state: u.searchParams.get('state')!, nonce: u.searchParams.get('nonce')!, challenge: u.searchParams.get('code_challenge')!, cookie };
   }
+  const back = (qs: string, cookie: string) => new Request(`${ORIGIN}/api/account/callback?${qs}`, { headers: { Cookie: cookie } });
 
   it('exchanges the code, sets the session cookie and returns to the start page', async () => {
-    const { state, nonce, challenge } = await startLogin();
+    const { state, nonce, challenge, cookie: lc } = await startLogin();
     let form: URLSearchParams | undefined;
     token = (f) => {
       form = f;
       return new Response(JSON.stringify({ access_token: 'at', refresh_token: 'rt', id_token: idToken(nonce), expires_in: 3600 }));
     };
-    const res = await run(callback, new Request(`${ORIGIN}/api/account/callback?code=abc&state=${state}`));
+    const res = await run(callback, back(`code=abc&state=${state}`, lc));
     expect(res.status).toBe(302);
     expect(res.headers.get('Location')).toBe('/tools/generator/?rows=7');
-    const cookie = res.headers.get('Set-Cookie')!;
+    const [cookie, cleared] = res.headers.getSetCookie();
     expect(cookie).toMatch(new RegExp(`^${SESSION_COOKIE}=[A-Za-z0-9_-]+; Path=/; Max-Age=\\d+; HttpOnly; Secure; SameSite=Lax$`));
+    expect(cleared).toMatch(/^ct_login=; Path=\/api\/account\/; Max-Age=0/);
     expect(form?.get('grant_type')).toBe('authorization_code');
     expect(form?.get('code')).toBe('abc');
     expect(await codeChallenge(form!.get('code_verifier')!)).toBe(challenge);
     expect((calls[0].init?.headers as Record<string, string>).Authorization).toBe('Basic ' + btoa('cid:csecret'));
   });
-  it('refuses a wrong nonce, a bad state or a cancelled sign-in', async () => {
-    const { state } = await startLogin();
+  it('refuses a wrong nonce, a bad state, another browser or a cancelled sign-in', async () => {
+    const { state, nonce, cookie: lc } = await startLogin();
     token = () => new Response(JSON.stringify({ access_token: 'at', id_token: idToken('other') }));
-    const wrongNonce = await run(callback, new Request(`${ORIGIN}/api/account/callback?code=abc&state=${state}`));
+    const wrongNonce = await run(callback, back(`code=abc&state=${state}`, lc));
     expect(wrongNonce.headers.get('Location')).toBe('/account/?error=signin');
-    expect(wrongNonce.headers.get('Set-Cookie')).toBeNull();
-    const badState = await run(callback, new Request(`${ORIGIN}/api/account/callback?code=abc&state=forged`));
+    expect(wrongNonce.headers.getSetCookie().some((c) => c.startsWith('ct_session='))).toBe(false);
+    const badState = await run(callback, back('code=abc&state=forged', lc));
     expect(badState.headers.get('Location')).toBe('/account/?error=expired');
-    const cancelled = await run(callback, new Request(`${ORIGIN}/api/account/callback?error=access_denied&state=${state}`));
+    token = () => new Response(JSON.stringify({ access_token: 'at', id_token: idToken(nonce) }));
+    const otherBrowser = await run(callback, back(`code=abc&state=${state}`, ''));
+    expect(otherBrowser.headers.get('Location')).toBe('/account/?error=expired');
+    expect(calls.filter((c) => c.url === TOKEN_URL)).toHaveLength(1);
+    const cancelled = await run(callback, back(`error=access_denied&state=${state}`, lc));
     expect(cancelled.headers.get('Location')).toBe('/account/?error=cancelled');
   });
 });

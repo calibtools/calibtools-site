@@ -33,7 +33,8 @@ catalog pages from the Storefront API and links into the cart.
 - No new runtime dependency without a one-line reason in the PR. Never jsPDF; use pdf-lib.
 - No analytics or tracking scripts. No cookies beyond what Shopify needs on its own domain.
   Exception — customer accounts (saved patterns, quote history): sign-in through Shopify customer
-  accounts; after sign-in only, one first-party HttpOnly session cookie on calib.tools. Saved patterns
+  accounts; first-party HttpOnly cookies on calib.tools only for sign-in: `ct_login` (10 min, while signing in)
+  and `ct_session` (after sign-in). Saved patterns
   are stored on the customer's Shopify record. No tracking, no third parties; list it on /privacy/.
 
 ## Conventions

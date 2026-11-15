@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   AUTHORIZE_URL, SESSION_COOKIE, STATE_TTL_MS, MAX_PATTERNS,
   codeChallenge, randomToken, seal, open, safeReturnTo, authorizeUrl, logoutUrl,
-  sessionCookie, clearSessionCookie, readCookie, needsRefresh, idTokenClaims,
+  sessionCookie, clearSessionCookie, loginCookie, clearLoginCookie, LOGIN_COOKIE, readCookie, needsRefresh, idTokenClaims,
   parseSavedPatterns, addPattern, removePattern, isGeneratorPath, newLoginState, checkLoginState,
   type Session,
 } from './account';
@@ -40,10 +40,16 @@ describe('seal / open', () => {
 describe('login state', () => {
   it('carries verifier, nonce and return path, and expires', async () => {
     const now = 1_800_000_000_000;
-    const { state, verifier, nonce } = await newLoginState(SECRET, '/tools/generator/?rows=7', now);
-    const ok = await checkLoginState(SECRET, state, now + 1000);
-    expect(ok).toEqual({ v: verifier, n: nonce, r: '/tools/generator/?rows=7', t: now });
-    expect(await checkLoginState(SECRET, state, now + STATE_TTL_MS + 1)).toBeNull();
+    const { state, verifier, nonce, binding } = await newLoginState(SECRET, '/tools/generator/?rows=7', now);
+    const ok = await checkLoginState(SECRET, state, binding, now + 1000);
+    expect(ok).toEqual({ v: verifier, n: nonce, b: binding, r: '/tools/generator/?rows=7', t: now });
+    expect(await checkLoginState(SECRET, state, binding, now + STATE_TTL_MS + 1)).toBeNull();
+  });
+  it('only completes in the browser that started sign-in', async () => {
+    const now = 1_800_000_000_000;
+    const { state } = await newLoginState(SECRET, null, now);
+    expect(await checkLoginState(SECRET, state, '', now)).toBeNull();
+    expect(await checkLoginState(SECRET, state, randomToken(), now)).toBeNull();
   });
 });
 
@@ -81,6 +87,10 @@ describe('cookies', () => {
     const c = sessionCookie('abc', 3600);
     expect(c).toBe(`${SESSION_COOKIE}=abc; Path=/; Max-Age=3600; HttpOnly; Secure; SameSite=Lax`);
     expect(clearSessionCookie()).toBe(`${SESSION_COOKIE}=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=Lax`);
+  });
+  it('login cookie lives 10 minutes and only on the sign-in routes', () => {
+    expect(loginCookie('b')).toBe(`${LOGIN_COOKIE}=b; Path=/api/account/; Max-Age=600; HttpOnly; Secure; SameSite=Lax`);
+    expect(clearLoginCookie()).toContain('Max-Age=0');
   });
   it('reads one cookie from a header', () => {
     expect(readCookie('a=1; ct_session=xyz; b=2', 'ct_session')).toBe('xyz');

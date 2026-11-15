@@ -119,7 +119,7 @@ export default function AccountPanel() {
           <a className="btn btn-md btn-primary no-underline" href="/api/account/login?return=/account/">Sign in</a>
         </div>
         <p className="m-0 text-[13px] text-ink-muted">
-          Signing in sets one cookie on calib.tools that keeps you signed in. See the <a href="/privacy/">privacy policy</a>.
+          Signing in sets a cookie on calib.tools that keeps you signed in; nothing is used for tracking. See the <a href="/privacy/">privacy policy</a>.
         </p>
       </div>
     );
