@@ -2,17 +2,27 @@
 import Base from '@/layouts/Base.astro';
 import { breadcrumbLd } from '@/lib/seo';
 import { CONTACT_EMAIL } from '@/lib/claims';
+import { TAG_IDS, TAG_LABELS, anyTagConfigured } from '@/lib/tags';
 const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: 'Privacy policy' }]);
 
 /** Build-time date for "Last updated" line. */
+/** The page describes the build it ships with: the cookie sections appear only when a tag is switched on. */
+const tagsOn = anyTagConfigured(TAG_IDS);
+const description = tagsOn
+  ? 'What we store when you browse, use the free tools, request a quote, order or review, and how to switch analytics and marketing cookies on or off.'
+  : 'No tracking cookies, no ads; one human check on forms. Exactly what we store when you browse, use the free tools, request a quote, order or review.';
 const lastUpdated = new Date().toISOString().slice(0, 10);
 ---
-<Base title="Privacy policy" description="No tracking cookies, no ads; one human check on forms. Exactly what we store when you browse, use the free tools, request a quote, order or review." jsonLd={bcLd}>
+<Base title="Privacy policy" description={description} jsonLd={bcLd}>
   <div class="container-x py-10 md:py-16">
     <div class="prose-calib mx-auto flex max-w-[720px] flex-col gap-5">
       <h1 class="h-display m-0 text-[32px] md:text-[40px]">Privacy policy</h1>
 
-      <p><strong>In short:</strong> we don&rsquo;t track you, set no advertising or analytics cookies and load no third-party scripts except Cloudflare&rsquo;s human check on forms. We only keep what we need to answer you, ship your order and run the site.</p>
+      {tagsOn ? (
+        <p><strong>In short:</strong> outside the United States we ask before using analytics or marketing cookies; in the United States they are on until you switch them off. &ldquo;Privacy settings&rdquo; at the bottom of every page changes your choice. Beyond that we only keep what we need to answer you, ship your order and run the site.</p>
+      ) : (
+        <p><strong>In short:</strong> we don&rsquo;t track you, set no advertising or analytics cookies and load no third-party scripts except Cloudflare&rsquo;s human check on forms. We only keep what we need to answer you, ship your order and run the site.</p>
+      )}
 
       <h2>Who is responsible</h2>
       <p>
@@ -26,6 +36,21 @@ const lastUpdated = new Date().toISOString().slice(0, 10);
         <li><strong>In your browser.</strong> We store a cart ID on your device (<code>localStorage</code> key <code>calib-cart-id</code>), created when you first add something to the cart. After you send a quote request, a summary of it is kept for that browser tab only (<code>sessionStorage</code> key <code>ct-quote</code>) so the confirmation page can show it; it is gone when you close the tab. No cookies unless you sign in (see Customer accounts).</li>
         <li><strong>Fonts.</strong> Geist fonts are served from our own domain; no external font services.</li>
       </ul>
+
+      {tagsOn && (
+        <>
+          <h2>Analytics and marketing cookies</h2>
+          <p><strong>Your choice.</strong> The first time you visit, a bar at the bottom of the page shows the choice. Outside the United States nothing in this section loads until you accept it, and &ldquo;Reject all&rdquo; is as easy as &ldquo;Accept all&rdquo;.</p>
+          <p>In the United States these cookies are on by default; &ldquo;Turn off&rdquo; or &ldquo;Do not sell or share my personal information&rdquo; switches them off. If your browser sends a Global Privacy Control signal, marketing cookies stay off.</p>
+          <p>To pick the right version of the bar, our server reads the two-letter country code Cloudflare attaches to your request; your IP address is not stored. Your choice is kept on your device (<code>localStorage</code> key <code>ct-consent</code>).</p>
+          <ul class="ml-5 flex flex-col gap-2 text-[15px] list-disc">
+            {TAG_IDS.ga4 && <li><strong>{TAG_LABELS.ga4}</strong> (analytics). Google Analytics 4 shows us which pages are visited, roughly where visitors are (country and city), the kind of device and the site they came from. It sets the cookies <code>_ga</code> and <code>_ga_*</code>, which last up to two years, and Google processes the data on its servers, including in the United States. See <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google&rsquo;s privacy policy</a>.</li>}
+            {TAG_IDS.googleAds && <li><strong>{TAG_LABELS.googleAds}</strong> (marketing). Measures whether a visit that came from one of our ads led to a quote or an order, and lets us show our ads to people who visited. See <a href="https://policies.google.com/technologies/ads" target="_blank" rel="noopener">how Google uses advertising cookies</a>.</li>}
+            {TAG_IDS.linkedin && <li><strong>{TAG_LABELS.linkedin}</strong> (marketing). Measures visits that came from LinkedIn and lets us show our posts and ads to people who visited. See <a href="https://www.linkedin.com/legal/privacy-policy" target="_blank" rel="noopener">LinkedIn&rsquo;s privacy policy</a>.</li>}
+            {TAG_IDS.hubspot && <li><strong>{TAG_LABELS.hubspot}</strong> (marketing). Links your visits to the quote requests and emails you send us, so the person answering you sees the context. See <a href="https://legal.hubspot.com/privacy-policy" target="_blank" rel="noopener">HubSpot&rsquo;s privacy policy</a>.</li>}
+          </ul>
+        </>
+      )}
 
       <h2>Free tools</h2>
       <p>Everything you enter in the generator, calculators and image checks stays in your browser. Images you check are not uploaded.</p>
@@ -62,10 +87,15 @@ const lastUpdated = new Date().toISOString().slice(0, 10);
       <p>Quote and order emails are kept as long as we need them for the request, the order, warranty and tax records. Review invitations expire after 30 days. Ask us any time to delete data we don&rsquo;t need to keep by law.</p>
 
       <h2>Your rights</h2>
-      <p>You can ask what we hold about you, correct it, delete it, take a copy or object to how we use it. Email <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>. If you&rsquo;re in the EU or UK, you can also complain to your local data protection authority. California residents: we don&rsquo;t sell or share personal information for advertising.</p>
+      <p>You can ask what we hold about you, correct it, delete it, take a copy or object to how we use it. Email <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>. If you&rsquo;re in the EU or UK, you can also complain to your local data protection authority.</p>
+      {tagsOn ? (
+        <p>California residents: &ldquo;Do not sell or share my personal information&rdquo; under &ldquo;Privacy settings&rdquo; switches off analytics and marketing cookies. We honor Global Privacy Control.</p>
+      ) : (
+        <p>California residents: we don&rsquo;t sell or share personal information for advertising.</p>
+      )}
 
       <h2>Legal basis (EU/UK)</h2>
-      <p>Order and quote data: to perform a contract or take steps toward one. Hosting, spam limits and page counts: our legitimate interest in running a secure site. Newsletter: your consent.</p>
+      <p>Order and quote data: to perform a contract or take steps toward one. Hosting, spam limits and page counts: our legitimate interest in running a secure site. Newsletter: your consent.{tagsOn && ' Analytics and marketing cookies: your consent, which you can withdraw under “Privacy settings”.'}</p>
 
       <h2>Changes</h2>
       <p>We update this page when what we collect changes. Last updated: {lastUpdated}.</p>
