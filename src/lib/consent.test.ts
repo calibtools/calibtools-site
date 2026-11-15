@@ -4,17 +4,16 @@ import { cleanTagIds, anyTagConfigured, tagsToLoad, TAG_LABELS } from './tags';
 import { readFileSync } from 'node:fs';
 
 describe('region', () => {
-  it('US is opt-out, everywhere else and unknown is opt-in', () => {
-    expect(regionFor('US')).toBe('optout');
-    for (const c of ['DE', 'FR', 'GB', 'CH', 'JP', 'KR', '', undefined, 'XX', 'T1']) expect(regionFor(c), String(c)).toBe('optin');
+  it('only decides the wording: United States or not', () => {
+    expect(regionFor('US')).toBe('us');
+    for (const c of ['DE', 'FR', 'GB', 'CH', 'JP', 'KR', '', undefined, 'XX', 'T1']) expect(regionFor(c), String(c)).toBe('other');
   });
 });
 
 describe('choice', () => {
-  it('defaults: opt-in off, opt-out on, GPC always off', () => {
-    expect(defaultChoice('optin', false)).toMatchObject({ analytics: false, marketing: false });
-    expect(defaultChoice('optout', false)).toMatchObject({ analytics: true, marketing: true });
-    expect(defaultChoice('optout', true)).toMatchObject({ analytics: false, marketing: false });
+  it('defaults: on for everyone, off with GPC', () => {
+    expect(defaultChoice(false)).toMatchObject({ analytics: true, marketing: true });
+    expect(defaultChoice(true)).toMatchObject({ analytics: false, marketing: false });
   });
   it('round-trips and rejects junk', () => {
     const c = { v: 1 as const, analytics: true, marketing: false, t: 1_800_000_000_000 };
@@ -24,9 +23,10 @@ describe('choice', () => {
   });
   it('a stored choice wins, except that GPC still switches marketing off', () => {
     const stored = { v: 1 as const, analytics: true, marketing: true, t: 1 };
-    expect(effectiveChoice(stored, 'optin', false)).toEqual(stored);
-    expect(effectiveChoice(stored, 'optout', true)).toMatchObject({ analytics: true, marketing: false });
-    expect(effectiveChoice(null, 'optin', false)).toMatchObject({ analytics: false, marketing: false });
+    expect(effectiveChoice(stored, false)).toEqual(stored);
+    expect(effectiveChoice(stored, true)).toMatchObject({ analytics: true, marketing: false });
+    expect(effectiveChoice(null, false)).toMatchObject({ analytics: true, marketing: true });
+    expect(effectiveChoice(null, true)).toMatchObject({ analytics: false, marketing: false });
   });
   it('the banner shows until a choice is stored', () => {
     expect(bannerNeeded(null)).toBe(true);

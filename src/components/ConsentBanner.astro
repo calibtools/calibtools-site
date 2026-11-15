@@ -1,15 +1,14 @@
 ---
 /**
  * Cookie banner and tag loader. Rendered by Base.astro only when a tag is configured (src/lib/tags.ts).
- * Two versions from one markup: ask first (everywhere except the United States) and on by default with
- * a way out (United States). The choice is kept in localStorage; "Privacy settings" in the footer reopens it.
+ * Tags are on by default for every visitor, with a way out under "Options"; visitors in the United States
+ * also see the "Do not sell or share" link. The choice is kept in localStorage; "Privacy settings" in the footer reopens it.
  */
 ---
 <div id="ct-consent" hidden class="fixed inset-x-0 bottom-0 z-[70] border-t border-ink bg-sheet" role="region" aria-label="Cookie choices">
   <div class="container-x flex flex-col gap-4 py-4 lg:flex-row lg:items-center lg:justify-between">
     <div class="flex max-w-[640px] flex-col gap-2">
-      <p class="m-0 text-[14px]" data-consent-text="optin">We would like to use analytics and marketing cookies to see which pages help and to show our ads to people who visited. The site works the same without them.</p>
-      <p class="m-0 text-[14px]" data-consent-text="optout" hidden>We use analytics and marketing cookies to see which pages help and to show our ads to people who visited. You can switch them off.</p>
+      <p class="m-0 text-[14px]">We use analytics and marketing cookies to see which pages help and to show our ads to people who visited. You can switch them off under Options.</p>
       <fieldset class="m-0 hidden flex-wrap gap-x-6 gap-y-2 border-0 p-0" data-consent-detail>
         <legend class="sr-only">Cookie categories</legend>
         <label class="flex min-h-[44px] items-center gap-2 text-[14px] md:min-h-0"><input type="checkbox" checked disabled /> Necessary (cart, sign-in)</label>
@@ -18,13 +17,13 @@
       </fieldset>
       <div class="flex flex-wrap gap-x-6 gap-y-1 text-[13px]">
         <a href="/privacy/">Privacy policy</a>
-        <button type="button" class="text-left text-brand-dark underline underline-offset-[3px]" data-consent-act="reject" data-consent-text="optout" hidden>Do not sell or share my personal information</button>
+        <button type="button" class="text-left text-brand-dark underline underline-offset-[3px]" data-consent-act="reject" data-consent-us hidden>Do not sell or share my personal information</button>
       </div>
     </div>
     <div class="flex flex-wrap gap-3">
       <button type="button" class="btn btn-md btn-secondary" data-consent-act="choose">Options</button>
       <button type="button" class="btn btn-md btn-secondary hidden" data-consent-act="save">Save choices</button>
-      <button type="button" class="btn btn-md btn-secondary" data-consent-act="reject"><span data-consent-text="optin">Reject all</span><span data-consent-text="optout" hidden>Turn off</span></button>
+      <button type="button" class="btn btn-md btn-secondary" data-consent-act="reject">Turn off</button>
       <button type="button" class="btn btn-md btn-secondary" data-consent-act="accept">Accept</button>
     </div>
   </div>
@@ -78,10 +77,10 @@
   }
 
   function show(region: Region, current: Choice) {
-    el.querySelectorAll<HTMLElement>('[data-consent-text]').forEach((n) => { n.hidden = n.dataset.consentText !== region; });
+    el.querySelectorAll<HTMLElement>('[data-consent-us]').forEach((n) => { n.hidden = region !== 'us'; });
     el.querySelectorAll<HTMLInputElement>('[data-consent-box]').forEach((b) => { b.checked = current[b.dataset.consentBox as 'analytics' | 'marketing']; });
-    // First view is the same everywhere: "Options" and "Accept". The reject button sits behind "Options";
-    // in the United States the "Do not sell or share" link also stays in view.
+    // First view: "Options" and "Accept". "Turn off" sits behind "Options"; in the United States the
+    // "Do not sell or share" link also stays in view.
     el.querySelector<HTMLElement>('button.btn[data-consent-act="reject"]')!.classList.add('hidden');
     el.hidden = false;
   }
@@ -98,12 +97,12 @@
 
   async function start(reopen = false) {
     const stored = read();
-    if (stored && !reopen) { apply(effectiveChoice(stored, 'optin', gpc)); return; }
-    let country = '';
-    try { country = (await (await fetch('/api/geo', { headers: { Accept: 'application/json' } })).json()).country ?? ''; } catch { /* unknown: ask first */ }
-    const region = regionFor(country);
-    const current = effectiveChoice(stored, region, gpc);
+    if (stored && !reopen) { apply(effectiveChoice(stored, gpc)); return; }
+    const current = effectiveChoice(stored, gpc);
     if (!reopen) apply(current);
+    let country = '';
+    try { country = (await (await fetch('/api/geo', { headers: { Accept: 'application/json' } })).json()).country ?? ''; } catch { /* unknown: no United States link */ }
+    const region = regionFor(country);
     if (reopen || bannerNeeded(stored)) show(region, current);
     el.onclick = (e) => {
       const act = (e.target as HTMLElement).closest<HTMLElement>('[data-consent-act]')?.dataset.consentAct;
