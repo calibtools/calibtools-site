@@ -19,7 +19,7 @@ const lastUpdated = new Date().toISOString().slice(0, 10);
       <h1 class="h-display m-0 text-[32px] md:text-[40px]">Privacy policy</h1>
 
       {tagsOn ? (
-        <p><strong>In short:</strong> outside the United States we ask before using analytics or marketing cookies; in the United States they are on until you switch them off. &ldquo;Privacy settings&rdquo; at the bottom of every page changes your choice. Beyond that we only keep what we need to answer you, ship your order and run the site.</p>
+        <p><strong>In short:</strong> we use analytics and marketing cookies, and you can switch them off at any time under &ldquo;Privacy settings&rdquo; at the bottom of every page. Beyond that we only keep what we need to answer you, ship your order and run the site.</p>
       ) : (
         <p><strong>In short:</strong> we don&rsquo;t track you, set no advertising or analytics cookies and load no third-party scripts except Cloudflare&rsquo;s human check on forms. We only keep what we need to answer you, ship your order and run the site.</p>
       )}
@@ -40,9 +40,9 @@ const lastUpdated = new Date().toISOString().slice(0, 10);
       {tagsOn && (
         <>
           <h2>Analytics and marketing cookies</h2>
-          <p><strong>Your choice.</strong> The first time you visit, a bar at the bottom of the page shows the choice. Outside the United States nothing in this section loads until you accept it. &ldquo;Options&rdquo; lets you reject everything or pick categories.</p>
-          <p>In the United States these cookies are on by default; &ldquo;Turn off&rdquo; under &ldquo;Options&rdquo;, or &ldquo;Do not sell or share my personal information&rdquo;, switches them off. If your browser sends a Global Privacy Control signal, marketing cookies stay off.</p>
-          <p>To pick the right version of the bar, our server reads the two-letter country code Cloudflare attaches to your request; your IP address is not stored. Your choice is kept on your device (<code>localStorage</code> key <code>ct-consent</code>).</p>
+          <p><strong>Your choice.</strong> These cookies are on by default. The first time you visit, a bar at the bottom of the page says so: &ldquo;Accept&rdquo; keeps them on, and &ldquo;Options&rdquo; lets you turn everything off or pick categories.</p>
+          <p>If your browser sends a Global Privacy Control signal, they stay off. Visitors in the United States also see &ldquo;Do not sell or share my personal information&rdquo;, which switches them off in one step.</p>
+          <p>To decide whether to show that link, our server reads the two-letter country code Cloudflare attaches to your request; your IP address is not stored. Your choice is kept on your device (<code>localStorage</code> key <code>ct-consent</code>).</p>
           <ul class="ml-5 flex flex-col gap-2 text-[15px] list-disc">
             {TAG_IDS.ga4 && <li><strong>{TAG_LABELS.ga4}</strong> (analytics). Google Analytics 4 shows us which pages are visited, roughly where visitors are (country and city), the kind of device and the site they came from. It sets the cookies <code>_ga</code> and <code>_ga_*</code>, which last up to two years, and Google processes the data on its servers, including in the United States. See <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google&rsquo;s privacy policy</a>.</li>}
             {TAG_IDS.googleAds && <li><strong>{TAG_LABELS.googleAds}</strong> (marketing). Measures whether a visit that came from one of our ads led to a quote or an order, and lets us show our ads to people who visited. See <a href="https://policies.google.com/technologies/ads" target="_blank" rel="noopener">how Google uses advertising cookies</a>.</li>}
@@ -95,7 +95,8 @@ const lastUpdated = new Date().toISOString().slice(0, 10);
       )}
 
       <h2>Legal basis (EU/UK)</h2>
-      <p>Order and quote data: to perform a contract or take steps toward one. Hosting, spam limits and page counts: our legitimate interest in running a secure site. Newsletter: your consent.{tagsOn && ' Analytics and marketing cookies: your consent, which you can withdraw under “Privacy settings”.'}</p>
+      <p>Order and quote data: to perform a contract or take steps toward one. Hosting, spam limits and page counts: our legitimate interest in running a secure site. Newsletter: your consent.</p>
+      {tagsOn && <p>Analytics and marketing cookies: our interest in understanding how the site is used and in advertising. You can switch them off under &ldquo;Privacy settings&rdquo;.</p>}
 
       <h2>Changes</h2>
       <p>We update this page when what we collect changes. Last updated: {lastUpdated}.</p>
