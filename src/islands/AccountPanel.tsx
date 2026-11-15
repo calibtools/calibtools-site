@@ -112,12 +112,15 @@ export default function AccountPanel() {
       <div className="flex max-w-[560px] flex-col gap-4">
         {msg && <p className="m-0 border border-line-strong bg-sheet p-3 text-[14px]" role="alert">{msg}</p>}
         <p className="m-0 text-base text-ink-muted">
-          Sign in with your email address to keep generator patterns, see your quotes and follow your orders. Shopify sends a
-          one-time code to your inbox; there is no password.
+          Keep generator patterns, see your quotes and follow your orders. New here? Enter your email on the next page and we
+          create your account with a one-time code; no password and no Shop app needed.
         </p>
         <div>
-          <a className="btn btn-md btn-primary no-underline" href="/api/account/login?return=/account/">Sign in</a>
+          <a className="btn btn-md btn-primary no-underline" href="/api/account/login?return=/account/">Sign in or create account</a>
         </div>
+        <p className="m-0 text-[13px] text-ink-muted">
+          On the sign-in page, use the email field. The “Continue with Shop” button is only a shortcut for people who already use Shop.
+        </p>
         <p className="m-0 text-[13px] text-ink-muted">
           Signing in sets a cookie on calib.tools that keeps you signed in; nothing is used for tracking. See the <a href="/privacy/">privacy policy</a>.
         </p>
