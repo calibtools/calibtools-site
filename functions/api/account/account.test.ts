@@ -198,6 +198,20 @@ describe('patterns', () => {
     expect(body.patterns.map((p: { name: string }) => p.name)).toEqual(['Rig B', 'Rig A']);
     expect(set).toMatchObject({ ownerId: customer.id, namespace: 'calibtools', key: 'saved_patterns', type: 'json' });
   });
+  it('renames a saved pattern', async () => {
+    let stored = '';
+    gql = ({ query, variables }) => {
+      if (query.includes('metafieldsSet')) {
+        stored = String((variables.metafields as Record<string, unknown>[])[0].value);
+        return { data: { metafieldsSet: { metafields: [{ key: 'saved_patterns' }], userErrors: [] } } };
+      }
+      return { data: { customer: { id: customer.id, savedPatterns: customer.savedPatterns } } };
+    };
+    const res = await post({ action: 'rename', id: 'P-AAAAAA', name: 'Line 3 camera' });
+    expect(res.status).toBe(200);
+    expect((await res.json()).patterns[0].name).toBe('Line 3 camera');
+    expect(JSON.parse(stored)[0]).toMatchObject({ id: 'P-AAAAAA', name: 'Line 3 camera' });
+  });
   it('rejects a link that is not a generator pattern', async () => {
     gql = () => ({ data: { customer: { id: customer.id, savedPatterns: null } } });
     const res = await post({ action: 'add', name: 'x', path: 'https://evil.example/' });

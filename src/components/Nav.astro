@@ -1,7 +1,7 @@
 ---
 import Logo from './Logo.astro';
 import CartBadge from '@/islands/CartBadge';
-import { ShoppingCart, Menu, X, ChevronDown } from 'lucide-astro';
+import { ShoppingCart, Menu, X, ChevronDown, User } from 'lucide-astro';
 import { headerGroups } from '@/lib/nav';
 
 interface Props { section?: string; theme?: 'dark' | 'light' }
@@ -125,6 +125,20 @@ const dark = theme === 'dark';
           <a href="/targets/" class="btn-md btn-primary whitespace-nowrap">
             Shop targets
           </a>
+          <a
+            href="/account/"
+            class:list={[
+              'flex items-center justify-center rounded text-ink no-underline',
+              'h-[var(--nav-cart-h)] w-[var(--nav-cart-h)]',
+              dark
+                ? 'border-[1.5px] border-white/20 hover:border-white/40'
+                : 'border-[1.5px] border-line hover:border-ink',
+            ]}
+            aria-label="Your account"
+            title="Your account"
+          >
+            <User size={18} stroke-width={1.6} aria-hidden="true" />
+          </a>
           <button
             type="button"
             class:list={[
@@ -165,7 +179,17 @@ const dark = theme === 'dark';
         <Logo theme={theme} />
       </div>
 
-      <div class="h-[var(--nav-cart-h)] w-[var(--nav-cart-h)]" aria-hidden="true"></div>
+      <a
+        href="/account/"
+        class:list={[
+          'flex items-center justify-center rounded text-ink no-underline',
+          'h-[var(--nav-cart-h)] w-[var(--nav-cart-h)]',
+          dark ? 'border-[1.5px] border-white/20' : 'border-[1.5px] border-ink',
+        ]}
+        aria-label="Your account"
+      >
+        <User size={18} stroke-width={1.6} aria-hidden="true" />
+      </a>
     </div>
   </div>
 

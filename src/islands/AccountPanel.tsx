@@ -63,6 +63,7 @@ function Section({ id, title, count, action, children }: { id: string; title: st
   );
 }
 
+const LINK_BTN = 'text-[14px] underline underline-offset-[3px] disabled:opacity-50';
 const EMPTY = 'm-0 border-t border-line px-5 py-4 text-[15px] text-ink-muted';
 
 const TH = 'h-10 px-5 whitespace-nowrap text-left font-mono text-[12px] font-medium uppercase tracking-[0.04em] text-brand-dark bg-brand-tint';
@@ -72,6 +73,8 @@ export default function AccountPanel() {
   const [state, setState] = useState<State>({ kind: 'loading' });
   const [busy, setBusy] = useState('');
   const [notice, setNotice] = useState('');
+  /** The row being renamed and the text in its field. */
+  const [editing, setEditing] = useState<{ id: string; name: string } | null>(null);
   const qs = typeof window === 'undefined' ? new URLSearchParams() : new URLSearchParams(window.location.search);
   const error = qs.get('error') ?? '';
   const detail = /^[a-z0-9_]{1,60}$/.test(qs.get('detail') ?? '') ? qs.get('detail') : '';
@@ -92,7 +95,8 @@ export default function AccountPanel() {
       .catch(() => setState({ kind: 'error' }));
   }, []);
 
-  async function remove(p: SavedPattern) {
+  /** One call for both changes to the saved list; the server returns the new list. */
+  async function change(p: SavedPattern, body: Record<string, string>, done: string, failed: string) {
     if (state.kind !== 'ready') return;
     setBusy(p.id);
     setNotice('');
@@ -101,18 +105,24 @@ export default function AccountPanel() {
         method: 'POST',
         credentials: 'same-origin',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'remove', id: p.id }),
+        body: JSON.stringify({ ...body, id: p.id }),
       });
       if (!r.ok) throw new Error();
       const { patterns } = await r.json();
       setState({ kind: 'ready', data: { ...state.data, patterns } });
-      setNotice(`Removed ${p.name}.`);
+      setNotice(done);
+      setEditing(null);
     } catch {
-      setNotice('Could not remove the pattern. Please try again.');
+      setNotice(failed);
     } finally {
       setBusy('');
     }
   }
+  const remove = (p: SavedPattern) => change(p, { action: 'remove' }, `Removed ${p.name}.`, 'Could not remove the pattern. Please try again.');
+  const rename = (p: SavedPattern, name: string) =>
+    name.trim() && name.trim() !== p.name
+      ? change(p, { action: 'rename', name }, 'Name saved.', 'Could not save the name. Please try again.')
+      : setEditing(null);
 
   if (state.kind === 'loading') {
     return <p className="m-0 text-ink-muted" role="status">Loading your account…</p>;
@@ -177,14 +187,32 @@ export default function AccountPanel() {
               <tbody>
                 {d.patterns.map((p) => (
                   <tr key={p.id}>
-                    <td className={TD}><a href={p.path}>{p.name}</a></td>
+                    <td className={TD}>
+                      {editing?.id === p.id ? (
+                        <form className="flex items-center gap-2" onSubmit={(e) => { e.preventDefault(); rename(p, editing.name); }}>
+                          <label className="sr-only" htmlFor={`name-${p.id}`}>Name for {p.id}</label>
+                          <input
+                            id={`name-${p.id}`}
+                            className="h-8 w-[280px] max-w-full border border-line-strong bg-sheet px-2 text-[14px]"
+                            value={editing.name}
+                            maxLength={80}
+                            autoFocus
+                            onChange={(e) => setEditing({ id: p.id, name: e.target.value })}
+                            onKeyDown={(e) => { if (e.key === 'Escape') setEditing(null); }}
+                          />
+                          <button type="submit" className={LINK_BTN} disabled={busy === p.id}>Save</button>
+                          <button type="button" className={`${LINK_BTN} text-ink-muted`} onClick={() => setEditing(null)}>Cancel</button>
+                        </form>
+                      ) : (
+                        <a href={p.path}>{p.name}</a>
+                      )}
+                    </td>
                     <td className={`${TD} font-mono`}>{p.id}</td>
                     <td className={`${TD} font-mono`}>{date(p.savedAt)}</td>
-                    <td className={`${TD} text-right whitespace-nowrap`}>
+                    <td className={`${TD} text-right`}>
                       <a className="mr-4" href={`/quote/?pattern=${encodeURIComponent(p.path)}`}>Request a quote</a>
-                      <button type="button" className="text-[14px] text-ink-muted underline underline-offset-[3px] disabled:opacity-50" disabled={busy === p.id} onClick={() => remove(p)}>
-                        Remove
-                      </button>
+                      <button type="button" className={`${LINK_BTN} mr-4 text-ink-muted`} disabled={busy === p.id} onClick={() => setEditing({ id: p.id, name: p.name })}>Rename</button>
+                      <button type="button" className={`${LINK_BTN} text-ink-muted`} disabled={busy === p.id} onClick={() => remove(p)}>Remove</button>
                     </td>
                   </tr>
                 ))}
