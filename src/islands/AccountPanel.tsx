@@ -15,6 +15,14 @@ const ERRORS: Record<string, string> = {
   signin: 'Sign-in did not complete. Please try again.',
 };
 
+/** Signed-out view: what an account gives, one line each. */
+const BENEFITS: [string, string][] = [
+  ['Saved patterns', 'Reopen any generator pattern on any computer.'],
+  ['Quotes', 'Every quote and its status in one place.'],
+  ['Orders', 'Follow payment and shipping.'],
+  ['No password', 'Sign in with a one-time code sent to your email.'],
+];
+
 const QUOTE_STATUS: Record<AccountSummary['quotes'][number]['status'], string> = {
   open: 'In preparation',
   sent: 'Ready to order',
@@ -109,21 +117,22 @@ export default function AccountPanel() {
   if (state.kind === 'signedOut') {
     const msg = ERRORS[error] ?? (state.available ? '' : ERRORS.unavailable);
     return (
-      <div className="flex max-w-[560px] flex-col gap-4">
+      <div className="flex max-w-[560px] flex-col gap-6">
         {msg && <p className="m-0 border border-line-strong bg-sheet p-3 text-[14px]" role="alert">{msg}</p>}
-        <p className="m-0 text-base text-ink-muted">
-          Keep generator patterns, see your quotes and follow your orders. Both buttons open the same Shopify page: enter your
-          email and a one-time code. A new email gets a new account; no password and no Shop app needed.
-        </p>
+        <ul className="m-0 flex list-none flex-col gap-3 p-0">
+          {BENEFITS.map(([title, text]) => (
+            <li key={title} className="flex items-start gap-3">
+              <span className="mt-[9px] h-1.5 w-1.5 shrink-0 bg-brand" aria-hidden="true" />
+              <span className="text-base"><strong className="font-semibold">{title}</strong> <span className="text-ink-muted">{text}</span></span>
+            </li>
+          ))}
+        </ul>
         <div className="flex flex-wrap gap-3">
           <a className="btn btn-md btn-primary no-underline" href="/api/account/login?return=/account/">Create account</a>
           <a className="btn btn-md btn-secondary no-underline" href="/api/account/login?return=/account/">Sign in</a>
         </div>
         <p className="m-0 text-[13px] text-ink-muted">
-          On the sign-in page, use the email field. The “Continue with Shop” button is only a shortcut for people who already use Shop.
-        </p>
-        <p className="m-0 text-[13px] text-ink-muted">
-          Signing in sets a cookie on calib.tools that keeps you signed in; nothing is used for tracking. See the <a href="/privacy/">privacy policy</a>.
+          Next page: enter your email, no Shop app needed. One cookie keeps you signed in, no tracking. <a href="/privacy/">Privacy policy</a>
         </p>
       </div>
     );
