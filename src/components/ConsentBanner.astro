@@ -25,7 +25,7 @@
       <button type="button" class="btn btn-md btn-secondary" data-consent-act="choose">Choose</button>
       <button type="button" class="btn btn-md btn-secondary hidden" data-consent-act="save">Save choices</button>
       <button type="button" class="btn btn-md btn-secondary" data-consent-act="reject"><span data-consent-text="optin">Reject all</span><span data-consent-text="optout" hidden>Turn off</span></button>
-      <button type="button" class="btn btn-md btn-secondary" data-consent-act="accept"><span data-consent-text="optin">Accept all</span><span data-consent-text="optout" hidden>OK</span></button>
+      <button type="button" class="btn btn-md btn-secondary" data-consent-act="accept"><span data-consent-text="optin">Accept all</span><span data-consent-text="optout" hidden>Accept</span></button>
     </div>
   </div>
 </div>
@@ -68,9 +68,20 @@
     }
   }
 
+  /** Remove Google Analytics cookies already on the device once analytics is switched off. */
+  function dropAnalyticsCookies() {
+    const host = location.hostname;
+    const domains = ['', `; domain=${host}`, `; domain=.${host.split('.').slice(-2).join('.')}`];
+    for (const name of document.cookie.split('; ').map((c) => c.split('=')[0]).filter((n) => n === '_ga' || n.startsWith('_ga_'))) {
+      for (const d of domains) document.cookie = `${name}=; Max-Age=0; path=/${d}`;
+    }
+  }
+
   function show(region: Region, current: Choice) {
     el.querySelectorAll<HTMLElement>('[data-consent-text]').forEach((n) => { n.hidden = n.dataset.consentText !== region; });
     el.querySelectorAll<HTMLInputElement>('[data-consent-box]').forEach((b) => { b.checked = current[b.dataset.consentBox as 'analytics' | 'marketing']; });
+    // United States: "Turn off" sits behind "Choose"; the "Do not sell or share" link stays in view
+    el.querySelector<HTMLElement>('button.btn[data-consent-act="reject"]')!.classList.toggle('hidden', region === 'optout');
     el.hidden = false;
   }
 
@@ -78,6 +89,7 @@
     const had = loaded.size > 0;
     write(c);
     el.hidden = true;
+    if (!c.analytics) dropAnalyticsCookies();
     // Scripts that already ran cannot be unloaded: start clean when something was switched off
     if (had && tagsToLoad(TAG_IDS, c).length < loaded.size) location.reload();
     else apply(c);
@@ -106,6 +118,7 @@
         el.querySelector<HTMLElement>('[data-consent-detail]')!.classList.replace('hidden', 'flex');
         el.querySelector<HTMLElement>('[data-consent-act="save"]')!.classList.remove('hidden');
         el.querySelector<HTMLElement>('[data-consent-act="choose"]')!.classList.add('hidden');
+        el.querySelector<HTMLElement>('button.btn[data-consent-act="reject"]')!.classList.remove('hidden');
       }
     };
   }
