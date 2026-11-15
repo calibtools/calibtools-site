@@ -31,7 +31,10 @@ catalog pages from the Storefront API and links into the cart.
 - Keep command output short (`head`, `cut -c`, `--jq`). Start from a fresh `origin/main`.
 - Keep pages static; use `client:load` islands only for interactive tools.
 - No new runtime dependency without a one-line reason in the PR. Never jsPDF; use pdf-lib.
-- No analytics or tracking scripts. No cookies beyond what Shopify needs on its own domain.
+- Analytics and marketing tags only through `src/lib/tags.ts` and the consent banner (`src/lib/consent.ts`):
+  asked first everywhere except the United States, on by default with an opt-out there, Global Privacy Control
+  honored. No tag ID is set yet, so nothing loads and no banner shows. Never add a third-party script
+  anywhere else; a tag that is switched on is listed on /privacy/. No other cookies beyond Shopify's own domain.
   Exception — customer accounts (saved patterns, quote history): sign-in through Shopify customer
   accounts; first-party HttpOnly cookies on calib.tools only for sign-in: `ct_login` (10 min, while signing in)
   and `ct_session` (after sign-in). Saved patterns

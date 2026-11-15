@@ -5,6 +5,8 @@ import Footer from '@/components/Footer.astro';
 import CartDrawer from '@/islands/CartDrawer';
 import MobileBottomCluster from '@/islands/MobileBottomCluster';
 import { ORGANIZATION_LD, autoBreadcrumbLd } from '@/lib/seo';
+import ConsentBanner from '@/components/ConsentBanner.astro';
+import { TAG_IDS, anyTagConfigured } from '@/lib/tags';
 
 interface PreloadImage {
   href: string;
@@ -40,6 +42,8 @@ const ogImageUrl = new URL(ogImage ?? '/og/default.png', Astro.site).href;
 const providedLd = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
 const hasBreadcrumb = providedLd.some((ld) => ld['@type'] === 'BreadcrumbList');
 const autoBc = !hasBreadcrumb ? autoBreadcrumbLd(Astro.url.pathname, title) : null;
+// No analytics or marketing tag is configured until IDs are set at build time; then the banner asks first
+const tagsOn = anyTagConfigured(TAG_IDS);
 const jsonLdItems = [...providedLd, ...(autoBc ? [autoBc] : []), ORGANIZATION_LD];
 ---
 <!doctype html>
@@ -85,6 +89,7 @@ const jsonLdItems = [...providedLd, ...(autoBc ? [autoBc] : []), ORGANIZATION_LD
       <slot />
     </main>
     <Footer />
+    {tagsOn && <ConsentBanner />}
     <slot name="mobile-cluster">
       <MobileBottomCluster client:load mode="shop" />
     </slot>

@@ -1,0 +1,117 @@
+---
+/**
+ * Cookie banner and tag loader. Rendered by Base.astro only when a tag is configured (src/lib/tags.ts).
+ * Two versions from one markup: ask first (everywhere except the United States) and on by default with
+ * a way out (United States). The choice is kept in localStorage; "Privacy settings" in the footer reopens it.
+ */
+---
+<div id="ct-consent" hidden class="fixed inset-x-0 bottom-0 z-[70] border-t border-ink bg-sheet" role="region" aria-label="Cookie choices">
+  <div class="container-x flex flex-col gap-4 py-4 lg:flex-row lg:items-center lg:justify-between">
+    <div class="flex max-w-[640px] flex-col gap-2">
+      <p class="m-0 text-[14px]" data-consent-text="optin">We would like to use analytics and marketing cookies to see which pages help and to show our ads to people who visited. The site works the same without them.</p>
+      <p class="m-0 text-[14px]" data-consent-text="optout" hidden>We use analytics and marketing cookies to see which pages help and to show our ads to people who visited. You can switch them off.</p>
+      <fieldset class="m-0 hidden flex-wrap gap-x-6 gap-y-2 border-0 p-0" data-consent-detail>
+        <legend class="sr-only">Cookie categories</legend>
+        <label class="flex min-h-[44px] items-center gap-2 text-[14px] md:min-h-0"><input type="checkbox" checked disabled /> Necessary (cart, sign-in)</label>
+        <label class="flex min-h-[44px] items-center gap-2 text-[14px] md:min-h-0"><input type="checkbox" data-consent-box="analytics" /> Analytics</label>
+        <label class="flex min-h-[44px] items-center gap-2 text-[14px] md:min-h-0"><input type="checkbox" data-consent-box="marketing" /> Marketing</label>
+      </fieldset>
+      <div class="flex flex-wrap gap-x-6 gap-y-1 text-[13px]">
+        <a href="/privacy/">Privacy policy</a>
+        <button type="button" class="text-left text-brand-dark underline underline-offset-[3px]" data-consent-act="reject" data-consent-text="optout" hidden>Do not sell or share my personal information</button>
+      </div>
+    </div>
+    <div class="flex flex-wrap gap-3">
+      <button type="button" class="btn btn-md btn-secondary" data-consent-act="choose">Choose</button>
+      <button type="button" class="btn btn-md btn-secondary hidden" data-consent-act="save">Save choices</button>
+      <button type="button" class="btn btn-md btn-secondary" data-consent-act="reject"><span data-consent-text="optin">Reject all</span><span data-consent-text="optout" hidden>Turn off</span></button>
+      <button type="button" class="btn btn-md btn-secondary" data-consent-act="accept"><span data-consent-text="optin">Accept all</span><span data-consent-text="optout" hidden>OK</span></button>
+    </div>
+  </div>
+</div>
+<script>
+  import { STORAGE_KEY, regionFor, parseChoice, serializeChoice, effectiveChoice, bannerNeeded, consentMode, type Choice, type Region } from '@/lib/consent';
+  import { TAG_IDS, tagsToLoad } from '@/lib/tags';
+
+  const el = document.getElementById('ct-consent')!;
+  const gpc = (navigator as Navigator & { globalPrivacyControl?: boolean }).globalPrivacyControl === true;
+  const read = (): Choice | null => { try { return parseChoice(localStorage.getItem(STORAGE_KEY)); } catch { return null; } };
+  const write = (c: Choice) => { try { localStorage.setItem(STORAGE_KEY, serializeChoice(c)); } catch { /* private mode: applies to this page only */ } };
+  const loaded = new Set<string>();
+  type W = Window & { dataLayer?: unknown[]; gtag?: (...a: unknown[]) => void; _linkedin_partner_id?: string; _linkedin_data_partner_ids?: string[] };
+  const w = window as W;
+
+  function apply(choice: Choice) {
+    const tags = tagsToLoad(TAG_IDS, choice);
+    const google = tags.filter((t) => t.key === 'ga4' || t.key === 'googleAds');
+    if (google.length) {
+      if (!w.gtag) {
+        w.dataLayer = w.dataLayer ?? [];
+        // gtag expects the arguments object itself
+        w.gtag = function () { w.dataLayer!.push(arguments); } as W['gtag'];
+        w.gtag!('consent', 'default', consentMode({ v: 1, analytics: false, marketing: false, t: 0 }));
+        w.gtag!('js', new Date());
+      }
+      w.gtag!('consent', 'update', consentMode(choice));
+    }
+    for (const t of tags) {
+      if (loaded.has(t.key)) continue;
+      loaded.add(t.key);
+      if (t.key === 'ga4' || t.key === 'googleAds') w.gtag!('config', t.id);
+      if (t.key === 'linkedin') { w._linkedin_partner_id = t.id; (w._linkedin_data_partner_ids = w._linkedin_data_partner_ids ?? []).push(t.id); }
+      if ((t.key === 'ga4' || t.key === 'googleAds') && document.querySelector('script[data-ct-tag="google"]')) continue;
+      const s = document.createElement('script');
+      s.async = true;
+      s.src = t.src;
+      s.dataset.ctTag = t.key === 'ga4' || t.key === 'googleAds' ? 'google' : t.key;
+      document.head.appendChild(s);
+    }
+  }
+
+  function show(region: Region, current: Choice) {
+    el.querySelectorAll<HTMLElement>('[data-consent-text]').forEach((n) => { n.hidden = n.dataset.consentText !== region; });
+    el.querySelectorAll<HTMLInputElement>('[data-consent-box]').forEach((b) => { b.checked = current[b.dataset.consentBox as 'analytics' | 'marketing']; });
+    el.hidden = false;
+  }
+
+  function decide(c: Choice) {
+    const had = loaded.size > 0;
+    write(c);
+    el.hidden = true;
+    // Scripts that already ran cannot be unloaded: start clean when something was switched off
+    if (had && tagsToLoad(TAG_IDS, c).length < loaded.size) location.reload();
+    else apply(c);
+  }
+
+  async function start(reopen = false) {
+    const stored = read();
+    if (stored && !reopen) { apply(effectiveChoice(stored, 'optin', gpc)); return; }
+    let country = '';
+    try { country = (await (await fetch('/api/geo', { headers: { Accept: 'application/json' } })).json()).country ?? ''; } catch { /* unknown: ask first */ }
+    const region = regionFor(country);
+    const current = effectiveChoice(stored, region, gpc);
+    if (!reopen) apply(current);
+    if (reopen || bannerNeeded(stored)) show(region, current);
+    el.onclick = (e) => {
+      const act = (e.target as HTMLElement).closest<HTMLElement>('[data-consent-act]')?.dataset.consentAct;
+      if (!act) return;
+      const now = Date.now();
+      if (act === 'accept') decide({ v: 1, analytics: true, marketing: !gpc, t: now });
+      if (act === 'reject') decide({ v: 1, analytics: false, marketing: false, t: now });
+      if (act === 'save') {
+        const box = (k: string) => el.querySelector<HTMLInputElement>(`[data-consent-box="${k}"]`)!.checked;
+        decide({ v: 1, analytics: box('analytics'), marketing: box('marketing'), t: now });
+      }
+      if (act === 'choose') {
+        el.querySelector<HTMLElement>('[data-consent-detail]')!.classList.replace('hidden', 'flex');
+        el.querySelector<HTMLElement>('[data-consent-act="save"]')!.classList.remove('hidden');
+        el.querySelector<HTMLElement>('[data-consent-act="choose"]')!.classList.add('hidden');
+      }
+    };
+  }
+
+  start();
+  document.addEventListener('click', (e) => {
+    if ((e.target as HTMLElement).closest('[data-consent-open]')) start(true);
+  });
+</script>
