@@ -22,7 +22,7 @@
       </div>
     </div>
     <div class="flex flex-wrap gap-3">
-      <button type="button" class="btn btn-md btn-secondary" data-consent-act="choose">Choose</button>
+      <button type="button" class="btn btn-md btn-secondary" data-consent-act="choose">Options</button>
       <button type="button" class="btn btn-md btn-secondary hidden" data-consent-act="save">Save choices</button>
       <button type="button" class="btn btn-md btn-secondary" data-consent-act="reject"><span data-consent-text="optin">Reject all</span><span data-consent-text="optout" hidden>Turn off</span></button>
       <button type="button" class="btn btn-md btn-secondary" data-consent-act="accept"><span data-consent-text="optin">Accept all</span><span data-consent-text="optout" hidden>Accept</span></button>
@@ -80,7 +80,7 @@
   function show(region: Region, current: Choice) {
     el.querySelectorAll<HTMLElement>('[data-consent-text]').forEach((n) => { n.hidden = n.dataset.consentText !== region; });
     el.querySelectorAll<HTMLInputElement>('[data-consent-box]').forEach((b) => { b.checked = current[b.dataset.consentBox as 'analytics' | 'marketing']; });
-    // United States: "Turn off" sits behind "Choose"; the "Do not sell or share" link stays in view
+    // United States: "Turn off" sits behind "Options"; the "Do not sell or share" link stays in view
     el.querySelector<HTMLElement>('button.btn[data-consent-act="reject"]')!.classList.toggle('hidden', region === 'optout');
     el.hidden = false;
   }
