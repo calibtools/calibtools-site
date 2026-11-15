@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { Check, Minus, Plus, ArrowRight } from '@/lib/icons';
 import {
-  findVariant, buildCartLines, buildSetCartLine, highestEndId,
+  findVariant, initialSelections, buildCartLines, buildSetCartLine, highestEndId,
   cartCreate, cartLinesAdd, cartQuery,
   getStoredCartId, setStoredCartId, dispatchCartUpdated,
   type Product,
@@ -22,30 +22,7 @@ interface Props {
 
 export default function VariantPicker({ product, fixtureVariantId, fixturePrice }: Props) {
   // Init selections from URL query params or first variant's options
-  const initSelections: Record<string, string> = {};
-  if (product.variants.length > 0) {
-    for (const opt of product.variants[0].selectedOptions) {
-      initSelections[opt.name] = opt.value;
-    }
-  } else {
-    for (const opt of product.options) {
-      if (opt.values.length > 0) initSelections[opt.name] = opt.values[0];
-    }
-  }
-  // Override from query params (e.g. ?size=300x200&dictionary=DICT_6X6_250)
-  if (typeof window !== 'undefined') {
-    const params = new URLSearchParams(window.location.search);
-    for (const opt of product.options) {
-      const qVal = params.get(opt.name.toLowerCase());
-      if (qVal) {
-        // Find matching option value (case-insensitive, × / x normalized)
-        const normalize = (s: string) => s.toLowerCase().replace(/×/g, 'x').replace(/\s+/g, '');
-        const match = opt.values.find((v) => normalize(v) === normalize(qVal));
-        if (match) initSelections[opt.name] = match;
-      }
-    }
-  }
-
+  const initSelections = initialSelections(product, typeof window !== 'undefined' ? window.location.search : '');
   const [selections, setSelections] = useState(initSelections);
   const [quantity, setQuantity] = useState(1);
   const [addFixture, setAddFixture] = useState(false);

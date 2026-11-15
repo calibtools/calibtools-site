@@ -682,3 +682,31 @@ const FALLBACK_COLLECTIONS: Collection[] = [
   { handle: 'multi-sensor', title: 'Multi-Sensor & Specialty Targets', description: 'LiDAR, radar, thermal, NIR, depth, hand-eye, multi-camera and line-scan targets.', products: FALLBACK_PRODUCTS.filter((p) => MULTI_SENSOR_HANDLES.includes(p.handle)) },
   { handle: 'mounts-accessories', title: 'Mounts & Accessories', description: 'Fixtures, stands, robot flange, hard cases.', products: FALLBACK_PRODUCTS.filter((p) => p.handle === 'mounting-fixture') },
 ];
+
+/**
+ * Option selections a product page starts with: first variant, then
+ * ?variant=<numeric id> (Shopify and Google Shopping links), then per-option
+ * params such as ?size=300x200&dictionary=DICT_6X6_250.
+ */
+export function initialSelections(product: Product, search: string): Record<string, string> {
+  const sel: Record<string, string> = {};
+  if (product.variants.length > 0) {
+    for (const opt of product.variants[0].selectedOptions) sel[opt.name] = opt.value;
+  } else {
+    for (const opt of product.options) if (opt.values.length > 0) sel[opt.name] = opt.values[0];
+  }
+  const params = new URLSearchParams(search);
+  const variantParam = params.get('variant');
+  const linked = variantParam && /^\d+$/.test(variantParam)
+    ? product.variants.find((v) => v.id.endsWith(`/${variantParam}`))
+    : undefined;
+  if (linked) for (const opt of linked.selectedOptions) sel[opt.name] = opt.value;
+  const normalize = (s: string) => s.toLowerCase().replace(/×/g, 'x').replace(/\s+/g, '');
+  for (const opt of product.options) {
+    const q = params.get(opt.name.toLowerCase());
+    if (!q) continue;
+    const match = opt.values.find((v) => normalize(v) === normalize(q));
+    if (match) sel[opt.name] = match;
+  }
+  return sel;
+}
