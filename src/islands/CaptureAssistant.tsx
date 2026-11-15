@@ -128,15 +128,20 @@ export default function CaptureAssistant() {
   const progress = captures.length / GUIDED_POSES.length;
 
   return (
-    <section className="flex flex-wrap gap-8" data-rows="layout">
+    <section className="flex flex-col gap-6">
+      <div className="card p-7">
+        <h1 className="m-0 mb-1 flex items-center gap-3 text-[26px] font-extrabold tracking-[-0.02em]"><Camera size={24} strokeWidth={1.6} className="text-brand" aria-hidden="true" />Capture assistant</h1>
+        <p className="m-0 text-sm text-ink-muted">Guided calibration image capture. 15 poses for good coverage. Nothing is uploaded.</p>
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]" data-rows="layout">
       {/* Camera + controls */}
-      <div className="flex min-w-0 flex-1 basis-[520px] flex-col gap-4">
-        <div className="card p-7">
-          <h1 className="m-0 mb-1 flex items-center gap-3 text-[26px] font-extrabold tracking-[-0.02em]"><Camera size={24} strokeWidth={1.6} className="text-brand" aria-hidden="true" />Capture assistant</h1>
-          <p className="m-0 mb-5 text-sm text-ink-muted">Guided calibration image capture. 15 poses for good coverage. Nothing is uploaded.</p>
+      <div className="flex min-w-0 flex-col gap-4">
+        <div className="card p-5">
+          <h2 className="m-0 mb-4 text-base font-bold">Camera</h2>
 
           {/* Video area */}
-          <div className="relative overflow-hidden rounded-lg bg-black">
+          <div className="relative overflow-hidden bg-black">
             <video
               ref={videoRef}
               className="w-full"
@@ -151,7 +156,7 @@ export default function CaptureAssistant() {
                 <p className="m-0 text-white/70">Camera preview will appear here</p>
                 <button
                   type="button"
-                  className="rounded bg-brand px-6 py-3 text-sm font-semibold text-white"
+                  className="btn-md btn-primary"
                   onClick={startCamera}
                 >
                   Start camera
@@ -182,17 +187,17 @@ export default function CaptureAssistant() {
 
           {/* Controls */}
           {cameraActive && (
-            <div className="mt-4 flex items-center gap-3">
+            <div className="mt-4 flex flex-wrap items-center gap-3">
               <button
                 type="button"
-                className="rounded bg-brand px-6 py-3 text-sm font-semibold text-white"
+                className="btn-md btn-primary"
                 onClick={capture}
               >
                 Capture ({captures.length}/{GUIDED_POSES.length})
               </button>
               <button
                 type="button"
-                className="rounded border border-ink bg-white px-4 py-3 text-sm font-medium"
+                className="btn-md btn-secondary"
                 onClick={stopCamera}
               >
                 Stop camera
@@ -200,7 +205,7 @@ export default function CaptureAssistant() {
               {captures.length > 0 && (
                 <button
                   type="button"
-                  className="rounded border border-ink bg-white px-4 py-3 text-sm font-medium"
+                  className="btn-md btn-secondary"
                   onClick={downloadAll}
                 >
                   Download all ({captures.length})
@@ -210,9 +215,9 @@ export default function CaptureAssistant() {
           )}
 
           {/* Progress bar */}
-          <div className="mt-4 h-2 overflow-hidden rounded-full bg-ground-panel">
+          <div className="mt-4 h-2 overflow-hidden bg-ground-panel">
             <div
-              className="h-full rounded-full bg-brand transition-all"
+              className="h-full bg-brand transition-all"
               style={{ width: `${progress * 100}%` }}
             />
           </div>
@@ -220,7 +225,7 @@ export default function CaptureAssistant() {
       </div>
 
       {/* Captured images */}
-      <div className="flex basis-[300px] flex-col gap-4">
+      <div className="flex min-w-0 flex-col gap-4">
         <div className="card p-5">
           <h2 className="m-0 mb-4 text-base font-bold">Captured images</h2>
           {captures.length === 0 ? (
@@ -263,6 +268,7 @@ export default function CaptureAssistant() {
             })}
           </div>
         </div>
+      </div>
       </div>
     </section>
   );
