@@ -5,6 +5,7 @@
  * Falls back to static data when env vars are missing so builds never fail.
  */
 
+import { track } from './track';
 import { MULTI_SENSOR_HANDLES, IMAGE_QUALITY_HANDLES } from './constants';
 import { fallbackMinEur } from './prices';
 
@@ -317,6 +318,7 @@ export async function cartCreate(lines: CartLineInput[]): Promise<{ cartId: stri
   `, { lines });
   const cart = data.cartCreate.cart;
   if (!cart) throw new Error(data.cartCreate.userErrors?.[0]?.message ?? 'Cart creation failed');
+  track('add_to_cart', { quantity: lines.reduce((n, l) => n + (l.quantity ?? 1), 0) });
   return { cartId: cart.id, checkoutUrl: cart.checkoutUrl };
 }
 
@@ -331,6 +333,7 @@ export async function cartLinesAdd(cartId: string, lines: CartLineInput[]): Prom
   `, { cartId, lines });
   const cart = data.cartLinesAdd.cart;
   if (!cart) throw new Error(data.cartLinesAdd.userErrors?.[0]?.message ?? 'Failed to add lines');
+  track('add_to_cart', { quantity: lines.reduce((n, l) => n + (l.quantity ?? 1), 0) });
   return { checkoutUrl: cart.checkoutUrl, totalQuantity: cart.totalQuantity };
 }
 

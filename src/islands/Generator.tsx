@@ -13,6 +13,7 @@ import { computeSetBoards, buildSetManifest, setBoardFilename } from '@/lib/expo
 import { PAPERS, computeLayout, fitNotice, reductionNotice, smallestFittingPaper, patternExtent, type Orientation } from '@/lib/pageLayout';
 import { LEAD_TIME } from '@/lib/claims';
 import { GENERATOR_DEFAULT, specFromParams, specToParams, patternPath, patternId } from '@/lib/patternLink';
+import { track } from '@/lib/track';
 
 /**
  * Pattern generator.
@@ -130,6 +131,7 @@ export default function Generator({ initialSpec, heading = 'Pattern generator' }
         return;
       }
       setSaved(r.ok ? 'ok' : r.status === 503 ? 'off' : 'fail');
+      if (r.ok) track('save_pattern', { pattern_type: spec.type });
     } catch {
       setSaved('fail');
     }
@@ -165,6 +167,7 @@ export default function Generator({ initialSpec, heading = 'Pattern generator' }
     a.download = name;
     a.click();
     URL.revokeObjectURL(a.href);
+    track('file_download', { file_extension: name.split('.').pop(), pattern_type: spec.type });
   };
   const slug = `${spec.type.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${spec.rows}x${spec.cols}-${spec.square}mm`;
 
