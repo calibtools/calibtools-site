@@ -19,6 +19,13 @@ export function accountConfigured(env: AccountEnv): env is Required<AccountEnv> 
   return Boolean(env.SHOPIFY_CUSTOMER_CLIENT_ID && env.SHOPIFY_CUSTOMER_CLIENT_SECRET && (env.ACCOUNT_SESSION_SECRET ?? '').length >= 32);
 }
 
+/**
+ * Shopify answers 403 "You do not have permission to access this website" (an HTML page, not JSON) to
+ * requests without a User-Agent, and Cloudflare Workers send none by default (Customer Account API
+ * reference, "Obtain access token").
+ */
+export const USER_AGENT = 'calib.tools account (+https://calib.tools/)';
+
 export function basicAuth(env: Required<AccountEnv>): string {
   return 'Basic ' + btoa(`${env.SHOPIFY_CUSTOMER_CLIENT_ID}:${env.SHOPIFY_CUSTOMER_CLIENT_SECRET}`);
 }
@@ -38,7 +45,7 @@ export async function tokenExchange(env: Required<AccountEnv>, body: Record<stri
   try {
     res = await fetch(TOKEN_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded', Authorization: basicAuth(env) },
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded', Authorization: basicAuth(env), 'User-Agent': USER_AGENT },
       body: new URLSearchParams(body).toString(),
     });
   } catch {
@@ -89,7 +96,7 @@ export class GraphQLError extends Error {}
 export async function customerGraphQL<T>(s: Session, query: string, variables: Record<string, unknown> = {}): Promise<T> {
   const res = await fetch(GRAPHQL_URL, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', Authorization: s.at },
+    headers: { 'Content-Type': 'application/json', Authorization: s.at, 'User-Agent': USER_AGENT },
     body: JSON.stringify({ query, variables }),
   });
   if (res.status === 401) throw new GraphQLError('unauthorized');

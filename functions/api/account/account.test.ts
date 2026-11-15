@@ -30,6 +30,8 @@ beforeEach(() => {
   token = () => new Response('{}', { status: 400 });
   vi.stubGlobal('fetch', vi.fn(async (url: string, init?: RequestInit) => {
     calls.push({ url: String(url), init });
+    // Shopify as it really behaves: no User-Agent, no service (403 with an HTML page)
+    if (!(init?.headers as Record<string, string> | undefined)?.['User-Agent']) return new Response('<html>You do not have permission to access this website</html>', { status: 403 });
     if (url === TOKEN_URL) return token(new URLSearchParams(String(init?.body)));
     if (url === GRAPHQL_URL) return new Response(JSON.stringify(gql(JSON.parse(String(init?.body)))));
     throw new Error('unexpected fetch ' + url);
@@ -97,7 +99,7 @@ describe('callback', () => {
     token = () => new Response(JSON.stringify({ error: 'invalid_client', error_description: 'x' }), { status: 401 });
     const rejected = await run(callback, back(`code=abc&state=${state}`, lc));
     expect(rejected.headers.get('Location')).toBe('/account/?error=token&detail=401_invalid_client');
-    token = () => new Response('<html>Forbidden</html>', { status: 403 });
+    token = () => new Response('<html>You do not have permission to access this website</html>', { status: 403 });
     const blocked = await run(callback, back(`code=abc&state=${state}`, lc));
     expect(blocked.headers.get('Location')).toBe('/account/?error=token&detail=403_not_json');
     token = () => new Response(JSON.stringify({ access_token: 'at' }));
