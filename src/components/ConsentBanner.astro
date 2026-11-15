@@ -30,7 +30,7 @@
 </div>
 <script>
   import { STORAGE_KEY, SHOPIFY_SYNC_KEY, shopifyConsent, regionFor, parseChoice, serializeChoice, effectiveChoice, bannerNeeded, consentMode, type Choice, type Region } from '@/lib/consent';
-  import { TAG_IDS, tagsToLoad, SHOPIFY_CONSENT_SCRIPT, CHECKOUT_DOMAIN, STOREFRONT_DOMAIN, STOREFRONT_TOKEN } from '@/lib/tags';
+  import { TAG_IDS, tagsToLoad, cookiesToDrop, SHOPIFY_CONSENT_SCRIPT, CHECKOUT_DOMAIN, STOREFRONT_DOMAIN, STOREFRONT_TOKEN } from '@/lib/tags';
 
   const el = document.getElementById('ct-consent')!;
   const gpc = (navigator as Navigator & { globalPrivacyControl?: boolean }).globalPrivacyControl === true;
@@ -67,11 +67,11 @@
     }
   }
 
-  /** Remove Google Analytics cookies already on the device once analytics is switched off. */
-  function dropAnalyticsCookies() {
+  /** Remove cookies of switched-off categories (Google Analytics, HubSpot) that are already on the device. */
+  function dropCookies(c: Choice) {
     const host = location.hostname;
     const domains = ['', `; domain=${host}`, `; domain=.${host.split('.').slice(-2).join('.')}`];
-    for (const name of document.cookie.split('; ').map((c) => c.split('=')[0]).filter((n) => n === '_ga' || n.startsWith('_ga_'))) {
+    for (const name of cookiesToDrop(document.cookie.split('; ').map((x) => x.split('=')[0]), c)) {
       for (const d of domains) document.cookie = `${name}=; Max-Age=0; path=/${d}`;
     }
   }
@@ -111,7 +111,7 @@
     const had = loaded.size > 0;
     write(c);
     el.hidden = true;
-    if (!c.analytics) dropAnalyticsCookies();
+    dropCookies(c);
     // Scripts that already ran cannot be unloaded: start clean when something was switched off
     if (had && tagsToLoad(TAG_IDS, c).length < loaded.size) location.reload();
     else { apply(c); syncShopify(c); }

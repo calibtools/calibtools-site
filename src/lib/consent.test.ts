@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { regionFor, defaultChoice, parseChoice, serializeChoice, effectiveChoice, bannerNeeded, consentMode, shopifyConsent, STORAGE_KEY } from './consent';
-import { cleanTagIds, anyTagConfigured, tagsToLoad, TAG_LABELS } from './tags';
+import { cleanTagIds, anyTagConfigured, tagsToLoad, cookiesToDrop, TAG_LABELS } from './tags';
 import { readFileSync } from 'node:fs';
 
 describe('region', () => {
@@ -77,5 +77,18 @@ describe('tags', () => {
   it('the banner and loader are only rendered when a tag is configured', () => {
     const base = readFileSync('src/layouts/Base.astro', 'utf8');
     expect(base).toMatch(/\{tagsOn && <ConsentBanner/);
+  });
+});
+
+describe('cookiesToDrop', () => {
+  const names = ['_ga', '_ga_EGSSX1GEQZ', 'hubspotutk', '__hstc', '__hssc', '__hssrc', 'ct_other', '_gat'];
+  it('keeps everything while both categories are on', () => {
+    expect(cookiesToDrop(names, { v: 1, analytics: true, marketing: true, t: 1 })).toEqual([]);
+  });
+  it('drops Google Analytics cookies when analytics is off', () => {
+    expect(cookiesToDrop(names, { v: 1, analytics: false, marketing: true, t: 1 })).toEqual(['_ga', '_ga_EGSSX1GEQZ']);
+  });
+  it('drops HubSpot cookies when marketing is off', () => {
+    expect(cookiesToDrop(names, { v: 1, analytics: true, marketing: false, t: 1 })).toEqual(['hubspotutk', '__hstc', '__hssc', '__hssrc']);
   });
 });

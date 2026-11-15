@@ -67,3 +67,10 @@ export const SHOPIFY_CONSENT_SCRIPT = 'https://cdn.shopify.com/shopifycloud/cons
 export const CHECKOUT_DOMAIN = 'shop.calib.tools';
 export const STOREFRONT_DOMAIN = 'calib.tools';
 export const STOREFRONT_TOKEN: string = import.meta.env.PUBLIC_SHOPIFY_STOREFRONT_TOKEN ?? '';
+
+/** First-party cookies set by tags of a category that is switched off; removed from the device right away. */
+export function cookiesToDrop(names: string[], choice: Choice): string[] {
+  return names.filter((n) =>
+    (!choice.analytics && (n === '_ga' || n.startsWith('_ga_'))) ||
+    (!choice.marketing && (n === 'hubspotutk' || n === '__hstc' || n === '__hssc' || n === '__hssrc')));
+}
