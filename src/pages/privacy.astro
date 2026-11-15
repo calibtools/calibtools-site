@@ -23,12 +23,17 @@ const lastUpdated = new Date().toISOString().slice(0, 10);
       <ul class="ml-5 flex flex-col gap-2 text-[15px] list-disc">
         <li><strong>Hosting.</strong> The site runs on Cloudflare Pages. Cloudflare processes your IP address and browser details to deliver pages and block attacks. See <a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener">Cloudflare&rsquo;s privacy policy</a>.</li>
         <li><strong>Page counts.</strong> We count page views on the server: page path and a referrer category such as &ldquo;generator&rdquo; or &ldquo;guide&rdquo;. No IP addresses, visitor IDs or sessions are stored, so a count can&rsquo;t be traced back to you. Known crawlers are skipped; the User-Agent is read for that check and not stored.</li>
-        <li><strong>In your browser.</strong> We store a cart ID on your device (<code>localStorage</code> key <code>calib-cart-id</code>), created when you first add something to the cart. After you send a quote request, a summary of it is kept for that browser tab only (<code>sessionStorage</code> key <code>ct-quote</code>) so the confirmation page can show it; it is gone when you close the tab. No cookies.</li>
+        <li><strong>In your browser.</strong> We store a cart ID on your device (<code>localStorage</code> key <code>calib-cart-id</code>), created when you first add something to the cart. After you send a quote request, a summary of it is kept for that browser tab only (<code>sessionStorage</code> key <code>ct-quote</code>) so the confirmation page can show it; it is gone when you close the tab. No cookies unless you sign in (see Customer accounts).</li>
         <li><strong>Fonts.</strong> Geist fonts are served from our own domain; no external font services.</li>
       </ul>
 
       <h2>Free tools</h2>
       <p>Everything you enter in the generator, calculators and image checks stays in your browser. Images you check are not uploaded.</p>
+
+      <h2>Customer accounts</h2>
+      <p>Signing in is optional. Sign-in runs through Shopify customer accounts: you enter your email on a Shopify page and receive a one-time code; there is no password. Your account, quotes and orders are kept by Shopify.</p>
+      <p>After you sign in, and only then, we set one cookie on calib.tools: <code>ct_session</code>. It is first-party, HttpOnly (page scripts cannot read it) and holds the encrypted Shopify sign-in tokens that keep you signed in for up to 14 days. It is not used for tracking and is deleted when you sign out.</p>
+      <p>Patterns you save from the generator are stored on your Shopify customer record as a list of generator links with the names you give them. You can remove them on your account page at any time.</p>
 
       <h2>Quote requests</h2>
       <p>When you send the quote form, we receive your name, company, work email, product, material, quantity, delivery country, message and, if you came from the generator, the link to your pattern.</p>
