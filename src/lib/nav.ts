@@ -150,6 +150,7 @@ export const footerGroups: FooterGroup[] = [
       { label: 'Files & downloads', href: '/files/' },
       { label: 'Verify a serial', href: '/verify/' },
       { label: 'Contact', href: '/contact/' },
+      { label: 'Your account', href: '/account/' },
     ],
   },
   {
