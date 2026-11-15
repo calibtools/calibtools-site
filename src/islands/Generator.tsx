@@ -112,6 +112,28 @@ export default function Generator({ initialSpec, heading = 'Pattern generator' }
     setCopied(ok ? 'ok' : 'fail');
     window.setTimeout(() => setCopied(null), 2500);
   };
+  const [saved, setSaved] = useState<'busy' | 'ok' | 'fail' | 'off' | null>(null);
+  useEffect(() => setSaved(null), [spec]);
+  /** Keep this pattern in the customer's account; signed-out visitors go through sign-in and come back to it. */
+  const saveToAccount = async () => {
+    const path = patternPath(spec);
+    setSaved('busy');
+    try {
+      const r = await fetch('/api/account/patterns', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'add', name: quoteSummary(spec), path }),
+      });
+      if (r.status === 401) {
+        window.location.href = `/api/account/login?return=${encodeURIComponent(path)}`;
+        return;
+      }
+      setSaved(r.ok ? 'ok' : r.status === 503 ? 'off' : 'fail');
+    } catch {
+      setSaved('fail');
+    }
+  };
   /** Quote request prefilled with this exact pattern (parameters only, no files). */
   const requestQuote = () => {
     const q = new URLSearchParams();
@@ -585,7 +607,11 @@ export default function Generator({ initialSpec, heading = 'Pattern generator' }
         <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 rounded border border-line px-5 py-3" data-testid="pattern-id-row">
           <span className="text-sm text-ink-muted">Pattern ID <span className="font-mono text-[15px] font-medium text-ink" data-testid="pattern-id">{urlRead ? pid : '\u2014'}</span> <span className="hidden sm:inline">&middot; same parameters, same ID. Quote it when you talk to a colleague or to us.</span></span>
           <span className="flex items-center gap-3">
-            <span className="text-[13px] text-ink-muted" role="status" aria-live="polite">{copied === 'ok' ? 'Link copied' : copied === 'fail' ? 'Could not copy; use the address bar' : ''}</span>
+            <span className="text-[13px] text-ink-muted" role="status" aria-live="polite">
+              {copied === 'ok' ? 'Link copied' : copied === 'fail' ? 'Could not copy; use the address bar' : ''}
+              {saved === 'ok' ? <>Saved to <a href="/account/">your account</a></> : saved === 'fail' ? 'Could not save; please try again' : saved === 'off' ? 'Accounts are not available yet' : ''}
+            </span>
+            <button type="button" onClick={saveToAccount} disabled={!urlRead || saved === 'busy'} className="rounded border border-ink px-3 py-2 text-sm font-semibold min-h-[44px] md:min-h-[36px]" data-testid="save-pattern">Save to account</button>
             <button type="button" onClick={copyPatternLink} disabled={!urlRead} className="rounded border border-ink px-3 py-2 text-sm font-semibold min-h-[44px] md:min-h-[36px]" data-testid="copy-pattern-link">Copy pattern link</button>
           </span>
         </div>

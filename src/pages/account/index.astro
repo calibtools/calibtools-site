@@ -1,0 +1,12 @@
+---
+import Base from '@/layouts/Base.astro';
+import AccountPanel from '@/islands/AccountPanel';
+---
+<Base title="Your account" description="Saved generator patterns, quotes and orders for your Calib.Tools account." noindex>
+  <div class="container-x py-[var(--section-y)]">
+    <div class="flex flex-col gap-8">
+      <h1 class="h-display m-0 text-[32px] md:text-[40px]">Your account</h1>
+      <AccountPanel client:load />
+    </div>
+  </div>
+</Base>
