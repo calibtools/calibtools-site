@@ -23,15 +23,48 @@ export function basicAuth(env: Required<AccountEnv>): string {
   return 'Basic ' + btoa(`${env.SHOPIFY_CUSTOMER_CLIENT_ID}:${env.SHOPIFY_CUSTOMER_CLIENT_SECRET}`);
 }
 
+export type TokenResult =
+  | { ok: true; tokens: TokenResponse }
+  | { ok: false; status: number; error: string; description: string };
+
+/** Short, URL-safe form of an OAuth error name ("invalid_client"); anything else becomes ''. */
+export function safeErrorName(v: unknown): string {
+  return typeof v === 'string' && /^[a-z_]{1,40}$/.test(v) ? v : '';
+}
+
+/** Token endpoint call that keeps the reason for a failure (status and OAuth error name; never the secret, code or tokens). */
+export async function tokenExchange(env: Required<AccountEnv>, body: Record<string, string>): Promise<TokenResult> {
+  let res: Response;
+  try {
+    res = await fetch(TOKEN_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded', Authorization: basicAuth(env) },
+      body: new URLSearchParams(body).toString(),
+    });
+  } catch {
+    return { ok: false, status: 0, error: 'network', description: '' };
+  }
+  const text = await res.text();
+  let json: Record<string, unknown> = {};
+  try {
+    const v = JSON.parse(text);
+    if (v && typeof v === 'object') json = v;
+  } catch {
+    // not JSON: keep the status, the body is not logged
+  }
+  if (res.ok && typeof json.access_token === 'string') return { ok: true, tokens: json as unknown as TokenResponse };
+  return {
+    ok: false,
+    status: res.status,
+    error: safeErrorName(json.error) || (res.ok ? 'no_access_token' : 'not_json'),
+    description: typeof json.error_description === 'string' ? json.error_description.slice(0, 200) : '',
+  };
+}
+
 export async function tokenRequest(env: Required<AccountEnv>, body: Record<string, string>): Promise<TokenResponse | null> {
-  const res = await fetch(TOKEN_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded', Authorization: basicAuth(env) },
-    body: new URLSearchParams(body).toString(),
-  });
-  if (!res.ok) return null;
-  const t = (await res.json()) as TokenResponse;
-  return t && typeof t.access_token === 'string' ? t : null;
+  const r = await tokenExchange(env, body);
+  if (!r.ok) console.log(JSON.stringify({ at: 'account.token', grant: body.grant_type, status: r.status, error: r.error, description: r.description }));
+  return r.ok ? r.tokens : null;
 }
 
 export async function readSession(request: Request, env: Required<AccountEnv>): Promise<Session | null> {

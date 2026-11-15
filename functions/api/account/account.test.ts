@@ -85,7 +85,7 @@ describe('callback', () => {
     const { state, nonce, cookie: lc } = await startLogin();
     token = () => new Response(JSON.stringify({ access_token: 'at', id_token: idToken('other') }));
     const wrongNonce = await run(callback, back(`code=abc&state=${state}`, lc));
-    expect(wrongNonce.headers.get('Location')).toBe('/account/?error=signin');
+    expect(wrongNonce.headers.get('Location')).toBe('/account/?error=nonce');
     expect(wrongNonce.headers.getSetCookie().some((c) => c.startsWith('ct_session='))).toBe(false);
     const badState = await run(callback, back('code=abc&state=forged', lc));
     expect(badState.headers.get('Location')).toBe('/account/?error=expired');
@@ -93,6 +93,16 @@ describe('callback', () => {
     const otherBrowser = await run(callback, back(`code=abc&state=${state}`, ''));
     expect(otherBrowser.headers.get('Location')).toBe('/account/?error=expired');
     expect(calls.filter((c) => c.url === TOKEN_URL)).toHaveLength(1);
+    calls = [];
+    token = () => new Response(JSON.stringify({ error: 'invalid_client', error_description: 'x' }), { status: 401 });
+    const rejected = await run(callback, back(`code=abc&state=${state}`, lc));
+    expect(rejected.headers.get('Location')).toBe('/account/?error=token&detail=401_invalid_client');
+    token = () => new Response('<html>Forbidden</html>', { status: 403 });
+    const blocked = await run(callback, back(`code=abc&state=${state}`, lc));
+    expect(blocked.headers.get('Location')).toBe('/account/?error=token&detail=403_not_json');
+    token = () => new Response(JSON.stringify({ access_token: 'at' }));
+    const noId = await run(callback, back(`code=abc&state=${state}`, lc));
+    expect(noId.headers.get('Location')).toBe('/account/?error=idtoken');
     const cancelled = await run(callback, back(`error=access_denied&state=${state}`, lc));
     expect(cancelled.headers.get('Location')).toBe('/account/?error=cancelled');
   });
