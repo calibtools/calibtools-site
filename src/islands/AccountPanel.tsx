@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import type { AccountSummary } from '@/lib/accountApi';
 import type { SavedPattern } from '@/lib/account';
 
@@ -47,20 +47,26 @@ function money(m: { amount: string; currencyCode: string }): string {
   }
 }
 
-function SectionHead({ label, title, count }: { label: string; title: string; count: number }) {
+/** One account section: a card with its title, count and one action on the top row, then a table or a one-line empty state. */
+function Section({ id, title, count, action, children }: { id: string; title: string; count: number; action: { href: string; label: string }; children: ReactNode }) {
   return (
-    <div className="flex flex-col gap-2">
-      <span className="eyebrow">{label}</span>
-      <span className="section-rule" aria-hidden="true" />
-      <h2 className="m-0 text-[22px] font-semibold">
-        {title} <span className="font-mono text-[14px] font-normal text-ink-muted">({count})</span>
-      </h2>
-    </div>
+    <section className="card" aria-labelledby={id}>
+      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 px-5 py-4">
+        <h2 id={id} className="m-0 flex items-baseline gap-2 text-[18px] font-semibold">
+          {title}
+          <span className="font-mono text-[13px] font-normal text-ink-muted">{count}</span>
+        </h2>
+        <a className="text-[14px] underline underline-offset-[3px]" href={action.href}>{action.label}</a>
+      </div>
+      {children}
+    </section>
   );
 }
 
-const TH = 'h-10 px-3 text-left font-mono text-[12px] font-medium uppercase tracking-[0.04em] text-brand-dark bg-brand-tint';
-const TD = 'h-10 px-3 text-[14px] border-t border-line';
+const EMPTY = 'm-0 border-t border-line px-5 py-4 text-[15px] text-ink-muted';
+
+const TH = 'h-10 px-5 whitespace-nowrap text-left font-mono text-[12px] font-medium uppercase tracking-[0.04em] text-brand-dark bg-brand-tint';
+const TD = 'h-10 px-5 whitespace-nowrap text-[14px] border-t border-line';
 
 export default function AccountPanel() {
   const [state, setState] = useState<State>({ kind: 'loading' });
@@ -151,23 +157,21 @@ export default function AccountPanel() {
 
   const d = state.data;
   return (
-    <div className="flex flex-col gap-12">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <p className="m-0 text-base">
-          Signed in as <span className="font-mono">{d.email}</span>
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-line pb-6">
+        <p className="m-0 flex flex-col gap-1">
+          <span className="eyebrow">Signed in as</span>
+          <span className="break-all font-mono text-[15px]">{d.email}</span>
         </p>
         <a className="btn btn-md btn-secondary no-underline" href="/api/account/logout">Sign out</a>
       </div>
 
-      <section className="flex flex-col gap-4" aria-labelledby="acct-patterns">
-        <div id="acct-patterns"><SectionHead label="Generator" title="Saved patterns" count={d.patterns.length} /></div>
-        {notice && <p className="m-0 text-[14px]" role="status">{notice}</p>}
+      <Section id="acct-patterns" title="Saved patterns" count={d.patterns.length} action={{ href: '/tools/generator/', label: 'Open the generator' }}>
+        {notice && <p className="m-0 border-t border-line px-5 py-3 text-[14px]" role="status">{notice}</p>}
         {d.patterns.length === 0 ? (
-          <p className="m-0 text-ink-muted">
-            No saved patterns yet. In the <a href="/tools/generator/">pattern generator</a>, use “Save to account” to keep a pattern here.
-          </p>
+          <p className={EMPTY}>Nothing saved yet. In the generator, “Save to account” keeps a pattern here.</p>
         ) : (
-          <div className="overflow-x-auto border border-line bg-sheet">
+          <div className="overflow-x-auto">
             <table className="w-full border-collapse">
               <thead><tr><th className={TH}>Name</th><th className={TH}>Pattern ID</th><th className={TH}>Saved</th><th className={TH}><span className="sr-only">Actions</span></th></tr></thead>
               <tbody>
@@ -188,14 +192,13 @@ export default function AccountPanel() {
             </table>
           </div>
         )}
-      </section>
+      </Section>
 
-      <section className="flex flex-col gap-4" aria-labelledby="acct-quotes">
-        <div id="acct-quotes"><SectionHead label="Custom orders" title="Quotes" count={d.quotes.length} /></div>
+      <Section id="acct-quotes" title="Quotes" count={d.quotes.length} action={{ href: '/quote/', label: 'Request a quote' }}>
         {d.quotes.length === 0 ? (
-          <p className="m-0 text-ink-muted">No quotes yet. <a href="/quote/">Request a quote</a> for a custom size or material.</p>
+          <p className={EMPTY}>No quotes yet. Custom sizes and materials are made to order.</p>
         ) : (
-          <div className="overflow-x-auto border border-line bg-sheet">
+          <div className="overflow-x-auto">
             <table className="w-full border-collapse">
               <thead><tr><th className={TH}>Quote</th><th className={TH}>Date</th><th className={TH}>Status</th><th className={`${TH} text-right`}>Total</th><th className={TH}><span className="sr-only">Link</span></th></tr></thead>
               <tbody>
@@ -212,14 +215,13 @@ export default function AccountPanel() {
             </table>
           </div>
         )}
-      </section>
+      </Section>
 
-      <section className="flex flex-col gap-4" aria-labelledby="acct-orders">
-        <div id="acct-orders"><SectionHead label="Shop" title="Orders" count={d.orders.length} /></div>
+      <Section id="acct-orders" title="Orders" count={d.orders.length} action={{ href: '/targets/', label: 'Shop targets' }}>
         {d.orders.length === 0 ? (
-          <p className="m-0 text-ink-muted">No orders yet.</p>
+          <p className={EMPTY}>No orders yet.</p>
         ) : (
-          <div className="overflow-x-auto border border-line bg-sheet">
+          <div className="overflow-x-auto">
             <table className="w-full border-collapse">
               <thead><tr><th className={TH}>Order</th><th className={TH}>Date</th><th className={TH}>Payment</th><th className={TH}>Shipping</th><th className={`${TH} text-right`}>Total</th><th className={TH}><span className="sr-only">Link</span></th></tr></thead>
               <tbody>
@@ -237,7 +239,7 @@ export default function AccountPanel() {
             </table>
           </div>
         )}
-      </section>
+      </Section>
     </div>
   );
 }
