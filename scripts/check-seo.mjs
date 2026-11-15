@@ -211,6 +211,11 @@ for (const file of htmlFiles) {
       }
       if (ld['@type'] === 'ProductGroup' && ld.hasVariant) {
         for (const variant of ld.hasVariant) {
+          for (const prop of ld.variesBy ?? []) {
+            const key = String(prop).replace('https://schema.org/', '');
+            if (variant[key] === undefined) errors.push({ file: rel, rule: 'jsonld-variant-varies-by', detail: `Variant "${variant.name}" missing ${key} (group varies by it)` });
+          }
+          if (ld.productGroupID && variant.inProductGroupWithID !== ld.productGroupID) errors.push({ file: rel, rule: 'jsonld-variant-group', detail: `Variant "${variant.name}" inProductGroupWithID does not match productGroupID` });
           const vo = variant.offers;
           if (!vo) continue;
           if (!vo.price && !vo.lowPrice) errors.push({ file: rel, rule: 'jsonld-product-price', detail: `Variant "${variant.name}" offers missing price` });

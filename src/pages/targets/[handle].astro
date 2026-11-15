@@ -30,6 +30,7 @@ import pkgExplodedImage from '@/assets/products/packaging/CT-PK-M_exploded.webp'
 import { compatRows, digitalFiles } from '@/lib/productCompat';
 import { QUOTE_ONLY_HANDLES, LAYOUT_ON_ORDER_HANDLES } from '@/lib/constants';
 import { skuAnchor, skuTitleFor } from '@/lib/productLongform';
+import { variesByFor, variantJsonLd } from '@/lib/productJsonLd';
 import { splitSpecValue } from '@/lib/specValue';
 import { drawingForPartNumber, representativePartNumber } from '@/lib/boardDrawing';
 import { caltabGeometry, caltabSvg } from '@/lib/halconCaltab';
@@ -262,19 +263,7 @@ const breadcrumbLd = {
     { '@type': 'ListItem', position: 3, name: product.title },
   ],
 };
-// Compute variesBy from product options
-// size → schema.org/size; pattern-changing options → schema.org/pattern; others omitted
-const PATTERN_OPTIONS = new Set(['dictionary', 'layout', 'pattern']);
-const variesBy = [...new Set(
-  product.options
-    .map((o) => {
-      const key = o.name.toLowerCase();
-      if (key === 'size') return 'https://schema.org/size';
-      if (PATTERN_OPTIONS.has(key)) return 'https://schema.org/pattern';
-      return null;
-    })
-    .filter((v: string | null): v is string => v !== null),
-)];
+const variesBy = variesByFor(product.options);
 
 // Price valid until — 1 year from build date
 const priceValidUntil = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
@@ -302,9 +291,8 @@ if (product.variants.length > 0) {
       url: `${siteUrl}${product.url}`,
     };
   }
-  productLd.hasVariant = product.variants.map((v) => ({
-    '@type': 'Product', name: `${product.title} — ${v.title}`, sku: v.sku || undefined,
-    offers: { '@type': 'Offer', price: v.priceAmount, priceCurrency: v.currencyCode, priceValidUntil, availability: v.availableForSale ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock', url: `${siteUrl}${product.url}`, seller: { '@type': 'Organization', name: 'Calib.Tools' } },
+  productLd.hasVariant = product.variants.map((v) => variantJsonLd({
+    variant: v, productTitle: product.title, productUrl: `${siteUrl}${product.url}`, groupId: handle, priceValidUntil,
   }));
 } else {
   productLd.offers = { '@type': 'AggregateOffer', lowPrice: product.priceMinAmount, priceCurrency: product.priceMinCurrency, availability: 'https://schema.org/InStock', url: `${siteUrl}${product.url}` };
