@@ -238,3 +238,9 @@ export function addPattern(list: SavedPattern[], p: { name: string; path: string
 export function removePattern(list: SavedPattern[], id: string): SavedPattern[] {
   return list.filter((x) => x.id !== id);
 }
+
+/** A customer's own name for a saved pattern. An empty name leaves the entry as it is. */
+export function renamePattern(list: SavedPattern[], id: string, name: string): SavedPattern[] {
+  const clean = name.trim().slice(0, MAX_NAME);
+  return clean ? list.map((x) => (x.id === id ? { ...x, name: clean } : x)) : list;
+}

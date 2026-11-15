@@ -1,10 +1,11 @@
 /**
  * POST /api/account/patterns   {"action":"add","name":"…","path":"/tools/generator/?…"}
  *                              {"action":"remove","id":"P-XXXXXX"}
+ *                              {"action":"rename","id":"P-XXXXXX","name":"…"}
  * Saves to / removes from the list on the customer's Shopify record (metafield
  * calibtools.saved_patterns). Returns {patterns:[…]}.
  */
-import { PATTERNS_KEY, PATTERNS_NAMESPACE, addPattern, parseSavedPatterns, removePattern } from '../../../src/lib/account';
+import { PATTERNS_KEY, PATTERNS_NAMESPACE, addPattern, parseSavedPatterns, removePattern, renamePattern } from '../../../src/lib/account';
 import {
   PATTERNS_QUERY, PATTERNS_SET, customerGraphQL, json, sameOrigin, withAccount, type AccountEnv,
 } from '../../../src/lib/accountApi';
@@ -31,6 +32,8 @@ export const onRequestPost: PagesFunction<AccountEnv> = async (ctx) => {
       }
     } else if (body.action === 'remove') {
       list = removePattern(list, String(body.id ?? ''));
+    } else if (body.action === 'rename') {
+      list = renamePattern(list, String(body.id ?? ''), String(body.name ?? ''));
     } else {
       return json({ error: 'action' }, 400);
     }

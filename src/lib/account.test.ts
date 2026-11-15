@@ -3,7 +3,7 @@ import {
   AUTHORIZE_URL, SESSION_COOKIE, STATE_TTL_MS, MAX_PATTERNS,
   codeChallenge, randomToken, seal, open, safeReturnTo, authorizeUrl, logoutUrl,
   sessionCookie, clearSessionCookie, loginCookie, clearLoginCookie, LOGIN_COOKIE, readCookie, needsRefresh, idTokenClaims,
-  parseSavedPatterns, addPattern, removePattern, isGeneratorPath, newLoginState, checkLoginState,
+  parseSavedPatterns, addPattern, removePattern, renamePattern, isGeneratorPath, newLoginState, checkLoginState,
   type Session,
 } from './account';
 
@@ -143,6 +143,14 @@ describe('saved patterns', () => {
   it('removes by id', () => {
     const list = addPattern([], { name: 'A', path: p1 }, '2026-11-15T10:00:00Z');
     expect(removePattern(list, list[0].id)).toEqual([]);
+  });
+  it('renames by id, trims, and keeps the old name when the new one is empty', () => {
+    const list = addPattern([], { name: 'A', path: p1 }, '2026-11-15T10:00:00Z');
+    const id = list[0].id;
+    expect(renamePattern(list, id, '  Line 3 camera  ')[0]).toMatchObject({ id, name: 'Line 3 camera', path: p1, savedAt: '2026-11-15T10:00:00Z' });
+    expect(renamePattern(list, id, 'n'.repeat(200))[0].name).toHaveLength(80);
+    expect(renamePattern(list, id, '   ')).toEqual(list);
+    expect(renamePattern(list, 'P-NOPE00', 'x')).toEqual(list);
   });
   it('parses stored JSON defensively', () => {
     expect(parseSavedPatterns(null)).toEqual([]);
