@@ -119,6 +119,8 @@
 
   async function start(reopen = false) {
     const stored = read();
+    // A tag can write its cookie again between "Turn off" and the reload: clear on every page start as well
+    dropCookies(effectiveChoice(stored, gpc));
     if (stored && !reopen) { apply(effectiveChoice(stored, gpc)); syncShopify(effectiveChoice(stored, gpc)); return; }
     const current = effectiveChoice(stored, gpc);
     if (!reopen) apply(current);
