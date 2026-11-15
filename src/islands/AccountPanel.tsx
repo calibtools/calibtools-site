@@ -13,6 +13,9 @@ const ERRORS: Record<string, string> = {
   cancelled: 'Sign-in was cancelled.',
   expired: 'The sign-in link expired. Please sign in again.',
   signin: 'Sign-in did not complete. Please try again.',
+  token: 'Sign-in did not complete. Please try again.',
+  idtoken: 'Sign-in did not complete. Please try again.',
+  nonce: 'Sign-in did not complete. Please try again.',
 };
 
 /** Signed-out view: what an account gives, one line each. */
@@ -63,7 +66,10 @@ export default function AccountPanel() {
   const [state, setState] = useState<State>({ kind: 'loading' });
   const [busy, setBusy] = useState('');
   const [notice, setNotice] = useState('');
-  const error = typeof window === 'undefined' ? '' : new URLSearchParams(window.location.search).get('error') ?? '';
+  const qs = typeof window === 'undefined' ? new URLSearchParams() : new URLSearchParams(window.location.search);
+  const error = qs.get('error') ?? '';
+  const detail = /^[a-z0-9_]{1,60}$/.test(qs.get('detail') ?? '') ? qs.get('detail') : '';
+  const ref = ERRORS[error] && error !== 'unavailable' && error !== 'cancelled' ? [error, detail].filter(Boolean).join('/') : '';
 
   useEffect(() => {
     fetch('/api/account/summary', { credentials: 'same-origin', headers: { Accept: 'application/json' } })
@@ -118,7 +124,12 @@ export default function AccountPanel() {
     const msg = ERRORS[error] ?? (state.available ? '' : ERRORS.unavailable);
     return (
       <div className="flex max-w-[560px] flex-col gap-6">
-        {msg && <p className="m-0 border border-line-strong bg-sheet p-3 text-[14px]" role="alert">{msg}</p>}
+        {msg && (
+          <p className="m-0 border border-line-strong bg-sheet p-3 text-[14px]" role="alert">
+            {msg}
+            {ref && <span className="block font-mono text-[12px] text-ink-muted">Reference: {ref}</span>}
+          </p>
+        )}
         <ul className="m-0 flex list-none flex-col gap-3 p-0">
           {BENEFITS.map(([title, text]) => (
             <li key={title} className="flex items-start gap-3">
