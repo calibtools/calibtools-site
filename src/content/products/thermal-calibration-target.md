@@ -22,6 +22,7 @@ relatedTargets:
   - { label: "Multi-camera target", href: "/targets/multi-camera-target/", note: "Several faces for cameras around a rig." }
   - { label: "¼″ mounting fixture", href: "/targets/mounting-fixture/", note: "Holds a board on a tripod or lab post." }
 relatedGuides:
+  - { label: "Thermal camera geometric calibration", href: "/guides/thermal-camera-geometric-calibration/", note: "Contrast, 14-bit conversion and detector settings for LWIR." }
   - { label: "OpenCV camera calibration", href: "/guides/opencv-camera-calibration/", note: "From images to a camera matrix." }
   - { label: "Why your board is not detected", href: "/guides/corner-detection-troubleshooting/", note: "Blur, tilt and resolution limits." }
   - { label: "What reprojection error tells you", href: "/guides/reprojection-error/", note: "And what a low value can hide." }
