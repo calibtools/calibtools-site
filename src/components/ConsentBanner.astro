@@ -30,6 +30,7 @@
 </div>
 <script>
   import { STORAGE_KEY, SHOPIFY_SYNC_KEY, shopifyConsent, regionFor, parseChoice, serializeChoice, effectiveChoice, bannerNeeded, consentMode, type Choice, type Region } from '@/lib/consent';
+  import { startMetaPixel, type MetaWindow } from '@/lib/metaPixel';
   import { TAG_IDS, tagsToLoad, cookiesToDrop, SHOPIFY_CONSENT_SCRIPT, CHECKOUT_DOMAIN, STOREFRONT_DOMAIN, STOREFRONT_TOKEN } from '@/lib/tags';
 
   const el = document.getElementById('ct-consent')!;
@@ -57,6 +58,7 @@
       if (loaded.has(t.key)) continue;
       loaded.add(t.key);
       if (t.key === 'ga4' || t.key === 'googleAds') w.gtag!('config', t.id);
+      if (t.key === 'meta') startMetaPixel(window as MetaWindow, t.id);
       if (t.key === 'linkedin') { w._linkedin_partner_id = t.id; (w._linkedin_data_partner_ids = w._linkedin_data_partner_ids ?? []).push(t.id); }
       if ((t.key === 'ga4' || t.key === 'googleAds') && document.querySelector('script[data-ct-tag="google"]')) continue;
       const s = document.createElement('script');
@@ -67,7 +69,7 @@
     }
   }
 
-  /** Remove cookies of switched-off categories (Google Analytics, HubSpot) that are already on the device. */
+  /** Remove cookies of switched-off categories (Google Analytics, HubSpot, Meta) that are already on the device. */
   function dropCookies(c: Choice) {
     const host = location.hostname;
     const domains = ['', `; domain=${host}`, `; domain=.${host.split('.').slice(-2).join('.')}`];
