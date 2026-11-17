@@ -54,6 +54,8 @@ const jsonLdItems = [...providedLd, ...(autoBc ? [autoBc] : []), ORGANIZATION_LD
     <title>{bareTitle ? title : `${title} · Calib.Tools`}</title>
     <meta name="description" content={description} />
     {noindex && <meta name="robots" content="noindex" />}
+    {/* Meta 域名验证，2026-11-17，对应 Meta 平台 Calib.Tools，不要删除 */}
+    <meta name="facebook-domain-verification" content="medo5c43zaicq35r04c4dvhq07g9ei" />
     <link rel="canonical" href={canonical} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
