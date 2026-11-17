@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
+import { trackMeta, checkoutParams } from '@/lib/metaPixel';
 import { ShoppingCart, X, Minus, Plus, Image as ImageIcon, ArrowRight } from '@/lib/icons';
 import {
   cartQuery, cartLinesUpdate, cartLinesRemove, formatPrice,
@@ -183,6 +184,7 @@ export default function CartDrawer() {
             <div className="flex flex-col gap-2">
               <a
                 href={cart.checkoutUrl}
+                onClick={() => trackMeta('InitiateCheckout', checkoutParams(cart))}
                 className="flex h-12 items-center justify-center rounded bg-brand text-base font-semibold text-white hover:bg-brand-dark"
               >
                 Checkout

@@ -71,7 +71,10 @@ describe('tags', () => {
     const configured = cleanTagIds({
       ga4: process.env.PUBLIC_GA4_ID, googleAds: process.env.PUBLIC_GOOGLE_ADS_ID,
       linkedin: process.env.PUBLIC_LINKEDIN_PARTNER_ID, hubspot: process.env.PUBLIC_HUBSPOT_ID,
+      meta: process.env.PUBLIC_META_PIXEL_ID,
     });
+    // the page must name every tag, whether or not this build has it switched on
+    for (const key of Object.keys(TAG_LABELS) as (keyof typeof TAG_LABELS)[]) expect(privacy, key).toContain(`TAG_LABELS.${key}`);
     for (const key of Object.keys(configured) as (keyof typeof TAG_LABELS)[]) expect(privacy, key).toContain(TAG_LABELS[key]);
   });
   it('the banner and loader are only rendered when a tag is configured', () => {

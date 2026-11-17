@@ -33,7 +33,9 @@ catalog pages from the Storefront API and links into the cart.
 - No new runtime dependency without a one-line reason in the PR. Never jsPDF; use pdf-lib.
 - Analytics and marketing tags only through `src/lib/tags.ts` and the consent banner (`src/lib/consent.ts`):
   on by default for every visitor with an opt-out under Options / Privacy settings, Global Privacy Control
-  honored (owner's decision 2026-11-15; legal review pending). GA4 is on. Never add a third-party script
+  honored (owner's decision 2026-11-15; legal review pending). GA4, HubSpot and the Meta Pixel are on. Meta Pixel (marketing; ID in `PUBLIC_META_PIXEL_ID`, events in
+  `src/lib/metaPixel.ts`): PageView, ViewContent, AddToCart, InitiateCheckout only; no advanced matching, no personal
+  data, no Conversions API; Purchase is not sent from this site. Never add a third-party script
   anywhere else; a tag that is switched on is listed on /privacy/. No other cookies beyond Shopify's own domain.
   Exception — customer accounts (saved patterns, quote history): sign-in through Shopify customer
   accounts; first-party HttpOnly cookies on calib.tools only for sign-in: `ct_login` (10 min, while signing in)

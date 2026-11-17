@@ -6,6 +6,8 @@ import {
   getStoredCartId, setStoredCartId, dispatchCartUpdated,
   type Product,
 } from '@/lib/shopify';
+import { trackMeta, viewContentParams, checkoutParams } from '@/lib/metaPixel';
+import type { CartTotals } from '@/lib/shopify';
 import { computeSetBoards } from '@/lib/exportSet';
 import { dictMarkerCount } from '@/lib/dicts/dicts';
 import { LEAD_TIME, INSPECTION_CLAIM_SHORT } from '@/lib/claims';
@@ -34,6 +36,14 @@ export default function VariantPicker({ product, fixtureVariantId, fixturePrice 
   const [boardStartIds, setBoardStartIds] = useState<number[]>([]);
 
   const variant = findVariant(product.variants, selections);
+
+  // Meta Pixel: one ViewContent per product page view, for the variant shown first
+  const viewReported = useRef(false);
+  useEffect(() => {
+    if (viewReported.current || !variant) return;
+    viewReported.current = true;
+    trackMeta('ViewContent', viewContentParams(variant));
+  }, [variant]);
 
   // Dispatch variant-changed for MobileBottomCluster
   useEffect(() => {
@@ -151,28 +161,32 @@ export default function VariantPicker({ product, fixtureVariantId, fixturePrice 
     const existingCartId = getStoredCartId();
     let checkoutUrl: string;
     let totalQuantity: number;
+    let totals: CartTotals;
 
     if (existingCartId) {
       try {
         const result = await cartLinesAdd(existingCartId, lines);
         checkoutUrl = result.checkoutUrl;
         totalQuantity = result.totalQuantity;
+        totals = result.totals;
       } catch {
         const result = await cartCreate(lines);
         setStoredCartId(result.cartId);
         // Re-fetch to get totalQuantity
         checkoutUrl = result.checkoutUrl;
         totalQuantity = quantity + addons.length * quantity;
+        totals = result.totals;
       }
     } else {
       const result = await cartCreate(lines);
       setStoredCartId(result.cartId);
       checkoutUrl = result.checkoutUrl;
       totalQuantity = quantity + addons.length * quantity;
+      totals = result.totals;
     }
 
     dispatchCartUpdated();
-    return { checkoutUrl, totalQuantity };
+    return { checkoutUrl, totalQuantity, totals };
   };
 
   const handleAddToCart = async () => {
@@ -244,7 +258,8 @@ export default function VariantPicker({ product, fixtureVariantId, fixturePrice 
     setError('');
     setConfirmation('');
     try {
-      const { checkoutUrl } = await addToCart();
+      const { checkoutUrl, totals } = await addToCart();
+      trackMeta('InitiateCheckout', checkoutParams(totals));
       window.location.href = checkoutUrl;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to add to cart');

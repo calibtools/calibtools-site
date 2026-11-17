@@ -5,7 +5,7 @@
  */
 import type { Choice } from './consent';
 
-export type TagKey = 'ga4' | 'googleAds' | 'linkedin' | 'hubspot';
+export type TagKey = 'ga4' | 'googleAds' | 'linkedin' | 'hubspot' | 'meta';
 export type TagIds = Partial<Record<TagKey, string>>;
 
 export const TAG_LABELS: Record<TagKey, string> = {
@@ -13,6 +13,7 @@ export const TAG_LABELS: Record<TagKey, string> = {
   googleAds: 'Google Ads',
   linkedin: 'LinkedIn Insight Tag',
   hubspot: 'HubSpot',
+  meta: 'Meta Pixel',
 };
 
 const FORMAT: Record<TagKey, RegExp> = {
@@ -20,10 +21,11 @@ const FORMAT: Record<TagKey, RegExp> = {
   googleAds: /^AW-\d{6,12}$/,
   linkedin: /^\d{5,9}$/,
   hubspot: /^\d{5,10}$/,
+  meta: /^\d{14,18}$/,
 };
 
-const CATEGORY: Record<TagKey, 'analytics' | 'marketing'> = { ga4: 'analytics', googleAds: 'marketing', linkedin: 'marketing', hubspot: 'marketing' };
-const ORDER: TagKey[] = ['ga4', 'googleAds', 'linkedin', 'hubspot'];
+const CATEGORY: Record<TagKey, 'analytics' | 'marketing'> = { ga4: 'analytics', googleAds: 'marketing', linkedin: 'marketing', hubspot: 'marketing', meta: 'marketing' };
+const ORDER: TagKey[] = ['ga4', 'googleAds', 'linkedin', 'hubspot', 'meta'];
 
 /** Keep only IDs in the expected format; anything else is dropped, so a typo cannot inject markup. */
 export function cleanTagIds(raw: Partial<Record<TagKey, string | undefined>>): TagIds {
@@ -44,6 +46,7 @@ export interface TagToLoad { key: TagKey; id: string; src: string }
 function srcFor(key: TagKey, id: string): string {
   if (key === 'ga4' || key === 'googleAds') return `https://www.googletagmanager.com/gtag/js?id=${id}`;
   if (key === 'linkedin') return 'https://snap.licdn.com/li.lms-analytics/insight.min.js';
+  if (key === 'meta') return 'https://connect.facebook.net/en_US/fbevents.js';
   return `https://js.hs-scripts.com/${id}.js`;
 }
 
@@ -57,6 +60,7 @@ export const TAG_IDS: TagIds = cleanTagIds({
   googleAds: import.meta.env.PUBLIC_GOOGLE_ADS_ID,
   linkedin: import.meta.env.PUBLIC_LINKEDIN_PARTNER_ID,
   hubspot: import.meta.env.PUBLIC_HUBSPOT_ID,
+  meta: import.meta.env.PUBLIC_META_PIXEL_ID,
 });
 
 /**
@@ -72,5 +76,16 @@ export const STOREFRONT_TOKEN: string = import.meta.env.PUBLIC_SHOPIFY_STOREFRON
 export function cookiesToDrop(names: string[], choice: Choice): string[] {
   return names.filter((n) =>
     (!choice.analytics && (n === '_ga' || n.startsWith('_ga_'))) ||
-    (!choice.marketing && (n === 'hubspotutk' || n === '__hstc' || n === '__hssc' || n === '__hssrc')));
+    (!choice.marketing && (n === 'hubspotutk' || n === '__hstc' || n === '__hssc' || n === '__hssrc' || n === '_fbp' || n === '_fbc')));
+}
+
+/**
+ * Domains to try when removing a cookie: none (host-only), the host, and every parent domain. A tag
+ * sets its cookie on the registrable domain, which is not always the last two labels (pages.dev previews).
+ */
+export function cookieDomains(host: string): string[] {
+  const labels = host.split('.');
+  const out = ['', host];
+  for (let i = 0; i < labels.length - 1; i++) out.push(`.${labels.slice(i).join('.')}`);
+  return out;
 }

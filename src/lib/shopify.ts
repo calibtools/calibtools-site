@@ -6,6 +6,7 @@
  */
 
 import { track } from './track';
+import { trackMeta, addToCartParams } from './metaPixel';
 import { MULTI_SENSOR_HANDLES, IMAGE_QUALITY_HANDLES } from './constants';
 import { fallbackMinEur } from './prices';
 
@@ -307,34 +308,46 @@ export async function getCollectionProducts(handle: string): Promise<Collection 
 
 // --- Cart (client-side) ---
 
-export async function cartCreate(lines: CartLineInput[]): Promise<{ cartId: string; checkoutUrl: string }> {
+/** What the add-to-cart mutations read back: enough to report the event and the cart total, nothing else. */
+const CART_AFTER_ADD = `id checkoutUrl totalQuantity
+        cost { subtotalAmount { amount currencyCode } }
+        lines(first: 100) { nodes { quantity merchandise { ... on ProductVariant { id price { amount currencyCode } } } } }`;
+
+/** Cart total and item count after an add, for the step that sends the visitor to the checkout. */
+export interface CartTotals { totalQuantity: number; cost: { subtotalAmount: { amount: string; currencyCode: string } } }
+
+function reportAdd(lines: CartLineInput[], cart: any): CartTotals {
+  track('add_to_cart', { quantity: lines.reduce((n, l) => n + (l.quantity ?? 1), 0) });
+  trackMeta('AddToCart', addToCartParams(lines, cart.lines?.nodes));
+  return { totalQuantity: cart.totalQuantity, cost: cart.cost };
+}
+
+export async function cartCreate(lines: CartLineInput[]): Promise<{ cartId: string; checkoutUrl: string; totals: CartTotals }> {
   const data = await storefront(`
     mutation CartCreate($lines: [CartLineInput!]!) {
       cartCreate(input: { lines: $lines }) {
-        cart { id checkoutUrl }
+        cart { ${CART_AFTER_ADD} }
         userErrors { field message }
       }
     }
   `, { lines });
   const cart = data.cartCreate.cart;
   if (!cart) throw new Error(data.cartCreate.userErrors?.[0]?.message ?? 'Cart creation failed');
-  track('add_to_cart', { quantity: lines.reduce((n, l) => n + (l.quantity ?? 1), 0) });
-  return { cartId: cart.id, checkoutUrl: cart.checkoutUrl };
+  return { cartId: cart.id, checkoutUrl: cart.checkoutUrl, totals: reportAdd(lines, cart) };
 }
 
-export async function cartLinesAdd(cartId: string, lines: CartLineInput[]): Promise<{ checkoutUrl: string; totalQuantity: number }> {
+export async function cartLinesAdd(cartId: string, lines: CartLineInput[]): Promise<{ checkoutUrl: string; totalQuantity: number; totals: CartTotals }> {
   const data = await storefront(`
     mutation CartLinesAdd($cartId: ID!, $lines: [CartLineInput!]!) {
       cartLinesAdd(cartId: $cartId, lines: $lines) {
-        cart { id checkoutUrl totalQuantity }
+        cart { ${CART_AFTER_ADD} }
         userErrors { field message }
       }
     }
   `, { cartId, lines });
   const cart = data.cartLinesAdd.cart;
   if (!cart) throw new Error(data.cartLinesAdd.userErrors?.[0]?.message ?? 'Failed to add lines');
-  track('add_to_cart', { quantity: lines.reduce((n, l) => n + (l.quantity ?? 1), 0) });
-  return { checkoutUrl: cart.checkoutUrl, totalQuantity: cart.totalQuantity };
+  return { checkoutUrl: cart.checkoutUrl, totalQuantity: cart.totalQuantity, totals: reportAdd(lines, cart) };
 }
 
 export async function getCartQuantity(cartId: string): Promise<number> {
