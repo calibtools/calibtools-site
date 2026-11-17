@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { cleanTagIds, tagsToLoad, cookiesToDrop, TAG_LABELS } from './tags';
+import { cleanTagIds, tagsToLoad, cookiesToDrop, cookieDomains, TAG_LABELS } from './tags';
 import { defaultChoice, effectiveChoice, parseChoice, serializeChoice } from './consent';
 import {
   startMetaPixel, trackMeta, variantNumber, viewContentParams, addToCartParams, checkoutParams, type MetaWindow,
@@ -36,6 +36,15 @@ describe('Meta Pixel: when it loads', () => {
     const names = ['_fbp', '_fbc', '_ga', 'ct_other'];
     expect(cookiesToDrop(names, stored(true, false))).toEqual(['_fbp', '_fbc']);
     expect(cookiesToDrop(names, stored(true, true))).toEqual([]);
+  });
+});
+
+describe('removing cookies: every domain a tag may have set them on', () => {
+  it('covers the host and each parent domain (Meta picks the registrable domain, e.g. under pages.dev)', () => {
+    expect(cookieDomains('calib.tools')).toEqual(['', 'calib.tools', '.calib.tools']);
+    expect(cookieDomains('7c54d834.calibtools-site.pages.dev'))
+      .toEqual(['', '7c54d834.calibtools-site.pages.dev', '.7c54d834.calibtools-site.pages.dev', '.calibtools-site.pages.dev', '.pages.dev']);
+    expect(cookieDomains('localhost')).toEqual(['', 'localhost']);
   });
 });
 

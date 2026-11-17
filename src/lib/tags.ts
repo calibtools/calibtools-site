@@ -78,3 +78,14 @@ export function cookiesToDrop(names: string[], choice: Choice): string[] {
     (!choice.analytics && (n === '_ga' || n.startsWith('_ga_'))) ||
     (!choice.marketing && (n === 'hubspotutk' || n === '__hstc' || n === '__hssc' || n === '__hssrc' || n === '_fbp' || n === '_fbc')));
 }
+
+/**
+ * Domains to try when removing a cookie: none (host-only), the host, and every parent domain. A tag
+ * sets its cookie on the registrable domain, which is not always the last two labels (pages.dev previews).
+ */
+export function cookieDomains(host: string): string[] {
+  const labels = host.split('.');
+  const out = ['', host];
+  for (let i = 0; i < labels.length - 1; i++) out.push(`.${labels.slice(i).join('.')}`);
+  return out;
+}
