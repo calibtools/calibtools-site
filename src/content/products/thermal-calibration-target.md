@@ -28,6 +28,20 @@ relatedGuides:
   - { label: "What reprojection error tells you", href: "/guides/reprojection-error/", note: "And what a low value can hide." }
 ---
 
+## At a glance
+
+| Item | Target value |
+| --- | --- |
+| Band | Long-wave infrared, 8–14 µm |
+| Pattern | Checkerboard or circle grid |
+| How the pattern shows | Plate heated from behind; pattern and background differ in emissivity |
+| Size | Built to the area you want the pattern to cover |
+| Power | Matched to the supply at the place of use |
+| Made for | Thermal camera intrinsics; extrinsics between thermal and visible cameras |
+| Not for | Calibrating temperature readings (it is not a blackbody) |
+| Software | OpenCV, Kalibr, MATLAB Camera Calibrator |
+| Ordering | Made to order; layout, price and delivery time confirmed with the quote |
+
 ## Why a printed board looks blank
 
 A long-wave infrared camera images heat radiated by surfaces, in the 8 to 14 µm band. Black ink and white board at the same temperature radiate almost the same amount, so a printed checkerboard shows up as an even gray rectangle.

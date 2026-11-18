@@ -27,6 +27,19 @@ relatedGuides:
   - { label: "How big should your target be?", href: "/guides/calibration-target-size/", note: "Size against field of view." }
 ---
 
+## At a glance
+
+| Item | Target value |
+| --- | --- |
+| Camera features | ArUco markers |
+| LiDAR features | Circular holes through the panel, found as depth edges |
+| Size | 600 × 400 mm planned; other sizes to your sensor layout |
+| Hole size | Set from your LiDAR's vertical resolution and working distance |
+| Substrate | Aluminum honeycomb panel |
+| Delivered with | Marker and hole-center positions in one coordinate frame, as a table |
+| Software | Your own pipeline, Autoware, MATLAB LiDAR-camera calibrator |
+| Ordering | Made to order; layout, price and delivery time confirmed with the quote |
+
 ## Why a camera board is not enough
 
 A camera finds a calibration board by its printed pattern. A LiDAR does not see print at all: it measures distance, and a flat board is just a flat patch of points.

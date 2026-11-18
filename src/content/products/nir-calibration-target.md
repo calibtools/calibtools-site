@@ -27,6 +27,18 @@ relatedGuides:
   - { label: "How big should your target be?", href: "/guides/calibration-target-size/", note: "The 60 % fill rule." }
 ---
 
+## At a glance
+
+| Item | Target value |
+| --- | --- |
+| Wavelength | 850 nm or 940 nm, contrast checked at your wavelength before production |
+| Pattern | ChArUco or checkerboard |
+| Size | 300 × 200 to 600 × 400 mm |
+| Surface | Matte, against glare from the camera's own illuminator |
+| Made for | Driver and occupant monitoring cameras, ToF cameras, industrial NIR cameras |
+| Software | OpenCV, ROS 2, MATLAB; nothing in the software depends on the wavelength |
+| Ordering | Made to order; layout, price and delivery time confirmed with the quote |
+
 ## Why a normal board fades in the near infrared
 
 What looks black to the eye is not always black at 850 or 940 nm. Many black inks get their color from dyes that absorb visible light and let near-infrared light through.
