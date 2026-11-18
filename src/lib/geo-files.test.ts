@@ -48,9 +48,14 @@ describe('llms.txt', () => {
 
 describe('robots.txt', () => {
   const robots = readFileSync(resolve(__dirname, '../../public/robots.txt'), 'utf-8');
-  it('lets search and AI answers use the site; the training choice is left unset', () => {
-    expect(robots).toMatch(/^Content-Signal: search=yes, ai-input=yes$/m);
-    expect(robots).not.toMatch(/ai-train/);
+  it('lets search and AI answers use the site; blocks AI training (decision 2026-11-19)', () => {
+    expect(robots).toMatch(/^Content-Signal: search=yes, ai-input=yes, ai-train=no$/m);
+    // training-only crawlers blocked, search and live-fetch agents not named in a Disallow group
+    const groups = robots.split(/\n\s*\n/);
+    const blocked = groups.filter((g) => /^Disallow: \/$/m.test(g)).join('\n');
+    for (const bot of ['GPTBot', 'ClaudeBot', 'Google-Extended', 'CCBot']) expect(blocked).toContain(`User-agent: ${bot}`);
+    for (const bot of ['OAI-SearchBot', 'ChatGPT-User', 'Claude-SearchBot', 'PerplexityBot', 'Googlebot', 'Bingbot', '*']) expect(blocked).not.toContain(`User-agent: ${bot}\n`);
+    expect(robots).toMatch(/^User-agent: \*\nContent-Signal:[^\n]*\nAllow: \/$/m);
     expect(robots).toMatch(/^Allow: \/$/m);
     expect(robots).toMatch(/^Sitemap: https:\/\/calib\.tools\/sitemap-index\.xml$/m);
   });
