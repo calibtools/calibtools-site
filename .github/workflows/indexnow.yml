@@ -1,0 +1,30 @@
+# Tell Bing and the other IndexNow engines which pages changed (by sitemap lastmod).
+# Daily after the morning deploys; run by hand with "all" once to send every page.
+
+name: IndexNow
+
+on:
+  schedule:
+    - cron: '30 5 * * *'
+  workflow_dispatch:
+    inputs:
+      all:
+        description: 'Submit every URL in the sitemap'
+        type: boolean
+        default: false
+
+concurrency:
+  group: indexnow
+  cancel-in-progress: false
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Submit changed pages
+        run: node scripts/indexnow.mjs ${{ inputs.all && '--all' || '--days=2' }}
