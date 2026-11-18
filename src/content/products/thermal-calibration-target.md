@@ -26,6 +26,16 @@ relatedGuides:
   - { label: "OpenCV camera calibration", href: "/guides/opencv-camera-calibration/", note: "From images to a camera matrix." }
   - { label: "Why your board is not detected", href: "/guides/corner-detection-troubleshooting/", note: "Blur, tilt and resolution limits." }
   - { label: "What reprojection error tells you", href: "/guides/reprojection-error/", note: "And what a low value can hide." }
+facts:
+  - { label: "Band", value: "Long-wave infrared, 8–14 µm" }
+  - { label: "Pattern", value: "Checkerboard or circle grid" }
+  - { label: "How the pattern shows", value: "Plate heated from behind; pattern and background differ in emissivity" }
+  - { label: "Size", value: "Built to the area you want the pattern to cover" }
+  - { label: "Power", value: "Matched to the supply at the place of use" }
+  - { label: "Made for", value: "Thermal camera intrinsics; extrinsics between thermal and visible cameras" }
+  - { label: "Not for", value: "Calibrating temperature readings (it is not a blackbody)" }
+  - { label: "Software", value: "OpenCV, Kalibr, MATLAB Camera Calibrator" }
+  - { label: "Ordering", value: "Made to order; layout, price and delivery time confirmed with the quote" }
 ---
 
 ## Why a printed board looks blank

@@ -4,7 +4,7 @@ import { wantsMarkdown } from '../../functions/_middleware';
 // built from parts so the icon-hygiene test (no inline <svg> in src) does not flag this fixture
 const SVG = 's' + 'vg';
 
-const page = `<html><head><title>ChArUco board · Calib.Tools</title></head><body>
+const page = `<html><head><title>ChArUco board · Calib.Tools</title><script type="application/ld+json">[{"@type":"BreadcrumbList"},{"@type":"ProductGroup","additionalProperty":[{"@type":"PropertyValue","name":"Band","value":"Long-wave infrared, 8–14 µm"}]}]</script></head><body>
 <header><nav><a href="/">Home</a></nav></header>
 <main>
   <div><a href="/tools/fov/" title="FOV &#38; resolution calculator">FOV</a></div>
@@ -48,6 +48,7 @@ describe('Markdown versions of pages', () => {
     expect(md).toContain('Every corner carries a marker ID.');
     expect(md).toContain('## Pattern');
     expect(md).not.toContain('CT-MOBILE-CARD');
+    expect(md).toMatch(/Last updated: [^\n]+\n\n## At a glance\n\n- \*\*Band\*\*: Long-wave infrared, 8–14 µm\n/);
     expect(md).toMatch(/^- +\*\*Flatness\*\*: ≤ 0.5 mm per meter$/m);
     expect(md).toMatch(/\| Size \| Squares \| Corners \|\n\| -+ \| -+ \| -+ \|\n\| 200 × 150 \| 5 × 7 \| 24 \|/);
     expect(md).not.toContain('<table');

@@ -67,6 +67,20 @@ function converter(base = SITE) {
 
 const textOf = (html) => html.replace(/<[^>]+>/g, ' ').replace(/&amp;/g, '&').replace(/&#38;/g, '&').replace(/\s+/g, ' ').trim();
 
+/** additionalProperty of the page's Product / ProductGroup structured data, as label/value pairs. */
+export function structuredFacts(html) {
+  const facts = [];
+  for (const m of html.matchAll(/<script\b[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/gi)) {
+    let data;
+    try { data = JSON.parse(m[1]); } catch { continue; }
+    for (const node of [data].flat()) {
+      if (!/^Product(Group)?$/.test(node?.['@type'] ?? '')) continue;
+      for (const p of node.additionalProperty ?? []) if (p?.name && p?.value) facts.push([String(p.name), String(p.value)]);
+    }
+  }
+  return facts;
+}
+
 export function pageMarkdown(html, { url, lastmod } = {}) {
   const main = mainHtml(html);
   const h1Html = (/<h1\b[^>]*>([\s\S]*?)<\/h1>/i.exec(main) ?? [])[1];
@@ -78,7 +92,9 @@ export function pageMarkdown(html, { url, lastmod } = {}) {
     if (line >= 0) body = body.split('\n').filter((_, i) => i !== line).join('\n').trim();
   }
   const meta = [url && `Source: ${url}`, lastmod && `Last updated: ${lastmod}`].filter(Boolean).join('  \n');
-  return `${h1 ? `# ${h1}\n\n` : ''}${meta}\n\n${body}\n`;
+  const facts = structuredFacts(html);
+  const glance = facts.length ? `## At a glance\n\n${facts.map(([k, v]) => `- **${k}**: ${v}`).join('\n')}\n\n` : '';
+  return `${h1 ? `# ${h1}\n\n` : ''}${meta}\n\n${glance}${body}\n`;
 }
 
 export function markdownPath(url) {

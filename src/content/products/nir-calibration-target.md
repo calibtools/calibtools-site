@@ -25,6 +25,14 @@ relatedGuides:
   - { label: "Why your board is not detected", href: "/guides/corner-detection-troubleshooting/", note: "Contrast, blur and resolution limits." }
   - { label: "ChArUco vs checkerboard vs AprilGrid", href: "/guides/charuco-vs-checkerboard-vs-aprilgrid/", note: "Which pattern for which job." }
   - { label: "How big should your target be?", href: "/guides/calibration-target-size/", note: "The 60 % fill rule." }
+facts:
+  - { label: "Wavelength", value: "850 nm or 940 nm; contrast checked at your wavelength before production" }
+  - { label: "Pattern", value: "ChArUco or checkerboard" }
+  - { label: "Size", value: "300 × 200 to 600 × 400 mm" }
+  - { label: "Surface", value: "Matte, against glare from the camera's own illuminator" }
+  - { label: "Made for", value: "Driver and occupant monitoring cameras, ToF cameras, industrial NIR cameras" }
+  - { label: "Software", value: "OpenCV, ROS 2, MATLAB" }
+  - { label: "Ordering", value: "Made to order; layout, price and delivery time confirmed with the quote" }
 ---
 
 ## Why a normal board fades in the near infrared

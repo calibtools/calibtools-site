@@ -62,6 +62,12 @@ const products = defineCollection({
     /** Right-column lists on long-form pages (desktop aside, after the article on mobile). */
     relatedTargets: z.array(z.object({ label: z.string(), href: z.string(), note: z.string().max(80) })).default([]),
     relatedGuides: z.array(z.object({ label: z.string(), href: z.string(), note: z.string().max(80) })).default([]),
+    /**
+     * Key facts as label/value pairs. Not rendered on the page: they go into the Product structured data
+     * (additionalProperty) and the Markdown version, for search engines and AI answers. Every value has to
+     * be stated in the page text too.
+     */
+    facts: z.array(z.object({ label: z.string().max(40), value: z.string().max(120) })).default([]),
   }),
 });
 

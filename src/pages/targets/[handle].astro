@@ -31,6 +31,7 @@ import { compatRows, digitalFiles } from '@/lib/productCompat';
 import { QUOTE_ONLY_HANDLES, LAYOUT_ON_ORDER_HANDLES } from '@/lib/constants';
 import { skuAnchor, skuTitleFor } from '@/lib/productLongform';
 import { variesByFor, variantJsonLd } from '@/lib/productJsonLd';
+import { productFacts, factsJsonLd } from '@/lib/productFacts';
 import { splitSpecValue } from '@/lib/specValue';
 import { drawingForPartNumber, representativePartNumber } from '@/lib/boardDrawing';
 import { caltabGeometry, caltabSvg } from '@/lib/halconCaltab';
@@ -297,6 +298,8 @@ if (product.variants.length > 0) {
 } else {
   productLd.offers = { '@type': 'AggregateOffer', lowPrice: product.priceMinAmount, priceCurrency: product.priceMinCurrency, availability: 'https://schema.org/InStock', url: `${siteUrl}${product.url}` };
 }
+const keyFacts = productFacts(productContent?.data, { madeToOrder: quoteOnly });
+if (keyFacts.length > 0) productLd.additionalProperty = factsJsonLd(keyFacts);
 if (reviewSummary.count > 0) {
   productLd.aggregateRating = {
     '@type': 'AggregateRating',

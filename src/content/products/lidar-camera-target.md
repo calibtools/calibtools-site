@@ -25,6 +25,15 @@ relatedGuides:
   - { label: "LiDAR-camera calibration", href: "/guides/lidar-camera-calibration/", note: "The method, step by step." }
   - { label: "OpenCV camera calibration", href: "/guides/opencv-camera-calibration/", note: "Intrinsics first." }
   - { label: "How big should your target be?", href: "/guides/calibration-target-size/", note: "Size against field of view." }
+facts:
+  - { label: "Camera features", value: "ArUco markers" }
+  - { label: "LiDAR features", value: "Circular holes through the panel, found as depth edges" }
+  - { label: "Size", value: "600 × 400 mm planned; other sizes to your sensor layout" }
+  - { label: "Hole size", value: "Set from your LiDAR's vertical resolution and working distance" }
+  - { label: "Substrate", value: "Aluminum honeycomb panel" }
+  - { label: "Delivered with", value: "Marker and hole-center positions in one coordinate frame, as a table" }
+  - { label: "Software", value: "Your own pipeline, Autoware, MATLAB LiDAR-camera calibrator" }
+  - { label: "Ordering", value: "Made to order; layout, price and delivery time confirmed with the quote" }
 ---
 
 ## Why a camera board is not enough
