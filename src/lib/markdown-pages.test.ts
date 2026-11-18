@@ -10,6 +10,9 @@ const page = `<html><head><title>ChArUco board · Calib.Tools</title></head><bod
   <div><a href="/tools/fov/" title="FOV &#38; resolution calculator">FOV</a></div>
   <h1><${SVG} viewBox="0 0 1 1"></${SVG}>ChArUco board, aluminum</h1>
   <a href="#reviews">Reviews</a> <a href="/faq/">FAQ</a>
+  <ul class="m-0 flex list-none md:hidden"><li>CT-MOBILE-CARD</li></ul>
+  <table class="w-full"><tbody><tr><td class="x">Flatness</td><td>≤ 0.5 mm per meter</td></tr><tr><td>Substrate</td><td>Aluminum composite</td></tr></tbody></table>
+  <table><tbody><tr><td>Size</td><td>Squares</td><td>Corners</td></tr><tr><td>200 × 150</td><td>5 × 7</td><td>24</td></tr></tbody></table>
   <header><p>Every corner carries a marker ID.</p></header>
   <pre><code># (cols, rows) in meters</code></pre>
   <p>Rigid board for <a href="/guides/charuco-vs-checkerboard-vs-aprilgrid/">ChArUco</a> calibration.</p>
@@ -44,6 +47,10 @@ describe('Markdown versions of pages', () => {
     expect(md).toContain('FAQ <https://calib.tools/faq/>');
     expect(md).toContain('Every corner carries a marker ID.');
     expect(md).toContain('## Pattern');
+    expect(md).not.toContain('CT-MOBILE-CARD');
+    expect(md).toMatch(/^- +\*\*Flatness\*\*: ≤ 0.5 mm per meter$/m);
+    expect(md).toMatch(/\| Size \| Squares \| Corners \|\n\| -+ \| -+ \| -+ \|\n\| 200 × 150 \| 5 × 7 \| 24 \|/);
+    expect(md).not.toContain('<table');
     expect(md).not.toContain('DICT_6X6_250');
     expect(md.split('\n').filter((l) => l === '# ChArUco board, aluminum')).toHaveLength(1);
     expect(md).toContain('```\n# (cols, rows) in meters\n```');
