@@ -3,49 +3,28 @@
  * sitemap-lastmod.mjs — inject <lastmod> into the Astro-generated sitemap.
  * Sources: guide frontmatter `updated`, git commit date for everything else.
  */
-import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, readdirSync, existsSync } from 'node:fs';
+import { pathToFileURL } from 'node:url';
 import { resolve, join } from 'node:path';
 import { execFileSync } from 'node:child_process';
 
 const ROOT = resolve(import.meta.dirname, '..');
 const DIST = resolve(ROOT, 'dist');
 
-// Map URL path → source file
-function sourceFileForPath(urlPath) {
+// Map URL path → the source files behind it (template, then content). The newest commit date wins.
+export function sourceFilesForPath(urlPath) {
   const p = urlPath.replace(/\/$/, '') || '/index';
-
-  // Guide pages
-  const guideMatch = p.match(/^\/guides\/(.+)$/);
-  if (guideMatch) return { file: `src/content/guides/${guideMatch[1]}.md`, type: 'guide' };
-
-  // Product pages (dynamic)
-  if (p.match(/^\/targets\/[^/]+$/) && p !== '/targets') {
-    return { file: 'src/pages/targets/[handle].astro', type: 'page' };
-  }
-
-  // Collection pages
-  if (p.match(/^\/targets\/collection\/.+$/)) {
-    return { file: 'src/pages/targets/collection/[collection].astro', type: 'page' };
-  }
-
-  // Tool sub-pages: /tools/generator/charuco etc.
-  const toolSubMatch = p.match(/^\/tools\/generator\/(.+)$/);
-  if (toolSubMatch) return { file: `src/pages/tools/generator/${toolSubMatch[1]}.astro`, type: 'page' };
-
-  // Tool pages: /tools/<name>
-  const toolMatch = p.match(/^\/tools\/(.+)$/);
-  if (toolMatch) return { file: `src/pages/tools/${toolMatch[1]}.astro`, type: 'page' };
-
-  // Index pages
-  if (p === '/index' || p === '') return { file: 'src/pages/index.astro', type: 'page' };
-  if (p === '/targets') return { file: 'src/pages/targets/index.astro', type: 'page' };
-  if (p === '/tools') return { file: 'src/pages/tools/index.astro', type: 'page' };
-  if (p === '/guides') return { file: 'src/pages/guides/index.astro', type: 'page' };
-  if (p === '/files') return { file: 'src/pages/files/index.astro', type: 'page' };
-
-  // Direct pages
-  const name = p.replace(/^\//, '');
-  return { file: `src/pages/${name}.astro`, type: 'page' };
+  let m;
+  if ((m = p.match(/^\/guides\/(.+)$/))) return [`src/content/guides/${m[1]}.md`];
+  if (p === '/applications') return ['src/pages/applications/index.astro'];
+  if ((m = p.match(/^\/applications\/([^/]+)$/))) return ['src/pages/applications/[slug].astro', `src/content/applications/${m[1]}.md`];
+  if ((m = p.match(/^\/targets\/collection\/(.+)$/))) return ['src/pages/targets/collection/[collection].astro', `src/content/collections/${m[1]}.md`];
+  if ((m = p.match(/^\/targets\/([^/]+)$/))) return ['src/pages/targets/[handle].astro', `src/content/products/${m[1]}.md`];
+  if ((m = p.match(/^\/tools\/generator\/([^/]+)$/))) return [`src/pages/tools/generator/${m[1]}.astro`, `src/content/tools/generator-${m[1]}.md`];
+  if ((m = p.match(/^\/tools\/([^/]+)$/))) return [`src/pages/tools/${m[1]}.astro`, `src/content/tools/${m[1]}.md`];
+  if (p === '/index') return ['src/pages/index.astro'];
+  if (['/targets', '/tools', '/guides', '/files'].includes(p)) return [`src/pages${p}/index.astro`];
+  return [`src/pages${p}.astro`];
 }
 
 function getGuideFrontmatterDate(filePath) {
@@ -66,36 +45,32 @@ function getGitDate(filePath) {
   return null;
 }
 
-// Find sitemap XML files
-const sitemapFiles = readdirSync(DIST).filter(
-  (f) => f.startsWith('sitemap') && f.endsWith('.xml') && f !== 'sitemap-index.xml',
-);
+if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
+  // Find sitemap XML files
+  const sitemapFiles = readdirSync(DIST).filter(
+    (f) => f.startsWith('sitemap') && f.endsWith('.xml') && f !== 'sitemap-index.xml',
+  );
 
-let updated = 0;
+  let updated = 0;
 
-for (const sitemapFile of sitemapFiles) {
-  const fullPath = join(DIST, sitemapFile);
-  let xml = readFileSync(fullPath, 'utf-8');
+  for (const sitemapFile of sitemapFiles) {
+    const fullPath = join(DIST, sitemapFile);
+    let xml = readFileSync(fullPath, 'utf-8');
 
-  xml = xml.replace(/<url>\s*<loc>([^<]+)<\/loc>(?!\s*<lastmod)/g, (match, loc) => {
-    const url = new URL(loc);
-    const source = sourceFileForPath(url.pathname);
-    let date = null;
+    xml = xml.replace(/<url>\s*<loc>([^<]+)<\/loc>(?!\s*<lastmod)/g, (match, loc) => {
+      const files = sourceFilesForPath(new URL(loc).pathname).filter((f) => existsSync(resolve(ROOT, f)));
+      const dates = files.map((f) => (f.startsWith('src/content/guides/') && getGuideFrontmatterDate(f)) || getGitDate(f)).filter(Boolean);
+      const date = dates.sort().at(-1) ?? null;
 
-    if (source.type === 'guide') {
-      date = getGuideFrontmatterDate(source.file) || getGitDate(source.file);
-    } else {
-      date = getGitDate(source.file);
-    }
+      if (date) {
+        updated++;
+        return match.replace('</loc>', `</loc>\n    <lastmod>${date}</lastmod>`);
+      }
+      return match;
+    });
 
-    if (date) {
-      updated++;
-      return match.replace('</loc>', `</loc>\n    <lastmod>${date}</lastmod>`);
-    }
-    return match;
-  });
+    writeFileSync(fullPath, xml);
+  }
 
-  writeFileSync(fullPath, xml);
+  console.log(`[sitemap-lastmod] Injected <lastmod> into ${updated} URL(s).`);
 }
-
-console.log(`[sitemap-lastmod] Injected <lastmod> into ${updated} URL(s).`);

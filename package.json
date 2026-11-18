@@ -12,7 +12,7 @@
     "guides:figures": "tsx scripts/guide-figures.ts",
     "docs:check": "node scripts/docs-check.mjs",
     "build": "astro build",
-    "postbuild": "node scripts/sitemap-lastmod.mjs && node scripts/check-links.mjs && node scripts/check-specs.mjs && tsx scripts/check-exports.mjs && node scripts/check-seo.mjs && node scripts/check-placeholders.mjs && node scripts/check-domain-verification.mjs",
+    "postbuild": "node scripts/sitemap-lastmod.mjs && node scripts/llms-txt.mjs && node scripts/check-links.mjs && node scripts/check-specs.mjs && tsx scripts/check-exports.mjs && node scripts/check-seo.mjs && node scripts/check-placeholders.mjs && node scripts/check-domain-verification.mjs",
     "preview": "astro preview",
     "check": "astro check",
     "test": "vitest run",
