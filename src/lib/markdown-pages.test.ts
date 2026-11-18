@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { mainHtml, pageMarkdown, markdownPath } from '../../scripts/markdown-pages.mjs';
+import { mainHtml, pageMarkdown, markdownPath, withAlternateLink } from '../../scripts/markdown-pages.mjs';
 import { wantsMarkdown } from '../../functions/_middleware';
 // built from parts so the icon-hygiene test (no inline <svg> in src) does not flag this fixture
 const SVG = 's' + 'vg';
@@ -72,5 +72,10 @@ describe('Markdown versions of pages', () => {
     expect(wantsMarkdown(req('*/*'))).toBe(false);
     expect(wantsMarkdown(req('text/markdown', '/files/a.pdf'))).toBe(false);
     expect(wantsMarkdown(req('text/markdown', '/api/geo'))).toBe(false);
+  });
+  it('adds one alternate link to the Markdown version in the head', () => {
+    const once = withAlternateLink('<html><head><title>x</title></head><body></body></html>', 'https://calib.tools/guides/a/');
+    expect(once).toContain('<link rel="alternate" type="text/markdown" href="https://calib.tools/guides/a/index.md"></head>');
+    expect(withAlternateLink(once, 'https://calib.tools/guides/a/')).toBe(once);
   });
 });

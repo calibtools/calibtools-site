@@ -97,6 +97,13 @@ export function pageMarkdown(html, { url, lastmod } = {}) {
   return `${h1 ? `# ${h1}\n\n` : ''}${meta}\n\n${glance}${body}\n`;
 }
 
+/** Point the HTML page at its Markdown version, so agents that read the head can find it. */
+export function withAlternateLink(html, url) {
+  if (/<link\b[^>]*type="text\/markdown"/i.test(html)) return html;
+  const tag = `<link rel="alternate" type="text/markdown" href="${url}index.md">`;
+  return html.replace(/<\/head>/i, `${tag}</head>`);
+}
+
 export function markdownPath(url) {
   return `${new URL(url).pathname.replace(/^\//, '')}index.md`;
 }
@@ -110,7 +117,9 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
   for (const e of entries) {
     const file = join(DIST, new URL(e.url).pathname, 'index.html');
     if (!existsSync(file)) continue;
-    writeFileSync(join(DIST, markdownPath(e.url)), pageMarkdown(readFileSync(file, 'utf-8'), e));
+    const html = readFileSync(file, 'utf-8');
+    writeFileSync(join(DIST, markdownPath(e.url)), pageMarkdown(html, e));
+    writeFileSync(file, withAlternateLink(html, e.url));
     n++;
   }
   console.log(`[markdown-pages] Wrote ${n} Markdown page(s).`);
