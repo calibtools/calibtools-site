@@ -5,7 +5,7 @@ date: 2026-11-16
 updated: 2026-11-16
 readingTime: "13 min"
 keyRule: "Stretch the radiometric frame before detection, refine the corners with cornerSubPix on the unstretched image, and judge the target by its contrast in gray levels: in our test, contrast cost more accuracy than blur ever did."
-related: ["opencv-camera-calibration", "corner-detection-troubleshooting", "calibration-target-size", "reprojection-error"]
+related: ["opencv-camera-calibration", "corner-detection-troubleshooting", "calibration-target-size", "reprojection-error", "tof-depth-camera-calibration"]
 products: ["thermal-calibration-target", "circlegrid-composite", "checkerboard-composite"]
 sampleFiles: []
 faq:
