@@ -19,7 +19,26 @@ export function mainHtml(html) {
   const m = /<main\b[^>]*>([\s\S]*)<\/main>/i.exec(html);
   let s = m ? m[1] : '';
   for (const tag of DROP) s = s.replace(new RegExp(`<${tag}\\b[\\s\\S]*?<\\/${tag}>`, 'gi'), '');
+  // mobile-only card lists repeat the part-number table next to them
+  s = s.replace(/<ul\b[^>]*class="[^"]*\bmd:hidden\b[^"]*"[^>]*>[\s\S]*?<\/ul>/gi, '');
+  s = s.replace(/<table\b[^>]*>[\s\S]*?<\/table>/gi, headerlessTable);
   return s.replace(/<(input|select|textarea)\b[^>]*>/gi, '');
+}
+
+/**
+ * Tables without a header row (the spec sheets) would stay raw HTML in GFM. Two-column ones become
+ * "label: value" lines; wider ones get their first row promoted to the header.
+ */
+function headerlessTable(table) {
+  if (/<th\b/i.test(table)) return table;
+  const rows = [...table.matchAll(/<tr\b[^>]*>([\s\S]*?)<\/tr>/gi)].map((r) => [...r[1].matchAll(/<td\b[^>]*>([\s\S]*?)<\/td>/gi)].map((c) => c[1]));
+  if (rows.length === 0) return table;
+  if (rows.every((r) => r.length === 2)) {
+    return `<ul>${rows.map(([k, v]) => `<li><strong>${k.trim()}</strong>: ${v.trim()}</li>`).join('')}</ul>`;
+  }
+  const [head, ...body] = rows;
+  const tr = (cells, tag) => `<tr>${cells.map((c) => `<${tag}>${c}</${tag}>`).join('')}</tr>`;
+  return `<table><thead>${tr(head, 'th')}</thead><tbody>${body.map((r) => tr(r, 'td')).join('')}</tbody></table>`;
 }
 
 function converter(base = SITE) {
