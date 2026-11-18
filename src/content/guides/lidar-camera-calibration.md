@@ -5,7 +5,7 @@ date: 2026-11-07
 updated: 2026-11-07
 readingTime: "13 min"
 keyRule: "Give both sensors the same physical features at known positions, spread the target through the shared field of view, and judge the result by projecting the cloud onto the image."
-related: ["hand-eye-calibration-opencv", "kalibr-camera-imu-calibration", "opencv-camera-calibration"]
+related: ["hand-eye-calibration-opencv", "kalibr-camera-imu-calibration", "opencv-camera-calibration", "tof-depth-camera-calibration"]
 products: ["lidar-camera-target", "radar-camera-target", "charuco-composite"]
 sampleFiles: []
 faq:
