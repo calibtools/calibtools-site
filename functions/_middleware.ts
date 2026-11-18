@@ -2,7 +2,8 @@
  * Cloudflare Pages middleware.
  *
  * 1. 301 redirect www → apex (runs first, unchanged).
- * 2. Anonymous page-view counter via Analytics Engine.
+ * 2. Markdown version of a page for requests that ask for text/markdown first.
+ * 3. Anonymous page-view counter via Analytics Engine.
  *
  * Counting rules — a request is counted only when ALL of these hold:
  *   - Method is GET
@@ -70,6 +71,21 @@ export function shouldCount(
   return true;
 }
 
+/**
+ * True when the request asks for Markdown before HTML (AI agents). Browsers send text/html first.
+ * Only page paths: files and API routes are left alone.
+ */
+export function wantsMarkdown(request: Request): boolean {
+  if (request.method !== 'GET') return false;
+  const pathname = new URL(request.url).pathname;
+  if (!pathname.endsWith('/') || SKIP_PREFIXES.some((p) => pathname.startsWith(p))) return false;
+  const accept = (request.headers.get('accept') || '').toLowerCase();
+  const md = accept.indexOf('text/markdown');
+  if (md < 0) return false;
+  const html = accept.indexOf('text/html');
+  return html < 0 || md < html;
+}
+
 export const onRequest: PagesFunction = async (context) => {
   const url = new URL(context.request.url);
 
@@ -82,10 +98,27 @@ export const onRequest: PagesFunction = async (context) => {
     });
   }
 
-  // ── 2. Serve the request first ──
-  const response = await context.next();
+  // ── 2. Markdown version for agents that ask for it (built by scripts/markdown-pages.mjs) ──
+  if (wantsMarkdown(context.request)) {
+    const assets = (context.env as Record<string, unknown>).ASSETS as { fetch: typeof fetch } | undefined;
+    const md = assets ? await assets.fetch(new URL(`${url.pathname}index.md`, url.origin).toString()) : null;
+    if (md?.ok) {
+      return new Response(md.body, {
+        headers: { 'Content-Type': 'text/markdown; charset=utf-8', Vary: 'Accept', 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex' },
+      });
+    }
+  }
 
-  // ── 3. Decide whether to count ──
+  // ── 3. Serve the request ──
+  let response = await context.next();
+  // The Markdown copies (/…/index.md) are for agents; keep them out of search results
+  if (url.pathname.endsWith('.md')) {
+    response = new Response(response.body, response);
+    response.headers.set('X-Robots-Tag', 'noindex');
+    response.headers.set('Content-Type', 'text/markdown; charset=utf-8');
+  }
+
+  // ── 4. Decide whether to count ──
   if (shouldCount(context.request, response.status)) {
     const pageViews = (context.env as Record<string, unknown>).PAGE_VIEWS as AEDataset | undefined;
     if (pageViews) {
