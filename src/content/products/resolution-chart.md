@@ -23,6 +23,13 @@ relatedTargets:
 relatedGuides:
   - { label: "USAF 1951 lp/mm table", href: "/guides/usaf-1951-lp-mm-table/", note: "Reading resolution from line pairs." }
   - { label: "Composite, ceramic or glass", href: "/guides/composite-ceramic-or-glass/", note: "Which substrate for which job." }
+facts:
+  - { label: "Standard", value: "ISO 12233, including eSFR layouts" }
+  - { label: "Measures", value: "MTF and SFR from slanted edges" }
+  - { label: "Resolution", value: "Up to 4000 LP/PH" }
+  - { label: "Versions", value: "Reflective, A3 to A1; transmissive on glass or film for small fields" }
+  - { label: "Software", value: "Imatest / iQ-Analyzer, OpenCV / sfrmat" }
+  - { label: "Ordering", value: "Made to order; layout, price and delivery time confirmed with the quote" }
 ---
 
 ## What the chart measures
