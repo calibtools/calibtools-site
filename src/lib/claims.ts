@@ -58,8 +58,23 @@ export const DEFECT_WARRANTY = 'one year from invoice';
 /** Business days before refund is initiated after inspection. */
 export const REFUND_START_DAYS = 3;
 
-/** Number of countries / territories we ship to. */
-export const SHIP_COUNTRY_COUNT = 41;
+/**
+ * Countries we ship to: the shipping zones in Shopify (General profile), 2026-11-19. Keep in step with
+ * Shopify, its shipping policy and Merchant Center — Google compares them.
+ */
+export const SHIP_COUNTRIES = [
+  'United States', 'Canada', 'Germany', 'Austria', 'Belgium', 'Bulgaria', 'Croatia', 'Cyprus', 'Czechia', 'Denmark',
+  'Estonia', 'Finland', 'France', 'Greece', 'Hungary', 'Ireland', 'Italy', 'Latvia', 'Lithuania', 'Luxembourg', 'Malta',
+  'Netherlands', 'Poland', 'Portugal', 'Romania', 'Slovakia', 'Slovenia', 'Spain', 'Sweden', 'United Kingdom',
+  'Switzerland', 'Norway', 'Israel', 'United Arab Emirates', 'Japan', 'South Korea', 'Malaysia', 'Singapore',
+  'Australia', 'New Zealand',
+] as const;
+
+/** Number of countries we ship to. */
+export const SHIP_COUNTRY_COUNT = SHIP_COUNTRIES.length;
+
+/** Company address as registered (also on /imprint/, Shopify and Merchant Center). */
+export const COMPANY_ADDRESS = '1401 21st Street, Suite R, Sacramento, CA 95811, USA';
 
 // ── Material specs ───────────────────────────────────────────────────
 

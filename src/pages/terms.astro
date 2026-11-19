@@ -1,0 +1,40 @@
+---
+import Base from '@/layouts/Base.astro';
+import { breadcrumbLd } from '@/lib/seo';
+import { CONTACT_EMAIL, LEAD_TIME_WEEKS, RETURN_WINDOW_DAYS, DEFECT_WARRANTY } from '@/lib/claims';
+const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: 'Terms of sale' }]);
+---
+<Base title="Terms of sale" description="Terms for buying calibration targets from Calib.Tools LLC: orders, prices and payment, made-to-order production, DAP delivery, returns, warranty and liability." jsonLd={bcLd}>
+  <div class="container-x py-10 md:py-16">
+    <div class="prose-calib mx-auto flex max-w-[720px] flex-col gap-5">
+      <h1 class="h-display m-0 text-[32px] md:text-[40px]">Terms of sale</h1>
+
+      <p>These terms cover buying from Calib.Tools LLC, whether through this website, our checkout or a written quote. If a quote says something different, the quote wins. Our company details are on the <a href="/imprint/">legal notice</a>.</p>
+
+      <h2>Orders</h2>
+      <p>Checkout sends you an order confirmation by email. We start production once payment is received. If we cannot make or ship what you ordered, we tell you and refund you in full.</p>
+
+      <h2>Prices and payment</h2>
+      <p>Prices are shown in your currency and exclude import VAT and duties. Shipping is a flat rate per region, shown at checkout before you pay. Orders from a quote can be paid against an invoice or purchase order as the quote states.</p>
+
+      <h2>Production and delivery</h2>
+      <p>Targets are made to order. Standard targets take {LEAD_TIME_WEEKS} to produce, measure and dispatch; custom sizes can take longer, as the quote says.</p>
+      <p>We ship by tracked express, DAP (Incoterms 2020) unless a quote says DDP: import VAT and duties are collected by the carrier on delivery. Transit times and destinations are on the <a href="/shipping/">shipping page</a>.</p>
+
+      <h2>Specifications</h2>
+      <p>Each product page and datasheet states the specification a target is made and measured to. The datasheet revision you receive with your order applies.</p>
+
+      <h2>Returns and warranty</h2>
+      <p>Standard catalog targets can be returned within {RETURN_WINDOW_DAYS} days of delivery, and defective targets are repaired or replaced up to {DEFECT_WARRANTY}. Custom targets can be returned only if they do not meet the agreed specification. The details are on the <a href="/returns/">returns page</a>.</p>
+
+      <h2>Liability</h2>
+      <p>Our liability for an order is limited to the price paid for it, except where the law does not allow such a limit. Nothing in these terms takes away rights you have under mandatory consumer law where you live.</p>
+
+      <h2>Law</h2>
+      <p>These terms are governed by the laws of the State of California, USA, without affecting mandatory consumer protection rules of your country of residence.</p>
+
+      <h2>Questions</h2>
+      <p>Email <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>. We answer within one business day.</p>
+    </div>
+  </div>
+</Base>
