@@ -1,7 +1,7 @@
 ---
 import Base from '@/layouts/Base.astro';
 import { breadcrumbLd } from '@/lib/seo';
-import { CONTACT_EMAIL } from '@/lib/claims';
+import { CONTACT_EMAIL, COMPANY_ADDRESS } from '@/lib/claims';
 const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: 'Legal notice' }]);
 ---
 <Base title="Legal notice" description="Company details for Calib.Tools LLC, supplier of camera calibration targets and free browser tools: registered address, contact, trademarks and liability." jsonLd={bcLd}>
@@ -12,7 +12,7 @@ const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: 'Legal notice' }]
       <h2>Company</h2>
       <p>
         Calib.Tools LLC<br />
-        1401 21st Street, Suite R, Sacramento, CA 95811, USA<br />
+        {COMPANY_ADDRESS}<br />
         Limited liability company, incorporated in California
       </p>
 

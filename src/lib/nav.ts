@@ -158,6 +158,7 @@ export const footerGroups: FooterGroup[] = [
     items: [
       { label: 'About', href: '/about/' },
       { label: 'Legal notice', href: '/imprint/' },
+      { label: 'Terms of sale', href: '/terms/' },
       { label: 'Privacy', href: '/privacy/' },
     ],
   },

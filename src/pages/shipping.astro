@@ -1,7 +1,7 @@
 ---
 import Base from '@/layouts/Base.astro';
 import { breadcrumbLd } from '@/lib/seo';
-import { LEAD_TIME_WEEKS, CONTACT_EMAIL, SHIP_COUNTRY_COUNT } from '@/lib/claims';
+import { LEAD_TIME_WEEKS, CONTACT_EMAIL, SHIP_COUNTRY_COUNT, SHIP_COUNTRIES } from '@/lib/claims';
 const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: 'Shipping' }]);
 ---
 <Base title="Shipping, duties and taxes" description="Made-to-order lead times, tracked express transit by region, how shipping is priced, and who pays import VAT and duties on Calib.Tools calibration targets." jsonLd={bcLd}>
@@ -25,10 +25,10 @@ const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: 'Shipping' }]);
         </tbody>
       </table>
 
-      <p>We ship to {SHIP_COUNTRY_COUNT} countries and territories. If yours is listed at checkout, we ship there.</p>
+      <p>We ship to {SHIP_COUNTRY_COUNT} countries: {SHIP_COUNTRIES.join(', ')}.</p>
 
       <h2>Shipping cost</h2>
-      <p>Checkout shows the carrier rate for your address and parcel size, so you pay what it actually costs to send. Boards of 600&nbsp;&times;&nbsp;400&nbsp;mm and larger go in bigger cartons and cost more to ship.</p>
+      <p>Shipping is a flat rate per region: one rate within Germany, one for the rest of the EU, and one for all other countries. Checkout shows the rate for your address in your currency before you pay.</p>
 
       <h2>Duties &amp; import VAT</h2>
       <p>Prices exclude import VAT and duties. We ship DAP (Delivered at Place): the carrier pays them at customs and collects them from you before delivery, usually with a small clearance fee.</p>

@@ -107,7 +107,7 @@ export const faqGroups: FaqGroup[] = [
       },
       {
         question: 'Where do you ship?',
-        answer: `To ${SHIP_COUNTRY_COUNT} countries and territories, including the US, Canada, the EU, the UK, Switzerland, Norway, Japan, South Korea, Australia, New Zealand and Singapore. If your country is listed at checkout, we ship there.`,
+        answer: `To ${SHIP_COUNTRY_COUNT} countries: the US, Canada, every EU country, the UK, Switzerland, Norway, Israel, the UAE, Japan, South Korea, Malaysia, Singapore, Australia and New Zealand. The full list is on the shipping page.`,
       },
       {
         question: 'Who pays import duties and VAT?',
