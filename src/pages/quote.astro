@@ -1,6 +1,6 @@
 ---
 import Base from '@/layouts/Base.astro';
-import { MATERIALS, countryOptions } from '@/lib/quote';
+import { MATERIALS, HEARD_FROM, countryOptions } from '@/lib/quote';
 const countries = countryOptions();
 ---
 <Base title="Request a quote" description="Request a quote or invoice/PO for Calib.Tools calibration targets." noindex>
@@ -79,6 +79,13 @@ const countries = countryOptions();
           <label for="q-message" class="label">Message <span class="font-normal text-ink-muted">(optional)</span></label>
           <textarea id="q-message" name="message" rows={4} class="input" placeholder="Deadline, how you use the target, special requirements..."></textarea>
         </div>
+        <div class="flex flex-col gap-1.5">
+          <label for="q-heard" class="label">How did you find us? <span class="font-normal text-ink-muted">(optional)</span></label>
+          <select id="q-heard" name="heard_from" class="input">
+            <option value="">Choose…</option>
+            {HEARD_FROM.map((h) => <option value={h.id}>{h.label}</option>)}
+          </select>
+        </div>
 
         {/* Source page — sent with the form submission, not tracking */}
         <input type="hidden" name="source_page" id="q-source" />
@@ -156,7 +163,7 @@ const countries = countryOptions();
             emailSent: Boolean(data.customerEmailSent),
           };
           try { sessionStorage.setItem('ct-quote', JSON.stringify(card)); } catch { /* private mode */ }
-          track('generate_lead', { material: card.material, country: card.country, from_generator: Boolean(card.pattern) });
+          track('generate_lead', { material: card.material, country: card.country, from_generator: Boolean(card.pattern), heard_from: String(fd.get('heard_from') || 'unanswered') });
           window.location.href = `/quote/sent/?q=${encodeURIComponent(data.id)}`;
           return;
         } else {

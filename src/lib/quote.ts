@@ -16,6 +16,23 @@ export type MaterialId = (typeof MATERIALS)[number]['id'];
 export const isMaterial = (v: string): v is MaterialId => MATERIALS.some((m) => m.id === v);
 export const materialLabel = (v: string): string => MATERIALS.find((m) => m.id === v)?.label ?? '';
 
+/**
+ * "How did you hear about us?" — optional, so we can tell which channel brings quote requests
+ * (decision 2026-11-19: no paid ads until the first order; measure the channels first).
+ */
+export const HEARD_FROM = [
+  { id: 'google', label: 'Google search' },
+  { id: 'ai', label: 'ChatGPT or another AI assistant' },
+  { id: 'forum', label: 'Forum or Q&A site (OpenCV, Stack Overflow, Reddit)' },
+  { id: 'github', label: 'GitHub' },
+  { id: 'colleague', label: 'A colleague or recommendation' },
+  { id: 'free-tools', label: 'I was already using your free tools' },
+  { id: 'other', label: 'Somewhere else' },
+] as const;
+export type HeardFromId = (typeof HEARD_FROM)[number]['id'];
+export const isHeardFrom = (v: string): v is HeardFromId => HEARD_FROM.some((h) => h.id === v);
+export const heardFromLabel = (v: string): string => HEARD_FROM.find((h) => h.id === v)?.label ?? '';
+
 export const MAX_QUANTITY = 9999;
 /** Whole number of boards (or sets) from 1 to MAX_QUANTITY, else null. */
 export function parseQuantity(raw: string): number | null {
@@ -84,6 +101,8 @@ export interface QuoteRecord {
   /** Pattern ID (P-XXXXXX) computed on the server from the pattern link, or ''. Optional: records before C2 have none. */
   patternId?: string;
   source_page: string;
+  /** Answer to "How did you hear about us?" (HEARD_FROM id), or ''. Optional: older records have none. */
+  heardFrom?: string;
   emailVerified: boolean;
   verifiedAt?: string;
   customerEmailSent: boolean;
@@ -126,6 +145,7 @@ export function internalBody(r: QuoteRecord, verifyNote: string): string {
   if (r.patternId) lines.push('', `Pattern ID: ${r.patternId}`);
   if (r.pattern) lines.push('', `Pattern (opens the exact pattern in the generator):\n${r.pattern}`);
   if (r.source_page) lines.push('', `Sent from: ${r.source_page}`);
+  lines.push(`Heard about us: ${heardFromLabel(r.heardFrom ?? '') || '—'}`);
   return lines.join('\n');
 }
 
