@@ -1,7 +1,7 @@
 ---
 import Base from '@/layouts/Base.astro';
 import { breadcrumbLd } from '@/lib/seo';
-import { CONTACT_EMAIL, COMPANY_ADDRESS, LEAD_TIME_WEEKS, RETURN_WINDOW_DAYS, DEFECT_WARRANTY } from '@/lib/claims';
+import { CONTACT_EMAIL, LEAD_TIME_WEEKS, RETURN_WINDOW_DAYS, DEFECT_WARRANTY } from '@/lib/claims';
 const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: 'Terms of sale' }]);
 ---
 <Base title="Terms of sale" description="Terms for buying calibration targets from Calib.Tools LLC: orders, prices and payment, made-to-order production, DAP delivery, returns, warranty and liability." jsonLd={bcLd}>
@@ -9,7 +9,7 @@ const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: 'Terms of sale' }
     <div class="prose-calib mx-auto flex max-w-[720px] flex-col gap-5">
       <h1 class="h-display m-0 text-[32px] md:text-[40px]">Terms of sale</h1>
 
-      <p>These terms apply when you buy from Calib.Tools LLC, {COMPANY_ADDRESS} (email <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>), through this website, our checkout or a written quote. A written quote can set different terms; where it does, the quote applies.</p>
+      <p>These terms cover buying from Calib.Tools LLC, whether through this website, our checkout or a written quote. If a quote says something different, the quote wins. Our company details are on the <a href="/imprint/">legal notice</a>.</p>
 
       <h2>Orders</h2>
       <p>Checkout sends you an order confirmation by email. We start production once payment is received. If we cannot make or ship what you ordered, we tell you and refund you in full.</p>

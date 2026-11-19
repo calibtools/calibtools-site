@@ -17,8 +17,8 @@ describe('policies say the same thing everywhere', () => {
     expect(s).not.toMatch(/carrier rate|actually costs to send/);
     expect(s).toContain('SHIP_COUNTRIES');
   });
-  it('contact page and legal notice show the company address from one constant', () => {
-    for (const f of ['src/pages/contact.astro', 'src/pages/imprint.astro', 'src/pages/terms.astro']) expect(read(f)).toContain('COMPANY_ADDRESS');
+  it('contact page and legal notice take the company address from one constant', () => {
+    for (const f of ['src/pages/contact.astro', 'src/pages/imprint.astro']) expect(read(f)).toContain('COMPANY_ADDRESS');
     expect(COMPANY_ADDRESS).toMatch(/Sacramento, CA 95811/);
   });
   it('terms of sale are linked from the footer and the contact page', () => {
