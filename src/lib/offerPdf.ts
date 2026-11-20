@@ -9,6 +9,9 @@ import fontkit from '@pdf-lib/fontkit';
 import { DOC_COLORS, hexToUnitRgb } from './docColors';
 import { WORDMARK_PATHS, WORDMARK_DOT_RECT } from './exportBrand';
 import { CONTACT_LINE } from './reportConfig';
+import { patternShapes, fillRgb, shapeBox } from './patternShapes';
+import { specFromLink, patternId } from './patternLink';
+import { getArUcoDict } from './dicts/dicts';
 
 export interface OfferItem {
   partNo?: string;
@@ -51,6 +54,10 @@ export interface OfferData {
     /** Label and value, the specification as confirmed with the customer. */
     specs: [string, string][];
     notes?: [string, string][];
+    /** Generator link (path or calib.tools URL) of the pattern; it is drawn to scale in the annex. */
+    pattern?: string;
+    /** Board outline in mm, [width, height]; the pattern is centered on it. Defaults to the pattern field. */
+    board?: [number, number];
   };
   signatory: { name: string; title: string };
   /** Diagonal mark across both pages, e.g. "SAMPLE". */
@@ -92,6 +99,8 @@ export function offerProblem(d: any): string | null {
   if (d.terms.options !== undefined && !isStrList(d.terms.options, 8)) return 'terms.options';
   if (!d.annex || !isPairs(d.annex.specs, 30) || d.annex.specs.length < 1) return 'annex';
   if (d.annex.notes !== undefined && !isPairs(d.annex.notes, 4)) return 'annex.notes';
+  if (d.annex.pattern !== undefined && (typeof d.annex.pattern !== 'string' || !specFromLink(d.annex.pattern))) return 'annex.pattern';
+  if (d.annex.board !== undefined && !(Array.isArray(d.annex.board) && d.annex.board.length === 2 && d.annex.board.every((v: unknown) => typeof v === 'number' && v > 0 && v <= 5000))) return 'annex.board';
   if (!d.signatory || !isStr(d.signatory.name, 80) || !isStr(d.signatory.title, 80)) return 'signatory';
   return null;
 }
@@ -348,8 +357,8 @@ export async function offerPdf(d: OfferData, fonts: OfferFonts): Promise<Uint8Ar
   y += para(`Validity. This quotation remains valid until ${d.validUntil}. Prices are in ${d.currency}, ${d.taxNote}.`, LEFT, y, WIDTH, sans, 8.6, MUTED);
 
   // ───────────────────────────── page 2
-  newPage();
-  y -= 10;
+  // The annex starts a new page unless the current one has only just begun.
+  if (y > PAGE_H * 0.4) { newPage(); y -= 10; }
   section(4, 'Technical annex', d.annex.reference ?? '');
   const specCols = d.annex.specs.length > 6 ? 2 : 1;
   const perCol = Math.ceil(d.annex.specs.length / specCols);
@@ -377,6 +386,41 @@ export async function offerPdf(d: OfferData, fonts: OfferFonts): Promise<Uint8Ar
       para(v, x + 3 * MM, y + 2.6 * MM + 11, w - 6 * MM, sans, 8.8);
     });
     y += h;
+  }
+
+  // Pattern drawing, to scale, from the same shapes the generator exports.
+  const spec = d.annex.pattern ? specFromLink(d.annex.pattern) : null;
+  // A marker pattern is drawn only when its dictionary data is on hand; never with stand-in squares.
+  const drawable = !!spec && (!/^(ChArUco|ArUco grid)$/.test(spec.type) || !!getArUcoDict(spec.dict));
+  if (spec && drawable) {
+    const shapes = patternShapes({ ...spec, scaleBar: false }).filter((s) => s.kind !== 'text');
+    const boxes = shapes.map(shapeBox);
+    const x0 = Math.min(...boxes.map((b) => b.x0)), y0 = Math.min(...boxes.map((b) => b.y0));
+    const pw = Math.max(...boxes.map((b) => b.x1)) - x0, ph = Math.max(...boxes.map((b) => b.y1)) - y0;
+    const [bw, bh] = d.annex.board ?? [pw, ph];
+    const k = Math.min((92 * MM) / bw, (70 * MM) / bh); // points per mm of board
+    const dh = bh * k;
+    ensure(dh + 26);
+    y += 8;
+    tag('Pattern drawing, to scale', LEFT, y);
+    y += 10;
+    box(LEFT, y, bw * k, dh, 0.6, LINE);
+    const ox = LEFT + ((bw - pw) / 2) * k, oy = y + ((bh - ph) / 2) * k;
+    for (const s of shapes) {
+      const [r, g, b] = fillRgb(s.fill);
+      const color = rgb(r, g, b);
+      if (s.kind === 'rect') page.drawRectangle({ x: ox + (s.x - x0) * k, y: PAGE_H - (oy + (s.y - y0 + s.h) * k), width: s.w * k, height: s.h * k, color });
+      else if (s.kind === 'circle') page.drawCircle({ x: ox + (s.cx - x0) * k, y: PAGE_H - (oy + (s.cy - y0) * k), size: s.r * k, color });
+    }
+    const fmt = (v: number) => String(Math.round(v * 100) / 100);
+    kv([
+      ['Board', `${fmt(bw)} × ${fmt(bh)} mm`],
+      ['Pattern field', `${fmt(pw)} × ${fmt(ph)} mm`],
+      ['Margins', `${fmt((bw - pw) / 2)} mm left and right, ${fmt((bh - ph) / 2)} mm top and bottom`],
+      ['Pattern ID', patternId(spec)],
+      ['Scale', `1:${fmt(MM / k)}`],
+    ], LEFT + bw * k + 8 * MM, y, RIGHT - (LEFT + bw * k + 8 * MM), 24 * MM, mono, 8.4);
+    y += dh + 4;
   }
 
   // 5 · acceptance, anchored to the bottom of the page
