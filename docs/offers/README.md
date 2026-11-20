@@ -39,3 +39,8 @@ the customer metafield `calibtools.offers` (JSON, read-only for the customer):
 The page shows `no` in place of the draft-order name. Add one entry per draft order with `metafieldsSet` (keep the existing entries). The order created from the
 draft shows the same links. Only calib.tools quotation links and generator paths are shown.
 Put the Pattern ID and the generator link in the offer's annex too, so the PDF names the exact pattern.
+
+## Pattern links
+A generator link in an offer (`annex.pattern`, annex notes, `calibtools.offers[].pattern`) must name a paper
+the pattern fits on at 100 %. `offer.ts check` refuses a link that does not and prints the paper to use
+(`smallestFittingPaper` in `src/lib/patternLinkFit.ts`). The paper is not part of the Pattern ID.

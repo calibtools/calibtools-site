@@ -8,6 +8,7 @@
  * `encrypt` output: store `payload` in a Shopify metaobject (type offer_doc, handle = id,
  * field payload); `url` is the link for the customer. The key is not stored anywhere.
  */
+import { linkFitsItsPaper, smallestFittingPaper } from '../src/lib/patternLinkFit';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { encryptOffer, newOfferId } from '../src/lib/offerCrypto';
@@ -27,6 +28,14 @@ if (problem) {
 }
 
 if (cmd === 'check') {
+  // A pattern link has to open on a paper the pattern fits on, or the customer sees a cropped preview.
+  const links = [data.annex?.pattern, ...(data.annex?.notes ?? []).map(([, v]: [string, string]) => v)].filter((v): v is string => typeof v === 'string' && v.includes('/tools/generator/'));
+  for (const link of links) {
+    if (!linkFitsItsPaper(link)) {
+      console.error(`pattern link opens on a paper that is too small; use paper=${smallestFittingPaper(link) ?? '(none fits: leave the link out)'}\n  ${link}`);
+      process.exit(1);
+    }
+  }
   console.log('ok');
 } else if (cmd === 'pdf') {
   const font = (f: string) => {
