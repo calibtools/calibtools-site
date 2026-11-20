@@ -2,7 +2,8 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { PDFDocument } from 'pdf-lib';
-import { money, offerPdf, offerProblem, offerTotals, type OfferData } from './offerPdf';
+import { letterheadLine, money, offerPdf, offerProblem, offerTotals, type OfferData } from './offerPdf';
+import { MISSION_LINE } from './brand';
 
 const ROOT = resolve(import.meta.dirname, '../..');
 const sample = (): OfferData => JSON.parse(readFileSync(resolve(ROOT, 'docs/offers/sample-offer.json'), 'utf8'));
@@ -62,6 +63,13 @@ describe('offer PDF', () => {
     expect(height).toBeCloseTo(841.89, 1);
     expect(doc.getTitle()).toBe('Quotation Q-SAMPLE-0001');
     expect(bytes.length).toBeLessThan(200_000);
+  });
+  it('puts the mission line beside the wordmark on the first page only', () => {
+    expect(letterheadLine(1)).toBe(MISSION_LINE);
+    expect(letterheadLine(2)).toBe('');
+    const src = readFileSync(resolve(ROOT, 'src/lib/offerPdf.ts'), 'utf8');
+    expect(src).toContain('letterheadLine(pages.length)');
+    expect(src).not.toContain('make machines see');
   });
   it('draws the pattern to scale in the annex when the offer names one', async () => {
     const PATTERN = '/tools/generator/?type=ChArUco&rows=9&cols=12&square=60&marker=45&dict=DICT_5X5_1000&paper=A4&startId=0&scaleBar=true';
