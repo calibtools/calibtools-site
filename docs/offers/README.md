@@ -44,3 +44,11 @@ Put the Pattern ID and the generator link in the offer's annex too, so the PDF n
 A generator link in an offer (`annex.pattern`, annex notes, `calibtools.offers[].pattern`) must name a paper
 the pattern fits on at 100 %. `offer.ts check` refuses a link that does not and prints the paper to use
 (`smallestFittingPaper` in `src/lib/patternLinkFit.ts`). The paper is not part of the Pattern ID.
+
+## Offer email
+The Shopify "Draft order invoice" notification uses `draft-order-invoice-offer.liquid` for drafts whose lines
+carry custom attributes (wrapped in `{% if has_custom_spec %} … {% else %} Shopify default {% endif %}`, placed
+right before `{% capture email_title %}`). It follows the site's visual rules: paper ground, framed wordmark,
+red square button, mono labels. Shopify has no API for notification templates; paste it in
+Settings → Notifications → Draft order invoice → Edit code, then check with `draftOrderInvoicePreview`.
+Line items are the unlisted "quote-item" products with `priceOverride`, so every surface shows a picture.
