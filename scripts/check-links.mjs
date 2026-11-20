@@ -32,7 +32,7 @@ const hrefRegex = /<a\s[^>]*?href="([^"]*?)"/gi;
 const broken = [];
 const toNoindex = [];
 /** noindex on purpose and fine to link to. */
-const NOINDEX_LINK_OK = ['/quote/', '/cart/', '/review/', '/verify/', '/account/'];
+const NOINDEX_LINK_OK = ['/quote/', '/cart/', '/review/', '/verify/', '/account/', '/pattern/'];
 const NOINDEX_RE = /<meta[^>]+name="robots"[^>]+content="[^"]*noindex/i;
 const isNoindex = (path) => NOINDEX_RE.test(readFileSync(path, 'utf-8'));
 

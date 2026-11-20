@@ -138,3 +138,12 @@ export function patternIdFromPath(link: string): string {
   const spec = specFromLink(link);
   return spec ? patternId(spec) : '';
 }
+
+/** Read-only page that shows one pattern with its parameters. */
+export const PATTERN_VIEW_PATH = '/pattern/';
+
+/** /pattern/?… for a generator link (path or full calib.tools URL); the link itself if it is not one. */
+export function patternViewPath(link: string): string {
+  const m = /^(?:https:\/\/calib\.tools)?\/tools\/generator(?:\/[a-z-]+)?\/?\?(.+)$/.exec(link.trim());
+  return m && specFromLink(link) ? `${PATTERN_VIEW_PATH}?${m[1]}` : link;
+}
