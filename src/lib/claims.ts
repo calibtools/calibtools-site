@@ -30,7 +30,6 @@ export const INCOTERM = 'DAP' as const;
 /** Return window from delivery date (calendar days). */
 export const RETURN_WINDOW_DAYS = 30;
 
-
 /**
  * Countries the store sells to (ISO 3166-1 alpha-2). Mirrors the Shopify markets
  * set on 2026-11-15: United States, Germany, Europe (EU 26), International, South Korea.
