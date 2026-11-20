@@ -54,6 +54,17 @@ describe('POST /api/quote', () => {
     expect(data.source_page).toBe('/tools/generator/');
   });
 
+  it('stores the "how did you find us" answer when it is one of the listed options', async () => {
+    const one = call({ name: 'A', company: 'B', email: 'eng@example-robotics.com', heard_from: 'ai' });
+    await one.res;
+    expect(JSON.parse([...one.store.entries()].find(([k]) => k.startsWith('quote:'))![1]).heardFrom).toBe('ai');
+    const bad = call({ name: 'A', company: 'B', email: 'eng@example-robotics.com', heard_from: '<script>' });
+    await bad.res;
+    expect(JSON.parse([...bad.store.entries()].find(([k]) => k.startsWith('quote:'))![1]).heardFrom).toBe('');
+    const none = call({ name: 'A', company: 'B', email: 'eng@example-robotics.com' });
+    expect((await none.res).status).toBe(200);
+  });
+
   it('drops a pattern link that is not a generator path', async () => {
     const { store, res } = call({ name: 'A', company: 'B', email: 'eng@example-robotics.com', pattern: 'https://evil.example/' });
     await res;

@@ -29,7 +29,7 @@ import type { EmailAttachment } from '../../src/lib/quoteFiles';
 import { verifyTurnstile, TURNSTILE_FIELD } from '../../src/lib/turnstile';
 import {
   confirmToken, confirmUrl, customerBody, customerSubject, internalBody, internalSubject,
-  isCountry, isMaterial, kvKey, newQuoteId, parseQuantity, type QuoteRecord,
+  isCountry, isHeardFrom, isMaterial, kvKey, newQuoteId, parseQuantity, type QuoteRecord,
 } from '../../src/lib/quote';
 
 interface Env {
@@ -134,6 +134,7 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
     country: get('country').toUpperCase(),
     message: get('message'),
     source_page: get('source_page').slice(0, 200),
+    heard_from: get('heard_from'),
   };
   const patternPath = cleanPatternPath(get('pattern'));
   const boardsRaw = Number(get('boards') || '1');
@@ -183,6 +184,7 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
     pattern: patternPath ? `https://calib.tools${patternPath}` : '',
     patternId: patternPath ? patternIdFromPath(patternPath) : '',
     source_page: fields.source_page,
+    heardFrom: isHeardFrom(fields.heard_from) ? fields.heard_from : '',
     emailVerified: false,
     customerEmailSent: false,
   };
