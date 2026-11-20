@@ -9,6 +9,7 @@ import fontkit from '@pdf-lib/fontkit';
 import { DOC_COLORS, hexToUnitRgb } from './docColors';
 import { WORDMARK_PATHS, WORDMARK_DOT_RECT } from './exportBrand';
 import { CONTACT_LINE } from './reportConfig';
+import { MISSION_LINE } from './brand';
 import { patternShapes, fillRgb, shapeBox } from './patternShapes';
 import { specFromLink, patternId } from './patternLink';
 import { getArUcoDict } from './dicts/dicts';
@@ -159,6 +160,11 @@ export function wrapText(text: string, font: PDFFont, size: number, maxWidth: nu
   return out;
 }
 
+/** The line beside the wordmark: the mission line on the first page, nothing on the pages after it. */
+export function letterheadLine(pageNumber: number): string {
+  return pageNumber === 1 ? MISSION_LINE : '';
+}
+
 /** Quotation PDF, two A4 pages. Throws when the data is incomplete. */
 export async function offerPdf(d: OfferData, fonts: OfferFonts): Promise<Uint8Array> {
   const problem = offerProblem(d);
@@ -206,6 +212,17 @@ export async function offerPdf(d: OfferData, fonts: OfferFonts): Promise<Uint8Ar
     for (const [rx, ry, rw, rh] of FRAME_RECTS) page.drawRectangle({ x: ox + rx * s, y: oy - (ry + rh) * s, width: rw * s, height: rh * s, color: BLACK });
     const [dx, dy, dw, dh] = WORDMARK_DOT_RECT;
     page.drawRectangle({ x: ox + dx * s, y: oy - (dy + dh) * s, width: dw * s, height: dh * s, color: RED });
+    // Letterhead: a hairline after the wordmark, then the mission line, centered on the wordmark's height.
+    // Left out when a very long quote number on the right would run into it.
+    const line = letterheadLine(pages.length);
+    const lineEnd = LEFT + 38 * MM + sans.widthOfTextAtSize(line, 8.6);
+    if (line && lineEnd + 6 * MM < RIGHT - mono.widthOfTextAtSize(headerId, 7.5)) {
+      const top = 12 * MM;
+      const h = FRAMED_VB.height * s;
+      const x = LEFT + 30 * MM + 4 * MM;
+      page.drawLine({ start: { x, y: PAGE_H - top }, end: { x, y: PAGE_H - top - h }, thickness: 0.7, color: LINE });
+      text(line, x + 4 * MM, top + h / 2 - 8.6 * 0.47, sans, 8.6, MUTED);
+    }
     textRight(headerId, RIGHT, 14.5 * MM, mono, 7.5);
     y = 26 * MM;
   };
