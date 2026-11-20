@@ -23,29 +23,32 @@ const entries = getAllDatasheets();
           <table class="w-full border-collapse text-[15px]">
             <thead>
               <tr class="bg-brand-tint text-left">
-                <th class="py-3 pl-3 pr-0 font-bold text-brand-dark"><span class="sr-only">First page</span></th>
-                <th class="py-3 px-3 font-bold text-brand-dark">Code</th>
-                <th class="py-3 px-3 font-bold text-brand-dark">Product</th>
-                <th class="py-3 px-3 font-bold text-brand-dark text-right">Pages</th>
-                <th class="py-3 px-3 font-bold text-brand-dark"></th>
+                <th class="py-3 pl-3 pr-0 font-bold text-brand-dark max-[359px]:hidden"><span class="sr-only">First page</span></th>
+                <th class="hidden py-3 px-3 font-bold text-brand-dark md:table-cell">Code</th>
+                <th class="py-3 px-2 font-bold text-brand-dark md:px-3">Product</th>
+                <th class="hidden py-3 px-3 text-right font-bold text-brand-dark md:table-cell">Pages</th>
+                <th class="py-3 px-2 font-bold text-brand-dark md:px-3"></th>
               </tr>
             </thead>
             <tbody>
               {entries.map((ds, i) => (
                 <tr class={`border-t border-line ${i % 2 === 1 ? 'bg-ground-alt' : ''}`}>
-                  <td class="py-3 pl-3 pr-0 align-middle">
+                  <td class="py-3 pl-3 pr-0 align-middle max-[359px]:hidden">
                     {ds.thumbUrl && (
                       <a href={ds.url} target="_blank" rel="noopener" class="block w-[56px] md:w-[72px]" aria-hidden="true" tabindex="-1">
                         <img src={ds.thumbUrl} alt="" width="720" height="1019" loading="lazy" decoding="async" class="block h-auto w-full border border-line bg-white" />
                       </a>
                     )}
                   </td>
-                  <td class="py-3 px-3 spec">{ds.code}</td>
-                  <td class="py-3 px-3">{ds.name}</td>
-                  <td class="py-3 px-3 spec text-right">{ds.pages}</td>
-                  <td class="py-3 px-3">
+                  <td class="spec hidden py-3 px-3 md:table-cell">{ds.code}</td>
+                  <td class="py-3 px-2 md:px-3">
+                    <span class="spec block text-[12px] text-ink-muted md:hidden">{ds.code}</span>
+                    {ds.name}
+                  </td>
+                  <td class="spec hidden py-3 px-3 text-right md:table-cell">{ds.pages}</td>
+                  <td class="py-3 px-2 md:px-3">
                     <a href={ds.url} target="_blank" rel="noopener" class="whitespace-nowrap font-semibold text-brand no-underline hover:text-brand-dark">Download PDF<span class="sr-only">{fileLinkHint(ds.url)}</span></a>
-                    <span class="spec block whitespace-nowrap text-[12px] text-ink-muted">{fileSizeLabel(ds.url)}</span>
+                    <span class="spec block text-[12px] text-ink-muted md:whitespace-nowrap"><span class="whitespace-nowrap md:hidden">{ds.pages} pages · </span><span class="whitespace-nowrap">{fileSizeLabel(ds.url)}</span></span>
                   </td>
                 </tr>
               ))}
