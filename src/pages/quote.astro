@@ -80,8 +80,8 @@ const countries = countryOptions();
           <textarea id="q-message" name="message" rows={4} class="input" placeholder="Deadline, how you use the target, special requirements..."></textarea>
         </div>
         <div class="flex flex-col gap-1.5">
-          <label for="q-heard" class="label">How did you find us? <span class="font-normal text-ink-muted">(optional)</span></label>
-          <select id="q-heard" name="heard_from" class="input">
+          <label for="q-heard" class="label">How did you find us?</label>
+          <select id="q-heard" name="heard_from" class="input" required>
             <option value="">Choose…</option>
             {HEARD_FROM.map((h) => <option value={h.id}>{h.label}</option>)}
           </select>
