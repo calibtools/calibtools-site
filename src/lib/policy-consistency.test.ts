@@ -35,3 +35,42 @@ describe('company address', () => {
     }
   });
 });
+
+describe('custom orders are final once paid (2026-11-21)', () => {
+  const read = (rel: string) => readFileSync(new URL(`../../${rel}`, import.meta.url), 'utf-8');
+  it('says so in one sentence', async () => {
+    const { CUSTOM_ORDER_FINAL } = await import('./orderTerms');
+    expect(CUSTOM_ORDER_FINAL).toMatch(/can’t be canceled, returned or exchanged once it is paid/);
+    expect(CUSTOM_ORDER_FINAL).toMatch(/repaired or replaced/);
+  });
+  it('uses that sentence on the returns page, in the terms, in the quotation PDF and on the order page', () => {
+    for (const rel of ['src/pages/returns.astro', 'src/pages/terms.astro', 'src/lib/offerPdf.ts', 'src/islands/OrderDetail.tsx']) {
+      expect(read(rel), rel).toContain('CUSTOM_ORDER_FINAL');
+    }
+  });
+  it('carries the same words in the offer email template', async () => {
+    const { CUSTOM_ORDER_FINAL } = await import('./orderTerms');
+    const email = read('docs/offers/draft-order-invoice-offer.liquid').replace(/&rsquo;/g, '’');
+    expect(email).toContain(CUSTOM_ORDER_FINAL);
+  });
+  it('offers paid repair for damage caused in use, with shipping both ways on the customer', async () => {
+    const { PAID_REPAIR } = await import('./orderTerms');
+    expect(PAID_REPAIR).toMatch(/repair the target for a fee/);
+    expect(PAID_REPAIR).toMatch(/shipping both ways/);
+    for (const rel of ['src/pages/returns.astro', 'src/pages/terms.astro', 'src/lib/offerPdf.ts', 'src/islands/OrderDetail.tsx']) {
+      expect(read(rel), rel).toContain('PAID_REPAIR');
+    }
+  });
+  it('says that paying accepts the quotation: on the quotation, in the offer email and in the terms', async () => {
+    const { PAYMENT_ACCEPTS_QUOTATION } = await import('./orderTerms');
+    expect(PAYMENT_ACCEPTS_QUOTATION).toMatch(/^Paying the order confirms/);
+    expect(read('src/lib/offerPdf.ts')).toContain('PAYMENT_ACCEPTS_QUOTATION');
+    expect(read('docs/offers/draft-order-invoice-offer.liquid')).toContain(PAYMENT_ACCEPTS_QUOTATION);
+    expect(read('src/pages/terms.astro')).toMatch(/paying the order accepts the specification/);
+  });
+  it('no page still says a custom target can be returned', () => {
+    for (const rel of ['src/pages/returns.astro', 'src/pages/terms.astro', 'src/pages/faq.astro']) {
+      expect(read(rel), rel).not.toMatch(/Custom targets can be returned/i);
+    }
+  });
+});

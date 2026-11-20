@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { patternViewPath } from '@/lib/patternLink';
 import { SIGN_OFF_LINE } from '@/lib/brand';
 import { CONTACT_EMAIL } from '@/lib/claims';
+import { CUSTOM_ORDER_FINAL, PAID_REPAIR } from '@/lib/orderTerms';
 import type { OrderDetail as Order, Money } from '@/lib/accountOrder';
 
 type State =
@@ -164,6 +165,12 @@ export function OrderView({ order }: { order: Order }) {
             {order.pattern && <li className="border-t border-line px-5 py-3 first:border-t-0"><a href={patternViewPath(order.pattern)}>Pattern <span className="font-mono">{order.patternId}</span></a> <span className="text-ink-muted">with every parameter, as ordered</span></li>}
           </ul>
         </section>
+      )}
+
+      {order.no && (
+        <p className="m-0 border border-line bg-ground-alt px-5 py-4 text-[14px] leading-[22px] text-ink-muted">
+          <span className="font-semibold text-ink">Made to order.</span> {CUSTOM_ORDER_FINAL} {PAID_REPAIR}
+        </p>
       )}
 
       <footer className="flex flex-col gap-2 border-t border-line pt-5">
