@@ -26,9 +26,9 @@ const APRILTAG_CHECKSUMS: Record<string, {code0: string; code1: string}> = {
 };
 
 describe('ArUco dictionaries', () => {
-  it('all 6 dictionaries load', () => {
+  it('all 7 dictionaries load', () => {
     const names = arucoDictNames();
-    expect(names).toHaveLength(6);
+    expect(names).toHaveLength(7);
     expect(names).toContain('DICT_6X6_250');
     expect(names).toContain('DICT_7X7_1000');
     expect(names).toContain('DICT_ARUCO_MIP_36h12');
@@ -186,5 +186,16 @@ describe('AprilTag families', () => {
       const ourGrid = decodeAprilBits(f.codes[id], f.d, f.bit_x, f.bit_y);
       expect(ourGrid, `AprilTag ${family} id ${id}`).toEqual(refGrid);
     }
+  });
+});
+
+describe('DICT_5X5_1000', () => {
+  it('has 1000 distinct 5×5 markers and starts with the markers of DICT_5X5_100, as in OpenCV', () => {
+    const big = getArUcoDict('DICT_5X5_1000')!;
+    const small = getArUcoDict('DICT_5X5_100')!;
+    expect(big.count).toBe(1000);
+    expect(big.markerSize).toBe(5);
+    expect(new Set(big.bits).size).toBe(1000);
+    expect(big.bits.slice(0, 100)).toEqual(small.bits);
   });
 });

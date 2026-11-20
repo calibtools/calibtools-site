@@ -259,6 +259,7 @@ function getDictionary(cv: any, dictName: string): any {
     'DICT_5X5_50': cv.aruco_DICT_5X5_50 ?? 4,
     'DICT_5X5_100': cv.aruco_DICT_5X5_100 ?? 5,
     'DICT_5X5_250': cv.aruco_DICT_5X5_250 ?? 6,
+    'DICT_5X5_1000': cv.aruco_DICT_5X5_1000 ?? 7,
     'DICT_6X6_50': cv.aruco_DICT_6X6_50 ?? 8,
     'DICT_6X6_100': cv.aruco_DICT_6X6_100 ?? 9,
     'DICT_6X6_250': cv.aruco_DICT_6X6_250 ?? 10,
