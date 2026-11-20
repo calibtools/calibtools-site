@@ -105,6 +105,13 @@ describe('offer PDF', () => {
     (d as any).items = [];
     await expect(offerPdf(d, fonts())).rejects.toThrow('offer data: items');
   });
+  it('draws the signature only from traced outlines that fit the signature box', async () => {
+    const { SIGNATURE } = await import('./signature');
+    if (!SIGNATURE.paths.length) return; // not traced yet: the box stays empty
+    expect(SIGNATURE.width / SIGNATURE.height).toBeGreaterThan(1.5);
+    for (const d of SIGNATURE.paths) expect(d).toMatch(/^M[-\d. ]+[LC][-\d. LC]+Z$/);
+    expect(SIGNATURE.paths.join('').length).toBeLessThan(60_000);
+  });
   it('signs the sample as the quotation signatory and names nobody else', () => {
     const d = sample();
     expect(d.signatory).toEqual({ name: 'Kevin Lee', title: 'Customer Success' });
