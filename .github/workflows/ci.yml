@@ -56,6 +56,8 @@ jobs:
         with: { name: dist, path: dist }
       - name: Side-by-side rows (Chromium)
         run: node scripts/check-card-rows.mjs
+      - name: File links keep the page (Chromium)
+        run: node scripts/check-file-clicks.mjs
 
   # Accessibility >= 95 and no color-contrast failures (fails); performance >= 90 (warning)
   lighthouse:
@@ -133,6 +135,13 @@ jobs:
         id: rows-other
         continue-on-error: true
         run: node scripts/check-card-rows.mjs --engines firefox,webkit --widths 1280,768
+      - name: File links keep the page (Firefox, WebKit)
+        id: files-other
+        continue-on-error: true
+        run: node scripts/check-file-clicks.mjs --engines firefox,webkit
+      - name: Warning (file links)
+        if: steps.files-other.outcome == 'failure'
+        run: echo "::warning::A file link replaced the page in Firefox or WebKit, or an engine did not start. See the step log."
       - name: Warning
         if: steps.rows-other.outcome == 'failure'
         run: echo "::warning::Side-by-side rows differ in Firefox or WebKit, or an engine did not start. See the step log."

@@ -3,6 +3,7 @@ import Base from '@/layouts/Base.astro';
 import { getAllDatasheets } from '@/lib/datasheetManifest';
 import { breadcrumbLd } from '@/lib/seo';
 import { CONTACT_EMAIL } from '@/lib/claims';
+import { fileLinkHint, fileSizeLabel } from '../../../scripts/file-links.mjs';
 const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: 'Downloads' }]);
 
 const entries = getAllDatasheets();
@@ -34,7 +35,7 @@ const entries = getAllDatasheets();
                 <tr class={`border-t border-line ${i % 2 === 1 ? 'bg-ground-alt' : ''}`}>
                   <td class="py-3 pl-3 pr-0 align-middle">
                     {ds.thumbUrl && (
-                      <a href={ds.url} class="block w-[56px] md:w-[72px]" aria-hidden="true" tabindex="-1">
+                      <a href={ds.url} target="_blank" rel="noopener" class="block w-[56px] md:w-[72px]" aria-hidden="true" tabindex="-1">
                         <img src={ds.thumbUrl} alt="" width="720" height="1019" loading="lazy" decoding="async" class="block h-auto w-full border border-line bg-white" />
                       </a>
                     )}
@@ -43,7 +44,8 @@ const entries = getAllDatasheets();
                   <td class="py-3 px-3">{ds.name}</td>
                   <td class="py-3 px-3 spec text-right">{ds.pages}</td>
                   <td class="py-3 px-3">
-                    <a href={ds.url} class="font-semibold text-brand no-underline hover:text-brand-dark">Download PDF</a>
+                    <a href={ds.url} target="_blank" rel="noopener" class="whitespace-nowrap font-semibold text-brand no-underline hover:text-brand-dark">Download PDF<span class="sr-only">{fileLinkHint(ds.url)}</span></a>
+                    <span class="spec block whitespace-nowrap text-[12px] text-ink-muted">{fileSizeLabel(ds.url)}</span>
                   </td>
                 </tr>
               ))}
