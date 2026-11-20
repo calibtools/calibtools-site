@@ -1,7 +1,7 @@
 ---
 import Base from '@/layouts/Base.astro';
 import { breadcrumbLd } from '@/lib/seo';
-import { CONTACT_EMAIL } from '@/lib/claims';
+import { CONTACT_EMAIL, COMPANY_ADDRESS } from '@/lib/claims';
 import { TAG_IDS, TAG_LABELS, anyTagConfigured } from '@/lib/tags';
 const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: 'Privacy policy' }]);
 
@@ -26,7 +26,7 @@ const lastUpdated = new Date().toISOString().slice(0, 10);
 
       <h2>Who is responsible</h2>
       <p>
-        Calib.Tools LLC, 1401 21st Street, Suite R, Sacramento, CA 95811, USA &mdash; <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
+        Calib.Tools LLC, {COMPANY_ADDRESS} &mdash; <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
       </p>
 
       <h2>Browsing the site</h2>

@@ -19,10 +19,19 @@ describe('policies say the same thing everywhere', () => {
   });
   it('contact page and legal notice take the company address from one constant', () => {
     for (const f of ['src/pages/contact.astro', 'src/pages/imprint.astro']) expect(read(f)).toContain('COMPANY_ADDRESS');
-    expect(COMPANY_ADDRESS).toMatch(/Sacramento, CA 95811/);
+    expect(COMPANY_ADDRESS).toMatch(/Albuquerque, NM 87110/);
   });
   it('terms of sale are linked from the footer and the contact page', () => {
     expect(read('src/lib/nav.ts')).toContain("href: '/terms/'");
     expect(read('src/pages/contact.astro')).toContain('href="/terms/"');
+  });
+});
+
+describe('company address', () => {
+  it('appears nowhere as a hand-typed old address', async () => {
+    const { readFileSync } = await import('node:fs');
+    for (const f of ['src/pages/privacy.astro', 'src/pages/imprint.astro', 'src/pages/contact.astro', 'src/pages/terms.astro', 'docs/offers/sample-offer.json']) {
+      expect(readFileSync(f, 'utf8'), f).not.toMatch(/Sacramento|1401 21st|incorporated in California|laws of the State of California/);
+    }
   });
 });
