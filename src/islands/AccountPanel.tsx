@@ -228,7 +228,7 @@ export default function AccountPanel() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full border-collapse">
-              <thead><tr><th className={TH}>Quote</th><th className={TH}>Date</th><th className={TH}>Status</th><th className={`${TH} text-right`}>Total</th><th className={TH}><span className="sr-only">Link</span></th></tr></thead>
+              <thead><tr><th className={TH}>Quote</th><th className={TH}>Date</th><th className={TH}>Status</th><th className={`${TH} text-right`}>Total</th><th className={TH}>Documents</th><th className={TH}><span className="sr-only">Link</span></th></tr></thead>
               <tbody>
                 {d.quotes.map((q) => (
                   <tr key={q.name}>
@@ -236,6 +236,7 @@ export default function AccountPanel() {
                     <td className={`${TD} font-mono`}>{date(q.date)}</td>
                     <td className={TD}>{QUOTE_STATUS[q.status]}</td>
                     <td className={`${TD} font-mono text-right`}>{money(q.total)}</td>
+                    <td className={TD}><Docs d={q} /></td>
                     <td className={`${TD} text-right whitespace-nowrap`}>{q.url ? <a href={q.url}>View and order</a> : ''}</td>
                   </tr>
                 ))}
@@ -251,7 +252,7 @@ export default function AccountPanel() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full border-collapse">
-              <thead><tr><th className={TH}>Order</th><th className={TH}>Date</th><th className={TH}>Payment</th><th className={TH}>Shipping</th><th className={`${TH} text-right`}>Total</th><th className={TH}><span className="sr-only">Link</span></th></tr></thead>
+              <thead><tr><th className={TH}>Order</th><th className={TH}>Date</th><th className={TH}>Payment</th><th className={TH}>Shipping</th><th className={`${TH} text-right`}>Total</th><th className={TH}>Documents</th><th className={TH}><span className="sr-only">Link</span></th></tr></thead>
               <tbody>
                 {d.orders.map((o) => (
                   <tr key={o.name}>
@@ -260,6 +261,7 @@ export default function AccountPanel() {
                     <td className={`${TD} first-letter:uppercase`}>{o.payment}</td>
                     <td className={`${TD} first-letter:uppercase`}>{o.fulfillment}</td>
                     <td className={`${TD} font-mono text-right`}>{money(o.total)}</td>
+                    <td className={TD}><Docs d={o} /></td>
                     <td className={`${TD} text-right whitespace-nowrap`}><a href={o.url}>Order status</a></td>
                   </tr>
                 ))}
@@ -269,5 +271,16 @@ export default function AccountPanel() {
         )}
       </Section>
     </div>
+  );
+}
+
+/** Quotation PDF and the pattern behind a quote or order, when Calib.Tools attached them. */
+function Docs({ d }: { d: { pdf: string; pattern: string; patternId: string } }) {
+  if (!d.pdf && !d.pattern) return <span className="text-ink-muted">—</span>;
+  return (
+    <span className="flex flex-col gap-1 whitespace-nowrap">
+      {d.pdf && <a href={d.pdf} target="_blank" rel="noopener">Quotation (PDF)</a>}
+      {d.pattern && <a href={d.pattern}>Pattern <span className="font-mono">{d.patternId}</span></a>}
+    </span>
   );
 }

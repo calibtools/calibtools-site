@@ -29,3 +29,13 @@ are not listed in the email.
 - Seller name and address come from the offer data. The footer is the shared contact line.
 - Signatory: "Kevin Lee", Customer Success. This is the one exception to the no-personal-names rule (see CLAUDE.md); no other name goes on the document.
 - To withdraw an offer, delete its metaobject; the link then answers 404.
+
+## Showing the quotation on the customer's account page
+/account/ lists each quote and order with "Quotation (PDF)" and "Pattern P-XXXXXX" links. They come from
+the customer metafield `calibtools.offers` (JSON, read-only for the customer):
+
+    [{ "draft": "#D4", "pdf": "https://calib.tools/q/<id>/<key>.pdf", "pattern": "/tools/generator/?…" }]
+
+Add one entry per draft order with `metafieldsSet` (keep the existing entries). The order created from the
+draft shows the same links. Only calib.tools quotation links and generator paths are shown.
+Put the Pattern ID and the generator link in the offer's annex too, so the PDF names the exact pattern.

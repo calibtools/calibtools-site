@@ -4,7 +4,7 @@
  * and talks to the Customer Account API. Responses are never cached.
  */
 import {
-  GRAPHQL_URL, TOKEN_URL, SESSION_COOKIE, PATTERNS_NAMESPACE, PATTERNS_KEY,
+  GRAPHQL_URL, TOKEN_URL, SESSION_COOKIE, PATTERNS_NAMESPACE, PATTERNS_KEY, OFFERS_KEY, parseOffers, type OfferDoc,
   open, seal, readCookie, needsRefresh, sessionFromTokens, sessionCookie, clearSessionCookie,
   parseSavedPatterns, type Session, type TokenResponse, type SavedPattern,
 } from './account';
@@ -151,8 +151,9 @@ export const SUMMARY_QUERY = `query AccountSummary {
     firstName
     emailAddress { emailAddress }
     savedPatterns: metafield(namespace: "${PATTERNS_NAMESPACE}", key: "${PATTERNS_KEY}") { value }
+    offers: metafield(namespace: "${PATTERNS_NAMESPACE}", key: "${OFFERS_KEY}") { value }
     orders(first: 20, sortKey: PROCESSED_AT, reverse: true) {
-      nodes { id name processedAt financialStatus fulfillmentStatus statusPageUrl totalPrice { amount currencyCode } }
+      nodes { id name processedAt financialStatus fulfillmentStatus statusPageUrl totalPrice { amount currencyCode } draftOrder { name } }
     }
     draftOrders(first: 20, sortKey: UPDATED_AT, reverse: true) {
       nodes { id name createdAt updatedAt status invoiceUrl totalPrice { amount currencyCode } }
@@ -176,7 +177,8 @@ export interface SummaryData {
     firstName: string | null;
     emailAddress: { emailAddress: string } | null;
     savedPatterns: { value: string } | null;
-    orders: { nodes: { id: string; name: string; processedAt: string; financialStatus: string | null; fulfillmentStatus: string; statusPageUrl: string; totalPrice: Money }[] };
+    offers?: { value: string } | null;
+    orders: { nodes: { id: string; name: string; processedAt: string; financialStatus: string | null; fulfillmentStatus: string; statusPageUrl: string; totalPrice: Money; draftOrder?: { name: string } | null }[] };
     draftOrders: { nodes: { id: string; name: string; createdAt: string; updatedAt: string; status: string; invoiceUrl: string | null; totalPrice: Money }[] };
   };
 }
@@ -186,14 +188,17 @@ export interface AccountSummary {
   email: string;
   firstName: string;
   patterns: SavedPattern[];
-  quotes: { name: string; date: string; status: 'open' | 'sent' | 'completed'; total: Money; url: string | null }[];
-  orders: { name: string; date: string; payment: string; fulfillment: string; total: Money; url: string }[];
+  quotes: ({ name: string; date: string; status: 'open' | 'sent' | 'completed'; total: Money; url: string | null } & OfferDoc)[];
+  orders: ({ name: string; date: string; payment: string; fulfillment: string; total: Money; url: string } & OfferDoc)[];
 }
 
 const DRAFT_STATUS: Record<string, 'open' | 'sent' | 'completed'> = { OPEN: 'open', INVOICE_SENT: 'sent', COMPLETED: 'completed' };
 
 export function toSummary(d: SummaryData): AccountSummary {
   const c = d.customer;
+  const offers = parseOffers(c.offers?.value);
+  const NO_DOC: OfferDoc = { pdf: '', pattern: '', patternId: '' };
+  const doc = (draft: string | undefined) => (draft && offers.get(draft)) || NO_DOC;
   return {
     signedIn: true,
     email: c.emailAddress?.emailAddress ?? '',
@@ -206,6 +211,7 @@ export function toSummary(d: SummaryData): AccountSummary {
       total: q.totalPrice,
       // the invoice link is only useful while the quote can still be paid
       url: q.status === 'COMPLETED' ? null : q.invoiceUrl,
+      ...doc(q.name),
     })),
     orders: c.orders.nodes.map((o) => ({
       name: o.name,
@@ -214,6 +220,7 @@ export function toSummary(d: SummaryData): AccountSummary {
       fulfillment: o.fulfillmentStatus.toLowerCase().replace(/_/g, ' '),
       total: o.totalPrice,
       url: o.statusPageUrl,
+      ...doc(o.draftOrder?.name),
     })),
   };
 }
