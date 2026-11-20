@@ -78,7 +78,8 @@ describe('how did you find us', () => {
     const { HEARD_FROM, isHeardFrom, internalBody } = await import('./quote');
     expect(HEARD_FROM.map((h) => h.id)).toContain('google');
     expect(isHeardFrom('ai')).toBe(true);
-    expect(isHeardFrom('bing') && isHeardFrom('naver')).toBe(true);
+    expect(isHeardFrom('bing')).toBe(true);
+    expect(isHeardFrom('naver')).toBe(false);
     expect(isHeardFrom('tiktok')).toBe(false);
     const base = { id: 'Q-20261119-AAAA', ts: '', name: 'A', company: 'B', email: 'a@b.co', product: '', material: '' as const, quantity: 1, boards: 1, country: 'US', message: '', pattern: '', source_page: '', emailVerified: false, customerEmailSent: false };
     expect(internalBody({ ...base, heardFrom: 'ai' }, 'verified')).toContain('Heard about us: ChatGPT or another AI assistant');
