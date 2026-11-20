@@ -30,8 +30,8 @@ describe('policies say the same thing everywhere', () => {
 describe('company address', () => {
   it('appears nowhere as a hand-typed old address', async () => {
     const { readFileSync } = await import('node:fs');
-    for (const f of ['src/pages/privacy.astro', 'src/pages/imprint.astro', 'src/pages/contact.astro', 'docs/offers/sample-offer.json']) {
-      expect(readFileSync(f, 'utf8'), f).not.toMatch(/Sacramento|1401 21st/);
+    for (const f of ['src/pages/privacy.astro', 'src/pages/imprint.astro', 'src/pages/contact.astro', 'src/pages/terms.astro', 'docs/offers/sample-offer.json']) {
+      expect(readFileSync(f, 'utf8'), f).not.toMatch(/Sacramento|1401 21st|incorporated in California|laws of the State of California/);
     }
   });
 });
