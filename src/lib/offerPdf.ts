@@ -10,7 +10,7 @@ import { DOC_COLORS, hexToUnitRgb } from './docColors';
 import { WORDMARK_PATHS, WORDMARK_DOT_RECT } from './exportBrand';
 import { CONTACT_LINE } from './reportConfig';
 import { MISSION_LINE } from './brand';
-import { CUSTOM_ORDER_FINAL } from './claims';
+import { CUSTOM_ORDER_FINAL } from './orderTerms';
 import { patternShapes, fillRgb, shapeBox } from './patternShapes';
 import { specFromLink, patternId } from './patternLink';
 import { getArUcoDict } from './dicts/dicts';

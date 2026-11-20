@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { patternViewPath } from '@/lib/patternLink';
 import { SIGN_OFF_LINE } from '@/lib/brand';
-import { CONTACT_EMAIL, CUSTOM_ORDER_FINAL } from '@/lib/claims';
+import { CONTACT_EMAIL } from '@/lib/claims';
+import { CUSTOM_ORDER_FINAL } from '@/lib/orderTerms';
 import type { OrderDetail as Order, Money } from '@/lib/accountOrder';
 
 type State =

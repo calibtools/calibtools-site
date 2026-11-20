@@ -1,7 +1,8 @@
 ---
 import Base from '@/layouts/Base.astro';
 import { breadcrumbLd } from '@/lib/seo';
-import { CONTACT_EMAIL, LEAD_TIME_WEEKS, RETURN_WINDOW_DAYS, DEFECT_WARRANTY, CUSTOM_ORDER_FINAL } from '@/lib/claims';
+import { CONTACT_EMAIL, LEAD_TIME_WEEKS, RETURN_WINDOW_DAYS, DEFECT_WARRANTY } from '@/lib/claims';
+import { CUSTOM_ORDER_FINAL } from '@/lib/orderTerms';
 const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: 'Terms of sale' }]);
 ---
 <Base title="Terms of sale" description="Terms for buying calibration targets from Calib.Tools LLC: orders, prices and payment, made-to-order production, DAP delivery, returns, warranty and liability." jsonLd={bcLd}>

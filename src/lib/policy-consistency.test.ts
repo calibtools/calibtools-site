@@ -39,7 +39,7 @@ describe('company address', () => {
 describe('custom orders are final once paid (2026-11-21)', () => {
   const read = (rel: string) => readFileSync(new URL(`../../${rel}`, import.meta.url), 'utf-8');
   it('says so in one sentence', async () => {
-    const { CUSTOM_ORDER_FINAL } = await import('./claims');
+    const { CUSTOM_ORDER_FINAL } = await import('./orderTerms');
     expect(CUSTOM_ORDER_FINAL).toMatch(/can’t be canceled, returned or exchanged once it is paid/);
     expect(CUSTOM_ORDER_FINAL).toMatch(/repaired or replaced/);
   });
@@ -49,7 +49,7 @@ describe('custom orders are final once paid (2026-11-21)', () => {
     }
   });
   it('carries the same words in the offer email template', async () => {
-    const { CUSTOM_ORDER_FINAL } = await import('./claims');
+    const { CUSTOM_ORDER_FINAL } = await import('./orderTerms');
     const email = read('docs/offers/draft-order-invoice-offer.liquid').replace(/&rsquo;/g, '’');
     expect(email).toContain(CUSTOM_ORDER_FINAL);
   });
