@@ -6,7 +6,7 @@
 import { describe, it, expect } from 'vitest';
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { VISION, MISSION, ONE_LINER } from './brand';
+import { VISION, MISSION, ONE_LINER, MISSION_LINE, SIGN_OFF_LINE } from './brand';
 import { TAGLINE } from './claims';
 import { ORGANIZATION_LD } from './seo';
 
@@ -19,6 +19,20 @@ describe('brand statements', () => {
     expect(MISSION.startsWith('We make the physical references that turn pixels into millimeters')).toBe(true);
     expect(MISSION.endsWith('The tools stay free.')).toBe(true);
     expect(ONE_LINER.startsWith('Calib.Tools builds the bridge')).toBe(true);
+  });
+
+  it('short lines are the approved wording (2026-11-20)', () => {
+    expect(MISSION_LINE).toBe('Built for the people who make machines see.');
+    expect(SIGN_OFF_LINE).toBe('Every calibration starts with a target you can trust.');
+  });
+
+  it('short lines are referenced, not retyped', () => {
+    expect(read('src/pages/about.astro')).toContain('{MISSION_LINE}');
+    expect(read('src/components/Footer.astro')).toContain('{MISSION_LINE}');
+    expect(read('docs/offers/draft-order-invoice-offer.liquid')).toContain(SIGN_OFF_LINE);
+    for (const rel of ['src/pages/about.astro', 'src/components/Footer.astro']) {
+      expect(read(rel)).not.toContain('make machines see');
+    }
   });
 
   it('one-liner fits a meta description', () => {
