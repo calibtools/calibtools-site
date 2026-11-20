@@ -3,7 +3,7 @@ import react from '@astrojs/react';
 import tailwind from '@astrojs/tailwind';
 import sitemap from '@astrojs/sitemap';
 
-const NOINDEX_PATHS = ['/cart/', '/quote/', '/review/', '/verify/', '/account/'];
+const NOINDEX_PATHS = ['/cart/', '/quote/', '/review/', '/verify/', '/account/', '/pattern/'];
 
 export default defineConfig({
   site: 'https://calib.tools',

@@ -1,3 +1,4 @@
+import { patternViewPath } from '@/lib/patternLink';
 import { useEffect, useState, type ReactNode } from 'react';
 import type { AccountSummary } from '@/lib/accountApi';
 import type { SavedPattern } from '@/lib/account';
@@ -206,7 +207,7 @@ export default function AccountPanel() {
                           <button type="button" className={`${LINK_BTN} text-ink-muted`} onClick={() => setEditing(null)}>Cancel</button>
                         </form>
                       ) : (
-                        <a href={p.path}>{p.name}</a>
+                        <a href={patternViewPath(p.path)}>{p.name}</a>
                       )}
                     </td>
                     <td className={`${TD} font-mono`}>{p.id}</td>
@@ -282,7 +283,7 @@ function Docs({ d }: { d: { pdf: string; pattern: string; patternId: string } })
   return (
     <span className="flex flex-col gap-1 whitespace-nowrap">
       {d.pdf && <a href={d.pdf} target="_blank" rel="noopener">Quotation (PDF)</a>}
-      {d.pattern && <a href={d.pattern}>Pattern <span className="font-mono">{d.patternId}</span></a>}
+      {d.pattern && <a href={patternViewPath(d.pattern)}>Pattern <span className="font-mono">{d.patternId}</span></a>}
     </span>
   );
 }

@@ -1,0 +1,9 @@
+---
+import Base from '@/layouts/Base.astro';
+import PatternView from '@/islands/PatternView';
+---
+<Base title="Pattern" description="One calibration pattern with its parameters, as saved from the Calib.Tools generator." noindex>
+  <div class="container-x py-[var(--section-y)]">
+    <PatternView client:load />
+  </div>
+</Base>
