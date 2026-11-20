@@ -30,6 +30,7 @@ import numpy as np
 DICTS = {
     "DICT_4X4_50":          aruco.DICT_4X4_50,
     "DICT_5X5_100":         aruco.DICT_5X5_100,
+    "DICT_5X5_1000":        aruco.DICT_5X5_1000,
     "DICT_6X6_250":         aruco.DICT_6X6_250,
     "DICT_7X7_1000":        aruco.DICT_7X7_1000,
     "DICT_ARUCO_ORIGINAL":  aruco.DICT_ARUCO_ORIGINAL,

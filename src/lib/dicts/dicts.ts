@@ -27,6 +27,7 @@ export interface AprilTagFamily {
 // Static imports for ArUco dictionaries
 import DICT_4X4_50 from './DICT_4X4_50.json';
 import DICT_5X5_100 from './DICT_5X5_100.json';
+import DICT_5X5_1000 from './DICT_5X5_1000.json';
 import DICT_6X6_250 from './DICT_6X6_250.json';
 import DICT_7X7_1000 from './DICT_7X7_1000.json';
 import DICT_ARUCO_ORIGINAL from './DICT_ARUCO_ORIGINAL.json';
@@ -43,6 +44,7 @@ import AT_36h11 from './apriltag-36h11.json';
 const ARUCO_DICTS: Record<string, ArUcoDict> = {
   DICT_4X4_50: DICT_4X4_50 as unknown as ArUcoDict,
   DICT_5X5_100: DICT_5X5_100 as unknown as ArUcoDict,
+  DICT_5X5_1000: DICT_5X5_1000 as unknown as ArUcoDict,
   DICT_6X6_250: DICT_6X6_250 as unknown as ArUcoDict,
   DICT_7X7_1000: DICT_7X7_1000 as unknown as ArUcoDict,
   DICT_ARUCO_ORIGINAL: DICT_ARUCO_ORIGINAL as unknown as ArUcoDict,
