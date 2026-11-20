@@ -63,6 +63,19 @@ describe('offer PDF', () => {
     expect(doc.getTitle()).toBe('Quotation Q-SAMPLE-0001');
     expect(bytes.length).toBeLessThan(200_000);
   });
+  it('draws the pattern to scale in the annex when the offer names one', async () => {
+    const PATTERN = '/tools/generator/?type=ChArUco&rows=9&cols=12&square=60&marker=45&dict=DICT_5X5_1000&paper=A4&startId=0&scaleBar=true';
+    const plain = await offerPdf(sample(), fonts());
+    const d = sample();
+    d.annex.pattern = PATTERN;
+    d.annex.board = [800, 600];
+    const drawn = await offerPdf(d, fonts());
+    // 54 squares and 54 markers add vector content (streams are compressed)
+    expect(drawn.length).toBeGreaterThan(plain.length + 1000);
+    expect((await PDFDocument.load(drawn)).getPageCount()).toBe(2);
+    expect(offerProblem({ ...sample(), annex: { ...sample().annex, pattern: 'https://evil.example/' } })).toBe('annex.pattern');
+    expect(offerProblem({ ...sample(), annex: { ...sample().annex, board: [800, -1] } })).toBe('annex.board');
+  });
   it('copes with long text and the largest allowed lists', async () => {
     const d = sample();
     d.items = Array.from({ length: 6 }, (_, i) => ({

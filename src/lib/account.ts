@@ -244,3 +244,40 @@ export function renamePattern(list: SavedPattern[], id: string, name: string): S
   const clean = name.trim().slice(0, MAX_NAME);
   return clean ? list.map((x) => (x.id === id ? { ...x, name: clean } : x)) : list;
 }
+
+// ── quotation documents (written by Calib.Tools in the admin, read-only for the customer) ──
+
+export const OFFERS_KEY = 'offers';
+const OFFER_PDF_RE = /^https:\/\/calib\.tools\/q\/[a-z0-9]{8,64}\/[A-Za-z0-9_-]{16,128}\.pdf$/;
+
+export interface OfferDoc {
+  /** Quotation PDF on calib.tools/q/…, or ''. */
+  pdf: string;
+  /** Generator path that reopens the pattern, or ''. */
+  pattern: string;
+  /** Pattern ID computed from the path, or ''. */
+  patternId: string;
+}
+
+/**
+ * Customer metafield calibtools.offers: [{ draft: "#D4", pdf, pattern }]. Returns the documents by
+ * draft-order name. Anything that is not a calib.tools quotation link or a generator path is dropped.
+ */
+export function parseOffers(value: string | null | undefined): Map<string, OfferDoc> {
+  const out = new Map<string, OfferDoc>();
+  if (!value) return out;
+  let list: unknown;
+  try { list = JSON.parse(value); } catch { return out; }
+  if (!Array.isArray(list)) return out;
+  for (const e of list.slice(0, 100)) {
+    if (!e || typeof e !== 'object') continue;
+    const { draft, pdf, pattern } = e as Record<string, unknown>;
+    if (typeof draft !== 'string' || !/^#D\d{1,9}$/.test(draft)) continue;
+    const pdfOk = typeof pdf === 'string' && OFFER_PDF_RE.test(pdf) ? pdf : '';
+    const path = typeof pattern === 'string' && isGeneratorPath(pattern.trim()) ? pattern.trim() : '';
+    const spec = path ? specFromLink(path) : null;
+    if (!pdfOk && !spec) continue;
+    out.set(draft, { pdf: pdfOk, pattern: spec ? path : '', patternId: spec ? patternId(spec) : '' });
+  }
+  return out;
+}
