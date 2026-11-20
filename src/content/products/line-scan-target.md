@@ -21,6 +21,7 @@ relatedTargets:
   - { label: "ChArUco, ceramic", href: "/targets/charuco-ceramic/", note: "Lithographed plate for small fields of view." }
   - { label: "HALCON plate, aluminum", href: "/targets/halcon-composite/", note: "For area cameras on the same line." }
 relatedGuides:
+  - { label: "Line-scan camera calibration", href: "/guides/line-scan-camera-calibration/", note: "Strip for the line axis, scanned board for mm per line and skew." }
   - { label: "Composite, ceramic or glass", href: "/guides/composite-ceramic-or-glass/", note: "Compare the tolerance with one pixel on the target." }
   - { label: "USAF 1951 lp/mm table", href: "/guides/usaf-1951-lp-mm-table/", note: "Reading resolution from line pairs." }
   - { label: "How big should your target be?", href: "/guides/calibration-target-size/", note: "Size against field of view." }

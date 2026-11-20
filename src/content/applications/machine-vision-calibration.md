@@ -21,6 +21,7 @@ links:
   - { label: "Format converter", href: "/tools/convert/" }
   - { label: "Pattern generator", href: "/tools/generator/" }
   - { label: "USAF 1951 lp/mm table", href: "/guides/usaf-1951-lp-mm-table/" }
+  - { label: "Line-scan camera calibration", href: "/guides/line-scan-camera-calibration/" }
   - { label: "Board not detected? Troubleshooting", href: "/guides/corner-detection-troubleshooting/" }
 selection:
   - { scenario: "HALCON measurement setup", pattern: "HALCON calibration plate", size: "Sized to the field", material: "Composite" }

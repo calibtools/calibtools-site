@@ -5,7 +5,7 @@ date: 2026-11-07
 updated: 2026-11-07
 readingTime: "11 min"
 keyRule: "Size the board to fill about 60 % of the frame at your working distance, then check that each square is at least 25 px and each marker bit at least 3 px."
-related: ["opencv-camera-calibration", "charuco-vs-checkerboard-vs-aprilgrid", "corner-detection-troubleshooting", "multi-board-marker-ids"]
+related: ["opencv-camera-calibration", "charuco-vs-checkerboard-vs-aprilgrid", "corner-detection-troubleshooting", "multi-board-marker-ids", "line-scan-camera-calibration"]
 products: ["charuco-composite", "charuco-ceramic", "checkerboard-composite"]
 sampleFiles: []
 faq:
@@ -116,7 +116,7 @@ The [FOV calculator](/tools/fov/) reports both numbers for each board it suggest
 
 **The board has to stay put (hand-eye, robot cells).** Fill applies to the camera's view at each robot pose; the [hand-eye guide](/guides/hand-eye-calibration-opencv/) explains how the poses are chosen.
 
-**Line-scan, telecentric and thermal cameras** each break one assumption above and have their own guides.
+**Line-scan, telecentric and thermal cameras** each break one assumption above and have their own guides: [line-scan](/guides/line-scan-camera-calibration/) and [thermal](/guides/thermal-camera-geometric-calibration/) are written.
 
 ## Views and tilt
 
