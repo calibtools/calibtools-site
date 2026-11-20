@@ -257,10 +257,12 @@ export interface OfferDoc {
   pattern: string;
   /** Pattern ID computed from the path, or ''. */
   patternId: string;
+  /** Quotation number as printed on the PDF, or ''. */
+  no: string;
 }
 
 /**
- * Customer metafield calibtools.offers: [{ draft: "#D4", pdf, pattern }]. Returns the documents by
+ * Customer metafield calibtools.offers: [{ draft: "#D4", no: "Q-…", pdf, pattern }]. Returns the documents by
  * draft-order name. Anything that is not a calib.tools quotation link or a generator path is dropped.
  */
 export function parseOffers(value: string | null | undefined): Map<string, OfferDoc> {
@@ -271,13 +273,14 @@ export function parseOffers(value: string | null | undefined): Map<string, Offer
   if (!Array.isArray(list)) return out;
   for (const e of list.slice(0, 100)) {
     if (!e || typeof e !== 'object') continue;
-    const { draft, pdf, pattern } = e as Record<string, unknown>;
+    const { draft, pdf, pattern, no } = e as Record<string, unknown>;
     if (typeof draft !== 'string' || !/^#D\d{1,9}$/.test(draft)) continue;
     const pdfOk = typeof pdf === 'string' && OFFER_PDF_RE.test(pdf) ? pdf : '';
     const path = typeof pattern === 'string' && isGeneratorPath(pattern.trim()) ? pattern.trim() : '';
     const spec = path ? specFromLink(path) : null;
-    if (!pdfOk && !spec) continue;
-    out.set(draft, { pdf: pdfOk, pattern: spec ? path : '', patternId: spec ? patternId(spec) : '' });
+    const quoteNo = typeof no === 'string' && /^[A-Za-z0-9][A-Za-z0-9._-]{0,39}$/.test(no) ? no : '';
+    if (!pdfOk && !spec && !quoteNo) continue;
+    out.set(draft, { pdf: pdfOk, pattern: spec ? path : '', patternId: spec ? patternId(spec) : '', no: quoteNo });
   }
   return out;
 }

@@ -34,8 +34,8 @@ are not listed in the email.
 /account/ lists each quote and order with "Quotation (PDF)" and "Pattern P-XXXXXX" links. They come from
 the customer metafield `calibtools.offers` (JSON, read-only for the customer):
 
-    [{ "draft": "#D4", "pdf": "https://calib.tools/q/<id>/<key>.pdf", "pattern": "/tools/generator/?…" }]
+    [{ "draft": "#D4", "no": "Q-20261120-AB12", "pdf": "https://calib.tools/q/<id>/<key>.pdf", "pattern": "/tools/generator/?…" }]
 
-Add one entry per draft order with `metafieldsSet` (keep the existing entries). The order created from the
+The page shows `no` in place of the draft-order name. Add one entry per draft order with `metafieldsSet` (keep the existing entries). The order created from the
 draft shows the same links. Only calib.tools quotation links and generator paths are shown.
 Put the Pattern ID and the generator link in the offer's annex too, so the PDF names the exact pattern.

@@ -88,6 +88,8 @@ export default function AccountPanel() {
           setState({ kind: 'signedOut', available: b.available !== false });
         } else if (r.ok) {
           setState({ kind: 'ready', data: await r.json() });
+          // Signed in: a leftover ?error=… from an earlier attempt no longer applies.
+          if (window.location.search) window.history.replaceState(null, '', window.location.pathname + window.location.hash);
         } else {
           setState({ kind: 'error' });
         }
@@ -232,7 +234,7 @@ export default function AccountPanel() {
               <tbody>
                 {d.quotes.map((q) => (
                   <tr key={q.name}>
-                    <td className={`${TD} font-mono`}>{q.name}</td>
+                    <td className={`${TD} font-mono`}>{q.no || q.name}</td>
                     <td className={`${TD} font-mono`}>{date(q.date)}</td>
                     <td className={TD}>{QUOTE_STATUS[q.status]}</td>
                     <td className={`${TD} font-mono text-right`}>{money(q.total)}</td>
@@ -256,7 +258,7 @@ export default function AccountPanel() {
               <tbody>
                 {d.orders.map((o) => (
                   <tr key={o.name}>
-                    <td className={`${TD} font-mono`}>{o.name}</td>
+                    <td className={`${TD} font-mono`}>{o.name}{o.no && <span className="block text-[13px] text-ink-muted">Quote {o.no}</span>}</td>
                     <td className={`${TD} font-mono`}>{date(o.date)}</td>
                     <td className={`${TD} first-letter:uppercase`}>{o.payment}</td>
                     <td className={`${TD} first-letter:uppercase`}>{o.fulfillment}</td>

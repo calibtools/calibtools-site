@@ -197,7 +197,7 @@ const DRAFT_STATUS: Record<string, 'open' | 'sent' | 'completed'> = { OPEN: 'ope
 export function toSummary(d: SummaryData): AccountSummary {
   const c = d.customer;
   const offers = parseOffers(c.offers?.value);
-  const NO_DOC: OfferDoc = { pdf: '', pattern: '', patternId: '' };
+  const NO_DOC: OfferDoc = { pdf: '', pattern: '', patternId: '', no: '' };
   const doc = (draft: string | undefined) => (draft && offers.get(draft)) || NO_DOC;
   return {
     signedIn: true,

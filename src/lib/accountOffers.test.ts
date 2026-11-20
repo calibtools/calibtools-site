@@ -8,7 +8,7 @@ const PATTERN = '/tools/generator/?type=ChArUco&rows=9&cols=12&square=30&marker=
 describe('quotation documents on the account page', () => {
   it('keeps calib.tools quotation links and generator paths, drops anything else', () => {
     const m = parseOffers(JSON.stringify([
-      { draft: '#D4', pdf: PDF, pattern: PATTERN },
+      { draft: '#D4', no: 'Q-20261120-AB12', pdf: PDF, pattern: PATTERN },
       { draft: '#D5', pdf: 'https://evil.example/q/x.pdf', pattern: 'https://evil.example/' },
       { draft: 'D6', pdf: PDF },
     ]));
@@ -16,6 +16,8 @@ describe('quotation documents on the account page', () => {
     expect(m.get('#D4')!.pdf).toBe(PDF);
     expect(m.get('#D4')!.pattern).toBe(PATTERN);
     expect(m.get('#D4')!.patternId).toMatch(/^P-/);
+    expect(m.get('#D4')!.no).toBe('Q-20261120-AB12');
+    expect(parseOffers(JSON.stringify([{ draft: '#D7', no: '<b>x</b>', pdf: PDF }])).get('#D7')!.no).toBe('');
   });
 
   it('survives a missing or broken metafield', () => {
