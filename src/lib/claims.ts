@@ -74,7 +74,7 @@ export const SHIP_COUNTRIES = [
 export const SHIP_COUNTRY_COUNT = SHIP_COUNTRIES.length;
 
 /** Company address as registered (also on /imprint/, Shopify and Merchant Center). */
-export const COMPANY_ADDRESS = '1401 21st Street, Suite R, Sacramento, CA 95811, USA';
+export const COMPANY_ADDRESS = '1209 Mountain Road Pl NE, Ste N, Albuquerque, NM 87110, USA';
 
 // ── Material specs ───────────────────────────────────────────────────
 

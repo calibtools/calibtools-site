@@ -10,7 +10,7 @@
   "intro": "Sample of the custom quotation layout. The figures on this page are placeholders, not an offer.",
   "seller": {
     "name": "Calib.Tools",
-    "address": ["1401 21st Street, Suite R", "Sacramento, CA 95811", "United States"],
+    "address": ["1209 Mountain Road Pl NE, Ste N", "Albuquerque, NM 87110", "United States"],
     "email": "hello@calib.tools"
   },
   "customer": { "name": "Sample Customer", "contact": "Vision systems", "address": ["Street 1", "00000 City", "Country"] },
