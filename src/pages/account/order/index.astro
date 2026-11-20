@@ -1,0 +1,11 @@
+---
+import Base from '@/layouts/Base.astro';
+import OrderDetail from '@/islands/OrderDetail';
+---
+<Base title="Your order" description="Items, shipping and documents for one order in your Calib.Tools account." noindex>
+  <div class="container-x py-[var(--section-y)]">
+    <div class="mx-auto max-w-[880px]">
+      <OrderDetail client:load />
+    </div>
+  </div>
+</Base>
