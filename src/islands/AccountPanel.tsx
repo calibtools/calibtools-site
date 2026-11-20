@@ -265,7 +265,7 @@ export default function AccountPanel() {
                     <td className={`${TD} first-letter:uppercase`}>{o.fulfillment}</td>
                     <td className={`${TD} font-mono text-right`}>{money(o.total)}</td>
                     <td className={TD}><Docs d={o} /></td>
-                    <td className={`${TD} text-right whitespace-nowrap`}><a href={o.url}>Order status</a></td>
+                    <td className={`${TD} text-right whitespace-nowrap`}><a href={o.page || o.url}>Order details</a></td>
                   </tr>
                 ))}
               </tbody>

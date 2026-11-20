@@ -3,6 +3,7 @@
  * Reads the sealed session cookie, refreshes the access token when it is about to expire,
  * and talks to the Customer Account API. Responses are never cached.
  */
+import { orderPath } from './accountOrder';
 import {
   GRAPHQL_URL, TOKEN_URL, SESSION_COOKIE, PATTERNS_NAMESPACE, PATTERNS_KEY, OFFERS_KEY, parseOffers, type OfferDoc,
   open, seal, readCookie, needsRefresh, sessionFromTokens, sessionCookie, clearSessionCookie,
@@ -189,7 +190,7 @@ export interface AccountSummary {
   firstName: string;
   patterns: SavedPattern[];
   quotes: ({ name: string; date: string; status: 'open' | 'sent' | 'completed'; total: Money; url: string | null } & OfferDoc)[];
-  orders: ({ name: string; date: string; payment: string; fulfillment: string; total: Money; url: string } & OfferDoc)[];
+  orders: ({ name: string; date: string; payment: string; fulfillment: string; total: Money; url: string; page: string } & OfferDoc)[];
 }
 
 const DRAFT_STATUS: Record<string, 'open' | 'sent' | 'completed'> = { OPEN: 'open', INVOICE_SENT: 'sent', COMPLETED: 'completed' };
@@ -220,6 +221,8 @@ export function toSummary(d: SummaryData): AccountSummary {
       fulfillment: o.fulfillmentStatus.toLowerCase().replace(/_/g, ' '),
       total: o.totalPrice,
       url: o.statusPageUrl,
+      // our own order page; '' falls back to Shopify's
+      page: orderPath(o.id),
       ...doc(o.draftOrder?.name),
     })),
   };
