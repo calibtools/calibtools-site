@@ -60,7 +60,7 @@ export default function QualityAnalyzer() {
 
           <div className="mb-3 flex items-center justify-between">
             <label htmlFor="calib-input" className="text-[13px] font-semibold">Calibration data</label>
-            <button type="button" className="text-xs text-brand underline" onClick={loadExample}>Load example</button>
+            <button type="button" className="min-h-[24px] text-xs text-brand underline" onClick={loadExample}>Load example</button>
           </div>
           <textarea
             id="calib-input"

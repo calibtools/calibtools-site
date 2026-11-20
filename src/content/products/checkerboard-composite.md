@@ -63,7 +63,7 @@ The rule from the [target size guide](/guides/calibration-target-size/): fill ab
 
 Work out your image scale with the [FOV calculator](/tools/fov/), then take Fine if its squares still reach 25 px and Coarse if they do not.
 
-## Sizes
+## Choosing a size
 
 The field widths below assume the board fills 60 % of the image. The image scale is the coarsest that still gives 25 px per square.
 

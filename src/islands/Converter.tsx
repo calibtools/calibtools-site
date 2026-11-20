@@ -100,7 +100,7 @@ export default function Converter() {
         <div className="card rows-3 gap-3 p-7">
           <div className="flex items-center justify-between">
             <label htmlFor="input" className="text-[13px] font-semibold">Input</label>
-            <button type="button" className="text-xs text-brand underline" onClick={loadExample}>Load example</button>
+            <button type="button" className="min-h-[24px] text-xs text-brand underline" onClick={loadExample}>Load example</button>
           </div>
           <textarea
             id="input"

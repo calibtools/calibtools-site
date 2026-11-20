@@ -29,7 +29,7 @@ selection:
   - { scenario: "Telecentric lens", pattern: "Circle grid or checkerboard", size: "Sized to the field", material: "Ceramic" }
   - { scenario: "Line-scan camera", pattern: "Line or dot strip", size: "300 to 800 mm long", material: "Chrome on glass" }
 faq:
-  - { q: "Circles or checkerboard?", a: "Both work. Circle centers are robust under defocus; checkerboard corners are less affected by perspective. Pick what your software expects and what your lens and lighting favour." }
+  - { q: "Circles or checkerboard?", a: "Both work. Circle centers are robust under defocus; checkerboard corners are less affected by perspective. Pick what your software expects and what your lens and lighting favor." }
   - { q: "How do I calibrate a telecentric lens?", a: "The standard pinhole model does not fit a telecentric lens. Use your software’s telecentric model (HALCON has one) or a scale-and-distortion fit, with a flat target on the object plane." }
   - { q: "How do I get mm per pixel?", a: "Image a target with known feature pitch in the measurement plane and fit scale and distortion. A ruler or printed grid is rarely accurate enough." }
 ---

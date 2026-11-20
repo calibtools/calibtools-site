@@ -160,7 +160,7 @@ That is single-corner precision. A measurement across the frame depends on how w
 | RMS fine, distances off by a constant factor | Wrong square size in the board definition | Measure the printed board; set `squareLength` in meters or millimeters consistently |
 | One view at 3× the others | Motion blur, moved board, reflection, ID mis-read | Drop it and recalibrate |
 | Residual grows with radius | Model too simple or no edge coverage | Edge views first; add k3 only if the trend remains |
-| RMS drops when adding rational terms, verification gets worse | Over-parameterised | Return to the five-parameter model |
+| RMS drops when adding rational terms, verification gets worse | Over-parameterized | Return to the five-parameter model |
 | RMS 0.5 px or more with every view similar | Board not flat, or printed and scaled | Rigid board; measure the print |
 | Very low RMS with 5 views | Too few views to constrain anything | 15 or more views; check parameter standard deviations |
 
