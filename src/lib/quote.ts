@@ -22,6 +22,8 @@ export const materialLabel = (v: string): string => MATERIALS.find((m) => m.id =
  */
 export const HEARD_FROM = [
   { id: 'google', label: 'Google search' },
+  { id: 'bing', label: 'Bing search' },
+  { id: 'naver', label: 'Naver or Daum' },
   { id: 'ai', label: 'ChatGPT or another AI assistant' },
   { id: 'forum', label: 'Forum or Q&A site (OpenCV, Stack Overflow, Reddit)' },
   { id: 'github', label: 'GitHub' },
