@@ -53,6 +53,14 @@ describe('custom orders are final once paid (2026-11-21)', () => {
     const email = read('docs/offers/draft-order-invoice-offer.liquid').replace(/&rsquo;/g, '’');
     expect(email).toContain(CUSTOM_ORDER_FINAL);
   });
+  it('offers paid repair for damage caused in use, with shipping both ways on the customer', async () => {
+    const { PAID_REPAIR } = await import('./orderTerms');
+    expect(PAID_REPAIR).toMatch(/repair the target for a fee/);
+    expect(PAID_REPAIR).toMatch(/shipping both ways/);
+    for (const rel of ['src/pages/returns.astro', 'src/pages/terms.astro', 'src/lib/offerPdf.ts', 'src/islands/OrderDetail.tsx']) {
+      expect(read(rel), rel).toContain('PAID_REPAIR');
+    }
+  });
   it('no page still says a custom target can be returned', () => {
     for (const rel of ['src/pages/returns.astro', 'src/pages/terms.astro', 'src/pages/faq.astro']) {
       expect(read(rel), rel).not.toMatch(/Custom targets can be returned/i);

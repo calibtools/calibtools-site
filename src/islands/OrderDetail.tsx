@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { patternViewPath } from '@/lib/patternLink';
 import { SIGN_OFF_LINE } from '@/lib/brand';
 import { CONTACT_EMAIL } from '@/lib/claims';
-import { CUSTOM_ORDER_FINAL } from '@/lib/orderTerms';
+import { CUSTOM_ORDER_FINAL, PAID_REPAIR } from '@/lib/orderTerms';
 import type { OrderDetail as Order, Money } from '@/lib/accountOrder';
 
 type State =
@@ -169,7 +169,7 @@ export function OrderView({ order }: { order: Order }) {
 
       {order.no && (
         <p className="m-0 border border-line bg-ground-alt px-5 py-4 text-[14px] leading-[22px] text-ink-muted">
-          <span className="font-semibold text-ink">Made to order.</span> {CUSTOM_ORDER_FINAL}
+          <span className="font-semibold text-ink">Made to order.</span> {CUSTOM_ORDER_FINAL} {PAID_REPAIR}
         </p>
       )}
 

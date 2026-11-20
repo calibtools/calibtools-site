@@ -10,7 +10,7 @@ import { DOC_COLORS, hexToUnitRgb } from './docColors';
 import { WORDMARK_PATHS, WORDMARK_DOT_RECT } from './exportBrand';
 import { CONTACT_LINE } from './reportConfig';
 import { MISSION_LINE } from './brand';
-import { CUSTOM_ORDER_FINAL } from './orderTerms';
+import { CUSTOM_ORDER_FINAL, PAID_REPAIR } from './orderTerms';
 import { patternShapes, fillRgb, shapeBox } from './patternShapes';
 import { specFromLink, patternId } from './patternLink';
 import { getArUcoDict } from './dicts/dicts';
@@ -443,15 +443,15 @@ export async function offerPdf(d: OfferData, fonts: OfferFonts): Promise<Uint8Ar
 
   // 5 · acceptance, anchored to the bottom of the page
   const signH = 49 * MM;
-  ensure(signH + 98);
-  y = Math.max(y, PAGE_H - 22 * MM - signH - 90);
+  ensure(signH + 111);
+  y = Math.max(y, PAGE_H - 22 * MM - signH - 103);
   section(5, 'Acceptance and order release');
   y += para(
     'To accept this quotation, return this page with the customer acceptance fields completed, or confirm the order through the link in the accompanying email. Purchase order details confirm quantities and delivery instructions.',
     LEFT, y, WIDTH, sans, 9, MUTED,
   ) + 4;
   // Custom orders are final once paid: said here, above the signatures, on every quotation.
-  y += para(CUSTOM_ORDER_FINAL, LEFT, y, WIDTH, sans, 9, BLACK) + 8;
+  y += para(`${CUSTOM_ORDER_FINAL} ${PAID_REPAIR}`, LEFT, y, WIDTH, sans, 9, BLACK) + 8;
   const oursW = (WIDTH - 8 * MM) * 0.43;
   const theirsX = LEFT + oursW + 8 * MM;
   const theirsW = RIGHT - theirsX;

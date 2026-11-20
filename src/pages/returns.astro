@@ -11,7 +11,7 @@ import {
   DEFECT_WARRANTY,
   REFUND_START_DAYS,
 } from '@/lib/claims';
-import { CUSTOM_ORDER_FINAL } from '@/lib/orderTerms';
+import { CUSTOM_ORDER_FINAL, PAID_REPAIR } from '@/lib/orderTerms';
 const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: 'Returns' }]);
 ---
 <Base title="Returns and refunds" description="Return a standard target within 30 days of delivery. How to get a return number, how to pack it, restocking after 30 days and the one-year defect warranty." jsonLd={bcLd}>
@@ -55,6 +55,10 @@ const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: 'Returns' }]);
 
       <h2>Custom and volume orders</h2>
       <p>{CUSTOM_ORDER_FINAL} This covers any pattern, size or substrate made to your drawing or quotation.</p>
+
+      <h2>Paid repair</h2>
+      <p>{PAID_REPAIR} This applies to standard and custom targets alike. Email us photos first and we&rsquo;ll tell you whether a repair is possible and what it costs.</p>
+
       <p>Returning part of a volume order of standard targets? Email us first and we&rsquo;ll work it out case by case.</p>
 
       <h2>Questions?</h2>
