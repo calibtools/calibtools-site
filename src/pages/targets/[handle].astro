@@ -19,7 +19,7 @@ import { optimizeProductImage } from '@/lib/optimizeProductImage';
 import { Ruler, Plus, Download, Columns2, ArrowRight, ArrowUp, ChevronDown } from 'lucide-astro';
 import { getProductData } from '@/lib/productData';
 import ReviewsSection from '@/islands/ReviewsSection';
-import { LEAD_TIME } from '@/lib/claims';
+import { LEAD_TIME, RETURN_WINDOW_DAYS, DEFECT_WARRANTY } from '@/lib/claims';
 import Stars from '@/components/Stars';
 import Rating from '@/components/Rating.astro';
 import { getReviewsForProduct, summarize } from '@/lib/reviews';
@@ -448,7 +448,7 @@ const quickLinks = hasLongform
     {collectionHandle && (
       <><a href={`/targets/collection/${collectionHandle}/`} class="text-ink-soft no-underline shrink-0 min-h-[44px] md:min-h-[24px] flex items-center">{collectionTitle}</a><span class="flex items-center">/</span></>
     )}
-    <span class="text-ink shrink-0 min-h-[44px] md:min-h-[24px] flex items-center">{product.title}</span>
+    <span class="text-ink min-w-0 min-h-[44px] md:min-h-[24px] flex items-center">{product.title}</span>
   </nav>
 
   {/* ── Buy box ── */}
@@ -827,8 +827,10 @@ const quickLinks = hasLongform
             {([
               ['Lead time', m.lead_time || LEAD_TIME],
               ['Shipping', 'Tracked express from the factory. Import VAT and duties are settled at import (DAP) unless agreed otherwise.'],
-              ['Returns', '30 days, unused, in original case.'],
-              ['Warranty', '2 years against manufacturing defects.'],
+              ['Returns', quoteOnly
+                ? 'Made to your specification, so it can\u2019t be returned or exchanged once it is paid.'
+                : `${RETURN_WINDOW_DAYS} days from delivery, unused, in its original packaging.`],
+              ['Warranty', `Defective targets are repaired or replaced up to ${DEFECT_WARRANTY}.`],
             ] as [string, string][]).map(([label, value], i) => (
               <tr class={`border-t border-line last:border-b ${i % 2 === 1 ? 'bg-ground-alt' : ''}`}>
                 <td class="w-[38%] py-2.5 pr-3 text-ink-muted">{label}</td>

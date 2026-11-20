@@ -68,6 +68,13 @@ describe('custom orders are final once paid (2026-11-21)', () => {
     expect(read('docs/offers/draft-order-invoice-offer.liquid')).toContain(PAYMENT_ACCEPTS_QUOTATION);
     expect(read('src/pages/terms.astro')).toMatch(/paying the order accepts the specification/);
   });
+  it('product pages take the warranty and return window from the shared constants', () => {
+    const page = read('src/pages/targets/[handle].astro');
+    expect(page).toContain('DEFECT_WARRANTY');
+    expect(page).toContain('RETURN_WINDOW_DAYS');
+    expect(page).not.toMatch(/\b(2|two) years against/i);
+    expect(page).not.toMatch(/'30 days, unused/);
+  });
   it('no page still says a custom target can be returned', () => {
     for (const rel of ['src/pages/returns.astro', 'src/pages/terms.astro', 'src/pages/faq.astro']) {
       expect(read(rel), rel).not.toMatch(/Custom targets can be returned/i);
