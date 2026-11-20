@@ -79,13 +79,18 @@ const countries = countryOptions();
           <label for="q-message" class="label">Message <span class="font-normal text-ink-muted">(optional)</span></label>
           <textarea id="q-message" name="message" rows={4} class="input" placeholder="Deadline, how you use the target, special requirements..."></textarea>
         </div>
-        <div class="flex flex-col gap-1.5">
-          <label for="q-heard" class="label">How did you find us?</label>
-          <select id="q-heard" name="heard_from" class="input" required>
-            <option value="">Choose…</option>
-            {HEARD_FROM.map((h) => <option value={h.id}>{h.label}</option>)}
-          </select>
-        </div>
+        <fieldset class="m-0 flex flex-col gap-1.5 border-0 p-0">
+          <legend class="label mb-1.5">How did you find us?</legend>
+          <div class="flex flex-col gap-2 rounded-sm border border-line p-3">
+            {HEARD_FROM.map((h) => (
+              <label class="flex cursor-pointer items-center gap-3 text-[15px]">
+                <input type="radio" name="heard_from" value={h.id} required />
+                <span>{h.label}</span>
+              </label>
+            ))}
+          </div>
+          <p id="q-heard_from-err" class="m-0 hidden text-sm text-brand-dark"></p>
+        </fieldset>
 
         {/* Source page — sent with the form submission, not tracking */}
         <input type="hidden" name="source_page" id="q-source" />
