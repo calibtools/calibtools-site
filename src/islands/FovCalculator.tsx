@@ -9,19 +9,36 @@ export const FOV_DEFAULTS = { preset: '2/3" (IMX174)', sensorW: 8.77, sensorH: 6
 
 export default function FovCalculator({ heading = 'FOV calculator' }: { heading?: string } = {}) {
   const [preset, setPreset] = useState(FOV_DEFAULTS.preset);
-  const [sensorW, setSensorW] = useState(FOV_DEFAULTS.sensorW);
-  const [sensorH, setSensorH] = useState(FOV_DEFAULTS.sensorH);
-  const [resW, setResW] = useState(FOV_DEFAULTS.resW);
-  const [resH, setResH] = useState(FOV_DEFAULTS.resH);
-  const [focal, setFocal] = useState(FOV_DEFAULTS.focal);
-  const [distance, setDistance] = useState(FOV_DEFAULTS.distance);
-  const [targetW, setTargetW] = useState(250);
-  const [targetH, setTargetH] = useState(175);
-  const [wantW, setWantW] = useState(300);
-  const [wantH, setWantH] = useState(0);
+  const [sensorWIn, setSensorW] = useState(FOV_DEFAULTS.sensorW);
+  const [sensorHIn, setSensorH] = useState(FOV_DEFAULTS.sensorH);
+  const [resWIn, setResW] = useState(FOV_DEFAULTS.resW);
+  const [resHIn, setResH] = useState(FOV_DEFAULTS.resH);
+  const [focalIn, setFocal] = useState(FOV_DEFAULTS.focal);
+  const [distanceIn, setDistance] = useState(FOV_DEFAULTS.distance);
+  const [targetWIn, setTargetW] = useState(250);
+  const [targetHIn, setTargetH] = useState(175);
+  const [wantWIn, setWantW] = useState(300);
+  const [wantHIn, setWantH] = useState(0);
   const [convAngle, setConvAngle] = useState(90);
   const [convAxis, setConvAxis] = useState<FovAxis>('horizontal');
   const [convRatio, setConvRatio] = useState('16:9');
+
+  // What is typed (…In) and what is calculated: an empty, zero or negative field never reaches the formulas.
+  const usable = (v: number, fallback: number) => (Number.isFinite(v) && v > 0 ? v : fallback);
+  const sensorW = usable(sensorWIn, FOV_DEFAULTS.sensorW);
+  const sensorH = usable(sensorHIn, FOV_DEFAULTS.sensorH);
+  const resW = usable(resWIn, FOV_DEFAULTS.resW);
+  const resH = usable(resHIn, FOV_DEFAULTS.resH);
+  const focal = usable(focalIn, FOV_DEFAULTS.focal);
+  const distance = usable(distanceIn, FOV_DEFAULTS.distance);
+  const targetW = usable(targetWIn, 250);
+  const targetH = usable(targetHIn, 175);
+  const wantW = usable(wantWIn, 300);
+  const wantH = Number.isFinite(wantHIn) && wantHIn >= 0 ? wantHIn : 0;
+  const typed = [sensorWIn, sensorHIn, resWIn, resHIn, focalIn, distanceIn, targetWIn, targetHIn, wantWIn];
+  const fieldNote = typed.every((v) => Number.isFinite(v) && v > 0) && wantHIn >= 0
+    ? null
+    : 'Enter values greater than zero. Empty, zero and negative fields are calculated with their default value.';
 
   const applyPreset = (name: string) => {
     setPreset(name);
@@ -81,36 +98,38 @@ export default function FovCalculator({ heading = 'FOV calculator' }: { heading?
 
         <div className="grid grid-cols-2 gap-3">
           <label className="rows-2 gap-y-2 text-[13px] font-semibold">Sensor width (mm)
-            <input className={field} type="number" min={0.1} step={0.01} value={sensorW} onChange={(e) => { setSensorW(+e.target.value); setPreset('Custom'); }} />
+            <input className={field} type="number" min={0.1} step={0.01} value={sensorWIn} onChange={(e) => { setSensorW(+e.target.value); setPreset('Custom'); }} />
           </label>
           <label className="rows-2 gap-y-2 text-[13px] font-semibold">Sensor height (mm)
-            <input className={field} type="number" min={0.1} step={0.01} value={sensorH} onChange={(e) => { setSensorH(+e.target.value); setPreset('Custom'); }} />
+            <input className={field} type="number" min={0.1} step={0.01} value={sensorHIn} onChange={(e) => { setSensorH(+e.target.value); setPreset('Custom'); }} />
           </label>
           <label className="rows-2 gap-y-2 text-[13px] font-semibold">Resolution W (px)
-            <input className={field} type="number" min={1} value={resW} onChange={(e) => { setResW(+e.target.value); setPreset('Custom'); }} />
+            <input className={field} type="number" min={1} value={resWIn} onChange={(e) => { setResW(+e.target.value); setPreset('Custom'); }} />
           </label>
           <label className="rows-2 gap-y-2 text-[13px] font-semibold">Resolution H (px)
-            <input className={field} type="number" min={1} value={resH} onChange={(e) => { setResH(+e.target.value); setPreset('Custom'); }} />
+            <input className={field} type="number" min={1} value={resHIn} onChange={(e) => { setResH(+e.target.value); setPreset('Custom'); }} />
           </label>
         </div>
 
         <label className="rows-2 gap-y-2 text-[13px] font-semibold">Focal length (mm)
-          <input className={field} type="number" min={1} step={0.5} value={focal} onChange={(e) => setFocal(+e.target.value)} />
+          <input className={field} type="number" min={1} step={0.5} value={focalIn} onChange={(e) => setFocal(+e.target.value)} />
         </label>
 
         <label className="rows-2 gap-y-2 text-[13px] font-semibold">Working distance (mm)
-          <input className={field} type="number" min={1} value={distance} onChange={(e) => setDistance(+e.target.value)} />
+          <input className={field} type="number" min={1} value={distanceIn} onChange={(e) => setDistance(+e.target.value)} />
         </label>
+
+        {fieldNote && <p role="status" className="m-0 text-[13px] leading-snug text-brand-dark">{fieldNote}</p>}
 
         <div className="border-t border-line pt-4">
           <span className="text-[13px] font-semibold">Lens finder (optional)</span>
           <p className="m-0 mb-3 text-xs text-ink-muted">Enter the field you need to see at the working distance. Leave height at 0 to size by width only.</p>
           <div className="grid grid-cols-2 gap-3">
             <label className="rows-2 gap-y-2 text-[13px] font-semibold">Field width (mm)
-              <input className={field} type="number" min={1} value={wantW} onChange={(e) => setWantW(+e.target.value)} />
+              <input className={field} type="number" min={1} value={wantWIn} onChange={(e) => setWantW(+e.target.value)} />
             </label>
             <label className="rows-2 gap-y-2 text-[13px] font-semibold">Field height (mm)
-              <input className={field} type="number" min={0} value={wantH} onChange={(e) => setWantH(+e.target.value)} />
+              <input className={field} type="number" min={0} value={wantHIn} onChange={(e) => setWantH(+e.target.value)} />
             </label>
           </div>
         </div>
@@ -120,10 +139,10 @@ export default function FovCalculator({ heading = 'FOV calculator' }: { heading?
           <p className="m-0 mb-3 text-xs text-ink-muted">Enter your calibration target size to get a recommended distance.</p>
           <div className="grid grid-cols-2 gap-3">
             <label className="rows-2 gap-y-2 text-[13px] font-semibold">Target width (mm)
-              <input className={field} type="number" min={1} value={targetW} onChange={(e) => setTargetW(+e.target.value)} />
+              <input className={field} type="number" min={1} value={targetWIn} onChange={(e) => setTargetW(+e.target.value)} />
             </label>
             <label className="rows-2 gap-y-2 text-[13px] font-semibold">Target height (mm)
-              <input className={field} type="number" min={1} value={targetH} onChange={(e) => setTargetH(+e.target.value)} />
+              <input className={field} type="number" min={1} value={targetHIn} onChange={(e) => setTargetH(+e.target.value)} />
             </label>
           </div>
         </div>
