@@ -35,3 +35,27 @@ describe('company address', () => {
     }
   });
 });
+
+describe('custom orders are final once paid (2026-11-21)', () => {
+  const read = (rel: string) => readFileSync(new URL(`../../${rel}`, import.meta.url), 'utf-8');
+  it('says so in one sentence', async () => {
+    const { CUSTOM_ORDER_FINAL } = await import('./claims');
+    expect(CUSTOM_ORDER_FINAL).toMatch(/can’t be canceled, returned or exchanged once it is paid/);
+    expect(CUSTOM_ORDER_FINAL).toMatch(/repaired or replaced/);
+  });
+  it('uses that sentence on the returns page, in the terms, in the quotation PDF and on the order page', () => {
+    for (const rel of ['src/pages/returns.astro', 'src/pages/terms.astro', 'src/lib/offerPdf.ts', 'src/islands/OrderDetail.tsx']) {
+      expect(read(rel), rel).toContain('CUSTOM_ORDER_FINAL');
+    }
+  });
+  it('carries the same words in the offer email template', async () => {
+    const { CUSTOM_ORDER_FINAL } = await import('./claims');
+    const email = read('docs/offers/draft-order-invoice-offer.liquid').replace(/&rsquo;/g, '’');
+    expect(email).toContain(CUSTOM_ORDER_FINAL);
+  });
+  it('no page still says a custom target can be returned', () => {
+    for (const rel of ['src/pages/returns.astro', 'src/pages/terms.astro', 'src/pages/faq.astro']) {
+      expect(read(rel), rel).not.toMatch(/Custom targets can be returned/i);
+    }
+  });
+});

@@ -10,6 +10,7 @@ import {
   RESTOCKING_FEE_MIN,
   DEFECT_WARRANTY,
   REFUND_START_DAYS,
+  CUSTOM_ORDER_FINAL,
 } from '@/lib/claims';
 const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: 'Returns' }]);
 ---
@@ -53,7 +54,8 @@ const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: 'Returns' }]);
       <p>Refunds go back to the card or account you paid with. We start the refund within {REFUND_START_DAYS} business days of the return passing inspection. Most banks show it within 5&ndash;10 business days.</p>
 
       <h2>Custom and volume orders</h2>
-      <p>Custom targets &mdash; patterns, sizes or substrates made to your drawing &mdash; can&rsquo;t be canceled or returned, unless they don&rsquo;t meet the agreed specification. Returning part of a volume order of standard targets? Email us first and we&rsquo;ll work it out case by case.</p>
+      <p>{CUSTOM_ORDER_FINAL} This covers any pattern, size or substrate made to your drawing or quotation.</p>
+      <p>Returning part of a volume order of standard targets? Email us first and we&rsquo;ll work it out case by case.</p>
 
       <h2>Questions?</h2>
       <p>Email <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>. Someone who knows the products will answer within one business day.</p>
