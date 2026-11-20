@@ -24,10 +24,7 @@ export default function PatternView() {
   if (state.kind === 'loading') return <p className="m-0 text-ink-muted">Loading the pattern…</p>;
   if (state.kind === 'none') {
     return (
-      <div className="flex flex-col gap-4">
-        <h1 className="h-display m-0 text-[32px] md:text-[40px]">Pattern</h1>
-        <p className="m-0 text-ink-muted">This link carries no pattern. <a href={GENERATOR_PATH}>Open the generator</a> to make one.</p>
-      </div>
+      <p className="m-0 text-ink-muted">This link carries no pattern. <a href={GENERATOR_PATH}>Open the generator</a> to make one.</p>
     );
   }
 
@@ -44,8 +41,8 @@ export default function PatternView() {
   return (
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-2">
-        <p className="m-0 font-mono text-[12px] uppercase tracking-[0.04em] text-ink-soft">Pattern</p>
-        <h1 className="h-display m-0 font-mono text-[32px] md:text-[40px]" data-testid="pattern-view-id">{id}</h1>
+        <p className="m-0 font-mono text-[12px] uppercase tracking-[0.04em] text-ink-soft">Pattern ID</p>
+        <p className="m-0 font-mono text-[24px] font-medium md:text-[28px]" data-testid="pattern-view-id">{id}</p>
         <p className="m-0 text-ink-muted">Same parameters, same ID. Quote it when you talk to a colleague or to us.</p>
       </div>
 
