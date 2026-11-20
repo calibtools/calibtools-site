@@ -147,7 +147,7 @@ describe('summary', () => {
     const body = await res.json();
     expect(body.email).toBe('ada@lab.example');
     expect(body.patterns).toHaveLength(1);
-    expect(body.quotes[0]).toEqual({ name: '#D2', date: '2026-11-11T10:00:00Z', status: 'sent', total: { amount: '900.0', currencyCode: 'EUR' }, url: 'https://shop.calib.tools/i/2', pdf: '', pattern: '', patternId: '' });
+    expect(body.quotes[0]).toEqual({ name: '#D2', date: '2026-11-11T10:00:00Z', status: 'sent', total: { amount: '900.0', currencyCode: 'EUR' }, url: 'https://shop.calib.tools/i/2', pdf: '', pattern: '', patternId: '', no: '' });
     expect(body.orders[0]).toMatchObject({ name: '#1001', payment: 'paid', fulfillment: 'in progress' });
     expect((calls[0].init?.headers as Record<string, string>).Authorization).toBe('at1');
   });
