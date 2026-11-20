@@ -1,5 +1,6 @@
 ---
 import Base from '@/layouts/Base.astro';
+import { isFileLink } from '../../../scripts/file-links.mjs';
 import ProductCard from '@/components/ProductCard.astro';
 import { productCardVisual } from '@/lib/productCardVisual';
 import { ArrowRight, FileText, ExternalLink } from 'lucide-astro';
@@ -140,7 +141,7 @@ const jsonLdItems = [articleLd, breadcrumbLd, ...(faqLd ? [faqLd] : [])];
             {d.sampleFiles.map((key: string) => {
               const link = sampleLinks[key as keyof typeof sampleLinks];
               return link ? (
-                <a href={link.href} class="inline-flex items-center gap-1.5 text-[14px] font-medium text-brand-dark no-underline">
+                <a href={link.href} {...(isFileLink(link.href) ? { target: '_blank', rel: 'noopener' } : {})} class="inline-flex items-center gap-1.5 text-[14px] font-medium text-brand-dark no-underline">
                   {link.label} <ExternalLink size={14} stroke-width={1.6} aria-hidden="true" />
                 </a>
               ) : null;

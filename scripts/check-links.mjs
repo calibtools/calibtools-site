@@ -11,6 +11,7 @@
 
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { resolve, join } from 'node:path';
+import { sameTabFileLinks } from './file-links.mjs';
 
 const DIST = resolve('dist');
 
@@ -31,6 +32,11 @@ const htmlFiles = findHtmlFiles(DIST);
 const hrefRegex = /<a\s[^>]*?href="([^"]*?)"/gi;
 const broken = [];
 const toNoindex = [];
+/** File links that would replace the page the visitor is reading (scripts/file-links.mjs). */
+const sameTab = [];
+for (const file of htmlFiles) {
+  for (const href of sameTabFileLinks(readFileSync(file, 'utf-8'))) sameTab.push({ file: file.replace(DIST + '/', ''), href });
+}
 /** noindex on purpose and fine to link to. */
 const NOINDEX_LINK_OK = ['/quote/', '/cart/', '/review/', '/verify/', '/account/', '/pattern/'];
 const NOINDEX_RE = /<meta[^>]+name="robots"[^>]+content="[^"]*noindex/i;
@@ -84,6 +90,13 @@ if (broken.length > 0) {
 if (toNoindex.length > 0) {
   console.error(`\n  ${toNoindex.length} link(s) from live pages to noindex pages:\n`);
   for (const { file, href } of toNoindex) console.error(`    ${file} → ${href}`);
+  console.error('');
+  process.exit(1);
+}
+
+if (sameTab.length > 0) {
+  console.error(`\n  ${sameTab.length} file link(s) open in the same tab (add target="_blank" rel="noopener" or the download attribute):\n`);
+  for (const { file, href } of sameTab) console.error(`    ${file} → ${href}`);
   console.error('');
   process.exit(1);
 }
