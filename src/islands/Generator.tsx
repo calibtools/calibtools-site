@@ -14,6 +14,7 @@ import { PAPERS, computeLayout, fitNotice, reductionNotice, smallestFittingPaper
 import { LEAD_TIME } from '@/lib/claims';
 import { GENERATOR_DEFAULT, specFromParams, specToParams, patternPath, patternId } from '@/lib/patternLink';
 import { track } from '@/lib/track';
+import { safeSpec, limitNote } from '@/lib/specLimits';
 
 /**
  * Pattern generator.
@@ -41,7 +42,10 @@ function mmToIn(mm: number): string {
 
 export default function Generator({ initialSpec, heading = 'Pattern generator' }: GeneratorProps = {}) {
   const defaultSpec: PatternSpec = GENERATOR_DEFAULT;
-  const [spec, setSpec] = useState<PatternSpec>({ ...defaultSpec, ...initialSpec });
+  // What is typed (rawSpec) and what is drawn (spec): a field that is empty, negative or huge mid-typing never reaches the geometry.
+  const [rawSpec, setSpec] = useState<PatternSpec>({ ...defaultSpec, ...initialSpec });
+  const spec = useMemo(() => safeSpec(rawSpec, defaultSpec), [rawSpec]);
+  const specNote = limitNote(rawSpec, spec);
   const [busy, setBusy] = useState<'pdf' | 'png' | null>(null);
   const [boardCount, setBoardCount] = useState(1);
   const [boardStartIds, setBoardStartIds] = useState<number[]>([]);
@@ -189,15 +193,16 @@ export default function Generator({ initialSpec, heading = 'Pattern generator' }
           </select>
         </label>
         <div className="grid grid-cols-2 gap-3">
-          <label className="rows-2 gap-y-2 text-[13px] font-semibold">Rows<input className={field} type="number" min={2} value={spec.rows} onChange={(e) => set('rows', +e.target.value)} /></label>
-          <label className="rows-2 gap-y-2 text-[13px] font-semibold">Columns<input className={field} type="number" min={2} value={spec.cols} onChange={(e) => set('cols', +e.target.value)} /></label>
+          <label className="rows-2 gap-y-2 text-[13px] font-semibold">Rows<input className={field} type="number" min={2} value={rawSpec.rows} onChange={(e) => set('rows', +e.target.value)} /></label>
+          <label className="rows-2 gap-y-2 text-[13px] font-semibold">Columns<input className={field} type="number" min={2} value={rawSpec.cols} onChange={(e) => set('cols', +e.target.value)} /></label>
           {fields.sizeLabel && (
-            <label className="rows-2 gap-y-2 text-[13px] font-semibold">{fields.sizeLabel}<input className={field} type="number" min={1} value={spec.square} onChange={(e) => set('square', +e.target.value)} /></label>
+            <label className="rows-2 gap-y-2 text-[13px] font-semibold">{fields.sizeLabel}<input className={field} type="number" min={1} value={rawSpec.square} onChange={(e) => set('square', +e.target.value)} /></label>
           )}
           {fields.marker && (
-            <label className="rows-2 gap-y-2 text-[13px] font-semibold">Marker size (mm)<input className={field} type="number" min={1} value={spec.marker} onChange={(e) => set('marker', +e.target.value)} /></label>
+            <label className="rows-2 gap-y-2 text-[13px] font-semibold">Marker size (mm)<input className={field} type="number" min={1} value={rawSpec.marker} onChange={(e) => set('marker', +e.target.value)} /></label>
           )}
         </div>
+        {specNote && <p role="status" className="m-0 text-[13px] font-normal leading-snug text-brand-dark">{specNote}</p>}
         {fields.dictionary && (
           <label className="rows-2 gap-y-2 text-[13px] font-semibold">Dictionary
             <select className={field} value={spec.dict} onChange={(e) => set('dict', e.target.value)}>{DICTS.map((d) => <option key={d}>{d}</option>)}</select>
@@ -215,7 +220,7 @@ export default function Generator({ initialSpec, heading = 'Pattern generator' }
             </select>
           </label>
           {fields.startId && (
-            <label className="rows-2 gap-y-2 text-[13px] font-semibold">Start ID<input className={field} type="number" min={0} value={spec.startId} onChange={(e) => set('startId', +e.target.value)} /></label>
+            <label className="rows-2 gap-y-2 text-[13px] font-semibold">Start ID<input className={field} type="number" min={0} value={rawSpec.startId} onChange={(e) => set('startId', +e.target.value)} /></label>
           )}
         </div>
         <label className="flex items-center gap-2.5 text-sm font-normal min-h-[44px] md:min-h-0">
@@ -599,9 +604,11 @@ export default function Generator({ initialSpec, heading = 'Pattern generator' }
                 </li>
               )}
             </ul>
-            <p className="m-0 mt-2 text-[12px] text-ink-muted">Or use squares ≤ {maxSquare} mm.{' '}
+{maxSquare >= 1 && (
+                        <p className="m-0 mt-2 text-[12px] text-ink-muted">Or use squares ≤ {maxSquare} mm.{' '}
               <button type="button" className="font-semibold underline min-h-[44px] md:min-h-[24px] inline-flex items-center" onClick={() => set('square', maxSquare)}>Set {maxSquare} mm</button>
             </p>
+            )}
           </div>
         )}
         <div className="flex justify-center overflow-hidden rounded-xl bg-ground-panel p-6 md:p-10">
