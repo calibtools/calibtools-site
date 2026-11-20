@@ -61,6 +61,13 @@ describe('custom orders are final once paid (2026-11-21)', () => {
       expect(read(rel), rel).toContain('PAID_REPAIR');
     }
   });
+  it('says that paying accepts the quotation: on the quotation, in the offer email and in the terms', async () => {
+    const { PAYMENT_ACCEPTS_QUOTATION } = await import('./orderTerms');
+    expect(PAYMENT_ACCEPTS_QUOTATION).toMatch(/^Paying the order confirms/);
+    expect(read('src/lib/offerPdf.ts')).toContain('PAYMENT_ACCEPTS_QUOTATION');
+    expect(read('docs/offers/draft-order-invoice-offer.liquid')).toContain(PAYMENT_ACCEPTS_QUOTATION);
+    expect(read('src/pages/terms.astro')).toMatch(/paying the order accepts the specification/);
+  });
   it('no page still says a custom target can be returned', () => {
     for (const rel of ['src/pages/returns.astro', 'src/pages/terms.astro', 'src/pages/faq.astro']) {
       expect(read(rel), rel).not.toMatch(/Custom targets can be returned/i);

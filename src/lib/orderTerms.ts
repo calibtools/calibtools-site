@@ -16,3 +16,10 @@ export const CUSTOM_ORDER_FINAL =
  */
 export const PAID_REPAIR =
   'Damage that happens in use or handling isn\u2019t covered. We can repair the target for a fee, and you pay the repair and shipping both ways.';
+
+/**
+ * Every detail of a custom order is in the quotation and confirmed with the customer before it is sent,
+ * so paying the order accepts it (owner decision 2026-11-21). On the quotation, in the offer email and in the terms.
+ */
+export const PAYMENT_ACCEPTS_QUOTATION =
+  'Paying the order confirms that you have checked this quotation and accept the specification in it.';
