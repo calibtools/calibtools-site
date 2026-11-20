@@ -23,7 +23,7 @@ faq:
     a: "The standard model handles most machine-vision lenses. For very wide lenses (roughly 120° and up), use the cv2.fisheye module, which uses an equidistant model with four distortion coefficients."
 ---
 
-Camera calibration finds the numbers that describe how your camera maps the 3D world onto pixels. OpenCV does the maths; the quality of the result depends almost entirely on the target and the images you give it.
+Camera calibration finds the numbers that describe how your camera maps the 3D world onto pixels. OpenCV does the math; the quality of the result depends almost entirely on the target and the images you give it.
 
 This guide walks through the whole job in OpenCV with Python: choosing and sizing a target, capturing images, detecting corners, calibrating and checking the result.
 

@@ -17,7 +17,7 @@ faq:
 
 The selection wizard guides you through five questions — application, accuracy need, camera type, environment and calibration toolchain — and produces a recommendation: pattern type, board size, material and a matching product link.
 
-It handles edge cases like fisheye lenses (which favour ChArUco for partial views) and outdoor environments (which need weather-resistant materials).
+It handles edge cases like fisheye lenses (which favor ChArUco for partial views) and outdoor environments (which need weather-resistant materials).
 
 ## How to use it
 
@@ -25,7 +25,7 @@ It handles edge cases like fisheye lenses (which favour ChArUco for partial view
 
 **Accuracy** — choose high (< 0.1 px), medium (< 0.5 px) or low (< 1 px). High accuracy steers toward a rigid aluminum composite board instead of paper.
 
-**Camera** — mono, stereo, fisheye or multi-camera. Stereo and multi-camera setups favour ChArUco or AprilGrid because partial views are common.
+**Camera** — mono, stereo, fisheye or multi-camera. Stereo and multi-camera setups favor ChArUco or AprilGrid because partial views are common.
 
 **Environment** — indoor, outdoor or both. Outdoor use requires materials rated for temperature and UV exposure.
 

@@ -84,7 +84,7 @@ found, centers = cv2.findCirclesGrid(
     gray, pattern_size, flags=cv2.CALIB_CB_ASYMMETRIC_GRID, blobDetector=detector)
 ```
 
-## Sizes
+## Choosing a size
 
 The field widths below assume the board fills about 60 % of the image, as in the [target size guide](/guides/calibration-target-size/). The image scales are the range that keeps the circles between 10 and 75 px with default settings; the [FOV calculator](/tools/fov/) gives yours.
 

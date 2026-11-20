@@ -43,7 +43,7 @@ Plates in use differ in the number of marks and their spacing, and your HALCON p
 
 Either way you get a `.descr` file with the plate, in the format `gen_caltab` writes.
 
-## Sizes
+## Choosing a size
 
 Five board sizes, with a layout that fits each as an example. The mark diameter is half the mark distance, the usual ratio.
 

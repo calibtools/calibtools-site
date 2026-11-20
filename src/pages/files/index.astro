@@ -48,7 +48,7 @@ const entries = getAllDatasheets();
                   <td class="spec hidden py-3 px-3 text-right md:table-cell">{ds.pages}</td>
                   <td class="py-3 px-2 md:px-3">
                     <a href={ds.url} target="_blank" rel="noopener" class="whitespace-nowrap font-semibold text-brand no-underline hover:text-brand-dark">Download PDF<span class="sr-only">{fileLinkHint(ds.url)}</span></a>
-                    <span class="spec block text-[12px] text-ink-muted md:whitespace-nowrap"><span class="whitespace-nowrap md:hidden">{ds.pages} pages · </span><span class="whitespace-nowrap">{fileSizeLabel(ds.url)}</span></span>
+                    <span class="spec block text-[12px] text-ink-muted md:whitespace-nowrap"><span class="whitespace-nowrap md:hidden">{ds.pages} {ds.pages === 1 ? 'page' : 'pages'} · </span><span class="whitespace-nowrap">{fileSizeLabel(ds.url)}</span></span>
                   </td>
                 </tr>
               ))}
