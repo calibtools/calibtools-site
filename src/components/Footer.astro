@@ -1,5 +1,6 @@
 ---
 import { FOOTER_LINE } from '@/lib/claims';
+import { MISSION_LINE } from '@/lib/brand';
 import { footerGroups } from '@/lib/nav';
 import { TAG_IDS, anyTagConfigured } from '@/lib/tags';
 const tagsOn = anyTagConfigured(TAG_IDS);
@@ -18,6 +19,7 @@ const tagsOn = anyTagConfigured(TAG_IDS);
     ))}
   </div>
   <div class="container-x flex flex-col gap-[var(--nav-space-5)] border-t border-line pb-[var(--nav-space-8)] pt-[var(--nav-space-6)]">
+    <p class="m-0 flex items-center gap-[var(--nav-space-3)] text-[length:var(--nav-text-base)] font-semibold text-ink"><span class="inline-block h-2 w-2 shrink-0 bg-brand" aria-hidden="true"></span>{MISSION_LINE}</p>
     <div class="flex items-center gap-[var(--nav-space-3)]">
       <img src="/brand/wordmark-framed-light.svg" alt="Calib.Tools" width="126" height="28" class="h-7" />
       <span class="text-[length:var(--nav-text-sm)] text-ink-soft">{FOOTER_LINE}</span>

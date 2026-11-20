@@ -33,6 +33,16 @@ export const VISION =
   'A world where every machine that sees knows exactly what its pixels mean in the physical world.';
 export const MISSION =
   'We make the physical references that turn pixels into millimeters — targets, files and measurement data — and we publish exactly how each file maps to each object, so any engineer can check it. The tools stay free.';
+/**
+ * Short mission line (owner decision 2026-11-20): who the work is for. Sits above the full
+ * mission paragraph on the About page and in the site footer.
+ */
+export const MISSION_LINE = 'Built for the people who make machines see.';
+/**
+ * Sign-off line (owner decision 2026-11-20): closes customer emails and order pages.
+ * The Shopify notification templates carry the same sentence (docs/offers/README.md).
+ */
+export const SIGN_OFF_LINE = 'Every calibration starts with a target you can trust.';
 export const ONE_LINER =
   'Calib.Tools builds the bridge between digital measurement and the physical world: calibration targets whose files, geometry and data agree.';
 

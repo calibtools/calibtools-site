@@ -116,6 +116,8 @@ Centralised constants — import and use everywhere, never hard-code.
 | Constant | Value |
 |---|---|
 | `FOOTER_LINE` | © 2026 Calib.Tools |
+| `MISSION_LINE` (brand.ts) | Built for the people who make machines see. — About page (above the full mission) and site footer |
+| `SIGN_OFF_LINE` (brand.ts) | Every calibration starts with a target you can trust. — closes customer emails and order pages |
 | `LEAD_TIME` | Made to order · ships in 2–3 weeks |
 | `SHIPS_FROM` | Ships from the factory |
 | `INSPECTION_CLAIM` | Measured before it ships — against a DAkkS-calibrated reference |

@@ -2,7 +2,7 @@
 import Base from '@/layouts/Base.astro';
 import { breadcrumbLd } from '@/lib/seo';
 import { INSPECTION_CLAIM, CONTACT_EMAIL } from '@/lib/claims';
-import { VISION, MISSION, ONE_LINER } from '@/lib/brand';
+import { VISION, MISSION, MISSION_LINE, ONE_LINER } from '@/lib/brand';
 import { Image } from 'astro:assets';
 import workspaceImg from '@/assets/about/workspace.webp';
 import benchImg from '@/assets/about/inspection-bench.webp';
@@ -25,6 +25,7 @@ const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: 'About' }]);
 
       <section class="flex flex-col gap-3">
         <h2>Our mission</h2>
+        <p class="m-0 border-l-2 border-brand pl-4 !text-[20px] font-semibold !leading-[28px] text-ink md:!text-[24px] md:!leading-[32px]">{MISSION_LINE}</p>
         <p>{MISSION}</p>
       </section>
 
