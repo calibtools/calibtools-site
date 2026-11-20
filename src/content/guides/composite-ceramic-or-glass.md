@@ -5,7 +5,7 @@ date: 2026-10-22
 updated: 2026-11-15
 readingTime: "9 min"
 keyRule: "Compare the target's tolerance with the size of one pixel on the board. If the tolerance is a fraction of a pixel, composite is enough; if it spans several pixels and you need measurement-grade results, go to ceramic. Choose glass when you need backlighting."
-related: ["printed-target-costs-half-a-pixel", "calibration-target-size", "reprojection-error", "charuco-vs-checkerboard-vs-aprilgrid"]
+related: ["printed-target-costs-half-a-pixel", "calibration-target-size", "reprojection-error", "charuco-vs-checkerboard-vs-aprilgrid", "line-scan-camera-calibration"]
 products: ["charuco-composite", "charuco-ceramic"]
 sampleFiles: ["datasheet"]
 faq:
