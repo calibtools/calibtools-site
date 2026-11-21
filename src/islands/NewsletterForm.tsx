@@ -11,6 +11,8 @@ interface Props {
   done?: string;
   /** Tag set on the subscriber in Shopify, e.g. "notify:plumbline". Also names the GA4 event's form. */
   tag?: string;
+  /** One line: email field and button side by side, no card, human check hidden unless needed. */
+  compact?: boolean;
   /** Prefix for the input id when two forms share a page. */
   id?: string;
 }
@@ -20,7 +22,7 @@ interface Props {
  * Posts to /api/subscribe (Cloudflare Pages Function → Shopify Admin API).
  * Honeypot field to reduce spam.
  */
-export default function NewsletterForm({ heading = 'New tools and targets, monthly.', note = 'No marketing fluff. One email a month, unsubscribe anytime.', button = 'Subscribe', done, tag, id = 'nl' }: Props = {}) {
+export default function NewsletterForm({ heading = 'New tools and targets, monthly.', note = 'No marketing fluff. One email a month, unsubscribe anytime.', button = 'Subscribe', done, tag, compact = false, id = 'nl' }: Props = {}) {
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<'idle' | 'busy' | 'success' | 'error'>('idle');
   const [turnstile, setTurnstile] = useState('');
@@ -67,6 +69,31 @@ export default function NewsletterForm({ heading = 'New tools and targets, month
       setMessage('Something went wrong. Please try again.');
     }
   };
+
+  if (compact) {
+    return (
+      <form className="flex w-full flex-col gap-2" onSubmit={handleSubmit}>
+        <div className="flex gap-2">
+          <label htmlFor={`${id}-email`} className="sr-only">{heading}</label>
+          <input
+            id={`${id}-email`}
+            type="email"
+            required
+            placeholder="you@company.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="h-10 min-w-0 flex-1 rounded border border-line-strong bg-sheet px-3 text-[15px] text-ink"
+          />
+          <button type="submit" disabled={status === 'busy'} className="btn-md btn-primary shrink-0 disabled:opacity-50">
+            {status === 'busy' ? 'Sending…' : button}
+          </button>
+        </div>
+        <input ref={honeypotRef} type="text" name="website" tabIndex={-1} autoComplete="off" className="absolute -left-[9999px] h-0 w-0 overflow-hidden" aria-hidden="true" />
+        <TurnstileBox onToken={setTurnstile} resetKey={resetKey} quiet />
+        <p className={`m-0 text-[13px] empty:hidden ${message ? (status === 'success' ? 'text-ok' : 'text-brand-dark') : 'text-ink-muted'}`} aria-live="polite">{message || note}</p>
+      </form>
+    );
+  }
 
   return (
     <form className="card flex flex-col gap-4 self-start bg-ground-alt p-5 sm:p-8 max-w-full overflow-hidden" onSubmit={handleSubmit}>

@@ -15,6 +15,7 @@
 
 import { adminFetch } from '../../src/lib/shopifyAdmin';
 import { verifyTurnstile } from '../../src/lib/turnstile';
+import { cleanTag, isNotifyOnly } from '../../src/lib/subscribeTags';
 
 interface Env {
   SHOPIFY_CLIENT_ID?: string;
@@ -111,33 +112,39 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
       }
     }
 
-    // Update marketing consent
-    const consentData = await adminFetch(ctx.env, `
-      mutation UpdateConsent($input: CustomerEmailMarketingConsentUpdateInput!) {
-        customerEmailMarketingConsentUpdate(input: $input) {
-          customer {
-            id
-            emailMarketingConsent { marketingState consentUpdatedAt }
+    // A "notify:" tag is one release notification, not a newsletter signup: no marketing consent is set.
+    const tag = cleanTag(body.tag);
+    const notifyOnly = isNotifyOnly(tag);
+    let state = 'NOTIFY';
+
+    if (!notifyOnly) {
+      // Update marketing consent
+      const consentData = await adminFetch(ctx.env, `
+        mutation UpdateConsent($input: CustomerEmailMarketingConsentUpdateInput!) {
+          customerEmailMarketingConsentUpdate(input: $input) {
+            customer {
+              id
+              emailMarketingConsent { marketingState consentUpdatedAt }
+            }
+            userErrors { field message }
           }
-          userErrors { field message }
         }
-      }
-    `, {
-      input: {
-        customerId,
-        emailMarketingConsent: {
-          marketingState: 'SUBSCRIBED',
-          marketingOptInLevel: 'SINGLE_OPT_IN',
-          consentUpdatedAt: new Date().toISOString(),
+      `, {
+        input: {
+          customerId,
+          emailMarketingConsent: {
+            marketingState: 'SUBSCRIBED',
+            marketingOptInLevel: 'SINGLE_OPT_IN',
+            consentUpdatedAt: new Date().toISOString(),
+          },
         },
-      },
-    });
+      });
 
-    const consent = consentData.customerEmailMarketingConsentUpdate.customer?.emailMarketingConsent;
-    const state = consent?.marketingState ?? 'SUBSCRIBED';
+      const consent = consentData.customerEmailMarketingConsentUpdate.customer?.emailMarketingConsent;
+      state = consent?.marketingState ?? 'SUBSCRIBED';
+    }
 
-    // Apply optional tag (e.g. "revision:charuco-composite")
-    const tag = typeof body.tag === 'string' ? body.tag.replace(/[^a-zA-Z0-9:_-]/g, '').slice(0, 64) : '';
+    // Apply optional tag (e.g. "revision:charuco-composite", "notify:plumbline")
     if (tag && customerId) {
       try {
         await adminFetch(ctx.env, `
@@ -148,7 +155,8 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
           }
         `, { id: customerId, tags: [tag] });
       } catch {
-        // Non-critical — subscription succeeded even if tagging fails
+        // For a newsletter signup the tag is extra. For a notify request it is the whole point.
+        if (notifyOnly) return json('error', { ok: false, message: 'Something went wrong. Please try again.' }, 500);
       }
     }
 

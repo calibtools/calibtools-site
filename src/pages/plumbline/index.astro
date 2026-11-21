@@ -51,30 +51,32 @@ const faqLd = {
   jsonLd={[bcLd, appLd, faqLd]}
 >
   {/* ── Hero ── */}
-  <section class="container-x flex flex-col gap-6 pt-[var(--section-y)] pb-12">
-    <span class="eyebrow">{software.name} · camera calibration software</span>
-    <h1 class="h-display m-0 max-w-[820px] text-[36px] leading-[1.1] md:text-[56px]">Know whether your camera calibration is good</h1>
-    <p class="m-0 max-w-[680px] text-lg leading-relaxed text-ink-muted">
-      {software.name} shows the error of every image and how much of the frame your corners cover. You see which images to retake before the numbers go into your pipeline.
-    </p>
+  <section class="container-x grid grid-cols-1 items-end gap-x-14 gap-y-10 pt-[var(--section-y)] pb-[var(--section-y)] lg:grid-cols-[minmax(0,7fr)_minmax(0,4fr)]" data-rows="layout">
+    <div class="flex min-w-0 flex-col gap-6">
+      <span class="eyebrow">{software.name} · camera calibration software</span>
+      <h1 class="h-display m-0 text-[36px] leading-[1.1] md:text-[56px]">Know whether your camera calibration is good</h1>
+      <p class="m-0 max-w-[640px] text-lg leading-relaxed text-ink-muted">
+        {software.name} shows the error of every image and how much of the frame your corners cover. You see which images to retake before the numbers go into your pipeline.
+      </p>
+    </div>
     {unreleased ? (
-      <div id="notify" class="flex max-w-[520px] scroll-mt-24 flex-col gap-4">
-        <div class="flex flex-wrap items-center gap-3">
-          <span class="badge text-brand-dark">{COMING_SOON_LABEL}</span>
-          <span class="font-mono text-[13px] text-ink-muted">{software.platforms.join(' · ')}</span>
-        </div>
+      <div id="notify" class="card bracket flex scroll-mt-24 flex-col gap-4 p-6">
+        <div><span class="badge text-brand-dark">{COMING_SOON_LABEL}</span></div>
+        <p class="m-0 text-[18px] font-semibold leading-snug">Be the first to get {software.name}</p>
         <NewsletterForm
           client:load
+          compact
           id="pl"
           tag={NOTIFY_TAG}
-          heading="Get an email when it is out"
-          note="We send the download link on release day. You also get our monthly email on new tools and targets; unsubscribe anytime."
+          heading="Email for the release notification"
+          note=""
           button="Notify me"
           done="Done. We email you the day Plumbline is out."
         />
+        <p class="m-0 border-t border-line pt-4 text-[13px] text-ink-muted">Support for {software.platforms.join(', ')}</p>
       </div>
     ) : (
-      <div class="grid max-w-[480px] grid-cols-3 gap-2">
+      <div class="grid grid-cols-3 gap-2">
         {software.platforms.map((p) => <a href={software.href} class="btn-md btn-secondary w-full normal-case tracking-normal text-[14px]">{p}</a>)}
       </div>
     )}

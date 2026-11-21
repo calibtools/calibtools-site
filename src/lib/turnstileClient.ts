@@ -32,13 +32,15 @@ function load(): Promise<void> {
 }
 
 /** Render the check into `el`; `onToken` gets the token ('' when it expires). Returns a reset function. */
-export async function mountTurnstile(el: HTMLElement, onToken: (token: string) => void): Promise<() => void> {
+export async function mountTurnstile(el: HTMLElement, onToken: (token: string) => void, opts: { quiet?: boolean } = {}): Promise<() => void> {
   if (!TURNSTILE_SITE_KEY) return () => {};
   await load();
   const id = window.turnstile!.render(el, {
     sitekey: TURNSTILE_SITE_KEY,
     size: 'flexible',
     theme: 'light',
+    // quiet: the widget stays hidden unless Cloudflare needs the visitor to do something
+    ...(opts.quiet ? { appearance: 'interaction-only' } : {}),
     callback: (t: string) => onToken(t),
     'expired-callback': () => onToken(''),
     'error-callback': () => onToken(''),
