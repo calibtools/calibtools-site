@@ -14,6 +14,8 @@ export default function MobileBottomCluster({ mode, defaultPrice }: Props) {
   const [variantId, setVariantId] = useState<string | undefined>();
   const [price, setPrice] = useState(defaultPrice ?? '');
   const [available, setAvailable] = useState(true);
+  /** Set for 600 × 400 and 800 × 600, which are quoted instead of added to the cart. */
+  const [quoteHref, setQuoteHref] = useState('');
   const [busy, setBusy] = useState(false);
   const [count, setCount] = useState(0);
   const [hidden, setHidden] = useState(mode === 'add-to-cart');
@@ -59,6 +61,7 @@ export default function MobileBottomCluster({ mode, defaultPrice }: Props) {
         setVariantId(detail.variantId);
         setPrice(detail.price ?? defaultPrice ?? '');
         setAvailable(detail.available ?? true);
+        setQuoteHref(detail.quoteHref ?? '');
       }
     };
     window.addEventListener('variant-changed', handler);
@@ -121,6 +124,10 @@ export default function MobileBottomCluster({ mode, defaultPrice }: Props) {
           className="btn-md btn-primary flex-1"
         >
           Shop targets
+        </a>
+      ) : quoteHref ? (
+        <a href={quoteHref} className="btn-md btn-primary flex-1">
+          {`Request a quote \u00B7 ${price.replace(/^From /, 'from ')}`}
         </a>
       ) : (
         <button

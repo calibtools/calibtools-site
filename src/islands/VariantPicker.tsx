@@ -13,6 +13,7 @@ import { dictMarkerCount } from '@/lib/dicts/dicts';
 import { LEAD_TIME, INSPECTION_CLAIM_SHORT } from '@/lib/claims';
 import { findCharucoSize, findAprilGridSize, markerCount } from '@/lib/boardSizes';
 import { entryForOptions, generatorUrlFor } from '@/lib/catalogPatterns';
+import { isLargeFormatVariant, fromLabel, largeFormatQuoteHref } from '@/lib/largeFormat';
 
 interface Props {
   product: Product;
@@ -36,6 +37,9 @@ export default function VariantPicker({ product, fixtureVariantId, fixturePrice 
   const [boardStartIds, setBoardStartIds] = useState<number[]>([]);
 
   const variant = findVariant(product.variants, selections);
+  // 600 × 400 and 800 × 600: starting price and a quote instead of the cart (src/lib/largeFormat.ts)
+  const fromPrice = variant && isLargeFormatVariant(variant) ? fromLabel(variant.price) : null;
+  const quoteHref = variant && fromPrice !== null ? largeFormatQuoteHref(product.title, variant) : '';
 
   // Meta Pixel: one ViewContent per product page view, for the variant shown first
   const viewReported = useRef(false);
@@ -51,11 +55,12 @@ export default function VariantPicker({ product, fixtureVariantId, fixturePrice 
     window.dispatchEvent(new CustomEvent('variant-changed', {
       detail: {
         variantId: variant?.id,
-        price: variant?.price ?? product.priceFrom,
+        price: fromPrice ?? (variant?.price ?? product.priceFrom),
         available: variant?.availableForSale ?? false,
+        quoteHref: quoteHref || undefined,
       },
     }));
-  }, [variant?.id, variant?.price, variant?.availableForSale, product.priceFrom]);
+  }, [variant?.id, variant?.price, variant?.availableForSale, product.priceFrom, fromPrice, quoteHref]);
 
   // Listen for select-size from ordering table row clicks
   useEffect(() => {
@@ -271,11 +276,11 @@ export default function VariantPicker({ product, fixtureVariantId, fixturePrice 
     <div className="flex flex-col gap-5">
       {/* Price */}
       <div className="flex items-baseline gap-3">
-        <span className="spec text-4xl font-extrabold">{variant?.price ?? product.priceFrom}</span>
-        {variant && !variant.availableForSale && (
+        <span className="spec text-4xl font-extrabold">{fromPrice ?? (variant?.price ?? product.priceFrom)}</span>
+        {fromPrice === null && variant && !variant.availableForSale && (
           <span className="text-sm text-brand">Out of stock</span>
         )}
-        <span className="text-sm text-ink-soft">excl. VAT · shipping calculated at checkout</span>
+        <span className="text-sm text-ink-soft">{fromPrice !== null ? 'excl. VAT · quoted with packing and freight' : 'excl. VAT · shipping calculated at checkout'}</span>
       </div>
 
       {/* Option selectors */}
@@ -378,6 +383,13 @@ export default function VariantPicker({ product, fixtureVariantId, fixturePrice 
         </fieldset>
       )}
 
+      {/* Large format: a quote, not the cart */}
+      {fromPrice !== null ? (
+        <div className="flex flex-col gap-3 pt-1.5" data-testid="large-format-quote">
+          <p className="m-0 text-sm text-ink-muted">Boards this size ship in a crate or an oversize carton, and freight depends on where they go, so we quote them: board, packing and freight to your address, and the delivery date. Need inserts, a stiffer substrate or a measurement report for every board? Ask for <a href="/project-grade/" className="text-brand-dark">Project grade</a>.</p>
+          <a href={quoteHref} className="btn-md btn-primary text-center no-underline">Request a quote</a>
+        </div>
+      ) : (<>
       {/* Quantity + buttons */}
       <div className="flex gap-3 pt-1.5">
         <div className="flex items-center rounded border border-line">
@@ -420,6 +432,7 @@ export default function VariantPicker({ product, fixtureVariantId, fixturePrice 
       >
         {busy === 'buy' ? 'Redirecting…' : 'Buy now'}
       </button>
+      </>)}
 
       {/* Selected variant part number */}
       {variant?.sku && (

@@ -31,6 +31,7 @@ import { compatRows, digitalFiles } from '@/lib/productCompat';
 import { QUOTE_ONLY_HANDLES, LAYOUT_ON_ORDER_HANDLES } from '@/lib/constants';
 import { skuAnchor, skuTitleFor } from '@/lib/productLongform';
 import { variesByFor, variantJsonLd } from '@/lib/productJsonLd';
+import { isLargeFormatVariant, fromLabel } from '@/lib/largeFormat';
 import { productFacts, factsJsonLd } from '@/lib/productFacts';
 import { splitSpecValue } from '@/lib/specValue';
 import { drawingForPartNumber, representativePartNumber } from '@/lib/boardDrawing';
@@ -279,21 +280,23 @@ const productLd: Record<string, any> = {
   image: productImages,
   ...(variesBy.length > 0 && { variesBy }),
 };
-if (product.variants.length > 0) {
+// 600 × 400 and 800 × 600 are quoted, not sold at a list price: leave them out of the offers (src/lib/largeFormat.ts)
+const listedVariants = product.variants.filter((v) => !isLargeFormatVariant(v));
+if (listedVariants.length > 0) {
   // Group-level AggregateOffer
-  const amounts = product.variants.map((v) => parseFloat(v.priceAmount)).filter((n) => !isNaN(n));
+  const amounts = listedVariants.map((v) => parseFloat(v.priceAmount)).filter((n) => !isNaN(n));
   if (amounts.length > 0) {
     productLd.offers = {
       '@type': 'AggregateOffer',
       lowPrice: Math.min(...amounts).toFixed(2),
       highPrice: Math.max(...amounts).toFixed(2),
-      priceCurrency: product.variants[0].currencyCode,
-      offerCount: product.variants.length,
-      availability: product.variants.some((v) => v.availableForSale) ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+      priceCurrency: listedVariants[0].currencyCode,
+      offerCount: listedVariants.length,
+      availability: listedVariants.some((v) => v.availableForSale) ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
       url: `${siteUrl}${product.url}`,
     };
   }
-  productLd.hasVariant = product.variants.map((v) => variantJsonLd({
+  productLd.hasVariant = listedVariants.map((v) => variantJsonLd({
     variant: v, productTitle: product.title, productUrl: `${siteUrl}${product.url}`, groupId: handle, priceValidUntil,
     image: productImages, description: product.description, finalSale: quoteOnly,
   }));
@@ -394,7 +397,8 @@ const faqJsonLd = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEn
 const priceFor = (pn: string) => {
   const base = (x: string) => x.split('-').slice(0, 4).join('-');
   const v = product.variants.find((x) => x.sku && pn === x.sku) ?? product.variants.find((x) => x.sku && base(pn) === base(x.sku));
-  return v?.price ?? '';
+  if (!v) return '';
+  return isLargeFormatVariant(v) ? fromLabel(v.price).replace(/^From /, 'from ') : v.price;
 };
 const orderingTables = (productData?.orderingTables ?? []).map((t) => {
   const sizeCol = t.header.findIndex((h) => /^size/i.test(h));
@@ -632,7 +636,8 @@ const quickLinks = hasLongform
           </div>
         </div>
       ))}
-      <p class="m-0 text-[13px] text-ink-muted">{isCharuco ? 'Part numbers are shown with the default dictionary, D6 (DICT_6X6_250). Replace D6 with D5 (DICT_5X5_100), D4 (DICT_4X4_50) or T36 (AprilTag 36h11) for the others. Start ID 0, row-major, OpenCV ≥ 4.6 placement. ' : ''}Larger sizes and other grids on request.</p>
+      {isCharuco && <p class="m-0 text-[13px] text-ink-muted">Part numbers are shown with the default dictionary, D6 (DICT_6X6_250). Replace D6 with D5 (DICT_5X5_100), D4 (DICT_4X4_50) or T36 (AprilTag 36h11) for the others. Start ID 0, row-major, OpenCV ≥ 4.6 placement.</p>}
+      <p class="m-0 text-[13px] text-ink-muted">600 × 400 and 800 × 600 are quoted with packing and freight. Larger sizes, other substrates and a report for every board: <a href="/project-grade/">Project grade</a>.</p>
     </section>
   )}
 

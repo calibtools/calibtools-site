@@ -11,6 +11,7 @@ import { idRange } from '@/lib/idRange';
 import type { PatternSpec } from '@/lib/patterns';
 import { findCharucoSize, findAprilGridSize } from '@/lib/boardSizes';
 import { newTabHint } from '../../scripts/new-tab-hint.mjs';
+import { isLargeFormatVariant, fromLabel, largeFormatQuoteHref } from '@/lib/largeFormat';
 
 interface Props {
   product: Product;
@@ -102,6 +103,9 @@ export default function PurchaseTable({ product, datasheetUrl: fallbackUrl }: Pr
   };
 
   const variants = product.variants;
+  /** 600 × 400 and 800 × 600 are quoted: "from $X" and a quote link instead of the cart (src/lib/largeFormat.ts). */
+  const priceLabel = (v: Variant) => (isLargeFormatVariant(v) ? fromLabel(v.price).replace(/^From /, 'from ') : v.price);
+  const quoteFor = (v: Variant) => (isLargeFormatVariant(v) ? largeFormatQuoteHref(product.title, v) : '');
   const isCharuco = product.handle.includes('charuco') || product.handle.includes('aprilgrid');
 
   if (variants.length === 0) {
@@ -186,7 +190,12 @@ export default function PurchaseTable({ product, datasheetUrl: fallbackUrl }: Pr
                     )}
                   </td>
                   <td className="py-3 px-3"><span className="badge border border-line text-ink">{cols.available}</span></td>
-                  <td className="py-3 px-3 spec text-right font-semibold">{v.price}</td>
+                  <td className="py-3 px-3 spec text-right font-semibold">{priceLabel(v)}</td>
+                  {quoteFor(v) ? (
+                  <td className="py-3 px-3 text-right" colSpan={2}>
+                    <a href={quoteFor(v)} className="text-[13px] font-semibold text-brand-dark no-underline hover:text-brand min-h-[24px] inline-flex items-center">Request a quote</a>
+                  </td>
+                  ) : (<>
                   <td className="py-3 px-3">
                     <div className="flex items-center justify-center rounded border border-line">
                       <button
@@ -220,6 +229,7 @@ export default function PurchaseTable({ product, datasheetUrl: fallbackUrl }: Pr
                       )}
                     </button>
                   </td>
+                  </>)}
                 </tr>
               );
             })}
@@ -256,10 +266,13 @@ export default function PurchaseTable({ product, datasheetUrl: fallbackUrl }: Pr
                     </span>
                   )}
                 </div>
-                <span className="spec text-base font-semibold shrink-0">{v.price}</span>
+                <span className="spec text-base font-semibold shrink-0">{priceLabel(v)}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="badge border border-line text-ink">{cols.available}</span>
+                {quoteFor(v) ? (
+                  <a href={quoteFor(v)} className="btn-md btn-secondary no-underline">Request a quote</a>
+                ) : (
                 <div className="flex items-center gap-2">
                   <div className="flex items-center rounded border border-line">
                     <button
@@ -291,6 +304,7 @@ export default function PurchaseTable({ product, datasheetUrl: fallbackUrl }: Pr
                     )}
                   </button>
                 </div>
+                )}
               </div>
             </div>
           );
