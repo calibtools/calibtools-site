@@ -4,7 +4,8 @@
 import { describe, it, expect } from 'vitest';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join, resolve } from 'node:path';
-import { isFileLink, rehypeFileLinks, sameTabFileLinks, fileKind, fileSizeLabel, fileLinkHint } from '../../scripts/file-links.mjs';
+import { isFileLink, rehypeFileLinks, sameTabFileLinks, unhintedFileLinks, fileKind, fileSizeLabel, fileLinkHint } from '../../scripts/file-links.mjs';
+import { newTabHint } from '../../scripts/new-tab-hint.mjs';
 
 const ROOT = resolve(import.meta.dirname, '../..');
 
@@ -56,6 +57,24 @@ describe('hint for screen readers', () => {
   });
 });
 
+describe('unhintedFileLinks', () => {
+  it('reports new-tab file links that screen readers are not told about', () => {
+    const html = [
+      '<a href="/a.pdf" target="_blank" rel="noopener">datasheet</a>',
+      '<a href="/b.pdf" target="_blank" rel="noopener">datasheet<span class="sr-only"> (PDF, opens in a new tab)</span></a>',
+      '<a href="/c.pdf" target="_blank" aria-label="Datasheet (PDF, opens in a new tab)">x</a>',
+      '<a href="/d.pdf" download>x</a>',
+      '<a href="/e.pdf" target="_blank" aria-hidden="true" tabindex="-1"><img src="/e.webp" alt=""></a>',
+      '<a href="https://example.com/" target="_blank">page</a>',
+    ].join('');
+    expect(unhintedFileLinks(html)).toEqual(['/a.pdf']);
+  });
+  it('islands use the same wording as pages', () => {
+    expect(newTabHint('PDF')).toBe(fileLinkHint('https://example.com/x.pdf'));
+    expect(newTabHint()).toBe(' (opens in a new tab)');
+  });
+});
+
 describe('sameTabFileLinks', () => {
   it('reports only file links without a new tab or a download attribute', () => {
     const html = '<a href="/a.pdf">x</a><a href="/b.pdf" target="_blank" rel="noopener">x</a><a href="/c.zip" download>x</a><a href="/page/">x</a>';
@@ -67,6 +86,15 @@ describe('source', () => {
   it('registers the plugin for Markdown and runs the check after the build', () => {
     expect(readFileSync(join(ROOT, 'astro.config.mjs'), 'utf-8')).toContain('rehypeFileLinks');
     expect(readFileSync(join(ROOT, 'scripts/check-links.mjs'), 'utf-8')).toContain('sameTabFileLinks');
+    expect(readFileSync(join(ROOT, 'scripts/check-links.mjs'), 'utf-8')).toContain('unhintedFileLinks');
+  });
+  it('islands that link to a quotation or datasheet in a new tab add the hidden hint', () => {
+    for (const f of ['src/islands/PurchaseTable.tsx', 'src/islands/AccountPanel.tsx', 'src/islands/OrderDetail.tsx']) {
+      const src = readFileSync(join(ROOT, f), 'utf-8');
+      const pdfLinks = [...src.matchAll(/<a\b[^>]*href=\{[^}]*(?:pdf|docsUrl)[^}]*\}[^>]*target="_blank"[^>]*>([\s\S]*?)<\/a>/g)];
+      expect(pdfLinks.length, f).toBeGreaterThan(0);
+      for (const m of pdfLinks) expect(m[1], f).toContain('newTabHint(');
+    }
   });
   it('built pages have no file link that replaces the page', () => {
     const dist = join(ROOT, 'dist');

@@ -11,7 +11,7 @@
 
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { resolve, join } from 'node:path';
-import { sameTabFileLinks } from './file-links.mjs';
+import { sameTabFileLinks, unhintedFileLinks } from './file-links.mjs';
 
 const DIST = resolve('dist');
 
@@ -34,8 +34,12 @@ const broken = [];
 const toNoindex = [];
 /** File links that would replace the page the visitor is reading (scripts/file-links.mjs). */
 const sameTab = [];
+/** File links that open a new tab without a hint for screen readers. */
+const unhinted = [];
 for (const file of htmlFiles) {
-  for (const href of sameTabFileLinks(readFileSync(file, 'utf-8'))) sameTab.push({ file: file.replace(DIST + '/', ''), href });
+  const html = readFileSync(file, 'utf-8');
+  for (const href of sameTabFileLinks(html)) sameTab.push({ file: file.replace(DIST + '/', ''), href });
+  for (const href of unhintedFileLinks(html)) unhinted.push({ file: file.replace(DIST + '/', ''), href });
 }
 /** noindex on purpose and fine to link to. */
 const NOINDEX_LINK_OK = ['/quote/', '/cart/', '/review/', '/verify/', '/account/', '/pattern/'];
@@ -90,6 +94,13 @@ if (broken.length > 0) {
 if (toNoindex.length > 0) {
   console.error(`\n  ${toNoindex.length} link(s) from live pages to noindex pages:\n`);
   for (const { file, href } of toNoindex) console.error(`    ${file} → ${href}`);
+  console.error('');
+  process.exit(1);
+}
+
+if (unhinted.length > 0) {
+  console.error(`\n  ${unhinted.length} file link(s) open a new tab without telling screen readers (add <span class="sr-only">{fileLinkHint(href)}</span>):\n`);
+  for (const { file, href } of unhinted) console.error(`    ${file} → ${href}`);
   console.error('');
   process.exit(1);
 }

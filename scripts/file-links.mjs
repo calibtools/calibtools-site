@@ -5,6 +5,9 @@
  */
 import { existsSync, statSync } from 'node:fs';
 import { join } from 'node:path';
+import { newTabHint } from './new-tab-hint.mjs';
+
+export { newTabHint };
 
 export const FILE_LINK_RE = /\.(pdf|zip|dxf|step|stp|stl|svg|csv|ya?ml|json|xml|txt)(?:[?#].*)?$/i;
 
@@ -30,8 +33,9 @@ export function fileSizeLabel(href, publicDir = 'public') {
 
 /** What a screen reader hears after the link text: file type, size, and that a new tab opens. */
 export function fileLinkHint(href, publicDir = 'public') {
-  return ` (${[fileKind(href), fileSizeLabel(href, publicDir), 'opens in a new tab'].filter(Boolean).join(', ')})`;
+  return newTabHint(fileKind(href), fileSizeLabel(href, publicDir));
 }
+
 
 /**
  * rehype plugin: every <a> to a file gets target="_blank" rel="noopener" and a hint for screen readers,
@@ -66,6 +70,23 @@ export function sameTabFileLinks(html) {
     const href = /\shref="([^"]*)"/.exec(tag)?.[1];
     if (!isFileLink(href)) continue;
     if (/\starget="_blank"/.test(tag) || /\sdownload(?:[=\s>])/.test(tag)) continue;
+    out.push(href);
+  }
+  return out;
+}
+
+/**
+ * File links in built HTML that open a new tab without telling screen-reader users: no hidden
+ * "sr-only" hint inside the link and no aria-label. A link hidden from screen readers
+ * (aria-hidden="true", e.g. a thumbnail next to the real link) is not read, so it needs no hint.
+ */
+export function unhintedFileLinks(html) {
+  const out = [];
+  for (const m of html.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/g)) {
+    const attrs = m[1];
+    const href = /\shref="([^"]*)"/.exec(' ' + attrs)?.[1];
+    if (!isFileLink(href) || !/\starget="_blank"/.test(' ' + attrs)) continue;
+    if (/\saria-hidden="true"/.test(' ' + attrs) || /\saria-label="[^"]+"/.test(' ' + attrs) || /class="[^"]*\bsr-only\b/.test(m[2])) continue;
     out.push(href);
   }
   return out;

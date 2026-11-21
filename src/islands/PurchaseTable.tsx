@@ -10,6 +10,7 @@ import { SHIPS_FROM } from '@/lib/claims';
 import { idRange } from '@/lib/idRange';
 import type { PatternSpec } from '@/lib/patterns';
 import { findCharucoSize, findAprilGridSize } from '@/lib/boardSizes';
+import { newTabHint } from '../../scripts/new-tab-hint.mjs';
 
 interface Props {
   product: Product;
@@ -178,6 +179,7 @@ export default function PurchaseTable({ product, datasheetUrl: fallbackUrl }: Pr
                     {cols.docsUrl ? (
                       <a href={cols.docsUrl} target="_blank" rel="noopener" className="text-ink-soft hover:text-brand min-h-[24px] inline-flex items-center" title="Datasheet PDF">
                         <FileText size={16} strokeWidth={1.6} aria-hidden="true" />
+                        <span className="sr-only">Datasheet{newTabHint('PDF')}</span>
                       </a>
                     ) : (
                       <span className="text-ink-soft/40">—</span>
