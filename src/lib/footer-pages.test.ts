@@ -61,18 +61,6 @@ describe('files/index.astro copy', () => {
   it('does not have CODE_TO_NAME map', () => expect(src).not.toContain('CODE_TO_NAME'));
 });
 
-describe('verify/index.astro copy', () => {
-  const src = read('src/pages/verify/index.astro');
-  it('has the approved h1', () => expect(src).toContain('Look up a serial number'));
-  it('explains what serial numbers are', () => expect(src).toContain('serial number on its label'));
-});
-
-describe('verify/[sn].astro not-found copy', () => {
-  const src = read('src/pages/verify/[sn].astro');
-  it('shows SN in heading', () => expect(src).toContain('No record for SN {sn}'));
-  it('explains shipping lag', () => expect(src).toContain('brand-new order can take a day'));
-});
-
 describe('contact.astro copy', () => {
   const src = read('src/pages/contact.astro');
   it('has the approved h1', () => expect(src).toContain('>Contact<'));

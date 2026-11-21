@@ -14,7 +14,6 @@ import {
   section,
   result_box,
   num,
-  qr_block,
   signature,
 } from '../ctdoc';
 import { board_svg, axes } from '../ctpattern';
@@ -543,7 +542,6 @@ export async function buildIR(opts: {
         ['Raw data', '\u2014'],
       ]);
 
-  const verifyUrl = `https://calib.tools/verify/${data.sn}`;
   const sig = signature(
     data.inspector,
     'Inspector',
@@ -553,8 +551,7 @@ export async function buildIR(opts: {
     pending ? undefined : 'Printed signature',
   );
   const foot =
-    `<div class="push" style="display:flex;justify-content:space-between;align-items:flex-end">${sig}` +
-    `${qr_block(verifyUrl, 15)}</div>`;
+    `<div class="push" style="display:flex;justify-content:space-between;align-items:flex-end">${sig}</div>`;
 
   const page2 =
     section(5, 'Feature map') +

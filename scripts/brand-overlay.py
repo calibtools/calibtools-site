@@ -30,17 +30,17 @@ BOARDS = {
     "B1": {
         "board_mm": (300, 200),
         "pattern_mm": (250, 175),
-        "text": "CT-CHT-P-300200-F   Checkerboard 7\u00d710 \u00b7 25 mm   SN 000093 \u00b7 Rev A",
+        "text": "CT-CHT-P-300200-F   Checkerboard 7\u00d710 \u00b7 25 mm   B2647 \u00b7 Rev A",
     },
     "B2": {
         "board_mm": (300, 200),
         "pattern_mm": (250, 175),
-        "text": "CT-CHA-P-300200-6X6   ChArUco 7\u00d710 \u00b7 25/18 mm \u00b7 DICT_6X6_250 \u00b7 IDs 0\u201334   SN 000127 \u00b7 Rev A",
+        "text": "CT-CHA-P-300200-6X6   ChArUco 7\u00d710 \u00b7 25/18 mm \u00b7 DICT_6X6_250 \u00b7 IDs 0\u201334   B2647 \u00b7 Rev A",
     },
     "B3": {
         "board_mm": (185, 110),
         "pattern_mm": (168, 98),
-        "text": "CT-CHA-C-185110-6X6   ChArUco 7\u00d712 \u00b7 14/10.5 mm \u00b7 DICT_6X6_250 \u00b7 IDs 0\u201341   SN 000311 \u00b7 Rev A",
+        "text": "CT-CHA-C-185110-6X6   ChArUco 7\u00d712 \u00b7 14/10.5 mm \u00b7 DICT_6X6_250 \u00b7 IDs 0\u201341   B2647 \u00b7 Rev A",
     },
 }
 
@@ -57,10 +57,10 @@ IMAGE_BOARDS = {
 
 # family-set per-board overrides (TL, TR, BL, BR)
 FAMILY_SET_OVERRIDES = [
-    {"ids": "IDs 0\u201334",   "sn": "SN 000201", "id_label": "#0",   "start_id": 0},
-    {"ids": "IDs 35\u201369",  "sn": "SN 000202", "id_label": "#35",  "start_id": 35},
-    {"ids": "IDs 70\u2013104", "sn": "SN 000203", "id_label": "#70",  "start_id": 70},
-    {"ids": "IDs 105\u2013139","sn": "SN 000204", "id_label": "#105", "start_id": 105},
+    {"ids": "IDs 0\u201334",   "sn": "B2647", "id_label": "#0",   "start_id": 0},
+    {"ids": "IDs 35\u201369",  "sn": "B2647", "id_label": "#35",  "start_id": 35},
+    {"ids": "IDs 70\u2013104", "sn": "B2647", "id_label": "#70",  "start_id": 70},
+    {"ids": "IDs 105\u2013139","sn": "B2647", "id_label": "#105", "start_id": 105},
 ]
 
 # ── helpers ────────────────────────────────────────────────────────────

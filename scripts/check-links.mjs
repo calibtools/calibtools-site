@@ -42,7 +42,7 @@ for (const file of htmlFiles) {
   for (const href of unhintedFileLinks(html)) unhinted.push({ file: file.replace(DIST + '/', ''), href });
 }
 /** noindex on purpose and fine to link to. */
-const NOINDEX_LINK_OK = ['/quote/', '/cart/', '/review/', '/verify/', '/account/', '/pattern/'];
+const NOINDEX_LINK_OK = ['/quote/', '/cart/', '/review/', '/account/', '/pattern/'];
 const NOINDEX_RE = /<meta[^>]+name="robots"[^>]+content="[^"]*noindex/i;
 const isNoindex = (path) => NOINDEX_RE.test(readFileSync(path, 'utf-8'));
 

@@ -15,7 +15,7 @@
     "handle": "checkerboard-composite",
     "file": "03-label.webp",
     "kind": "ai",
-    "alt": "Lower-left corner of the Calib.Tools checkerboard calibration board with the printed line that gives part number, pattern size and serial number."
+    "alt": "Lower-left corner of the Calib.Tools checkerboard calibration board with the printed line that gives part number, pattern size and batch number."
   },
   {
     "handle": "checkerboard-composite",
@@ -39,7 +39,7 @@
     "handle": "charuco-composite",
     "file": "03-label.webp",
     "kind": "ai",
-    "alt": "Lower-left corner of the Calib.Tools ChArUco calibration board with the printed line that gives part number, pattern size, dictionary, start ID and serial number."
+    "alt": "Lower-left corner of the Calib.Tools ChArUco calibration board with the printed line that gives part number, pattern size, dictionary, start ID and batch number."
   },
   {
     "handle": "charuco-composite",
@@ -111,7 +111,7 @@
     "handle": "charuco-ceramic",
     "file": "03-label.webp",
     "kind": "ai",
-    "alt": "Lower edge of the Calib.Tools ceramic ChArUco calibration plate with the printed line that gives part number, pattern size, dictionary, start ID and serial number."
+    "alt": "Lower edge of the Calib.Tools ceramic ChArUco calibration plate with the printed line that gives part number, pattern size, dictionary, start ID and batch number."
   },
   {
     "handle": "charuco-ceramic",
@@ -135,7 +135,7 @@
     "handle": "circlegrid-composite",
     "file": "03-label.webp",
     "kind": "ai",
-    "alt": "Lower-left corner of the Calib.Tools circle grid calibration board with the printed line that gives part number, circle count, pitch and serial number."
+    "alt": "Lower-left corner of the Calib.Tools circle grid calibration board with the printed line that gives part number, circle count, pitch and batch number."
   },
   {
     "handle": "circlegrid-composite",

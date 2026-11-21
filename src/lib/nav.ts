@@ -88,7 +88,6 @@ export const supportDropdown: NavItem[] = [
   { label: 'Shipping, duties & taxes', href: '/shipping/' },
   { label: 'Returns', href: '/returns/' },
   { label: 'Files & downloads', href: '/files/' },
-  { label: 'Verify a serial', href: '/verify/' },
   { label: 'About', href: '/about/' },
   { label: 'Contact', href: '/contact/' },
 ];
@@ -148,7 +147,6 @@ export const footerGroups: FooterGroup[] = [
       { label: 'Shipping, duties & taxes', href: '/shipping/' },
       { label: 'Returns', href: '/returns/' },
       { label: 'Files & downloads', href: '/files/' },
-      { label: 'Verify a serial', href: '/verify/' },
       { label: 'Contact', href: '/contact/' },
       { label: 'Your account', href: '/account/' },
     ],

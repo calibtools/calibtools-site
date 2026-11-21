@@ -83,7 +83,7 @@ Every board comes with this file filled in for its own grid. All sizes use a spa
 
 ## What is printed on the board
 
-The tag grid is centered with a white quiet zone of at least one tag pitch on every side. Outside it, an edge strip carries the part number, the serial number and a 100 mm scale bar.
+The tag grid is centered with a white quiet zone of at least one tag pitch on every side. Outside it, an edge strip carries the part number, the batch number and a 100 mm scale bar.
 
 ## Mounting
 

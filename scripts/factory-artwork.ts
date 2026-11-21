@@ -4,7 +4,11 @@
  * drawing (dimensions, tolerances, marker ID map) and the OpenCV JSON.
  *
  * Usage:
- *   pnpm exec tsx scripts/factory-artwork.ts --pn CT-CHA-P-400X300-D5 [--rev A] [--out out/factory]
+ *   pnpm exec tsx scripts/factory-artwork.ts --pn CT-CHA-P-400X300-D5 --mark B2647 [--rev A] [--out out/factory]
+ *
+ * --mark is printed on the label line: the batch number for standard boards (B + YYWW of the
+ * production order, e.g. B2647) or the quotation number for custom boards (e.g. QT-20261121-01).
+ * There is no per-board serial number (owner decision 2026-11-22).
  *
  * All text is outlined (opentype.js), so the files open identically anywhere.
  * PDFs are rendered with Playwright Chromium (CT_CHROMIUM_PATH to use a system Chrome).
@@ -28,6 +32,11 @@ import { COMPOSITE_FLATNESS, COMPOSITE_TOLERANCE } from '../src/lib/claims';
 const args = Object.fromEntries(process.argv.slice(2).map((a, i, arr) => (a.startsWith('--') ? [a.slice(2), arr[i + 1]] : [])).filter((p) => p.length));
 const PN = args.pn ?? 'CT-CHA-P-400X300-D5';
 const REV = args.rev ?? 'A';
+const MARK = args.mark ?? '';        // batch number (standard) or quotation number (custom)
+if (!/^(B\d{4}|QT-\d{8}-\d{2})$/.test(MARK)) {
+  console.error('[factory] --mark is required: a batch number like B2647 or a quotation number like QT-20261121-01');
+  process.exit(1);
+}
 const FOR = args.for ?? '';          // customer name for the approval drawing, optional
 const OUT = resolve(args.out ?? 'out/factory', PN);
 mkdirSync(OUT, { recursive: true });
@@ -98,7 +107,7 @@ let lx = ox;
 const labelParts: string[] = [];
 labelParts.push(wordmarkSvgGroup({ x: lx, y: labelBaseline - CAP, heightMm: wmH }));
 lx += wmW + gap;
-for (const field of [PN, summary, `SN ________ · Rev ${REV}`]) {
+for (const field of [PN, summary, `${MARK} · Rev ${REV}`]) {
   labelParts.push(text(field, mono, labelSize, lx, labelBaseline));
   lx += textWidth(field, mono, labelSize) + gap;
 }

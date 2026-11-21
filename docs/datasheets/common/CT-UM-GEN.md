@@ -19,9 +19,9 @@ Check the board on arrival: no dents on edges, no delamination, print intact. Re
 
 ## 2. Identification
 
-Every target carries an edge strip with: brand · full part number (e.g. `CT-CHA-P-300X200-D6`) · pattern summary (rows × columns · square / marker size · dictionary · start ID) · serial number (`YYWW-NNNNN`) · datasheet revision · a 100 mm scale bar.
+Every target carries an edge strip with: brand · full part number (e.g. `CT-CHA-P-300X200-D6`) · pattern summary (rows × columns · square / marker size · dictionary · start ID) · batch number (`B` + year + week, e.g. `B2647`; custom targets carry the quotation number instead) · datasheet revision · a 100 mm scale bar.
 
-Quote the serial number in any support request.
+Quote your order number and the batch number in any support request.
 
 ## 3. Handling
 
@@ -88,7 +88,7 @@ Composite boards: 2 years against delamination, indoor print fading and warping 
 
 ## 11. Support
 
-hello@calib.tools · we reply within one business day. Include the serial number and, for detection problems, one full-resolution sample image.
+hello@calib.tools · we reply within one business day. Include your order number, the batch number and, for detection problems, one full-resolution sample image.
 
 ## 12. Disposal
 

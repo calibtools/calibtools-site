@@ -35,7 +35,7 @@ Circle grids use filled dot centroids rather than corner intersections. Centroid
 
 Spacing is the pitch of the underlying square lattice. A symmetric grid has a circle at every lattice position; its `findCirclesGrid` pattern size is (cols, rows). An asymmetric grid has a circle at every other position, so circles in a row are two pitches apart and each row is shifted by one pitch against the next; rows × cols above are rows and circles per row, and the pattern size is (circles per row, rows) with `CALIB_CB_ASYMMETRIC_GRID`. Every layout leaves at least one pitch of white between the outermost circles and the board edge. Other grid sizes or circle dimensions: custom order (CUS).
 
-Pattern area is centered with a white quiet zone ≥ 1 circle pitch on all sides; the edge strip with part number, serial and 100 mm scale bar sits outside the quiet zone.
+Pattern area is centered with a white quiet zone ≥ 1 circle pitch on all sides; the edge strip with part number, batch number and 100 mm scale bar sits outside the quiet zone.
 
 ## Specifications
 

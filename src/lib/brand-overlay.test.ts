@@ -27,9 +27,9 @@ const BOARD_SPECS: Record<string, { board_mm: [number, number]; pattern_mm: [num
 
 // Text lines
 const BOARD_TEXTS: Record<string, string> = {
-  B1: 'CALIB.TOOLS   CT-CHT-P-300240-2500   Checkerboard 7\u00d710 \u00b7 25 mm   SN 000093 \u00b7 Rev A',
-  B2: 'CALIB.TOOLS   CT-CHA-P-300240-2518   ChArUco 7\u00d710 \u00b7 25/18 mm \u00b7 DICT_6X6_250 \u00b7 IDs 0\u201334   SN 000127 \u00b7 Rev A',
-  B3: 'CALIB.TOOLS   CT-CHA-C-200150-1007   ChArUco 12\u00d717 \u00b7 10/7 mm \u00b7 DICT_6X6_250 \u00b7 IDs 0\u2013101   SN 000311 \u00b7 Rev A',
+  B1: 'CALIB.TOOLS   CT-CHT-P-300240-2500   Checkerboard 7\u00d710 \u00b7 25 mm   B2647 \u00b7 Rev A',
+  B2: 'CALIB.TOOLS   CT-CHA-P-300240-2518   ChArUco 7\u00d710 \u00b7 25/18 mm \u00b7 DICT_6X6_250 \u00b7 IDs 0\u201334   B2647 \u00b7 Rev A',
+  B3: 'CALIB.TOOLS   CT-CHA-C-200150-1007   ChArUco 12\u00d717 \u00b7 10/7 mm \u00b7 DICT_6X6_250 \u00b7 IDs 0\u2013101   B2647 \u00b7 Rev A',
 };
 
 function boardPixelWidth(board: Board): number {

@@ -22,7 +22,6 @@ const MAX_DEPTH = 2;
 const EXCLUDED = new Set([
   '/404/',
   '/review/',          // internal review submission flow (noindex)
-  '/verify/unknown/',  // fallback for invalid serial numbers (noindex)
 ]);
 
 // Duplicate-named pages (e.g. "index 2.html") are build artifacts, skip

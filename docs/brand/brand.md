@@ -91,7 +91,7 @@ Manifest: `/site.webmanifest` (standalone, references `android-chrome-*.png` and
 The label at the bottom of each target image uses: compact wordmark outline
 (`05-product-marking/laser-wordmark-compact-mono.svg`) scaled so its cap height = 1 % of board height,
 followed by Geist Mono at 0.86 × that cap height, color Gray 80 `#333333` at 100 % opacity,
-three-space gaps between fields: wordmark, part number, pattern summary, serial + revision.
+three-space gaps between fields: wordmark, part number, pattern summary, batch number (standard boards) or quotation number (custom boards) + revision.
 
 > **Note:** the kit's own label-line example (`label-line-example.pdf`) still shows the superseded
 > part number `300240-2500`. The site's `scripts/brand-overlay.py` config block is the source of truth

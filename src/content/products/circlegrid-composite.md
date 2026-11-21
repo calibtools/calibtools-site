@@ -102,7 +102,7 @@ Other grids and circle sizes are a custom order; [ask for a quote](/quote/).
 
 ## What is printed on the board
 
-The grid is centered with a white quiet zone of at least one circle pitch on every side. Outside it, an edge strip carries the part number, the serial number and a 100 mm scale bar.
+The grid is centered with a white quiet zone of at least one circle pitch on every side. Outside it, an edge strip carries the part number, the batch number and a 100 mm scale bar.
 
 ## Mounting
 

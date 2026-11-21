@@ -560,7 +560,7 @@ export class Doc {
         .join(' \u00B7 ');
     this.footerLeft =
       footerLeft ??
-      CONTACT_LINE + (sn ? ` \u00B7 calib.tools/verify/${sn}` : '');
+      CONTACT_LINE;
   }
 
   addPage(bodyHtml: string, titleBlock?: boolean): void {

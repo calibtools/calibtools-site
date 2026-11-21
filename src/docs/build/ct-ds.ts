@@ -278,7 +278,7 @@ function mono(text: string): string {
 function chaCProductRendering(): string {
   const mk185 = CERAMIC_SIZES.find((s) => s.square === 14)!.marker;
   const label =
-    `CALIB.TOOLS   CT-CHA-C-185X110-D6   ChArUco 7\u00d712 \u00b7 14/${mk185} mm \u00b7 DICT_6X6_250 \u00b7 IDs 0\u201341   SN [per unit] \u00b7 Rev A`;
+    `CALIB.TOOLS   CT-CHA-C-185X110-D6   ChArUco 7\u00d712 \u00b7 14/${mk185} mm \u00b7 DICT_6X6_250 \u00b7 IDs 0\u201341   B2647 \u00b7 Rev A`;
   const board = board_svg({
     W: 185, H: 110, rows: 7, cols: 12, sq: 14,
     marker: mk185, mx: 8.5, my: 6,
@@ -432,7 +432,7 @@ function chaCDeliverablesBox(): string {
     ['Files', '<span class="mono">.opencv.json \u00b7 .ros2.yaml \u00b7 .halcon.txt</span> (from the pattern generator)'],
   ]) + '</div>';
   const right = '<div>' + tag('Configuration & service') + kv([
-    ['Marking on board', 'Label line with part / pattern / SN / Rev; printed X / Y arrows.'],
+    ['Marking on board', 'Label line with part / pattern / batch number / Rev; printed X / Y arrows.'],
     ['Lead time', LEAD_TIME + '.'],
     ['Options', 'Fixture \u00b7 custom NRE.'],
   ]) + '</div>';
