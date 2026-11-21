@@ -1,0 +1,96 @@
+---
+import Base from '@/layouts/Base.astro';
+import { breadcrumbLd } from '@/lib/seo';
+import { software, NOTIFY_SUBJECT } from '@/lib/software';
+import { ACADEMY_NAME } from '@/lib/nav';
+
+const inDev = software.status === 'unreleased';
+const mailto = `mailto:${software.notifyEmail}?subject=${encodeURIComponent(NOTIFY_SUBJECT)}`;
+const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: software.name }]);
+// Describes the program without offers, version or download until a version ships.
+const appLd = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: software.name,
+  url: `https://calib.tools${software.href}`,
+  applicationCategory: 'DeveloperApplication',
+  operatingSystem: software.platforms.join(', '),
+  license: 'https://opensource.org/licenses/MIT',
+  publisher: { '@type': 'Organization', name: 'Calib.Tools', url: 'https://calib.tools' },
+};
+const nextSteps = [
+  { href: '/tools/generator/', label: 'Pattern generator', note: 'Print a ChArUco or checkerboard pattern at exact size.' },
+  { href: '/tools/capture/', label: 'Capture assistant', note: 'Take a set of calibration images with good coverage.' },
+  { href: '/tools/quality/', label: 'Calibration quality analyzer', note: 'Check coverage and reprojection error of a calibration you already ran.' },
+  { href: '/guides/', label: ACADEMY_NAME, note: 'Guides to calibrating with OpenCV, step by step.' },
+];
+---
+<Base
+  title="Plumbline: free, open-source camera calibration software"
+  description="Plumbline is free, open-source desktop software for camera calibration on Windows, macOS and Linux, from Calib.Tools. Not released yet: what the first version will do, and how to hear when it ships."
+  section="plumbline"
+  jsonLd={[bcLd, appLd]}
+>
+  <section class="container-x flex flex-col gap-6 pt-[var(--section-y)] pb-10">
+    <div class="flex flex-wrap items-center gap-3">
+      <span class="eyebrow">Desktop software</span>
+      {inDev && <span class="badge text-brand-dark">Not released yet</span>}
+    </div>
+    <h1 class="h-display m-0 max-w-[880px] text-[36px] md:text-[48px]">{software.name}: camera calibration software for {software.platforms.join(', ').replace(/, (?=[^,]*$)/, ' and ')}</h1>
+    <p class="m-0 max-w-[760px] text-lg leading-relaxed text-ink-muted">
+      {software.name} is an open-source desktop program for calibrating cameras, made by Calib.Tools.
+      {inDev && ' The first version is not released yet, so there is nothing to download. This page lists what it is planned to do.'}
+    </p>
+    {inDev && (
+      <div class="flex flex-wrap items-center gap-4">
+        <a href={mailto} class="btn-md btn-primary">Tell me when it ships</a>
+        <span class="text-[15px] text-ink-muted">Opens an email to {software.notifyEmail}. We write back when the first version is out.</span>
+      </div>
+    )}
+  </section>
+
+  <section class="border-t border-line">
+    <div class="container-x flex flex-col gap-5 py-[var(--section-y)]">
+      <span class="section-no">At a glance</span>
+      <span class="section-rule"></span>
+      <h2 class="m-0 text-[24px] font-semibold md:text-[28px]">What it is</h2>
+      <table class="w-full max-w-[760px] border-collapse text-[14px]">
+        <tbody>
+          <tr class="border-b border-line"><th scope="row" class="align-top pt-[15px] w-[112px] py-3 pr-4 md:w-[180px] text-left font-mono text-[12px] font-medium uppercase tracking-[0.04em] text-ink-soft">Status</th><td class="py-3 align-top">{inDev ? 'Being built; no version released yet' : `Version ${software.version}`}</td></tr>
+          <tr class="border-b border-line"><th scope="row" class="align-top pt-[15px] py-3 pr-4 text-left font-mono text-[12px] font-medium uppercase tracking-[0.04em] text-ink-soft">Platforms</th><td class="py-3 align-top">{software.platforms.join(', ')}</td></tr>
+          <tr class="border-b border-line"><th scope="row" class="align-top pt-[15px] py-3 pr-4 text-left font-mono text-[12px] font-medium uppercase tracking-[0.04em] text-ink-soft">License</th><td class="py-3 align-top">Open source, {software.license}</td></tr>
+          <tr class="border-b border-line"><th scope="row" class="align-top pt-[15px] py-3 pr-4 text-left font-mono text-[12px] font-medium uppercase tracking-[0.04em] text-ink-soft">Built on</th><td class="py-3 align-top">OpenCV and other open-source libraries, credited in the documentation</td></tr>
+          <tr class="border-b border-line"><th scope="row" class="align-top pt-[15px] py-3 pr-4 text-left font-mono text-[12px] font-medium uppercase tracking-[0.04em] text-ink-soft">Made by</th><td class="py-3 align-top">Calib.Tools. Sales of calibration targets pay for its development.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="border-t border-line">
+    <div class="container-x flex flex-col gap-5 py-[var(--section-y)]">
+      <span class="section-no">{inDev ? 'Planned' : 'Features'}</span>
+      <span class="section-rule"></span>
+      <h2 class="m-0 text-[24px] font-semibold md:text-[28px]">{inDev ? 'Planned for the first version' : 'What it does'}</h2>
+      <ul class="m-0 flex max-w-[760px] list-disc flex-col gap-2 pl-6 text-[17px] leading-[1.65]">
+        {(inDev ? software.planned : software.released).map((f) => <li class="pl-1">{f}</li>)}
+      </ul>
+      {inDev && <p class="m-0 max-w-[760px] text-[15px] text-ink-muted">This is a plan, not a list of finished features. More camera models and multi-camera calibration are planned for later versions; each feature is listed here once it ships.</p>}
+    </div>
+  </section>
+
+  <section class="border-t border-line">
+    <div class="container-x flex flex-col gap-5 py-[var(--section-y)]">
+      <span class="section-no">Until then</span>
+      <span class="section-rule"></span>
+      <h2 class="m-0 text-[24px] font-semibold md:text-[28px]">Calibrate with the browser tools today</h2>
+      <div class="flex max-w-[760px] flex-col border-t border-line">
+        {nextSteps.map((s) => (
+          <a href={s.href} class="flex flex-col gap-1 border-b border-line py-4 text-ink no-underline hover:text-ink">
+            <span class="font-medium">{s.label}</span>
+            <span class="text-[15px] text-ink-muted">{s.note}</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+</Base>
