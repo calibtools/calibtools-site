@@ -137,6 +137,7 @@ export const footerGroups: FooterGroup[] = [
       { label: 'Detection check', href: '/tools/check/' },
       { label: 'Quality analyzer', href: '/tools/quality/' },
       { label: 'Capture assistant', href: '/tools/capture/' },
+      { label: software.name, href: software.href },
     ],
   },
   {
@@ -153,6 +154,7 @@ export const footerGroups: FooterGroup[] = [
   {
     heading: 'Support',
     items: [
+      { label: ACADEMY_NAME, href: '/guides/' },
       { label: 'FAQ', href: '/faq/' },
       { label: 'Shipping, duties & taxes', href: '/shipping/' },
       { label: 'Returns', href: '/returns/' },
