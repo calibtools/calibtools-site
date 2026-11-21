@@ -72,7 +72,7 @@ export default function NewsletterForm({ heading = 'New tools and targets, month
 
   if (compact) {
     return (
-      <form className="flex w-full max-w-[460px] flex-col gap-2" onSubmit={handleSubmit}>
+      <form className="flex w-full flex-col gap-2" onSubmit={handleSubmit}>
         <div className="flex gap-2">
           <label htmlFor={`${id}-email`} className="sr-only">{heading}</label>
           <input
