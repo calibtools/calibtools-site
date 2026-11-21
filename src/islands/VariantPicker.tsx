@@ -275,8 +275,10 @@ export default function VariantPicker({ product, fixtureVariantId, fixturePrice 
   return (
     <div className="flex flex-col gap-5">
       {/* Price */}
-      <div className="flex items-baseline gap-3">
-        <span className="spec text-4xl font-extrabold">{fromPrice ?? (variant?.price ?? product.priceFrom)}</span>
+      <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+        {fromPrice !== null
+          ? <span className="spec whitespace-nowrap text-4xl font-extrabold"><span className="text-xl font-semibold">From </span>{fromPrice.replace(/^From /, '')}</span>
+          : <span className="spec text-4xl font-extrabold">{variant?.price ?? product.priceFrom}</span>}
         {fromPrice === null && variant && !variant.availableForSale && (
           <span className="text-sm text-brand">Out of stock</span>
         )}
