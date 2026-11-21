@@ -20,8 +20,10 @@ const allGuides = await getCollection('guides');
 const isReady = (g: typeof allGuides[number]) => !g.data.draft && !g.body?.includes('[BODY COPY');
 const guides = allGuides.filter(isReady).slice(0, 3);
 
-/* Three tools on the home page */
-const featuredTools = tools.slice(0, 3);
+/* Phones list the first three tools; wide screens list all of them, so the list is as tall as the
+   heading and field-of-view card beside it instead of leaving an empty block under three rows. */
+const PHONE_TOOLS = 3;
+const featuredTools = tools.filter((t) => t.live);
 
 /* The field-of-view calculator's opening example, computed by the tool's own code at build time */
 const fovIn = FOV_DEFAULTS;
@@ -129,9 +131,9 @@ const featuredReviews = allReviews
         </a>
       </div>
       <ol class="m-0 flex list-none flex-col border-t border-line-strong p-0 lg:w-[58%]">
-        {featuredTools.map((t) => (
-          <li class="border-b border-line-strong">
-            <a href={t.href} class="flex items-start gap-4 py-5 text-ink no-underline hover:text-ink md:gap-6">
+        {featuredTools.map((t, i) => (
+          <li class:list={['border-b border-line-strong', i >= PHONE_TOOLS && 'hidden lg:block']}>
+            <a href={t.href} class="flex items-start gap-4 py-5 text-ink no-underline hover:text-ink md:gap-6 lg:py-4">
               <span class="flex min-w-0 flex-1 flex-col gap-1">
                 <strong class="text-[17px] font-medium">{t.title}</strong>
                 <span class="text-[15px] leading-relaxed text-ink-muted">{t.body}</span>
