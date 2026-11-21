@@ -133,17 +133,17 @@ const featuredReviews = allReviews
       <ol class="m-0 flex list-none flex-col border-t border-line-strong p-0 lg:w-[58%]">
         {featuredTools.map((t, i) => (
           <li class:list={['border-b border-line-strong', i >= PHONE_TOOLS && 'hidden lg:block']}>
-            {/* Glyph, title and Open share one top line: the 48 px glyph box starts at the top of the title's
-                24 px line, and Open sits on that same line. Glyphs: public/icons/tools/<key>.svg, one 30 × 24 live area. */}
-            <a href={t.href} class="flex items-start gap-4 py-5 text-ink no-underline hover:text-ink md:gap-5 lg:py-4">
-              <span class="flex h-12 w-12 shrink-0 items-center justify-center border border-line bg-sheet">
+            {/* The glyph is the button (owner 2026-11-21): the whole row links, and the 48 px glyph box turns
+                ink-bordered on hover or focus. Its top lines up with the top of the title's 24 px line.
+                Glyphs: public/icons/tools/<key>.svg, one 30 × 24 live area. */}
+            <a href={t.href} class="group flex items-start gap-4 py-5 text-ink no-underline hover:text-ink md:gap-5 lg:py-4">
+              <span class="flex h-12 w-12 shrink-0 items-center justify-center border border-line bg-sheet transition-colors group-hover:border-ink group-focus-visible:border-ink">
                 <img src={`/icons/tools/${t.key}.svg`} alt="" width="40" height="40" class="block h-10 w-10" loading="lazy" decoding="async" />
               </span>
               <span class="flex min-w-0 flex-1 flex-col gap-1">
-                <strong class="text-[17px] font-medium leading-6">{t.title}</strong>
+                <strong class="text-[17px] font-medium leading-6 group-hover:text-brand-dark">{t.title}</strong>
                 <span class="text-[15px] leading-relaxed text-ink-muted">{t.body}</span>
               </span>
-              <span class="shrink-0 font-mono text-[12px] font-semibold uppercase leading-6 tracking-[0.04em] text-brand-dark">Open</span>
             </a>
           </li>
         ))}
