@@ -96,7 +96,7 @@ export async function buildILACCert(opts: {
     [
       [
         'Factory inspection',
-        '<span class="mono">CT-IR-&lt;SN&gt;</span> · included with every target',
+        '<span class="mono">CT-IR</span> · included with every target',
         'Calib.Tools (manufacturer)',
       ],
       [

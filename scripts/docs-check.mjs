@@ -18,9 +18,6 @@ function collectSourceFiles() {
   const patterns = [
     { dir: 'src/docs', ext: '.ts' },
     { dir: 'docs/datasheets', ext: '.md' },
-    { dir: 'data', file: 'serials.json' },
-    { dir: 'data/measurements', ext: '.json' },
-    { dir: 'data', file: 'sample_coords.json' },
     { dir: 'src/lib', file: 'reportConfig.ts' },
     { dir: 'src/lib', file: 'claims.ts' },
   ];

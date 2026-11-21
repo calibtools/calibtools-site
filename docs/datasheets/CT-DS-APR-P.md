@@ -23,7 +23,7 @@ AprilGrid uses AprilTag 36h11 markers arranged in a regular grid. It is the stan
 
 Dictionary: AprilTag 36h11. Tag spacing ratio 0.3 (gap = 0.3 × tag side). IDs start at 0 at the bottom-left tag and run left to right, then upward, as Kalibr numbers them; the origin is the bottom-left tag corner, x right, y up. Kalibr `tagSpacing` parameter equals the gap divided by the tag side (0.3). Other grid sizes or spacing ratios: custom order (CUS).
 
-Pattern area is centered with a white quiet zone ≥ 1 tag pitch on all sides; the edge strip with part number, serial and 100 mm scale bar sits outside the quiet zone.
+Pattern area is centered with a white quiet zone ≥ 1 tag pitch on all sides; the edge strip with part number, batch number and 100 mm scale bar sits outside the quiet zone.
 
 ## Specifications
 

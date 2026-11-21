@@ -44,4 +44,4 @@ Units: if you pass mm here, your extrinsics come out in mm. Pass meters for ROS 
 
 Edges only, flat storage, no solvents on the print. Full details: CT-UM-GEN section 3, 7, 8.
 
-Support: hello@calib.tools with serial number and one full-resolution image.
+Support: hello@calib.tools with your order number, the batch number on the label and one full-resolution image.

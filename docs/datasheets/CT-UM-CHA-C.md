@@ -43,4 +43,4 @@ Thermal expansion is ≈ 7 µm per meter per °C — negligible for camera calib
 
 Dimensionally stable for life unless damaged. Re-inspect after any impact or if a visible chip reaches the pattern area.
 
-Support: hello@calib.tools with the serial number.
+Support: hello@calib.tools with your order number and the batch number on the label.

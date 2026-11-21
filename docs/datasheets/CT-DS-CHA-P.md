@@ -23,7 +23,7 @@ ChArUco combines a checkerboard with ArUco markers in the white squares. Markers
 
 `{DICT}`: `D6` = DICT_6X6_250 (default, most robust) · `D5` = DICT_5X5_100 · `D4` = DICT_4X4_50 (decodes at lower resolution, fewer unique IDs) · `T36` = AprilTag 36h11. Start ID 0, row-major over white squares, OpenCV ≥ 4.6 placement convention (`legacy_pattern: false`). Other grids, dictionaries or start IDs: custom order (CUS).
 
-Pattern area is centered with a white quiet zone ≥ 1 square on all sides; the edge strip with part number, serial and 100 mm scale bar sits outside the quiet zone.
+Pattern area is centered with a white quiet zone ≥ 1 square on all sides; the edge strip with part number, batch number and 100 mm scale bar sits outside the quiet zone.
 
 ## Specifications
 

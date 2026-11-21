@@ -19,7 +19,7 @@ describe('generateQR', () => {
   });
 
   it('handles a verify URL', () => {
-    const qr = generateQR('https://calib.tools/verify/000311');
+    const qr = generateQR('https://calib.tools/tools/generator/');
     expect(qr.length).toBeGreaterThanOrEqual(21);
     // Has finder patterns in corners (top-left 7×7 should have dark border)
     expect(qr[0][0]).toBe(true);

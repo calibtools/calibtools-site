@@ -23,7 +23,7 @@ HALCON calibration plate with rectangularly arranged marks, the layout that HALC
 
 The number of marks, the mark distance and the mark diameter are fixed with the order: send your existing `.descr` file, or the `gen_caltab` parameters (marks in x and y, mark distance, diameter ratio), and the plate is made to them. A `.descr` description file in `gen_caltab` format is supplied with every plate. Plates with hexagonally arranged marks (`create_caltab`, `.cpd`): custom order (CUS).
 
-Pattern area is centered with a white quiet zone ≥ 1 mark pitch on all sides; the edge strip with part number, serial and 100 mm scale bar sits outside the quiet zone.
+Pattern area is centered with a white quiet zone ≥ 1 mark pitch on all sides; the edge strip with part number, batch number and 100 mm scale bar sits outside the quiet zone.
 
 ## Specifications
 

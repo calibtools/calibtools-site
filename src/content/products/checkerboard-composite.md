@@ -89,7 +89,7 @@ The other grids look the same after a half turn. They are fine for a single came
 
 ## What is printed on the board
 
-The pattern is centered on the board. An edge strip carries the part number, the serial number and a 100 mm scale bar, so the board can be identified and its scale checked with a ruler years later.
+The pattern is centered on the board. An edge strip carries the part number, the batch number and a 100 mm scale bar, so the board can be identified and its scale checked with a ruler years later.
 
 ## Mounting
 

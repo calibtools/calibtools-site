@@ -74,7 +74,7 @@ If several boards share one scene, give each one its own ID range so the detecto
 
 ## What is printed on the board
 
-The pattern is centered with a white quiet zone of at least one square on every side. Outside that zone, an edge strip carries the part number, the serial number and a 100 mm scale bar.
+The pattern is centered with a white quiet zone of at least one square on every side. Outside that zone, an edge strip carries the part number, the batch number and a 100 mm scale bar.
 
 Grid size, square size and ID range are printed with it, so anyone picking the board up later can rebuild the configuration without searching for the order.
 

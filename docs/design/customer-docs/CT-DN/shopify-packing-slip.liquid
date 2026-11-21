@@ -1,7 +1,7 @@
 <!--
   Calib.Tools delivery-note packing slip for Shopify.
-  Uses system / Google-hosted Geist when available. Keep product properties named
-  Serial(s), Serial, or SN; Start ID and ID range are printed in the properties loop.
+  Uses system / Google-hosted Geist when available. Line properties (Start ID, ID range,
+  quotation number) are printed in the properties loop. No serial-number column (2026-11-22).
 -->
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap');
@@ -71,7 +71,7 @@
   <table>
     <thead>
       <tr>
-        <th>Pos</th><th>Part number</th><th>Description</th><th>Serial(s)</th><th class="qty">Qty</th><th>Line properties</th><th>HS code</th><th>Origin</th>
+        <th>Pos</th><th>Part number</th><th>Description</th><th class="qty">Qty</th><th>Line properties</th><th>HS code</th><th>Origin</th>
       </tr>
     </thead>
     <tbody>
@@ -80,13 +80,10 @@
         <td class="mono">{{ forloop.index }}</td>
         <td class="mono">{{ line_item.sku | default: '—' }}</td>
         <td>{{ line_item.title }}</td>
-        <td class="mono">{{ line_item.properties['Serial(s)'] | default: line_item.properties['Serial'] | default: line_item.properties['SN'] | default: '—' }}</td>
         <td class="qty mono">{{ line_item.quantity }}</td>
         <td class="properties">
           {% for property in line_item.properties %}
-            {% unless property.first == 'Serial(s)' or property.first == 'Serial' or property.first == 'SN' %}
-              <span class="mono">{{ property.first }} {{ property.last }}</span>{% unless forloop.last %}<br>{% endunless %}
-            {% endunless %}
+            <span class="mono">{{ property.first }} {{ property.last }}</span>{% unless forloop.last %}<br>{% endunless %}
           {% endfor %}
         </td>
         <td class="mono">{{ line_item.properties['HS code'] | default: '—' }}</td>

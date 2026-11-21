@@ -4,7 +4,7 @@ import tailwind from '@astrojs/tailwind';
 import sitemap from '@astrojs/sitemap';
 import { rehypeFileLinks } from './scripts/file-links.mjs';
 
-const NOINDEX_PATHS = ['/cart/', '/quote/', '/review/', '/verify/', '/account/', '/pattern/'];
+const NOINDEX_PATHS = ['/cart/', '/quote/', '/review/', '/account/', '/pattern/'];
 
 export default defineConfig({
   site: 'https://calib.tools',
