@@ -190,7 +190,7 @@ export default function PurchaseTable({ product, datasheetUrl: fallbackUrl }: Pr
                     )}
                   </td>
                   <td className="py-3 px-3"><span className="badge border border-line text-ink">{cols.available}</span></td>
-                  <td className="py-3 px-3 spec text-right font-semibold">{priceLabel(v)}</td>
+                  <td className="whitespace-nowrap py-3 px-3 spec text-right font-semibold">{priceLabel(v)}</td>
                   {quoteFor(v) ? (
                   <td className="py-3 px-3 text-right" colSpan={2}>
                     <a href={quoteFor(v)} className="text-[13px] font-semibold text-brand-dark no-underline hover:text-brand min-h-[24px] inline-flex items-center">Request a quote</a>

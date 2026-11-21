@@ -628,7 +628,7 @@ const quickLinks = hasLongform
                     <td class="whitespace-nowrap py-3 px-3 font-mono text-[13px] text-brand-dark">{shownPn(row.pn)}</td>
                     {hasSkuTitles && <td class="py-3 px-3 text-[14px] text-ink">{skuTitleFor(row.pn, skuNotes) ?? ''}</td>}
                     {row.cells.slice(1).map((c, ci) => <td class={`py-3 px-3 ${ci === 0 ? 'whitespace-nowrap' : 'font-mono text-[13px]'}`}>{c}</td>)}
-                    {anyPrice && <td class="py-3 px-3 text-right font-mono text-[13px] font-semibold">{row.price}</td>}
+                    {anyPrice && <td class="whitespace-nowrap py-3 px-3 text-right font-mono text-[13px] font-semibold">{row.price}</td>}
                   </tr>
                 ))}
               </tbody>
