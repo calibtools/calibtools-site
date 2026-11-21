@@ -27,10 +27,10 @@ relatedTargets:
   - { label: "¼″ mounting fixture", href: "/targets/mounting-fixture/", note: "Soft jaws that hold a ceramic plate by its edges." }
   - { label: "Hand-eye calibration kit", href: "/targets/hand-eye-calibration-kit/", note: "Board and flange adapter for a camera on a robot." }
 relatedGuides:
-  - { label: "Composite, ceramic or glass", href: "/guides/composite-ceramic-or-glass/", note: "Compare the tolerance with one pixel on the board." }
-  - { label: "How big should your target be?", href: "/guides/calibration-target-size/", note: "The 60 % fill rule and pixels per marker bit." }
-  - { label: "What reprojection error tells you", href: "/guides/reprojection-error/", note: "And what a low value can hide." }
-  - { label: "OpenCV camera calibration", href: "/guides/opencv-camera-calibration/", note: "Load the board file and run the calibration." }
+  - { label: "Composite, ceramic or glass", href: "/calibacademy/composite-ceramic-or-glass/", note: "Compare the tolerance with one pixel on the board." }
+  - { label: "How big should your target be?", href: "/calibacademy/calibration-target-size/", note: "The 60 % fill rule and pixels per marker bit." }
+  - { label: "What reprojection error tells you", href: "/calibacademy/reprojection-error/", note: "And what a low value can hide." }
+  - { label: "OpenCV camera calibration", href: "/calibacademy/opencv-camera-calibration/", note: "Load the board file and run the calibration." }
 ---
 
 ## When the board becomes the limit
@@ -41,7 +41,7 @@ Work out how much of the board one pixel covers: the width of your field of view
 
 On this plate the pattern is lithographed in chrome on alumina ceramic, with a ±2 µm target for the position of any feature at 20 °C. This is a target value; we will publish the measurement method with the first production plates.
 
-The [substrate guide](/guides/composite-ceramic-or-glass/) works through the comparison with numbers. For fields wider than about 400 mm, the [composite ChArUco board](/targets/charuco-composite/) carries the same pattern at a size that fills the image.
+The [substrate guide](/calibacademy/composite-ceramic-or-glass/) works through the comparison with numbers. For fields wider than about 400 mm, the [composite ChArUco board](/targets/charuco-composite/) carries the same pattern at a size that fills the image.
 
 ## Choosing a size
 
@@ -87,9 +87,9 @@ Every plate is measured before it ships: features, flatness and a visual check.
 
 ## Files and software
 
-Each plate comes with `.opencv.json`, `.ros2.yaml`, a HALCON point tuple (`.halcon.txt`) and a `.dxf` of the pattern. The [OpenCV calibration guide](/guides/opencv-camera-calibration/) shows how to load the board file.
+Each plate comes with `.opencv.json`, `.ros2.yaml`, a HALCON point tuple (`.halcon.txt`) and a `.dxf` of the pattern. The [OpenCV calibration guide](/calibacademy/opencv-camera-calibration/) shows how to load the board file.
 
-A plate this accurate deserves a careful reading of the result. The [reprojection error guide](/guides/reprojection-error/) shows the two checks that tell you whether the model holds at the image edges.
+A plate this accurate deserves a careful reading of the result. The [reprojection error guide](/calibacademy/reprojection-error/) shows the two checks that tell you whether the model holds at the image edges.
 
 ## Care and storage
 

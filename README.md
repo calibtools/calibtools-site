@@ -10,7 +10,7 @@ pnpm test && pnpm check && pnpm build
 ```
 
 Structure
-- `src/pages` — home, /tools/*, /targets/*, /guides/*
+- `src/pages` — home, /tools/*, /targets/*, /calibacademy/*
 - `src/islands` — React islands (Generator)
 - `src/lib/patterns.ts` — pattern geometry (seed of packages/core)
 - `src/lib/shopify.ts` — Storefront API client with static fallback

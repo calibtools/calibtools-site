@@ -23,8 +23,8 @@ const valid = new Set<string>([
   '/targets/',
   ...slugs('products').filter((s) => !NO_PAGE.has(s)).map((s) => `/targets/${s}/`),
   ...slugs('collections').map((s) => `/targets/collection/${s}/`),
-  ...slugs('guides').map((s) => `/guides/${s}/`),
-  '/guides/',
+  ...slugs('guides').map((s) => `/calibacademy/${s}/`),
+  '/calibacademy/',
   ...slugs('applications').map((s) => `/applications/${s}/`),
   ...tools.map((t) => t.href),
   // One generator page per pattern (src/pages/tools/generator/<pattern>.astro)
@@ -38,8 +38,8 @@ const valid = new Set<string>([
 
 describe('productLongform helpers', () => {
   it('extracts internal markdown links and ignores external, mailto and same-page anchors', () => {
-    const md = 'See [a](/targets/x/) and [b](/guides/y/#z), [c](https://e.com), [d](mailto:a@b), [e](#CT-1).';
-    expect(extractInternalLinks(md)).toEqual(['/targets/x/', '/guides/y/']);
+    const md = 'See [a](/targets/x/) and [b](/calibacademy/y/#z), [c](https://e.com), [d](mailto:a@b), [e](#CT-1).';
+    expect(extractInternalLinks(md)).toEqual(['/targets/x/', '/calibacademy/y/']);
   });
 
   it('turns a part number into a stable row anchor without the dictionary placeholder', () => {
@@ -139,7 +139,7 @@ describe('long-form batch 2 (C6)', () => {
       expect(bodyWordCount(raw)).toBeGreaterThanOrEqual(450);
       const links = [...extractInternalLinks(body), ...extractFrontmatterHrefs(frontmatter)];
       expect(new Set(links.filter((h) => h.startsWith('/targets/') && h !== `/targets/${slug}/`)).size).toBeGreaterThanOrEqual(4);
-      expect(links.some((h) => h.startsWith('/guides/'))).toBe(true);
+      expect(links.some((h) => h.startsWith('/calibacademy/'))).toBe(true);
     });
   }
 
@@ -197,7 +197,7 @@ describe('long-form batch 3: multi-sensor targets (principle and selection)', ()
       expect(body).toContain('(/quote/?product=');
       const links = [...extractInternalLinks(body), ...extractFrontmatterHrefs(frontmatter)];
       expect(new Set(links.filter((h) => h.startsWith('/targets/') && h !== `/targets/${slug}/`)).size).toBeGreaterThanOrEqual(4);
-      expect(links.some((h) => h.startsWith('/guides/'))).toBe(true);
+      expect(links.some((h) => h.startsWith('/calibacademy/'))).toBe(true);
     });
 
     it(`${slug}: gives no tolerance or accuracy figure that has not been confirmed`, () => {
@@ -220,7 +220,7 @@ describe('long-form batch 4: image-quality and metrology targets (principle and 
       expect(body).not.toMatch(/±\s?\d/);
       const links = [...extractInternalLinks(body), ...extractFrontmatterHrefs(frontmatter)];
       expect(new Set(links.filter((h) => h.startsWith('/targets/') && h !== `/targets/${slug}/`)).size).toBeGreaterThanOrEqual(4);
-      expect(links.some((h) => h.startsWith('/guides/'))).toBe(true);
+      expect(links.some((h) => h.startsWith('/calibacademy/'))).toBe(true);
     });
   }
 

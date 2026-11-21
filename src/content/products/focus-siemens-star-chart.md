@@ -21,8 +21,8 @@ relatedTargets:
   - { label: "Backlit target", href: "/targets/backlit-target/", note: "Patterns on a light source." }
   - { label: "ChArUco, ceramic", href: "/targets/charuco-ceramic/", note: "Geometric calibration for small fields." }
 relatedGuides:
-  - { label: "USAF 1951 lp/mm table", href: "/guides/usaf-1951-lp-mm-table/", note: "Reading resolution from line pairs." }
-  - { label: "Why your board is not detected", href: "/guides/corner-detection-troubleshooting/", note: "What blur does to detection." }
+  - { label: "USAF 1951 lp/mm table", href: "/calibacademy/usaf-1951-lp-mm-table/", note: "Reading resolution from line pairs." }
+  - { label: "Why your board is not detected", href: "/calibacademy/corner-detection-troubleshooting/", note: "What blur does to detection." }
 ---
 
 ## What a Siemens star shows

@@ -21,8 +21,8 @@ relatedTargets:
   - { label: "Reflectance panels", href: "/targets/reflectance-panel/", note: "Known reflectance at LiDAR wavelengths." }
   - { label: "Siemens star and focus chart", href: "/targets/focus-siemens-star-chart/", note: "Set focus first." }
 relatedGuides:
-  - { label: "Composite, ceramic or glass", href: "/guides/composite-ceramic-or-glass/", note: "Which substrate for which job." }
-  - { label: "Why your board is not detected", href: "/guides/corner-detection-troubleshooting/", note: "How exposure and contrast affect detection." }
+  - { label: "Composite, ceramic or glass", href: "/calibacademy/composite-ceramic-or-glass/", note: "Which substrate for which job." }
+  - { label: "Why your board is not detected", href: "/calibacademy/corner-detection-troubleshooting/", note: "How exposure and contrast affect detection." }
 ---
 
 ## What the steps measure

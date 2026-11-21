@@ -14,13 +14,13 @@ products:
   - "multi-camera-target"
   - "mounting-fixture"
 links:
-  - { label: "Camera calibration with OpenCV", href: "/guides/opencv-camera-calibration/" }
-  - { label: "Hand-eye calibration in OpenCV", href: "/guides/hand-eye-calibration-opencv/" }
-  - { label: "Kalibr camera–IMU calibration", href: "/guides/kalibr-camera-imu-calibration/" }
+  - { label: "Camera calibration with OpenCV", href: "/calibacademy/opencv-camera-calibration/" }
+  - { label: "Hand-eye calibration in OpenCV", href: "/calibacademy/hand-eye-calibration-opencv/" }
+  - { label: "Kalibr camera–IMU calibration", href: "/calibacademy/kalibr-camera-imu-calibration/" }
   - { label: "ArUco marker generator", href: "/tools/generator/aruco/" }
   - { label: "AprilTag generator", href: "/tools/generator/apriltag/" }
-  - { label: "Multiple boards in one rig", href: "/guides/multi-board-marker-ids/" }
-  - { label: "Board not detected? Troubleshooting", href: "/guides/corner-detection-troubleshooting/" }
+  - { label: "Multiple boards in one rig", href: "/calibacademy/multi-board-marker-ids/" }
+  - { label: "Board not detected? Troubleshooting", href: "/calibacademy/corner-detection-troubleshooting/" }
 selection:
   - { scenario: "Hand-eye, camera on the arm", pattern: "ChArUco, fixed in the cell", size: "200 × 150 to 400 × 300 mm", material: "Ceramic or composite" }
   - { scenario: "Hand-eye, board on the flange", pattern: "ChArUco with flange adapter", size: "200 × 150 to 300 × 200 mm", material: "Ceramic (light, stable)" }

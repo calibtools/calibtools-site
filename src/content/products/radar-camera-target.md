@@ -21,9 +21,9 @@ relatedTargets:
   - { label: "Thermal calibration target", href: "/targets/thermal-calibration-target/", note: "When the sensor set includes a thermal camera." }
   - { label: "¼″ mounting fixture", href: "/targets/mounting-fixture/", note: "Holds a board on a tripod." }
 relatedGuides:
-  - { label: "LiDAR-camera calibration", href: "/guides/lidar-camera-calibration/", note: "The same idea for another sensor pair." }
-  - { label: "OpenCV camera calibration", href: "/guides/opencv-camera-calibration/", note: "Intrinsics first." }
-  - { label: "Multi-board marker IDs", href: "/guides/multi-board-marker-ids/", note: "Several targets in one scene." }
+  - { label: "LiDAR-camera calibration", href: "/calibacademy/lidar-camera-calibration/", note: "The same idea for another sensor pair." }
+  - { label: "OpenCV camera calibration", href: "/calibacademy/opencv-camera-calibration/", note: "Intrinsics first." }
+  - { label: "Multi-board marker IDs", href: "/calibacademy/multi-board-marker-ids/", note: "Several targets in one scene." }
 ---
 
 ## What a radar sees

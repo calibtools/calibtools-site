@@ -5,7 +5,7 @@ const pages = [
   { name: 'product-charuco-composite', url: '/targets/charuco-composite/' },
   { name: 'generator', url: '/tools/generator/' },
   { name: 'cart', url: '/cart/' },
-  { name: 'guides-index', url: '/guides/' },
+  { name: 'guides-index', url: '/calibacademy/' },
 ];
 
 const viewports = [

@@ -22,8 +22,8 @@ relatedTargets:
   - { label: "Siemens star and focus chart", href: "/targets/focus-siemens-star-chart/", note: "Set focus before you measure color." }
   - { label: "Reflectance panels", href: "/targets/reflectance-panel/", note: "Known reflectance in the infrared." }
 relatedGuides:
-  - { label: "OpenCV camera calibration", href: "/guides/opencv-camera-calibration/", note: "Geometry, the other half of calibration." }
-  - { label: "Composite, ceramic or glass", href: "/guides/composite-ceramic-or-glass/", note: "Which substrate for which job." }
+  - { label: "OpenCV camera calibration", href: "/calibacademy/opencv-camera-calibration/", note: "Geometry, the other half of calibration." }
+  - { label: "Composite, ceramic or glass", href: "/calibacademy/composite-ceramic-or-glass/", note: "Which substrate for which job." }
 ---
 
 ## What a color chart is for

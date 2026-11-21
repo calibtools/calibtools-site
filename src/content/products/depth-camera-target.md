@@ -22,10 +22,10 @@ relatedTargets:
   - { label: "Reflectance panels", href: "/targets/reflectance-panel/", note: "Known reflectance to test range against brightness." }
   - { label: "Hand-eye calibration kit", href: "/targets/hand-eye-calibration-kit/", note: "When the depth camera rides on a robot." }
 relatedGuides:
-  - { label: "OpenCV camera calibration", href: "/guides/opencv-camera-calibration/", note: "From images to a camera matrix." }
-  - { label: "Composite, ceramic or glass", href: "/guides/composite-ceramic-or-glass/", note: "Which substrate for which accuracy." }
-  - { label: "What reprojection error tells you", href: "/guides/reprojection-error/", note: "And what a low value can hide." }
-  - { label: "ToF depth camera calibration", href: "/guides/tof-depth-camera-calibration/", note: "Intrinsics from the amplitude image and a flat-board depth check." }
+  - { label: "OpenCV camera calibration", href: "/calibacademy/opencv-camera-calibration/", note: "From images to a camera matrix." }
+  - { label: "Composite, ceramic or glass", href: "/calibacademy/composite-ceramic-or-glass/", note: "Which substrate for which accuracy." }
+  - { label: "What reprojection error tells you", href: "/calibacademy/reprojection-error/", note: "And what a low value can hide." }
+  - { label: "ToF depth camera calibration", href: "/calibacademy/tof-depth-camera-calibration/", note: "Intrinsics from the amplitude image and a flat-board depth check." }
 ---
 
 ## Two different questions

@@ -12,7 +12,7 @@ products:
   - "aprilgrid-composite"
   - "charuco-ceramic"
 links:
-  - { label: "Camera calibration with OpenCV", href: "/guides/opencv-camera-calibration/" }
+  - { label: "Camera calibration with OpenCV", href: "/calibacademy/opencv-camera-calibration/" }
   - { label: "Pattern generator", href: "/tools/generator/" }
   - { label: "FOV calculator", href: "/tools/fov/" }
   - { label: "Detection check", href: "/tools/check/" }
@@ -29,7 +29,7 @@ faq:
 
 ## Where to start
 
-Generate a pattern with the free [pattern generator](/tools/generator/), print it at 100 %, glue it to something flat and follow the [OpenCV calibration guide](/guides/opencv-camera-calibration/). That is enough to learn the method and get a working calibration.
+Generate a pattern with the free [pattern generator](/tools/generator/), print it at 100 %, glue it to something flat and follow the [OpenCV calibration guide](/calibacademy/opencv-camera-calibration/). That is enough to learn the method and get a working calibration.
 
 ## When to move to a rigid board
 

@@ -13,8 +13,8 @@ products:
   - "multi-camera-target"
   - "nir-calibration-target"
 links:
-  - { label: "Camera calibration with OpenCV", href: "/guides/opencv-camera-calibration/" }
-  - { label: "ToF depth camera calibration", href: "/guides/tof-depth-camera-calibration/" }
+  - { label: "Camera calibration with OpenCV", href: "/calibacademy/opencv-camera-calibration/" }
+  - { label: "ToF depth camera calibration", href: "/calibacademy/tof-depth-camera-calibration/" }
   - { label: "FOV calculator", href: "/tools/fov/" }
   - { label: "ChArUco generator", href: "/tools/generator/charuco/" }
 selection:

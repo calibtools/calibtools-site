@@ -37,4 +37,4 @@ Load the 15 images into `cv2.calibrateCamera` with the matching board config fro
 
 ## Related guides
 
-- [ChArUco vs checkerboard vs AprilGrid](/guides/charuco-vs-checkerboard-vs-aprilgrid/) — choose your pattern before capturing
+- [ChArUco vs checkerboard vs AprilGrid](/calibacademy/charuco-vs-checkerboard-vs-aprilgrid/) — choose your pattern before capturing

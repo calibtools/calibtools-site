@@ -43,7 +43,7 @@ With `K` and the distortion coefficients you can undistort images, measure in mi
 
 For most OpenCV work, use a **ChArUco** board. The ArUco markers tell the detector which corner is which, so a view still counts when part of the board is outside the image. That lets you put corners right at the image edge, where distortion is strongest.
 
-A plain **checkerboard** gives the same corner accuracy but needs every inner corner visible in every view. For camera–IMU calibration with Kalibr, use an **AprilGrid**. The [pattern comparison](/guides/charuco-vs-checkerboard-vs-aprilgrid/) covers the trade-offs.
+A plain **checkerboard** gives the same corner accuracy but needs every inner corner visible in every view. For camera–IMU calibration with Kalibr, use an **AprilGrid**. The [pattern comparison](/calibacademy/charuco-vs-checkerboard-vs-aprilgrid/) covers the trade-offs.
 
 ## 2. Size the board
 
@@ -184,28 +184,28 @@ A calibration that runs without an error can still be wrong. Work through these 
 
 2. **Sharpness.** Open the images at 100 %. Motion blur and glare move the detected corners; drop those views.
 
-3. **The board.** Measure one printed square and compare it with the size in your code. Lay a straightedge across the board: in [our test with a printed board](/guides/printed-target-costs-half-a-pixel/) a bow of 1 mm made the focal length 2.2 % short.
+3. **The board.** Measure one printed square and compare it with the size in your code. Lay a straightedge across the board: in [our test with a printed board](/calibacademy/printed-target-costs-half-a-pixel/) a bow of 1 mm made the focal length 2.2 % short.
 
 4. **Per-view error.** Compute the reprojection error of each view. One view at three times the others is a bad view; remove it and calibrate again.
 
 5. **The model.** Stay with the five standard distortion coefficients unless the error grows toward the image edge with good coverage. More terms fit the same corners and extrapolate worse.
 
-The [reprojection error guide](/guides/reprojection-error/) shows how to do checks 4 and 5, and what a low RMS can hide.
+The [reprojection error guide](/calibacademy/reprojection-error/) shows how to do checks 4 and 5, and what a low RMS can hide.
 
 ## Common problems
 
 | Symptom | Likely cause | Fix |
 |---|---|---|
 | No corners found | Wrong board size, or columns and rows swapped | Board size is (columns, rows) in squares for ChArUco, inner corners for a checkerboard |
-| ChArUco markers found but no corners | Board made with the pre-4.6 layout | Call `board.setLegacyPattern(True)`; see the [detection troubleshooting guide](/guides/corner-detection-troubleshooting/) |
+| ChArUco markers found but no corners | Board made with the pre-4.6 layout | Call `board.setLegacyPattern(True)`; see the [detection troubleshooting guide](/calibacademy/corner-detection-troubleshooting/) |
 | RMS above 1 px | Blur, glare, bent target, few corner views | Re-shoot sharper views that cover the image corners |
 | Good RMS, wrong distances | Square size mis-entered or printer scaling | Measure the printed square and use that value |
 | Calibration drifts between sessions | Focus or zoom moved | Lock the lens, recalibrate after any change |
 
 ## Next steps
 
-- [Pick the right pattern](/guides/charuco-vs-checkerboard-vs-aprilgrid/) for stereo, multi-camera or camera–IMU work.
+- [Pick the right pattern](/calibacademy/charuco-vs-checkerboard-vs-aprilgrid/) for stereo, multi-camera or camera–IMU work.
 
-- [Run several boards in one rig](/guides/multi-board-marker-ids/) without marker ID clashes.
+- [Run several boards in one rig](/calibacademy/multi-board-marker-ids/) without marker ID clashes.
 
 - Check your images with the [detection check](/tools/check/) and [quality analyzer](/tools/quality/) before calibrating.

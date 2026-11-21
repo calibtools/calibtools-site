@@ -103,4 +103,4 @@ At the sensor that is 32.0 ÷ 0.5 = 64 lp/mm, well under the 145 lp/mm Nyquist l
 
 A USAF reading is quick but depends on the person looking at it and on contrast.
 
-For a measured MTF or SFR curve across the field, use a slanted-edge chart such as our [ISO 12233 resolution chart](/targets/resolution-chart/). For geometric calibration, see [camera calibration with OpenCV](/guides/opencv-camera-calibration/).
+For a measured MTF or SFR curve across the field, use a slanted-edge chart such as our [ISO 12233 resolution chart](/targets/resolution-chart/). For geometric calibration, see [camera calibration with OpenCV](/calibacademy/opencv-camera-calibration/).

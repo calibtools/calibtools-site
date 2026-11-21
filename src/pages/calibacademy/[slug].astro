@@ -56,7 +56,7 @@ const articleLd = {
   dateModified: d.updated.toISOString(),
   author: { '@type': 'Organization', name: 'Calib.Tools', url: `${siteUrl}/about/` },
   publisher: { '@type': 'Organization', name: 'Calib.Tools', url: siteUrl },
-  mainEntityOfPage: `${siteUrl}/guides/${entry.slug}/`,
+  mainEntityOfPage: `${siteUrl}/calibacademy/${entry.slug}/`,
 };
 
 // JSON-LD: Breadcrumb
@@ -65,7 +65,7 @@ const breadcrumbLd = {
   '@type': 'BreadcrumbList',
   itemListElement: [
     { '@type': 'ListItem', position: 1, name: 'Home', item: siteUrl },
-    { '@type': 'ListItem', position: 2, name: ACADEMY_NAME, item: `${siteUrl}/guides/` },
+    { '@type': 'ListItem', position: 2, name: ACADEMY_NAME, item: `${siteUrl}/calibacademy/` },
     { '@type': 'ListItem', position: 3, name: d.title },
   ],
 };
@@ -90,7 +90,7 @@ const jsonLdItems = [articleLd, breadcrumbLd, ...(faqLd ? [faqLd] : [])];
     <article class="prose-calib flex min-w-0 flex-1 basis-[560px] max-w-[720px] flex-col gap-5">
       {/* Breadcrumb */}
       <div class="flex gap-2 text-sm text-ink-soft">
-        <a href="/guides/" class="text-ink-soft no-underline min-h-[44px] md:min-h-[24px] flex items-center">{ACADEMY_NAME}</a><span class="flex items-center">/</span><span class="flex items-center">Article</span>
+        <a href="/calibacademy/" class="text-ink-soft no-underline min-h-[44px] md:min-h-[24px] flex items-center">{ACADEMY_NAME}</a><span class="flex items-center">/</span><span class="flex items-center">Article</span>
       </div>
 
       {/* Eyebrow */}
@@ -156,7 +156,7 @@ const jsonLdItems = [articleLd, breadcrumbLd, ...(faqLd ? [faqLd] : [])];
         <div class="flex flex-col gap-3 border-t border-line pt-6">
           <span class="text-[13px] font-bold uppercase tracking-[0.06em] text-ink-soft">Related guides</span>
           {related.map((r) => r && (
-            <a href={`/guides/${r.slug}/`} class="flex justify-between gap-4 text-[15px] text-ink no-underline hover:text-brand">
+            <a href={`/calibacademy/${r.slug}/`} class="flex justify-between gap-4 text-[15px] text-ink no-underline hover:text-brand">
               <span>{r.data.title}</span>
               <ArrowRight size={16} stroke-width={1.6} class="shrink-0 text-ink-soft" aria-hidden="true" />
             </a>
@@ -207,7 +207,7 @@ const jsonLdItems = [articleLd, breadcrumbLd, ...(faqLd ? [faqLd] : [])];
       {related.length > 0 && (
         <div class="flex flex-col gap-2.5 border-t border-line pt-5">
           <span class="text-[13px] font-bold uppercase tracking-[0.06em] text-ink-soft">Related</span>
-          {related.map((r) => r && <a href={`/guides/${r.slug}/`} class="text-[15px] text-ink no-underline min-h-[24px] flex items-center">{r.data.title}</a>)}
+          {related.map((r) => r && <a href={`/calibacademy/${r.slug}/`} class="text-[15px] text-ink no-underline min-h-[24px] flex items-center">{r.data.title}</a>)}
         </div>
       )}
       <div class="flex flex-col gap-2.5 rounded-lg bg-ink p-5 text-white">

@@ -29,10 +29,10 @@ describe('www → apex redirect', () => {
   });
 
   it('preserves path and query on redirect', () => {
-    const result = handleRequest('https://www.calib.tools/guides/multi-board-marker-ids/?foo=bar#section');
+    const result = handleRequest('https://www.calib.tools/calibacademy/multi-board-marker-ids/?foo=bar#section');
     expect(result).not.toBe('next');
     if (result === 'next') throw new Error('unreachable');
     expect(result.status).toBe(301);
-    expect(result.location).toBe('https://calib.tools/guides/multi-board-marker-ids/?foo=bar#section');
+    expect(result.location).toBe('https://calib.tools/calibacademy/multi-board-marker-ids/?foo=bar#section');
   });
 });

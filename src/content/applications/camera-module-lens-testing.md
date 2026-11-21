@@ -16,7 +16,7 @@ products:
   - "focus-siemens-star-chart"
   - "resolution-targets-glass"
 links:
-  - { label: "USAF 1951 lp/mm table", href: "/guides/usaf-1951-lp-mm-table/" }
+  - { label: "USAF 1951 lp/mm table", href: "/calibacademy/usaf-1951-lp-mm-table/" }
   - { label: "FOV calculator", href: "/tools/fov/" }
   - { label: "Quality analyzer", href: "/tools/quality/" }
 selection:

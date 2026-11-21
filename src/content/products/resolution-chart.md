@@ -21,8 +21,8 @@ relatedTargets:
   - { label: "24-patch color chart", href: "/targets/color-chart/", note: "Color reference for ISP tuning." }
   - { label: "Backlit target", href: "/targets/backlit-target/", note: "Transmissive patterns on a light source." }
 relatedGuides:
-  - { label: "USAF 1951 lp/mm table", href: "/guides/usaf-1951-lp-mm-table/", note: "Reading resolution from line pairs." }
-  - { label: "Composite, ceramic or glass", href: "/guides/composite-ceramic-or-glass/", note: "Which substrate for which job." }
+  - { label: "USAF 1951 lp/mm table", href: "/calibacademy/usaf-1951-lp-mm-table/", note: "Reading resolution from line pairs." }
+  - { label: "Composite, ceramic or glass", href: "/calibacademy/composite-ceramic-or-glass/", note: "Which substrate for which job." }
 facts:
   - { label: "Standard", value: "ISO 12233, including eSFR layouts" }
   - { label: "Measures", value: "MTF and SFR from slanted edges" }

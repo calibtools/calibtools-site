@@ -41,5 +41,5 @@ You have a Kalibr checkerboard YAML from an existing setup and need the same boa
 
 ## Related guides
 
-- [ChArUco vs checkerboard vs AprilGrid](/guides/charuco-vs-checkerboard-vs-aprilgrid/) — choosing the right pattern before converting
+- [ChArUco vs checkerboard vs AprilGrid](/calibacademy/charuco-vs-checkerboard-vs-aprilgrid/) — choosing the right pattern before converting
 

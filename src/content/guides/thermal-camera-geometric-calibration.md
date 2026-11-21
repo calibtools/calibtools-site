@@ -162,7 +162,7 @@ With these settings the grid was found at 5 gray levels of contrast in 29 of 30 
 
 ## 5. Calibrate
 
-`calibrateCamera` runs exactly as for a visible camera; the [OpenCV calibration guide](/guides/opencv-camera-calibration/) has the full pipeline. What changes is which numbers you can trust:
+`calibrateCamera` runs exactly as for a visible camera; the [OpenCV calibration guide](/calibacademy/opencv-camera-calibration/) has the full pipeline. What changes is which numbers you can trust:
 
 | Pattern and detector | Conditions | RMS | Focal length error |
 |---|---|---|---|
@@ -258,13 +258,13 @@ Before you accept the calibration:
 
 ## Next steps
 
-- [Camera calibration with OpenCV](/guides/opencv-camera-calibration/) — the full pipeline that sections 4 and 5 plug into.
+- [Camera calibration with OpenCV](/calibacademy/opencv-camera-calibration/) — the full pipeline that sections 4 and 5 plug into.
 
-- [Why your calibration board is not detected](/guides/corner-detection-troubleshooting/) — the resolution, blur and tilt limits for the same detectors on a visible camera.
+- [Why your calibration board is not detected](/calibacademy/corner-detection-troubleshooting/) — the resolution, blur and tilt limits for the same detectors on a visible camera.
 
-- [How big should your target be?](/guides/calibration-target-size/) — size the board for a 640 × 512 or 320 × 256 core; plan for 20 px per square or more.
+- [How big should your target be?](/calibacademy/calibration-target-size/) — size the board for a 640 × 512 or 320 × 256 core; plan for 20 px per square or more.
 
-- [What reprojection error tells you](/guides/reprojection-error/) — why a 0.09 px RMS with a 0.7 % focal length error is possible.
+- [What reprojection error tells you](/calibacademy/reprojection-error/) — why a 0.09 px RMS with a 0.7 % focal length error is possible.
 
 - Our [heated thermal target](/targets/thermal-calibration-target/) is built to your pattern and size; tell us the core, lens and working distance and we lay out the squares or dots for it.
 

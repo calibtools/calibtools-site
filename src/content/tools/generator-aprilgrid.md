@@ -53,7 +53,7 @@ tagSize: 0.02
 tagSpacing: 0.3
 ```
 
-Tag 0 is at the bottom left and the tags are drawn as Kalibr draws them, so the detected corner order matches. The [Kalibr camera–IMU guide](/guides/kalibr-camera-imu-calibration/) walks through the whole calibration.
+Tag 0 is at the bottom left and the tags are drawn as Kalibr draws them, so the detected corner order matches. The [Kalibr camera–IMU guide](/calibacademy/kalibr-camera-imu-calibration/) walks through the whole calibration.
 
 ## Free for commercial use
 
@@ -65,6 +65,6 @@ Camera–IMU calibration means moving the camera or the target quickly, and a sh
 
 ## Related guides
 
-- [ChArUco vs checkerboard vs AprilGrid](/guides/charuco-vs-checkerboard-vs-aprilgrid/) — when to choose AprilGrid
-- [Kalibr camera–IMU calibration](/guides/kalibr-camera-imu-calibration/) — from recording to result
+- [ChArUco vs checkerboard vs AprilGrid](/calibacademy/charuco-vs-checkerboard-vs-aprilgrid/) — when to choose AprilGrid
+- [Kalibr camera–IMU calibration](/calibacademy/kalibr-camera-imu-calibration/) — from recording to result
 - Single tags for localization? Use the [AprilTag generator](/tools/generator/apriltag/).

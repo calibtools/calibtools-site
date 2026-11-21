@@ -12,8 +12,8 @@ products:
   - "depth-camera-target"
   - "backlit-target"
 links:
-  - { label: "Thermal camera geometric calibration", href: "/guides/thermal-camera-geometric-calibration/" }
-  - { label: "Camera calibration with OpenCV", href: "/guides/opencv-camera-calibration/" }
+  - { label: "Thermal camera geometric calibration", href: "/calibacademy/thermal-camera-geometric-calibration/" }
+  - { label: "Camera calibration with OpenCV", href: "/calibacademy/opencv-camera-calibration/" }
   - { label: "FOV calculator", href: "/tools/fov/" }
   - { label: "Pattern generator", href: "/tools/generator/" }
 selection:

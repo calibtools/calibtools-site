@@ -21,9 +21,9 @@ relatedTargets:
   - { label: "LiDAR-camera target", href: "/targets/lidar-camera-target/", note: "When the rig also carries a LiDAR." }
   - { label: "¼″ mounting fixture", href: "/targets/mounting-fixture/", note: "Holds single boards on tripods around the rig." }
 relatedGuides:
-  - { label: "Multi-board marker IDs", href: "/guides/multi-board-marker-ids/", note: "How to give each board its own ID range." }
-  - { label: "ChArUco vs checkerboard vs AprilGrid", href: "/guides/charuco-vs-checkerboard-vs-aprilgrid/", note: "Which pattern for which job." }
-  - { label: "OpenCV camera calibration", href: "/guides/opencv-camera-calibration/", note: "Intrinsics first, then extrinsics." }
+  - { label: "Multi-board marker IDs", href: "/calibacademy/multi-board-marker-ids/", note: "How to give each board its own ID range." }
+  - { label: "ChArUco vs checkerboard vs AprilGrid", href: "/calibacademy/charuco-vs-checkerboard-vs-aprilgrid/", note: "Which pattern for which job." }
+  - { label: "OpenCV camera calibration", href: "/calibacademy/opencv-camera-calibration/", note: "Intrinsics first, then extrinsics." }
 ---
 
 ## The problem with one flat board
@@ -46,7 +46,7 @@ Because the faces are fixed to each other, all cameras measure one rigid body. E
 
 The standard builds have 3 or 5 faces, each 300 mm across. Three faces suit cameras on one side of the scene; five faces suit cameras that stand all the way round it.
 
-The ID ranges follow the rule in the [multi-board guide](/guides/multi-board-marker-ids/): each face starts where the previous one ends, so no ID appears twice anywhere on the target.
+The ID ranges follow the rule in the [multi-board guide](/calibacademy/multi-board-marker-ids/): each face starts where the previous one ends, so no ID appears twice anywhere on the target.
 
 These are target values. The target is made to order; we set the number of faces, their size and their angles for your rig and confirm them with you before production.
 

@@ -22,9 +22,9 @@ relatedTargets:
   - { label: "Depth and ToF targets", href: "/targets/depth-camera-target/", note: "Step blocks to check reported distances." }
   - { label: "¼″ mounting fixture", href: "/targets/mounting-fixture/", note: "Holds smaller boards on a tripod." }
 relatedGuides:
-  - { label: "LiDAR-camera calibration", href: "/guides/lidar-camera-calibration/", note: "The method, step by step." }
-  - { label: "OpenCV camera calibration", href: "/guides/opencv-camera-calibration/", note: "Intrinsics first." }
-  - { label: "How big should your target be?", href: "/guides/calibration-target-size/", note: "Size against field of view." }
+  - { label: "LiDAR-camera calibration", href: "/calibacademy/lidar-camera-calibration/", note: "The method, step by step." }
+  - { label: "OpenCV camera calibration", href: "/calibacademy/opencv-camera-calibration/", note: "Intrinsics first." }
+  - { label: "How big should your target be?", href: "/calibacademy/calibration-target-size/", note: "Size against field of view." }
 facts:
   - { label: "Camera features", value: "ArUco markers" }
   - { label: "LiDAR features", value: "Circular holes through the panel, found as depth edges" }
@@ -65,7 +65,7 @@ The panel is aluminum honeycomb because a large panel has to stay flat and still
 - Capture the panel at several positions and angles across the shared field, not only in the center.
 - Calibrate the camera intrinsics first, with a [ChArUco board](/targets/charuco-composite/), and keep them fixed.
 
-The [LiDAR-camera guide](/guides/lidar-camera-calibration/) goes through the method and how to check the result.
+The [LiDAR-camera guide](/calibacademy/lidar-camera-calibration/) goes through the method and how to check the result.
 
 ## What you receive
 

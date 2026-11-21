@@ -87,6 +87,6 @@ For repeatable sub-pixel results a rigid, measured board is worth it. See the [C
 
 ## Related guides
 
-- [ChArUco vs checkerboard vs AprilGrid](/guides/charuco-vs-checkerboard-vs-aprilgrid/) — when to use each pattern
+- [ChArUco vs checkerboard vs AprilGrid](/calibacademy/charuco-vs-checkerboard-vs-aprilgrid/) — when to use each pattern
 
-- [Multiple boards in one rig](/guides/multi-board-marker-ids/) — keeping marker IDs distinct
+- [Multiple boards in one rig](/calibacademy/multi-board-marker-ids/) — keeping marker IDs distinct

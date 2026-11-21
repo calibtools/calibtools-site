@@ -43,7 +43,7 @@ For every robot pose you record two transforms:
 
 - **Target pose** `T_target2cam` — where the board is as seen by the camera, from `solvePnP` on the detected corners.
 
-The camera must be calibrated first (intrinsics and distortion). Follow the [camera calibration guide](/guides/opencv-camera-calibration/) with the lens locked at its production focus; a poor intrinsic calibration shows up directly as hand-eye error.
+The camera must be calibrated first (intrinsics and distortion). Follow the [camera calibration guide](/calibacademy/opencv-camera-calibration/) with the lens locked at its production focus; a poor intrinsic calibration shows up directly as hand-eye error.
 
 ## 1. Choose and mount the target
 
@@ -232,8 +232,8 @@ HALCON users have the same workflow in `calibrate_hand_eye` with a point-based c
 
 ## Next steps
 
-- [Calibrate the camera](/guides/opencv-camera-calibration/) before the hand-eye run, and keep the two calibrations together.
+- [Calibrate the camera](/calibacademy/opencv-camera-calibration/) before the hand-eye run, and keep the two calibrations together.
 
-- [Choose a pattern](/guides/charuco-vs-checkerboard-vs-aprilgrid/) if the cell also needs stereo or camera–IMU calibration.
+- [Choose a pattern](/calibacademy/charuco-vs-checkerboard-vs-aprilgrid/) if the cell also needs stereo or camera–IMU calibration.
 
-- For a cell with several cameras, [give each board its own marker IDs](/guides/multi-board-marker-ids/).
+- For a cell with several cameras, [give each board its own marker IDs](/calibacademy/multi-board-marker-ids/).

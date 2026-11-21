@@ -15,7 +15,7 @@ const DIST = resolve(ROOT, 'dist');
 export function sourceFilesForPath(urlPath) {
   const p = urlPath.replace(/\/$/, '') || '/index';
   let m;
-  if ((m = p.match(/^\/guides\/(.+)$/))) return [`src/content/guides/${m[1]}.md`];
+  if ((m = p.match(/^\/calibacademy\/(.+)$/))) return [`src/content/guides/${m[1]}.md`];
   if (p === '/applications') return ['src/pages/applications/index.astro'];
   if ((m = p.match(/^\/applications\/([^/]+)$/))) return ['src/pages/applications/[slug].astro', `src/content/applications/${m[1]}.md`];
   if ((m = p.match(/^\/targets\/collection\/(.+)$/))) return ['src/pages/targets/collection/[collection].astro', `src/content/collections/${m[1]}.md`];
@@ -23,7 +23,7 @@ export function sourceFilesForPath(urlPath) {
   if ((m = p.match(/^\/tools\/generator\/([^/]+)$/))) return [`src/pages/tools/generator/${m[1]}.astro`, `src/content/tools/generator-${m[1]}.md`];
   if ((m = p.match(/^\/tools\/([^/]+)$/))) return [`src/pages/tools/${m[1]}.astro`, `src/content/tools/${m[1]}.md`];
   if (p === '/index') return ['src/pages/index.astro'];
-  if (['/targets', '/tools', '/guides', '/files'].includes(p)) return [`src/pages${p}/index.astro`];
+  if (['/targets', '/tools', '/calibacademy', '/files'].includes(p)) return [`src/pages${p}/index.astro`];
   return [`src/pages${p}.astro`];
 }
 

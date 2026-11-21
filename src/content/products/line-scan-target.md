@@ -21,10 +21,10 @@ relatedTargets:
   - { label: "ChArUco, ceramic", href: "/targets/charuco-ceramic/", note: "Lithographed plate for small fields of view." }
   - { label: "HALCON plate, aluminum", href: "/targets/halcon-composite/", note: "For area cameras on the same line." }
 relatedGuides:
-  - { label: "Line-scan camera calibration", href: "/guides/line-scan-camera-calibration/", note: "Strip for the line axis, scanned board for mm per line and skew." }
-  - { label: "Composite, ceramic or glass", href: "/guides/composite-ceramic-or-glass/", note: "Compare the tolerance with one pixel on the target." }
-  - { label: "USAF 1951 lp/mm table", href: "/guides/usaf-1951-lp-mm-table/", note: "Reading resolution from line pairs." }
-  - { label: "How big should your target be?", href: "/guides/calibration-target-size/", note: "Size against field of view." }
+  - { label: "Line-scan camera calibration", href: "/calibacademy/line-scan-camera-calibration/", note: "Strip for the line axis, scanned board for mm per line and skew." }
+  - { label: "Composite, ceramic or glass", href: "/calibacademy/composite-ceramic-or-glass/", note: "Compare the tolerance with one pixel on the target." }
+  - { label: "USAF 1951 lp/mm table", href: "/calibacademy/usaf-1951-lp-mm-table/", note: "Reading resolution from line pairs." }
+  - { label: "How big should your target be?", href: "/calibacademy/calibration-target-size/", note: "Size against field of view." }
 ---
 
 ## What is different about a line-scan camera
@@ -51,7 +51,7 @@ A line-scan system often resolves a few hundredths of a millimeter per pixel ove
 
 Lithographed chrome on glass has sharp edges and holds its dimensions with temperature far better than a printed board. It also works in transmission, on a back light, which is how many web and glass inspection lines are lit.
 
-The [substrate guide](/guides/composite-ceramic-or-glass/) compares the options with numbers.
+The [substrate guide](/calibacademy/composite-ceramic-or-glass/) compares the options with numbers.
 
 ## Choosing length and pitch
 

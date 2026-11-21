@@ -21,8 +21,8 @@ relatedTargets:
   - { label: "ISO 12233 chart", href: "/targets/resolution-chart/", note: "Response curves for whole cameras." }
   - { label: "ChArUco, ceramic", href: "/targets/charuco-ceramic/", note: "Geometric calibration for small fields." }
 relatedGuides:
-  - { label: "USAF 1951 lp/mm table", href: "/guides/usaf-1951-lp-mm-table/", note: "Every group and element in lp/mm and µm." }
-  - { label: "Composite, ceramic or glass", href: "/guides/composite-ceramic-or-glass/", note: "Why small fields need glass." }
+  - { label: "USAF 1951 lp/mm table", href: "/calibacademy/usaf-1951-lp-mm-table/", note: "Every group and element in lp/mm and µm." }
+  - { label: "Composite, ceramic or glass", href: "/calibacademy/composite-ceramic-or-glass/", note: "Why small fields need glass." }
 ---
 
 ## What these targets are for
@@ -37,7 +37,7 @@ This family covers the common patterns. They answer three questions: how fine a 
 
 The USAF 1951 pattern is a set of bar triplets, horizontal and vertical, that get smaller step by step. They are arranged in groups, and each group has six elements.
 
-Find the smallest element in which you can still count three separate bars in both directions. Its group and element numbers give the resolution in line pairs per millimeter. The [USAF 1951 table](/guides/usaf-1951-lp-mm-table/) lists every value and the bar width that goes with it.
+Find the smallest element in which you can still count three separate bars in both directions. Its group and element numbers give the resolution in line pairs per millimeter. The [USAF 1951 table](/calibacademy/usaf-1951-lp-mm-table/) lists every value and the bar width that goes with it.
 
 It is a visual test, quick to do and understood everywhere. For a full response curve, use slanted edges as on the [ISO 12233 chart](/targets/resolution-chart/).
 

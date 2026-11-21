@@ -58,5 +58,5 @@ A printed sheet is fine for a first test. Paper stretches with humidity and does
 
 ## Related guides
 
-- [ChArUco vs checkerboard vs AprilGrid](/guides/charuco-vs-checkerboard-vs-aprilgrid/) — which pattern for which job
+- [ChArUco vs checkerboard vs AprilGrid](/calibacademy/charuco-vs-checkerboard-vs-aprilgrid/) — which pattern for which job
 - [Composite board datasheet](/files/datasheets/CT-DS-CHA-P.pdf) — feature tolerance and flatness of the board

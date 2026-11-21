@@ -15,7 +15,7 @@ const page = `<html><head><title>ChArUco board · Calib.Tools</title><script typ
   <table><tbody><tr><td>Size</td><td>Squares</td><td>Corners</td></tr><tr><td>200 × 150</td><td>5 × 7</td><td>24</td></tr></tbody></table>
   <header><p>Every corner carries a marker ID.</p></header>
   <pre><code># (cols, rows) in meters</code></pre>
-  <p>Rigid board for <a href="/guides/charuco-vs-checkerboard-vs-aprilgrid/">ChArUco</a> calibration.</p>
+  <p>Rigid board for <a href="/calibacademy/charuco-vs-checkerboard-vs-aprilgrid/">ChArUco</a> calibration.</p>
   <script>console.log('x')</script><style>.a{}</style>
   <${SVG} viewBox="0 0 1 1"><path d="M0 0"/></${SVG}>
   <button type="button">Add to cart</button>
@@ -37,7 +37,7 @@ describe('Markdown versions of pages', () => {
     expect(md.startsWith('# ChArUco board, aluminum\n')).toBe(true);
     expect(md).toContain('Source: https://calib.tools/targets/charuco-composite/');
     expect(md).toContain('Last updated: 2026-11-18');
-    expect(md).toContain('[ChArUco](https://calib.tools/guides/charuco-vs-checkerboard-vs-aprilgrid/)');
+    expect(md).toContain('[ChArUco](https://calib.tools/calibacademy/charuco-vs-checkerboard-vs-aprilgrid/)');
     expect(md).toContain('| Size | Tolerance |');
     expect(md).toContain('| 400 × 300 mm | ±0.3 mm |');
     expect(md).not.toMatch(/Add to cart|console\.log|Home\]|© Calib/);
@@ -74,8 +74,8 @@ describe('Markdown versions of pages', () => {
     expect(wantsMarkdown(req('text/markdown', '/api/geo'))).toBe(false);
   });
   it('adds one alternate link to the Markdown version in the head', () => {
-    const once = withAlternateLink('<html><head><title>x</title></head><body></body></html>', 'https://calib.tools/guides/a/');
-    expect(once).toContain('<link rel="alternate" type="text/markdown" href="https://calib.tools/guides/a/index.md"></head>');
-    expect(withAlternateLink(once, 'https://calib.tools/guides/a/')).toBe(once);
+    const once = withAlternateLink('<html><head><title>x</title></head><body></body></html>', 'https://calib.tools/calibacademy/a/');
+    expect(once).toContain('<link rel="alternate" type="text/markdown" href="https://calib.tools/calibacademy/a/index.md"></head>');
+    expect(withAlternateLink(once, 'https://calib.tools/calibacademy/a/')).toBe(once);
   });
 });

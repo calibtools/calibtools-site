@@ -95,7 +95,7 @@ The marker bits are the limit. ChArUco is complete down to about 2 px per bit an
 
 Relaxed detector parameters (`minMarkerPerimeterRate`, smaller adaptive-threshold windows, `perspectiveRemovePixelPerCell`) and 2× cubic upscaling recovered nothing at 12 px per square. Once the bits are gone, no setting brings them back.
 
-**Fix:** move closer, use a larger board, or use a dictionary with fewer bits (4×4 gives 6 cells across instead of 8). The [target size guide](/guides/calibration-target-size/) and the [FOV calculator](/tools/fov/) turn a required bit size into a board size.
+**Fix:** move closer, use a larger board, or use a dictionary with fewer bits (4×4 gives 6 cells across instead of 8). The [target size guide](/calibacademy/calibration-target-size/) and the [FOV calculator](/tools/fov/) turn a required bit size into a board size.
 
 ### Blur
 
@@ -268,7 +268,7 @@ Kalibr's AprilGrid uses the AprilTag 36h11 family, and the bit-size limits above
 
 Check the YAML against the print: `tagCols` and `tagRows` count tags, `tagSize` is the tag edge in meters, and `tagSpacing` is the gap between tags divided by the tag size. A grid from a different generator may also start at another tag ID, so compare the decoded IDs with what Kalibr expects.
 
-The [Kalibr guide](/guides/kalibr-camera-imu-calibration/) covers the file in detail.
+The [Kalibr guide](/calibacademy/kalibr-camera-imu-calibration/) covers the file in detail.
 
 For a quick OpenCV sanity check of an AprilGrid image, run the dictionary sweep above; `DICT_APRILTAG_36h11` should decode every visible tag.
 
@@ -297,10 +297,10 @@ The browser [detection check](/tools/check/) runs the same OpenCV detectors on a
 
 ## Next steps
 
-- [Camera calibration with OpenCV](/guides/opencv-camera-calibration/) — the full pipeline once every frame detects.
+- [Camera calibration with OpenCV](/calibacademy/opencv-camera-calibration/) — the full pipeline once every frame detects.
 
-- [How big should your target be?](/guides/calibration-target-size/) — turn the pixels-per-bit requirement into a board size.
+- [How big should your target be?](/calibacademy/calibration-target-size/) — turn the pixels-per-bit requirement into a board size.
 
-- [ChArUco vs checkerboard vs AprilGrid](/guides/charuco-vs-checkerboard-vs-aprilgrid/) — when the robustness trade-offs above should change your pattern.
+- [ChArUco vs checkerboard vs AprilGrid](/calibacademy/charuco-vs-checkerboard-vs-aprilgrid/) — when the robustness trade-offs above should change your pattern.
 
-- Several boards in one scene: [give each board its own marker IDs](/guides/multi-board-marker-ids/) so the detector cannot confuse them.
+- Several boards in one scene: [give each board its own marker IDs](/calibacademy/multi-board-marker-ids/) so the detector cannot confuse them.
