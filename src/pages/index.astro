@@ -131,14 +131,14 @@ const featuredReviews = allReviews
           </dl>
         </a>
       </div>
-      <ol class="m-0 flex list-none flex-col border-t border-line-strong p-0 lg:w-[58%]">
+      <ol class="m-0 grid list-none auto-rows-fr border-t border-line-strong p-0 lg:w-[58%]">
         {featuredTools.map((t, i) => (
           <li class:list={['border-b border-line-strong', i >= PHONE_TOOLS && 'hidden lg:block']}>
             {/* The glyph is the button (owner 2026-11-21): the whole row links, and the glyph box turns
-                ink-bordered on hover or focus. Every row is at least as tall as the 80 px glyph box and the text
-                is centered on it, so the glyphs sit at the same spacing down the list.
+                ink-bordered on hover or focus. Rows share one height (grid, auto-rows-fr: the tallest row sets it) and the
+                text is centered on the 80 px glyph box, so the glyphs sit at the same spacing down the list.
                 Glyphs: public/icons/tools/<key>.svg, one 30 × 24 live area. */}
-            <a href={t.href} class="group flex items-center gap-4 py-3 text-ink no-underline hover:text-ink md:gap-5">
+            <a href={t.href} class="group flex h-full items-center gap-4 py-3 text-ink no-underline hover:text-ink md:gap-5">
               <span class="flex h-16 w-16 shrink-0 items-center justify-center border border-line bg-sheet transition-colors group-hover:border-ink group-focus-visible:border-ink md:h-20 md:w-20">
                 <img src={`/icons/tools/${t.key}.svg`} alt="" width="64" height="64" class="block h-[52px] w-[52px] md:h-16 md:w-16" loading="lazy" decoding="async" />
               </span>
