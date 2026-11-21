@@ -38,6 +38,9 @@ export const MISSION =
  * mission paragraph on the About page and in the site footer.
  */
 export const MISSION_LINE = 'Built for the people who make machines see.';
+
+/** Shown beside the sign-in choices on /account/ (owner's pick, 2026-11-22). */
+export const ACCOUNT_LINE = 'Pick up your calibration work where you left it.';
 /**
  * Sign-off line (owner decision 2026-11-20): closes customer emails and order pages.
  * The Shopify notification templates carry the same sentence (docs/offers/README.md).
