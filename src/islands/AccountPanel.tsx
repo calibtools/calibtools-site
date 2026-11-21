@@ -2,6 +2,7 @@ import { patternViewPath } from '@/lib/patternLink';
 import { useEffect, useState, type ReactNode } from 'react';
 import type { AccountSummary } from '@/lib/accountApi';
 import type { SavedPattern } from '@/lib/account';
+import { newTabHint } from '../../scripts/new-tab-hint.mjs';
 
 type State =
   | { kind: 'loading' }
@@ -282,7 +283,7 @@ function Docs({ d }: { d: { pdf: string; pattern: string; patternId: string } })
   if (!d.pdf && !d.pattern) return <span className="text-ink-muted">—</span>;
   return (
     <span className="flex flex-col gap-1 whitespace-nowrap">
-      {d.pdf && <a href={d.pdf} target="_blank" rel="noopener">Quotation (PDF)</a>}
+      {d.pdf && <a href={d.pdf} target="_blank" rel="noopener">Quotation (PDF)<span className="sr-only">{newTabHint()}</span></a>}
       {d.pattern && <a href={patternViewPath(d.pattern)}>Pattern <span className="font-mono">{d.patternId}</span></a>}
     </span>
   );

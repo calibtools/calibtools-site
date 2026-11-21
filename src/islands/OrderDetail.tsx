@@ -4,6 +4,7 @@ import { SIGN_OFF_LINE } from '@/lib/brand';
 import { CONTACT_EMAIL } from '@/lib/claims';
 import { CUSTOM_ORDER_FINAL, PAID_REPAIR } from '@/lib/orderTerms';
 import type { OrderDetail as Order, Money } from '@/lib/accountOrder';
+import { newTabHint } from '../../scripts/new-tab-hint.mjs';
 
 type State =
   | { kind: 'loading' }
@@ -161,7 +162,7 @@ export function OrderView({ order }: { order: Order }) {
         <section className="card" aria-labelledby="order-docs">
           <h2 id="order-docs" className={HEAD}>Documents</h2>
           <ul className="m-0 flex list-none flex-col p-0 text-[14px]">
-            {order.pdf && <li className="border-t border-line px-5 py-3 first:border-t-0"><a href={order.pdf} target="_blank" rel="noopener">Quotation {order.no} (PDF)</a></li>}
+            {order.pdf && <li className="border-t border-line px-5 py-3 first:border-t-0"><a href={order.pdf} target="_blank" rel="noopener">Quotation {order.no} (PDF)<span className="sr-only">{newTabHint()}</span></a></li>}
             {order.pattern && <li className="border-t border-line px-5 py-3 first:border-t-0"><a href={patternViewPath(order.pattern)}>Pattern <span className="font-mono">{order.patternId}</span></a> <span className="text-ink-muted">with every parameter, as ordered</span></li>}
           </ul>
         </section>
