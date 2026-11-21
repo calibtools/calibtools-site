@@ -2,7 +2,7 @@
 import Logo from './Logo.astro';
 import CartBadge from '@/islands/CartBadge';
 import { ShoppingCart, Menu, X, ChevronDown, User } from 'lucide-astro';
-import { headerGroups } from '@/lib/nav';
+import { headerGroups, PROMOTED_FIRST } from '@/lib/nav';
 
 interface Props { section?: string; theme?: 'dark' | 'light' }
 const { section, theme = 'light' } = Astro.props;
@@ -25,7 +25,7 @@ const dark = theme === 'dark';
       <div class="flex items-center gap-[var(--nav-space-1)]">
         {headerGroups.map((group) => {
           const isDropdown = group.items || group.columns;
-          const isCurrent = section === group.key;
+          const isCurrent = section === group.key || (!!section && !!group.sections?.includes(section));
           if (!isDropdown) {
             return (
               <a
@@ -93,12 +93,12 @@ const dark = theme === 'dark';
                         href={item.href}
                         class:list={[
                           'flex flex-col gap-0.5 rounded px-[var(--nav-space-3)] py-[var(--nav-space-2)] no-underline transition-colors text-ink hover:bg-brand-tint hover:text-brand',
-                          idx === 0 && group.key === 'tools' ? 'mb-[var(--nav-space-2)] pb-[var(--nav-space-3)] border-b border-line' : '',
+                          idx === 0 && PROMOTED_FIRST.has(group.key) ? 'mb-[var(--nav-space-2)] pb-[var(--nav-space-3)] border-b border-line' : '',
                         ]}
                       >
                         <span class:list={[
                           'text-[length:var(--nav-text-base)] whitespace-nowrap',
-                          idx === 0 && group.key === 'tools' ? 'font-semibold' : 'font-medium',
+                          idx === 0 && PROMOTED_FIRST.has(group.key) ? 'font-semibold' : 'font-medium',
                         ]}>{item.label}</span>
                         {item.description && (
                           <span class="text-[length:var(--nav-text-sm)] text-ink-soft leading-snug line-clamp-2">{item.description}</span>
@@ -222,7 +222,7 @@ const dark = theme === 'dark';
               { label: col.heading, isHeading: true, href: '' },
               ...col.items.map((i) => ({ ...i, isHeading: false })),
             ])
-          : (group.items || []).map((i, idx) => ({ ...i, isHeading: false, isFirst: idx === 0 && group.key === 'tools' }));
+          : (group.items || []).map((i, idx) => ({ ...i, isHeading: false, isFirst: idx === 0 && PROMOTED_FIRST.has(group.key) }));
         return (
           <details class="group">
             <summary class="flex cursor-pointer items-center justify-between min-h-[48px] px-[var(--nav-space-3)] text-[length:var(--nav-text-base)] font-medium select-none text-ink hover:text-brand rounded [&::-webkit-details-marker]:hidden list-none">

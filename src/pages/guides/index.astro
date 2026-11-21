@@ -1,13 +1,14 @@
 ---
+import { ACADEMY_NAME } from '@/lib/nav';
 import Base from '@/layouts/Base.astro';
 import { getCollection } from 'astro:content';
 import { breadcrumbLd } from '@/lib/seo';
 const guides = (await getCollection('guides')).filter((g) => !g.data.draft).sort((a, b) => b.data.updated.valueOf() - a.data.updated.valueOf());
-const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: 'Guides' }]);
+const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: ACADEMY_NAME }]);
 ---
-<Base title="Calibration guides" section="guides" description="Practical guides to camera calibration: OpenCV step by step, choosing a pattern, running several boards in one rig, and reading a USAF 1951 resolution chart." jsonLd={bcLd}>
+<Base title="Calib Academy: camera calibration guides" section="guides" description="Practical guides to camera calibration: OpenCV step by step, choosing a pattern, running several boards in one rig, and reading a USAF 1951 resolution chart." jsonLd={bcLd}>
   <section class="container-x flex flex-col gap-8 py-[var(--section-y)]">
-    <span class="eyebrow">Knowledge base</span>
+    <span class="eyebrow">{ACADEMY_NAME}</span>
     <h1 class="h-display m-0 text-[36px] md:text-[48px]">Where calibration starts.</h1>
     <div class="flex max-w-[800px] flex-col border-t border-line">
       {guides.map((g) => (
