@@ -1,14 +1,12 @@
 ---
 import Base from '@/layouts/Base.astro';
 import { breadcrumbLd } from '@/lib/seo';
-import { software, NOTIFY_SUBJECT, SAMPLE, coveragePercent } from '@/lib/software';
+import { software, COMING_SOON_LABEL, NOTIFY_TAG, SAMPLE, coveragePercent } from '@/lib/software';
+import NewsletterForm from '@/islands/NewsletterForm';
 import { drawingForPartNumber } from '@/lib/boardDrawing';
 import { errorBarsFigureSvg, coverageMapFigureSvg } from '@/lib/guideFigures';
 
 const unreleased = software.status === 'unreleased';
-const notifyHref = (platform: string) =>
-  `mailto:${software.notifyEmail}?subject=${encodeURIComponent(`${NOTIFY_SUBJECT}: ${platform}`)}`;
-
 // Figures are drawn from SAMPLE (what the app reports for its own sample images), never typed in.
 const errors = SAMPLE.errorsPx;
 const LEFT_OUT = 3; // image 04, the one left out in the third figure
@@ -27,7 +25,7 @@ const faqs = [
   { q: 'Which lenses does it handle?', a: 'Standard lenses, with the OpenCV camera model and its optional k3, tangential, rational and thin-prism terms. Fisheye lenses are not supported yet.' },
   { q: 'Which boards can I use?', a: 'ChArUco boards and checkerboards, printed yourself or bought. You enter the square count, the sizes and the dictionary.' },
   { q: 'Will the result work with OpenCV and ROS?', a: 'Yes. The calibration runs on OpenCV, and the export is an OpenCV YAML or JSON file or a ROS camera_info file.' },
-  { q: 'When can I download it?', a: 'Plumbline is not released yet. Choose your system at the top of this page and we email you the download link on the day it ships.' },
+  { q: 'When can I download it?', a: 'Plumbline is not released yet. Leave your email at the top of this page and we send you the download link on the day it ships. It will run on Windows, macOS and Linux.' },
 ];
 
 const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: software.name }]);
@@ -59,15 +57,27 @@ const faqLd = {
     <p class="m-0 max-w-[680px] text-lg leading-relaxed text-ink-muted">
       {software.name} shows the error of every image and how much of the frame your corners cover. You see which images to retake before the numbers go into your pipeline.
     </p>
-    <div class="flex flex-col gap-3" data-platforms>
-      <span class="spec-label">{unreleased ? 'Get the download link for' : 'Download for'}</span>
-      <div class="grid max-w-[480px] grid-cols-3 gap-2">
-        {software.platforms.map((p) => (
-          <a href={unreleased ? notifyHref(p) : software.href} data-platform={p} class="btn-md btn-secondary w-full normal-case tracking-normal text-[14px]">{p}</a>
-        ))}
+    {unreleased ? (
+      <div id="notify" class="flex max-w-[520px] scroll-mt-24 flex-col gap-4">
+        <div class="flex flex-wrap items-center gap-3">
+          <span class="badge text-brand-dark">{COMING_SOON_LABEL}</span>
+          <span class="font-mono text-[13px] text-ink-muted">{software.platforms.join(' · ')}</span>
+        </div>
+        <NewsletterForm
+          client:load
+          id="pl"
+          tag={NOTIFY_TAG}
+          heading="Get an email when it is out"
+          note="We send the download link on release day. You also get our monthly email on new tools and targets; unsubscribe anytime."
+          button="Notify me"
+          done="Done. We email you the day Plumbline is out."
+        />
       </div>
-      {unreleased && <span class="max-w-[480px] text-[14px] text-ink-muted">Each button opens an email to {software.notifyEmail}. We send the link the day {software.name} ships.</span>}
-    </div>
+    ) : (
+      <div class="grid max-w-[480px] grid-cols-3 gap-2">
+        {software.platforms.map((p) => <a href={software.href} class="btn-md btn-secondary w-full normal-case tracking-normal text-[14px]">{p}</a>)}
+      </div>
+    )}
   </section>
 
   {/* ── 1 Error for every image ── */}
@@ -206,22 +216,10 @@ const faqLd = {
 
   {/* ── Closing ── */}
   <section class="border-t border-line">
-    <div class="container-x flex flex-col gap-5 py-[var(--section-y)]" data-platforms>
+    <div class="container-x flex flex-col gap-5 py-[var(--section-y)]">
       <h2 class="m-0 text-[24px] font-semibold md:text-[28px]">{unreleased ? `Get ${software.name} when it ships` : `Download ${software.name}`}</h2>
-      <div class="grid max-w-[480px] grid-cols-3 gap-2">
-        {software.platforms.map((p) => (
-          <a href={unreleased ? notifyHref(p) : software.href} data-platform={p} class="btn-md btn-secondary w-full normal-case tracking-normal text-[14px]">{p}</a>
-        ))}
-      </div>
+      {unreleased && <div><a href="#notify" class="btn-md btn-primary">Notify me</a></div>}
       <p class="m-0 max-w-[760px] text-[15px] text-ink-muted">Until then, the <a href="/tools/quality/">calibration quality analyzer</a> checks a calibration you already ran, in your browser.</p>
     </div>
   </section>
-
-  <script>
-    import { track } from '@/lib/track';
-    // One event per platform button, so requests can be counted by system. No personal data.
-    document.querySelectorAll<HTMLAnchorElement>('[data-platforms] a[data-platform]').forEach((a) => {
-      a.addEventListener('click', () => track('generate_lead', { form: 'plumbline_link', platform: a.dataset.platform }));
-    });
-  </script>
 </Base>

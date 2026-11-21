@@ -71,6 +71,8 @@ const ALLOWLIST = [
   'DAkkS-accredited laboratory',
   'DAkkS-calibrated',
   'certificate from a DAkkS-accredited laboratory',
+  // Owner decision 2026-11-22: /plumbline/ says this where the download buttons will be. This exact phrase only.
+  'Plumbline is coming soon',
 ];
 
 /**

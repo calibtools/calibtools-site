@@ -3,11 +3,8 @@
  * Read by the header navigation and /plumbline/. Every page that mentions Plumbline reads its
  * status from here, so the wording switches in one place when the first version ships.
  *
- * Status 2026-11-22: not released yet. Until then the platform buttons on /plumbline/ open an
- * email asking for the download link.
+ * Status 2026-11-22: not released yet. Until then /plumbline/ shows a sign-up for the release email.
  */
-import { CONTACT_EMAIL } from './claims';
-
 export type SoftwareStatus = 'unreleased' | 'released';
 
 export interface SoftwareDef {
@@ -17,8 +14,6 @@ export interface SoftwareDef {
   /** Version string of the latest release; null before the first one. */
   version: string | null;
   platforms: readonly string[];
-  /** Where visitors ask for the download link until the sign-up form exists. */
-  notifyEmail: string;
 }
 
 export const software: SoftwareDef = {
@@ -27,11 +22,13 @@ export const software: SoftwareDef = {
   status: 'unreleased',
   version: null,
   platforms: ['Windows', 'macOS', 'Linux'],
-  notifyEmail: CONTACT_EMAIL,
 };
 
-/** Subject line of the download request email (mailto link on /plumbline/). */
-export const NOTIFY_SUBJECT = 'Plumbline download link';
+/** Shown where the download buttons will be, until the first release. The only place this wording is allowed (scripts/check-prose.mjs). */
+export const COMING_SOON_LABEL = 'Plumbline is coming soon';
+
+/** Tag set on people who ask to be told about the release (POST /api/subscribe). */
+export const NOTIFY_TAG = 'notify:plumbline';
 
 /**
  * What Plumbline reports for the 24 sample images that come with it. The images are rendered from
