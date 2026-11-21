@@ -25,7 +25,7 @@ export const software: SoftwareDef = {
 };
 
 /** Shown where the download buttons will be, until the first release. The only place this wording is allowed (scripts/check-prose.mjs). */
-export const COMING_SOON_LABEL = 'Plumbline is coming soon';
+export const COMING_SOON_LABEL = 'Coming soon';
 
 /** Tag set on people who ask to be told about the release (POST /api/subscribe). */
 export const NOTIFY_TAG = 'notify:plumbline';
