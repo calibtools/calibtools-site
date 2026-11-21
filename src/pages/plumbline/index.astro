@@ -15,7 +15,6 @@ const appLd = {
   url: `https://calib.tools${software.href}`,
   applicationCategory: 'DeveloperApplication',
   operatingSystem: software.platforms.join(', '),
-  license: 'https://opensource.org/licenses/MIT',
   publisher: { '@type': 'Organization', name: 'Calib.Tools', url: 'https://calib.tools' },
 };
 const nextSteps = [
@@ -58,7 +57,6 @@ const nextSteps = [
         <tbody>
           <tr class="border-b border-line"><th scope="row" class="align-top pt-[15px] w-[112px] py-3 pr-4 md:w-[180px] text-left font-mono text-[12px] font-medium uppercase tracking-[0.04em] text-ink-soft">Status</th><td class="py-3 align-top">{inDev ? 'Being built; no version released yet' : `Version ${software.version}`}</td></tr>
           <tr class="border-b border-line"><th scope="row" class="align-top pt-[15px] py-3 pr-4 text-left font-mono text-[12px] font-medium uppercase tracking-[0.04em] text-ink-soft">Platforms</th><td class="py-3 align-top">{software.platforms.join(', ')}</td></tr>
-          <tr class="border-b border-line"><th scope="row" class="align-top pt-[15px] py-3 pr-4 text-left font-mono text-[12px] font-medium uppercase tracking-[0.04em] text-ink-soft">License</th><td class="py-3 align-top">Open source, {software.license}</td></tr>
           <tr class="border-b border-line"><th scope="row" class="align-top pt-[15px] py-3 pr-4 text-left font-mono text-[12px] font-medium uppercase tracking-[0.04em] text-ink-soft">Built on</th><td class="py-3 align-top">OpenCV and other open-source libraries, credited in the documentation</td></tr>
           <tr class="border-b border-line"><th scope="row" class="align-top pt-[15px] py-3 pr-4 text-left font-mono text-[12px] font-medium uppercase tracking-[0.04em] text-ink-soft">Made by</th><td class="py-3 align-top">Calib.Tools. Sales of calibration targets pay for its development.</td></tr>
         </tbody>
