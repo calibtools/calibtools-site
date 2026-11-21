@@ -298,7 +298,7 @@ if (product.variants.length > 0) {
 } else {
   productLd.offers = { '@type': 'AggregateOffer', lowPrice: product.priceMinAmount, priceCurrency: product.priceMinCurrency, availability: 'https://schema.org/InStock', url: `${siteUrl}${product.url}` };
 }
-const keyFacts = productFacts(productContent?.data, { madeToOrder: quoteOnly });
+const keyFacts = productFacts(productContent?.data, { madeToOrder: quoteOnly, keySpecs });
 if (keyFacts.length > 0) productLd.additionalProperty = factsJsonLd(keyFacts);
 if (reviewSummary.count > 0) {
   productLd.aggregateRating = {
