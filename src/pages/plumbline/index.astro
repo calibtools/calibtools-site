@@ -40,10 +40,6 @@ const nextSteps = [
       <span class="text-[40px] leading-none md:text-[56px]">{software.name}</span>
       <span class="text-[22px] font-medium leading-snug text-ink-muted md:text-[28px]">Camera calibration software for your computer</span>
     </h1>
-    <p class="m-0 max-w-[680px] text-lg leading-relaxed text-ink-muted">
-      Made by Calib.Tools.
-      {inDev && ' The first version is not released yet. This page lists what it is planned to do.'}
-    </p>
     <div class="flex flex-col gap-3">
       <span class="spec-label">{inDev ? 'Tell me when it ships for' : 'Download for'}</span>
       {/* One button per platform, from src/lib/software.ts. Before the first release each opens an email naming the platform. */}
@@ -63,8 +59,7 @@ const nextSteps = [
       <h2 class="m-0 text-[24px] font-semibold md:text-[28px]">What it is</h2>
       <table class="w-full max-w-[760px] border-collapse text-[14px]">
         <tbody>
-          <tr class="border-b border-line"><th scope="row" class="align-top pt-[15px] w-[112px] py-3 pr-4 md:w-[180px] text-left font-mono text-[12px] font-medium uppercase tracking-[0.04em] text-ink-soft">Status</th><td class="py-3 align-top">{inDev ? 'Being built; no version released yet' : `Version ${software.version}`}</td></tr>
-          <tr class="border-b border-line"><th scope="row" class="align-top pt-[15px] py-3 pr-4 text-left font-mono text-[12px] font-medium uppercase tracking-[0.04em] text-ink-soft">Built on</th><td class="py-3 align-top">OpenCV and other open-source libraries, credited in the documentation</td></tr>
+          <tr class="border-b border-line"><th scope="row" class="align-top pt-[15px] w-[112px] py-3 pr-4 md:w-[180px] text-left font-mono text-[12px] font-medium uppercase tracking-[0.04em] text-ink-soft">Built on</th><td class="py-3 align-top">OpenCV and other open-source libraries, credited in the documentation</td></tr>
           <tr class="border-b border-line"><th scope="row" class="align-top pt-[15px] py-3 pr-4 text-left font-mono text-[12px] font-medium uppercase tracking-[0.04em] text-ink-soft">Made by</th><td class="py-3 align-top">Calib.Tools. Sales of calibration targets pay for its development.</td></tr>
         </tbody>
       </table>
@@ -79,7 +74,6 @@ const nextSteps = [
       <ul class="m-0 flex max-w-[760px] list-disc flex-col gap-2 pl-6 text-[17px] leading-[1.65]">
         {(inDev ? software.planned : software.released).map((f) => <li class="pl-1">{f}</li>)}
       </ul>
-      {inDev && <p class="m-0 max-w-[760px] text-[15px] text-ink-muted">This is a plan, not a list of finished features. More camera models and multi-camera calibration are planned for later versions; each feature is listed here once it ships.</p>}
     </div>
   </section>
 
