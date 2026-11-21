@@ -1,0 +1,47 @@
+---
+import Base from '@/layouts/Base.astro';
+import { breadcrumbLd } from '@/lib/seo';
+import { INSPECTION_CLAIM_SHORT } from '@/lib/claims';
+import { CUSTOM_ORDER_FINAL, PAYMENT_ACCEPTS_QUOTATION } from '@/lib/orderTerms';
+const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: 'Project grade' }]);
+---
+<Base title="Project grade calibration targets" description="Calibration targets built for one project: any size, honeycomb or solid aluminum, glass or ceramic, inserts, a report per board. What sets the price." jsonLd={bcLd}>
+  <div class="container-x py-10 md:py-16">
+    <div class="prose-calib mx-auto flex max-w-[720px] flex-col gap-5">
+      <h1 class="h-display m-0 text-[32px] md:text-[40px]">Project grade</h1>
+
+      <p>Our Standard targets are the sizes listed on each product page, with a price, made to the specification on that page. Project grade targets are built for one project: the size, substrate, mounting and checks follow what your setup needs, and we quote them one by one.</p>
+
+      <h2>Standard and Project grade</h2>
+      <table>
+        <thead><tr><th></th><th>Standard</th><th>Project grade</th></tr></thead>
+        <tbody>
+          <tr><td>Size</td><td>Listed sizes. Up to 400 &times; 300 mm in the cart; 600 &times; 400 and 800 &times; 600 on a quote, from the price on the product page</td><td>The size your field of view needs, including above 800 &times; 600 mm</td></tr>
+          <tr><td>Substrate</td><td>As on the product page</td><td>Aluminum composite, honeycomb aluminum panel, solid aluminum plate, glass or ceramic</td></tr>
+          <tr><td>Pattern</td><td>Catalog patterns</td><td>Your layout, mixed boards, separate ID ranges for every board in a set</td></tr>
+          <tr><td>Mounting</td><td>As on the product page</td><td>Inserts, dowel and through holes, or a frame, to your drawing</td></tr>
+          <tr><td>Checks</td><td>{INSPECTION_CLAIM_SHORT}</td><td>A measurement report for every board, with the method written on it</td></tr>
+          <tr><td>Ordering</td><td>Cart, or a quote for the two large sizes</td><td>Quotation first, then payment</td></tr>
+        </tbody>
+      </table>
+
+      <h2>What sets the price</h2>
+      <ul class="ml-5 flex flex-col gap-2 text-[15px] list-disc">
+        <li><strong>Substrate.</strong> Aluminum composite costs least; honeycomb and solid aluminum cost more and stay flatter at large sizes; glass and ceramic cost most.</li>
+        <li><strong>Size.</strong> Price grows faster than area above about 400 &times; 300 mm, because the panel, the packing and the freight all step up.</li>
+        <li><strong>Checks.</strong> A report for every board adds measuring time per board.</li>
+        <li><strong>Mounting.</strong> Each insert, hole or frame is a machining step.</li>
+        <li><strong>Pattern.</strong> A new layout is drawn and proofed once; repeat orders of the same layout skip that step.</li>
+        <li><strong>Quantity.</strong> The setup is shared across the boards, so the price per board falls with quantity.</li>
+        <li><strong>Lead time.</strong> A rush slot costs extra.</li>
+        <li><strong>Packing and freight.</strong> Large boards travel in a crate; we quote it with freight to your address, or with duties paid on request.</li>
+      </ul>
+
+      <h2>How a quote works</h2>
+      <p>Send your requirement through the <a href="/quote/">quote form</a>: the size or the camera setup, the substrate if you know it, the mounting, the checks you need and the quantity. A drawing helps. We reply within one business day, with questions if something is open.</p>
+      <p>The quotation lists every item and the full specification, so you can compare it line by line. {PAYMENT_ACCEPTS_QUOTATION} {CUSTOM_ORDER_FINAL}</p>
+
+      <p><a href="/quote/" class="btn-md btn-primary no-underline">Request a quote</a></p>
+    </div>
+  </div>
+</Base>
