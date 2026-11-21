@@ -1,4 +1,5 @@
 import type { Variant } from './shopify';
+import { returnPolicyLd } from './seo';
 
 /** Shopify options that change the printed pattern map to schema.org/pattern. */
 const PATTERN_OPTIONS = new Set(['dictionary', 'layout', 'pattern']);
@@ -32,6 +33,12 @@ export function variantJsonLd(args: {
   productUrl: string;
   groupId: string;
   priceValidUntil: string;
+  /** Group pictures; Google wants an image on every variant for merchant listings. */
+  image?: string | string[];
+  /** Group description, repeated on each variant (Google lists it as missing otherwise). */
+  description?: string;
+  /** Made to order: no returns once paid (same rule as the page's returns line). */
+  finalSale?: boolean;
 }): Record<string, any> {
   const { variant: v, productTitle, productUrl, groupId, priceValidUntil } = args;
   const ld: Record<string, any> = {
@@ -40,6 +47,8 @@ export function variantJsonLd(args: {
     sku: v.sku || undefined,
     inProductGroupWithID: groupId,
   };
+  if (args.image && (typeof args.image === 'string' || args.image.length > 0)) ld.image = args.image;
+  if (args.description) ld.description = args.description;
   for (const opt of v.selectedOptions) {
     const prop = schemaPropFor(opt.name);
     if (prop && ld[prop] === undefined) ld[prop] = opt.value;
@@ -52,6 +61,7 @@ export function variantJsonLd(args: {
     availability: v.availableForSale ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
     url: variantUrl(productUrl, v.id),
     seller: { '@type': 'Organization', name: 'Calib.Tools' },
+    hasMerchantReturnPolicy: returnPolicyLd({ final: args.finalSale }),
   };
   return ld;
 }

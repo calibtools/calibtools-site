@@ -67,3 +67,26 @@ describe('variantJsonLd', () => {
     expect(fixture.pattern).toBeUndefined();
   });
 });
+
+describe('merchant listing fields on each variant', () => {
+  const args = { variant: v(1, '300×200', 'DICT_6X6_250'), productTitle: 'ChArUco', productUrl: base, groupId: 'charuco-composite', priceValidUntil: '2027-01-01' };
+  it('carries the group pictures and description', () => {
+    const ld = variantJsonLd({ ...args, image: ['https://calib.tools/a.webp'], description: 'A board.' });
+    expect(ld.image).toEqual(['https://calib.tools/a.webp']);
+    expect(ld.description).toBe('A board.');
+  });
+  it('gives standard targets the 30-day return window and made-to-order targets no returns', async () => {
+    const { RETURN_WINDOW_DAYS } = await import('./claims');
+    const std = variantJsonLd(args).offers.hasMerchantReturnPolicy;
+    expect(std.returnPolicyCategory).toBe('https://schema.org/MerchantReturnFiniteReturnWindow');
+    expect(std.merchantReturnDays).toBe(RETURN_WINDOW_DAYS);
+    const fin = variantJsonLd({ ...args, finalSale: true }).offers.hasMerchantReturnPolicy;
+    expect(fin.returnPolicyCategory).toBe('https://schema.org/MerchantReturnNotPermitted');
+    expect(fin.merchantReturnDays).toBeUndefined();
+  });
+  it('the product page passes pictures, description and the made-to-order flag', async () => {
+    const { readFileSync } = await import('node:fs');
+    const page = readFileSync(new URL('../pages/targets/[handle].astro', import.meta.url), 'utf-8');
+    expect(page).toMatch(/image: productImages, description: product\.description, finalSale: quoteOnly/);
+  });
+});

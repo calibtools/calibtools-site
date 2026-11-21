@@ -66,6 +66,27 @@ export function autoBreadcrumbLd(pathname: string, leafTitle: string): Record<st
   return breadcrumbLd(items);
 }
 
+/**
+ * schema.org MerchantReturnPolicy, from the same constants as /returns/. Standard targets: change-of-mind
+ * returns within RETURN_WINDOW_DAYS, by mail, return shipping paid by the customer. Made-to-order targets
+ * (`final: true`) can't be returned once paid (CUSTOM_ORDER_FINAL); defects are covered by the warranty.
+ */
+export function returnPolicyLd(opts: { final?: boolean } = {}): Record<string, any> {
+  const common = {
+    '@type': 'MerchantReturnPolicy',
+    applicableCountry: [...SHIP_TO_COUNTRIES],
+    merchantReturnLink: `${SITE_URL}/returns/`,
+  };
+  if (opts.final) return { ...common, returnPolicyCategory: 'https://schema.org/MerchantReturnNotPermitted' };
+  return {
+    ...common,
+    returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
+    merchantReturnDays: RETURN_WINDOW_DAYS,
+    returnMethod: 'https://schema.org/ReturnByMail',
+    returnFees: 'https://schema.org/ReturnFeesCustomerResponsibility',
+  };
+}
+
 export const ORGANIZATION_LD: Record<string, any> = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
@@ -80,15 +101,5 @@ export const ORGANIZATION_LD: Record<string, any> = {
     email: 'hello@calib.tools',
     contactType: 'customer support',
   },
-  // Standard targets: change-of-mind returns within RETURN_WINDOW_DAYS, by mail, return
-  // shipping paid by the customer (see /returns/). Defects are covered separately there.
-  hasMerchantReturnPolicy: {
-    '@type': 'MerchantReturnPolicy',
-    applicableCountry: [...SHIP_TO_COUNTRIES],
-    returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
-    merchantReturnDays: RETURN_WINDOW_DAYS,
-    returnMethod: 'https://schema.org/ReturnByMail',
-    returnFees: 'https://schema.org/ReturnFeesCustomerResponsibility',
-    merchantReturnLink: `${SITE_URL}/returns/`,
-  },
+  hasMerchantReturnPolicy: returnPolicyLd(),
 };
