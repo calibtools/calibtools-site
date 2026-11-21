@@ -1,4 +1,5 @@
 ---
+import { ACADEMY_NAME } from '@/lib/nav';
 import Base from '@/layouts/Base.astro';
 import { isFileLink, fileLinkHint } from '../../../scripts/file-links.mjs';
 import ProductCard from '@/components/ProductCard.astro';
@@ -64,7 +65,7 @@ const breadcrumbLd = {
   '@type': 'BreadcrumbList',
   itemListElement: [
     { '@type': 'ListItem', position: 1, name: 'Home', item: siteUrl },
-    { '@type': 'ListItem', position: 2, name: 'Guides', item: `${siteUrl}/guides/` },
+    { '@type': 'ListItem', position: 2, name: ACADEMY_NAME, item: `${siteUrl}/guides/` },
     { '@type': 'ListItem', position: 3, name: d.title },
   ],
 };
@@ -89,7 +90,7 @@ const jsonLdItems = [articleLd, breadcrumbLd, ...(faqLd ? [faqLd] : [])];
     <article class="prose-calib flex min-w-0 flex-1 basis-[560px] max-w-[720px] flex-col gap-5">
       {/* Breadcrumb */}
       <div class="flex gap-2 text-sm text-ink-soft">
-        <a href="/guides/" class="text-ink-soft no-underline min-h-[44px] md:min-h-[24px] flex items-center">Guides</a><span class="flex items-center">/</span><span class="flex items-center">Article</span>
+        <a href="/guides/" class="text-ink-soft no-underline min-h-[44px] md:min-h-[24px] flex items-center">{ACADEMY_NAME}</a><span class="flex items-center">/</span><span class="flex items-center">Article</span>
       </div>
 
       {/* Eyebrow */}

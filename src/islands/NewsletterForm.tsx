@@ -1,12 +1,26 @@
 import { useState, useRef } from 'react';
 import TurnstileBox from './TurnstileBox';
+import { track } from '@/lib/track';
+
+interface Props {
+  /** Heading, note and button text; default to the monthly newsletter wording. */
+  heading?: string;
+  note?: string;
+  button?: string;
+  /** Message after a successful signup. */
+  done?: string;
+  /** Tag set on the subscriber in Shopify, e.g. "notify:plumbline". Also names the GA4 event's form. */
+  tag?: string;
+  /** Prefix for the input id when two forms share a page. */
+  id?: string;
+}
 
 /**
  * Newsletter signup form.
  * Posts to /api/subscribe (Cloudflare Pages Function → Shopify Admin API).
  * Honeypot field to reduce spam.
  */
-export default function NewsletterForm() {
+export default function NewsletterForm({ heading = 'New tools and targets, monthly.', note = 'No marketing fluff. One email a month, unsubscribe anytime.', button = 'Subscribe', done, tag, id = 'nl' }: Props = {}) {
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<'idle' | 'busy' | 'success' | 'error'>('idle');
   const [turnstile, setTurnstile] = useState('');
@@ -30,7 +44,7 @@ export default function NewsletterForm() {
       const res = await fetch('/api/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: trimmed, honeypot: honeypotRef.current?.value ?? '', turnstile }),
+        body: JSON.stringify({ email: trimmed, honeypot: honeypotRef.current?.value ?? '', turnstile, ...(tag ? { tag } : {}) }),
       });
       const data = await res.json();
       setResetKey((k) => k + 1);
@@ -40,8 +54,9 @@ export default function NewsletterForm() {
         setMessage(
           data.state === 'PENDING'
             ? 'Check your inbox to confirm your subscription.'
-            : 'Subscribed! You\'ll hear from us monthly.',
+            : done ?? 'Subscribed! You\'ll hear from us monthly.',
         );
+        if (tag) track('generate_lead', { form: tag });
         setEmail('');
       } else {
         setStatus('error');
@@ -55,13 +70,13 @@ export default function NewsletterForm() {
 
   return (
     <form className="card flex flex-col gap-4 self-start bg-ground-alt p-5 sm:p-8 max-w-full overflow-hidden" onSubmit={handleSubmit}>
-      <strong className="text-xl">New tools and targets, monthly.</strong>
-      <span className="text-[15px] text-ink-muted">No marketing fluff. One email a month, unsubscribe anytime.</span>
+      <strong className="text-xl">{heading}</strong>
+      <span className="text-[15px] text-ink-muted">{note}</span>
 
-      <label htmlFor="nl-email" className="text-[13px] font-semibold">Work email</label>
+      <label htmlFor={`${id}-email`} className="text-[13px] font-semibold">Work email</label>
       <div className="flex gap-2">
         <input
-          id="nl-email"
+          id={`${id}-email`}
           type="email"
           required
           placeholder="you@company.com"
@@ -74,7 +89,7 @@ export default function NewsletterForm() {
           disabled={status === 'busy'}
           className="btn-md btn-primary disabled:opacity-50"
         >
-          {status === 'busy' ? 'Sending…' : 'Subscribe'}
+          {status === 'busy' ? 'Sending…' : button}
         </button>
       </div>
 

@@ -35,10 +35,11 @@ describe('llms.txt', () => {
       { url: 'https://calib.tools/guides/reprojection-error/', title: 'Reprojection error', description: 'What it means.' },
       { url: 'https://calib.tools/targets/charuco-composite/', title: 'ChArUco board, aluminum', description: 'Rigid board.' },
       { url: 'https://calib.tools/applications/robotics-calibration/', title: 'Robotics', description: 'Hand-eye.' },
+      { url: 'https://calib.tools/plumbline/', title: 'Plumbline', description: 'Desktop software.' },
       { url: 'https://calib.tools/shipping/', title: 'Shipping', description: 'Where we ship.' },
     ]);
     expect(txt.startsWith('# Calib.Tools\n\n> Targets and free tools.\n')).toBe(true);
-    const order = ['## Free tools', '## Guides', '## Calibration targets', '## Applications', '## Company'].map((h) => txt.indexOf(h));
+    const order = ['## Free tools', '## Calib Academy (guides)', '## Plumbline desktop software', '## Calibration targets', '## Applications', '## Company'].map((h) => txt.indexOf(h));
     expect(order.every((i, n) => i > 0 && (n === 0 || i > order[n - 1]))).toBe(true);
     expect(txt).toContain('- [ChArUco generator](https://calib.tools/tools/generator/charuco/): Free PDF.');
     expect(txt).toContain('- [Shipping](https://calib.tools/shipping/): Where we ship.');

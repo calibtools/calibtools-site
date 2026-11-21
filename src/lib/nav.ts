@@ -4,6 +4,10 @@
  */
 
 import { tools } from './tools';
+import { software } from './software';
+
+/** Name of the guides section (URL stays /guides/). Owner decision 2026-11-22. */
+export const ACADEMY_NAME = 'Calib Academy';
 
 // ── Types ────────────────────────────────────────────────────────────
 
@@ -28,7 +32,12 @@ export interface NavGroup {
   items?: NavItem[];
   /** Mega-menu columns. */
   columns?: MegaMenuColumn[];
+  /** Other page sections that light up this group (Calib Academy pages light up Support). */
+  sections?: string[];
 }
+
+/** Groups whose first dropdown item is promoted (weight 600, rule below it). */
+export const PROMOTED_FIRST = new Set(['tools', 'support']);
 
 export interface FooterGroup {
   heading: string;
@@ -81,9 +90,10 @@ export const toolsDropdown: NavItem[] = [
   { label: 'All tools', href: '/tools/' },
 ];
 
-// ── Support dropdown ─────────────────────────────────────────────────
+// ── Support dropdown (Calib Academy first, separated like the generator in Tools) ──
 
 export const supportDropdown: NavItem[] = [
+  { label: ACADEMY_NAME, href: '/guides/' },
   { label: 'FAQ', href: '/faq/' },
   { label: 'Shipping, duties & taxes', href: '/shipping/' },
   { label: 'Returns', href: '/returns/' },
@@ -98,8 +108,8 @@ export const headerGroups: NavGroup[] = [
   { key: 'targets', label: 'Targets', columns: targetsMega },
   { key: 'tools', label: 'Tools', items: toolsDropdown },
   { key: 'applications', label: 'Applications', href: '/applications/' },
-  { key: 'guides', label: 'Guides', href: '/guides/' },
-  { key: 'support', label: 'Support', items: supportDropdown },
+  { key: 'plumbline', label: software.name, href: software.href },
+  { key: 'support', label: 'Support', items: supportDropdown, sections: ['guides'] },
 ];
 
 // ── Footer groups ────────────────────────────────────────────────────

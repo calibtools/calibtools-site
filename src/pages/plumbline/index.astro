@@ -1,0 +1,225 @@
+---
+import Base from '@/layouts/Base.astro';
+import { breadcrumbLd } from '@/lib/seo';
+import { software, COMING_SOON_LABEL, NOTIFY_TAG, SAMPLE, coveragePercent } from '@/lib/software';
+import NewsletterForm from '@/islands/NewsletterForm';
+import { drawingForPartNumber } from '@/lib/boardDrawing';
+import { errorBarsFigureSvg, coverageMapFigureSvg } from '@/lib/guideFigures';
+
+const unreleased = software.status === 'unreleased';
+// Figures are drawn from SAMPLE (what the app reports for its own sample images), never typed in.
+const errors = SAMPLE.errorsPx;
+const LEFT_OUT = 3; // image 04, the one left out in the third figure
+const grid = SAMPLE.coverage;
+const covered = coveragePercent(grid);
+const barsSvg = errorBarsFigureSvg(errors, { label: `Bar chart of the reprojection error of ${errors.length} sample images, between ${Math.min(...errors).toFixed(3)} and ${Math.max(...errors).toFixed(3)} px` });
+const barsOutSvg = errorBarsFigureSvg(errors, { leftOut: LEFT_OUT, label: `The same bar chart with image 0${LEFT_OUT + 1} drawn as an outline: it is left out of the calibration` });
+const coverageSvg = coverageMapFigureSvg(grid, `Coverage map: ${covered} percent of the image has corners; the cells along the edges are empty`);
+
+const BOARD_PN = 'CT-CHA-P-400X300-D6';
+const boardSvg = drawingForPartNumber(BOARD_PN);
+
+const faqs = [
+  { q: 'Is Plumbline free?', a: 'Yes. It costs nothing, for commercial work too.' },
+  { q: 'Are my images uploaded?', a: 'No. Plumbline runs on your computer and works offline. Your images and results stay there.' },
+  { q: 'Which lenses does it handle?', a: 'Standard lenses, with the OpenCV camera model and its optional k3, tangential, rational and thin-prism terms. Fisheye lenses are not supported yet.' },
+  { q: 'Which boards can I use?', a: 'ChArUco boards and checkerboards, printed yourself or bought. You enter the square count, the sizes and the dictionary.' },
+  { q: 'Will the result work with OpenCV and ROS?', a: 'Yes. The calibration runs on OpenCV, and the export is an OpenCV YAML or JSON file or a ROS camera_info file.' },
+  { q: 'When can I download it?', a: 'Plumbline is not released yet. Leave your email at the top of this page and we send you the download link on the day it ships. It will run on Windows, macOS and Linux.' },
+];
+
+const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: software.name }]);
+const appLd = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: software.name,
+  url: `https://calib.tools${software.href}`,
+  applicationCategory: 'DeveloperApplication',
+  operatingSystem: software.platforms.join(', '),
+  publisher: { '@type': 'Organization', name: 'Calib.Tools', url: 'https://calib.tools' },
+};
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+};
+---
+<Base
+  title="Plumbline: free camera calibration software"
+  description="Plumbline is free desktop software for camera calibration on Windows, macOS, Linux. See the error of every image and how much of the frame the corners cover."
+  section="plumbline"
+  jsonLd={[bcLd, appLd, faqLd]}
+>
+  {/* ── Hero ── */}
+  <section class="container-x flex flex-col gap-6 pt-[var(--section-y)] pb-12">
+    <span class="eyebrow">{software.name} · camera calibration software</span>
+    <h1 class="h-display m-0 max-w-[820px] text-[36px] leading-[1.1] md:text-[56px]">Know whether your camera calibration is good</h1>
+    <p class="m-0 max-w-[680px] text-lg leading-relaxed text-ink-muted">
+      {software.name} shows the error of every image and how much of the frame your corners cover. You see which images to retake before the numbers go into your pipeline.
+    </p>
+    {unreleased ? (
+      <div id="notify" class="flex max-w-[520px] scroll-mt-24 flex-col gap-4">
+        <div class="flex flex-wrap items-center gap-3">
+          <span class="badge text-brand-dark">{COMING_SOON_LABEL}</span>
+          <span class="font-mono text-[13px] text-ink-muted">{software.platforms.join(' · ')}</span>
+        </div>
+        <NewsletterForm
+          client:load
+          id="pl"
+          tag={NOTIFY_TAG}
+          heading="Get an email when it is out"
+          note="We send the download link on release day. You also get our monthly email on new tools and targets; unsubscribe anytime."
+          button="Notify me"
+          done="Done. We email you the day Plumbline is out."
+        />
+      </div>
+    ) : (
+      <div class="grid max-w-[480px] grid-cols-3 gap-2">
+        {software.platforms.map((p) => <a href={software.href} class="btn-md btn-secondary w-full normal-case tracking-normal text-[14px]">{p}</a>)}
+      </div>
+    )}
+  </section>
+
+  {/* ── 1 Error for every image ── */}
+  <section class="border-t border-line">
+    <div class="container-x grid items-center gap-x-14 gap-y-8 py-[var(--section-y)] lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]" data-rows="layout">
+      <div class="flex flex-col gap-5">
+        <span class="section-no">Error per image</span>
+        <span class="section-rule"></span>
+        <h2 class="m-0 text-[24px] font-semibold md:text-[28px]">See the error of every image</h2>
+        <p class="m-0 text-[17px] leading-[1.65] text-ink-muted">One number for the whole set hides the two images that spoil it. {software.name} draws one bar per image, so a blurred shot or a misplaced corner stands out and you know where to look.</p>
+      </div>
+      <figure class="card p-5 m-0 flex flex-col gap-3">
+        <div class="[&>svg]:block [&>svg]:h-auto [&>svg]:w-full" set:html={barsSvg} />
+        <figcaption class="text-[13px] text-ink-muted">Reprojection error of the {errors.length} sample images, in pixels. Whole set: <span class="font-pixel" data-unit="px">{SAMPLE.rmsPx.toFixed(3)} px</span> RMS.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  {/* ── 2 Coverage ── */}
+  <section class="border-t border-line">
+    <div class="container-x grid items-center gap-x-14 gap-y-8 py-[var(--section-y)] lg:grid-cols-[minmax(0,6fr)_minmax(0,5fr)]" data-rows="layout">
+      <figure class="card p-5 order-2 m-0 flex flex-col gap-3 lg:order-1">
+        <div class="mx-auto w-full max-w-[440px] [&>svg]:block [&>svg]:h-auto [&>svg]:w-full" set:html={coverageSvg} />
+        <figcaption class="text-[13px] text-ink-muted">Corners per cell across the {errors.length} sample images. {covered}&nbsp;% of the frame has corners; the outlined cells have none.</figcaption>
+      </figure>
+      <div class="order-1 flex flex-col gap-5 lg:order-2">
+        <span class="section-no">Coverage</span>
+        <span class="section-rule"></span>
+        <h2 class="m-0 text-[24px] font-semibold md:text-[28px]">See where your corners fell</h2>
+        <p class="m-0 text-[17px] leading-[1.65] text-ink-muted">A low error only describes the parts of the image where corners were found. Lens distortion is strongest toward the edges, and that is where views are usually missing. The map shows which cells still need one.</p>
+      </div>
+    </div>
+  </section>
+
+  {/* ── 3 Leave an image out ── */}
+  <section class="border-t border-line">
+    <div class="container-x grid items-center gap-x-14 gap-y-8 py-[var(--section-y)] lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]" data-rows="layout">
+      <div class="flex flex-col gap-5">
+        <span class="section-no">Recalibrate</span>
+        <span class="section-rule"></span>
+        <h2 class="m-0 text-[24px] font-semibold md:text-[28px]">Leave an image out and calibrate again</h2>
+        <p class="m-0 text-[17px] leading-[1.65] text-ink-muted">Click a bar to leave that image out. {software.name} calibrates again with the rest and shows the new result beside the list. Click the bar once more to bring the image back.</p>
+      </div>
+      <figure class="card p-5 m-0 flex flex-col gap-3">
+        <div class="[&>svg]:block [&>svg]:h-auto [&>svg]:w-full" set:html={barsOutSvg} />
+        <figcaption class="text-[13px] text-ink-muted">Image 0{LEFT_OUT + 1} is left out. The other {errors.length - 1} images are used for the result.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  {/* ── 4 Board ── */}
+  <section class="border-t border-line">
+    <div class="container-x grid items-center gap-x-14 gap-y-8 py-[var(--section-y)] lg:grid-cols-[minmax(0,6fr)_minmax(0,5fr)]" data-rows="layout">
+      {boardSvg && (
+        <figure class="card p-5 order-2 m-0 flex flex-col gap-3 lg:order-1">
+          <div class="mx-auto w-full max-w-[440px] [&>svg]:block [&>svg]:h-auto [&>svg]:w-full" set:html={boardSvg} />
+          <figcaption class="text-[13px] text-ink-muted">A ChArUco board, drawn from the same geometry as the board itself: <a href="/targets/charuco-composite/" class="whitespace-nowrap">{BOARD_PN}</a>.</figcaption>
+        </figure>
+      )}
+      <div class="order-1 flex flex-col gap-5 lg:order-2">
+        <span class="section-no">Target</span>
+        <span class="section-rule"></span>
+        <h2 class="m-0 text-[24px] font-semibold md:text-[28px]">Describe your board once</h2>
+        <p class="m-0 text-[17px] leading-[1.65] text-ink-muted">{software.name} works with ChArUco boards and checkerboards, printed or bought. Enter the squares across and down, the square size, and for ChArUco the marker size and dictionary. It then states the corner count and marker IDs it expects, so a wrong entry shows before you calibrate.</p>
+        <p class="m-0 text-[15px] text-ink-muted">No board yet? <a href="/tools/generator/charuco/">Print one with the pattern generator</a>.</p>
+      </div>
+    </div>
+  </section>
+
+  {/* ── 5 Export ── */}
+  <section class="border-t border-line">
+    <div class="container-x grid items-center gap-x-14 gap-y-8 py-[var(--section-y)] lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]" data-rows="layout">
+      <div class="flex flex-col gap-5">
+        <span class="section-no">Export</span>
+        <span class="section-rule"></span>
+        <h2 class="m-0 text-[24px] font-semibold md:text-[28px]">Get a file your pipeline reads</h2>
+        <p class="m-0 text-[17px] leading-[1.65] text-ink-muted">Export the camera matrix and distortion coefficients as OpenCV YAML or JSON, or as a ROS camera_info file that camera drivers load as it is.</p>
+      </div>
+      <figure class="card p-5 m-0 flex min-w-0 flex-col gap-3">
+        <code class="block max-w-full whitespace-pre-wrap [overflow-wrap:anywhere] font-mono text-[12px] leading-[1.6] text-ink">{SAMPLE.cameraInfo}</code>
+        <figcaption class="text-[13px] text-ink-muted">The start of the camera_info file {software.name} writes for the sample images.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  {/* ── 6 Check it yourself ── */}
+  <section class="border-t border-line bg-ground-alt">
+    <div class="container-x flex flex-col gap-5 py-[var(--section-y)]">
+      <span class="section-no">Check it yourself</span>
+      <span class="section-rule"></span>
+      <h2 class="m-0 text-[24px] font-semibold md:text-[28px]">Sample images with a known answer</h2>
+      <p class="m-0 max-w-[760px] text-[17px] leading-[1.65] text-ink-muted">{software.name} comes with {errors.length} sample images rendered from a camera whose focal length is known. Run them yourself and compare.</p>
+      <dl class="m-0 grid max-w-[760px] grid-cols-1 gap-px border border-line bg-line md:grid-cols-3">
+        <div class="rows-3 gap-y-1 bg-sheet p-3">
+          <dt class="spec-label">True focal length</dt>
+          <dd class="contents">
+            <span class="font-pixel text-[18px] leading-snug text-ink" data-unit="px">{SAMPLE.trueFocalPx} px</span>
+            <span class="spec-cond">set when the images were rendered</span>
+          </dd>
+        </div>
+        <div class="rows-3 gap-y-1 bg-sheet p-3">
+          <dt class="spec-label">{software.name} finds</dt>
+          <dd class="contents">
+            <span class="font-pixel text-[18px] leading-snug text-ink" data-unit="px">{SAMPLE.focalPx.toFixed(1)} px</span>
+            <span class="spec-cond">from {errors.length} images, {SAMPLE.corners.toLocaleString('en-US')} corners</span>
+          </dd>
+        </div>
+        <div class="rows-3 gap-y-1 bg-sheet p-3">
+          <dt class="spec-label">Reprojection error</dt>
+          <dd class="contents">
+            <span class="font-pixel text-[18px] leading-snug text-ink" data-unit="px">{SAMPLE.rmsPx.toFixed(3)} px</span>
+            <span class="spec-cond">RMS per point, as OpenCV reports it</span>
+          </dd>
+        </div>
+      </dl>
+      <p class="m-0 max-w-[760px] text-[15px] text-ink-muted">Your images stay on your computer. {software.name} works offline and sends nothing.</p>
+    </div>
+  </section>
+
+  {/* ── 7 Questions ── */}
+  <section class="border-t border-line">
+    <div class="container-x flex flex-col gap-5 py-[var(--section-y)]">
+      <span class="section-no">Questions</span>
+      <span class="section-rule"></span>
+      <h2 class="m-0 text-[24px] font-semibold md:text-[28px]">Before you ask</h2>
+      <dl class="m-0 flex max-w-[760px] flex-col border-t border-line">
+        {faqs.map((f) => (
+          <div class="flex flex-col gap-1 border-b border-line py-4">
+            <dt class="font-medium">{f.q}</dt>
+            <dd class="m-0 text-[15px] leading-relaxed text-ink-muted">{f.a}</dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  </section>
+
+  {/* ── Closing ── */}
+  <section class="border-t border-line">
+    <div class="container-x flex flex-col gap-5 py-[var(--section-y)]">
+      <h2 class="m-0 text-[24px] font-semibold md:text-[28px]">{unreleased ? `Get ${software.name} when it ships` : `Download ${software.name}`}</h2>
+      {unreleased && <div><a href="#notify" class="btn-md btn-primary">Notify me</a></div>}
+      <p class="m-0 max-w-[760px] text-[15px] text-ink-muted">Until then, the <a href="/tools/quality/">calibration quality analyzer</a> checks a calibration you already ran, in your browser.</p>
+    </div>
+  </section>
+</Base>
