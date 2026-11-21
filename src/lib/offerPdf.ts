@@ -10,6 +10,7 @@ import { DOC_COLORS, hexToUnitRgb } from './docColors';
 import { WORDMARK_PATHS, WORDMARK_DOT_RECT } from './exportBrand';
 import { CONTACT_LINE } from './reportConfig';
 import { MISSION_LINE } from './brand';
+import { SIGNATURE } from './signature';
 import { CUSTOM_ORDER_FINAL, PAID_REPAIR, PAYMENT_ACCEPTS_QUOTATION } from './orderTerms';
 import { patternShapes, fillRgb, shapeBox } from './patternShapes';
 import { specFromLink, patternId } from './patternLink';
@@ -459,6 +460,14 @@ export async function offerPdf(d: OfferData, fonts: OfferFonts): Promise<Uint8Ar
   tag('Calib.Tools quotation authorization', LEFT + 3 * MM, y + 3 * MM);
   rule(y + 17 * MM, LEFT + 3 * MM, LEFT + oursW - 3 * MM, 0.8);
   text('Signature', LEFT + 3 * MM, y + 13.5 * MM, mono, 7, SOFT);
+  // The signature sits on its line, after the label: at most 10.5 mm high, never past the box.
+  if (SIGNATURE.paths.length && SIGNATURE.width > 0 && SIGNATURE.height > 0) {
+    const sx = LEFT + 3 * MM + 16 * MM;
+    const k = Math.min((10.5 * MM) / SIGNATURE.height, (LEFT + oursW - 3 * MM - sx) / SIGNATURE.width);
+    const bottom = y + 18.2 * MM; // descenders dip 1.2 mm below the line
+    // One path, so the tracer's counter-wound holes (the eye of an "e") stay open.
+    page.drawSvgPath(SIGNATURE.paths.join(''), { x: sx, y: PAGE_H - bottom + SIGNATURE.height * k, scale: k, color: BLACK });
+  }
   const meta: [string, string][] = [['Name', d.signatory.name], ['Title', d.signatory.title], ['Date', d.date], ['Quote no.', d.no]];
   meta.forEach(([k, v], i) => {
     const x = LEFT + 3 * MM + (i % 2) * (oursW / 2 - 1 * MM);
