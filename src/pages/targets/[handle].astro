@@ -442,12 +442,14 @@ const quickLinks = hasLongform
   }] : undefined}
 >
   {/* Breadcrumb */}
-  {/* Phones: one link up to the collection; the product name is the H1 just below, and the full
-      trail took three 44 px rows. Wider screens keep the full trail. */}
+  {/* Phones: one link up to the collection and the product name on the next line; the full trail
+      took three 44 px rows. The H1 sits below the gallery on phones, so the name stays up here.
+      Wider screens keep the full trail. */}
   <nav class="container-x pt-5 text-sm md:hidden" aria-label="Breadcrumb">
     <a href={collectionHandle ? `/targets/collection/${collectionHandle}/` : '/targets/'} class="inline-flex min-h-[44px] items-center gap-1.5 text-ink-soft no-underline hover:text-ink">
       <span aria-hidden="true">&larr;</span>{collectionHandle ? collectionTitle : 'Calibration targets'}
     </a>
+    <p class="m-0 text-ink" aria-current="page">{product.title}</p>
   </nav>
   <nav class="container-x hidden flex-wrap gap-x-2 gap-y-1 pt-5 text-sm text-ink-soft md:flex" aria-label="Breadcrumb">
     <a href="/" class="text-ink-soft no-underline shrink-0 min-h-[44px] md:min-h-[24px] flex items-center">Home</a><span class="flex items-center">/</span>
