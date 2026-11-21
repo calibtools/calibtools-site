@@ -55,11 +55,11 @@ const tiles = await Promise.all(collections.map(async (c) => {
   {tiles.map((t) => (
     <a href={`/targets/collection/${t.handle}/`} data-card class="group flex items-center justify-between gap-4 border-b border-line py-4 text-ink no-underline hover:text-ink md:card md:bracket md:rows-5 md:items-start md:justify-normal md:gap-x-0 md:gap-y-3 md:border-b md:p-5 md:hover:border-ink">
       {t.image
-        ? <Image src={t.image.src} alt={t.image.alt} widths={[160, 320, 640]} sizes="(min-width: 1024px) 200px, (min-width: 768px) 30vw, 84px" class="aspect-[3/2] w-[84px] shrink-0 bg-ground-panel object-cover md:w-full" loading="lazy" />
-        : <div class="aspect-[3/2] w-[84px] shrink-0 items-end md:flex md:w-full [&>svg]:hidden md:[&>svg]:block" set:html={t.outline?.svg ?? ''} />}
+        ? <Image src={t.image.src} alt={t.image.alt} widths={[160, 320, 640]} sizes="(min-width: 1024px) 200px, (min-width: 768px) 30vw, (min-width: 360px) 84px, 64px" class="aspect-[3/2] w-[64px] shrink-0 min-[360px]:w-[84px] bg-ground-panel object-cover md:w-full" loading="lazy" />
+        : <div class="aspect-[3/2] w-[64px] shrink-0 min-[360px]:w-[84px] items-end md:flex md:w-full [&>svg]:hidden md:[&>svg]:block" set:html={t.outline?.svg ?? ''} />}
       <span class="spec-label hidden md:block">{t.outline ? t.outline.caption : t.countLabel}</span>
       <div class="flex min-w-0 flex-1 flex-col gap-1 md:contents">
-        <strong class="hyphens-auto break-words text-[17px] leading-tight md:text-[20px]">{t.title}</strong>
+        <strong class="hyphens-auto text-[17px] leading-tight md:text-[20px]">{t.title}</strong>
         <span class="text-[14px] leading-snug text-ink-muted">{t.description}</span>
       </div>
       <span class="shrink-0 font-mono text-[14px] font-semibold md:self-end md:pt-2">{t.price ? `from ${t.price}` : 'quote'}</span>
