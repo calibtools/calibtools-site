@@ -90,7 +90,7 @@ export default function NewsletterForm({ heading = 'New tools and targets, month
         </div>
         <input ref={honeypotRef} type="text" name="website" tabIndex={-1} autoComplete="off" className="absolute -left-[9999px] h-0 w-0 overflow-hidden" aria-hidden="true" />
         <TurnstileBox onToken={setTurnstile} resetKey={resetKey} quiet />
-        <p className={`m-0 text-[13px] ${message ? (status === 'success' ? 'text-ok' : 'text-brand-dark') : 'text-ink-muted'}`} aria-live="polite">{message || note}</p>
+        <p className={`m-0 text-[13px] empty:hidden ${message ? (status === 'success' ? 'text-ok' : 'text-brand-dark') : 'text-ink-muted'}`} aria-live="polite">{message || note}</p>
       </form>
     );
   }

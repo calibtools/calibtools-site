@@ -69,11 +69,11 @@ const faqLd = {
           id="pl"
           tag={NOTIFY_TAG}
           heading="Email for the release notification"
-          note="One email, nothing else."
+          note=""
           button="Notify me"
           done="Done. We email you the day Plumbline is out."
         />
-        <p class="m-0 border-t border-line pt-4 font-mono text-[13px] text-ink-muted">{software.platforms.join(' · ')}</p>
+        <p class="m-0 border-t border-line pt-4 text-[13px] text-ink-muted">Support for {software.platforms.join(', ')}</p>
       </div>
     ) : (
       <div class="grid grid-cols-3 gap-2">
