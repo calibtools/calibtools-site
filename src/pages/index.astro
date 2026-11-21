@@ -121,9 +121,10 @@ const featuredReviews = allReviews
         <h2 class="m-0 text-[24px] font-semibold md:text-[28px]">Size the board before you buy it</h2>
         <p class="m-0 max-w-[400px] text-[15px] leading-relaxed text-ink-muted">Seven tools that run in your browser. No images or calibration files leave your computer.</p>
         <a href="/tools/" class="text-[14px] font-medium underline decoration-1 underline-offset-[3px]">All tools</a>
-        <a href="/tools/fov/" class="mt-2 flex max-w-[400px] flex-col gap-3 border border-line-strong bg-sheet p-4 text-ink no-underline hover:border-ink hover:text-ink">
+        <a href="/tools/fov/" class="mt-2 flex max-w-[400px] flex-col gap-3 border border-line-strong bg-sheet p-4 text-ink no-underline hover:border-ink hover:text-ink lg:flex-1">
           <span class="spec-label">Field-of-view calculator · {fovIn.preset.replace(/ \(.*\)$/, '')} sensor, {fovIn.focal} mm lens, {fovIn.distance} mm away</span>
-          <FovDiagram fov={fovOut} distance={fovIn.distance} focal={fovIn.focal} />
+          {/* On wide screens the card grows to the foot of the tool list beside it; the drawing stays centered */}
+          <div class="flex flex-1 items-center"><div class="w-full"><FovDiagram fov={fovOut} distance={fovIn.distance} focal={fovIn.focal} /></div></div>
           <dl class="m-0 grid grid-cols-2 gap-3 border-t border-line pt-3">
             <div class="rows-2 gap-y-1"><dt class="spec-label">Field of view</dt><dd class="m-0 font-mono text-[15px] font-semibold">{fovOut.hCoverage.toFixed(0)} × {fovOut.vCoverage.toFixed(0)} mm</dd></div>
             <div class="rows-2 gap-y-1"><dt class="spec-label">Suggested board</dt><dd class="m-0 font-mono text-[15px] font-semibold">{fovBoard.board.label} mm</dd></div>
@@ -133,12 +134,13 @@ const featuredReviews = allReviews
       <ol class="m-0 flex list-none flex-col border-t border-line-strong p-0 lg:w-[58%]">
         {featuredTools.map((t, i) => (
           <li class:list={['border-b border-line-strong', i >= PHONE_TOOLS && 'hidden lg:block']}>
-            {/* The glyph is the button (owner 2026-11-21): the whole row links, and the 48 px glyph box turns
-                ink-bordered on hover or focus. Its top lines up with the top of the title's 24 px line.
+            {/* The glyph is the button (owner 2026-11-21): the whole row links, and the glyph box turns
+                ink-bordered on hover or focus. Every row is at least as tall as the 80 px glyph box and the text
+                is centered on it, so the glyphs sit at the same spacing down the list.
                 Glyphs: public/icons/tools/<key>.svg, one 30 × 24 live area. */}
-            <a href={t.href} class="group flex items-start gap-4 py-5 text-ink no-underline hover:text-ink md:gap-5 lg:py-4">
-              <span class="flex h-12 w-12 shrink-0 items-center justify-center border border-line bg-sheet transition-colors group-hover:border-ink group-focus-visible:border-ink">
-                <img src={`/icons/tools/${t.key}.svg`} alt="" width="40" height="40" class="block h-10 w-10" loading="lazy" decoding="async" />
+            <a href={t.href} class="group flex items-center gap-4 py-3 text-ink no-underline hover:text-ink md:gap-5">
+              <span class="flex h-16 w-16 shrink-0 items-center justify-center border border-line bg-sheet transition-colors group-hover:border-ink group-focus-visible:border-ink md:h-20 md:w-20">
+                <img src={`/icons/tools/${t.key}.svg`} alt="" width="64" height="64" class="block h-[52px] w-[52px] md:h-16 md:w-16" loading="lazy" decoding="async" />
               </span>
               <span class="flex min-w-0 flex-1 flex-col gap-1">
                 <strong class="text-[17px] font-medium leading-6 group-hover:text-brand-dark">{t.title}</strong>

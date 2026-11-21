@@ -102,7 +102,7 @@ Checked by `node scripts/check-card-rows.mjs` after a build: every page, six wid
 What the check does not see, so review still has to: blocks with different tags or mostly different classes, table rows (cells are centered by default), content behind a closed `details`, a menu or the cart drawer, results that appear only after an upload, and the dark theme of the tools.
 
 Icons: only where they speed up recognition (download, file type, tolerance class). Tolerance icons use GD&T symbols (⏥ flatness, ⌖ position, ⊥ perpendicularity). No decorative icon next to every heading.
-Exception (owner decision 2026-11-21): the home page's free-tools list shows one glyph per tool (`public/icons/tools/<key>.svg`). They are small drawings of what the tool does, not stock line icons: 40 × 40 box, one 30 × 24 live area, ink #141414 and red #E60012 only, 1–1.5 px strokes, in a 48 px bordered sheet box whose top lines up with the title line. The glyph box is the row's button (no "Open" label): its border turns ink on hover and focus. A new tool gets a glyph drawn the same way (`toolGlyphs.test.ts`).
+Exception (owner decision 2026-11-21): the home page's free-tools list shows one glyph per tool (`public/icons/tools/<key>.svg`). They are small drawings of what the tool does, not stock line icons: 40 × 40 box, one 30 × 24 live area, ink #141414 and red #E60012 only, 1–1.5 px strokes, in an 80 px bordered sheet box (64 px on phones) with the row text centered on it, every row at least as tall as the box so the glyphs keep one spacing. The glyph box is the row's button (no "Open" label): its border turns ink on hover and focus. A new tool gets a glyph drawn the same way (`toolGlyphs.test.ts`).
 
 ## 4. Images
 
