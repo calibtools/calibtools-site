@@ -1,5 +1,20 @@
 # Pricing — rules, anchors, and regeneration
 
+## Large formats (owner decision 2026-11-21)
+
+The rule below applies to 400 × 300 and smaller, ceramic and accessories. **600 × 400 and 800 × 600**
+composite boards no longer follow calib.io: they are priced at the factory's retail price × 3
+(6.8 CNY/USD, precise endings) and shown on the site as "From <price>" with a quote button, not in
+the cart (`src/lib/largeFormat.ts`). Set in Shopify 2026-11-21:
+
+| Size | Checkerboard, circle grid, AprilGrid, HALCON | ChArUco |
+|---|---|---|
+| 600 × 400 | $439 | $579 |
+| 800 × 600 | $929 | $1,009 |
+
+The monotonicity check below no longer holds across the 400 × 300 → 600 × 400 step, on purpose.
+Recalculate when the factory's supply prices are agreed.
+
 ## Price rule
 
 1. **Composite targets** (CHT-P, CHA-P): `target_EUR = calib.io_anchor × 1.175`,
