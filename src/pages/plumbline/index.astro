@@ -58,17 +58,18 @@ const faqLd = {
       {software.name} shows the error of every image and how much of the frame your corners cover. You see which images to retake before the numbers go into your pipeline.
     </p>
     {unreleased ? (
-      <div id="notify" class="flex max-w-[520px] scroll-mt-24 flex-col gap-4">
-        <div class="flex flex-wrap items-center gap-3">
+      <div id="notify" class="flex scroll-mt-24 flex-col gap-x-8 gap-y-4 lg:flex-row lg:items-start">
+        <div class="flex flex-wrap items-center gap-3 lg:h-10">
           <span class="badge text-brand-dark">{COMING_SOON_LABEL}</span>
           <span class="font-mono text-[13px] text-ink-muted">{software.platforms.join(' · ')}</span>
         </div>
         <NewsletterForm
           client:load
+          compact
           id="pl"
           tag={NOTIFY_TAG}
-          heading="Get an email when it is out"
-          note="We send the download link on release day. One email, nothing else."
+          heading="Email for the release notification"
+          note="We email you the download link on release day. One email, nothing else."
           button="Notify me"
           done="Done. We email you the day Plumbline is out."
         />
