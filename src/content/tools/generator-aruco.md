@@ -81,4 +81,4 @@ Printed markers are fine for pose estimation and quick tests. For camera calibra
 
 - Need a calibration board rather than single markers? Use the [ChArUco generator](/tools/generator/charuco/).
 - Using AprilTag instead? See the [AprilTag generator](/tools/generator/apriltag/).
-- [ChArUco vs checkerboard vs AprilGrid](/guides/charuco-vs-checkerboard-vs-aprilgrid/)
+- [ChArUco vs checkerboard vs AprilGrid](/calibacademy/charuco-vs-checkerboard-vs-aprilgrid/)

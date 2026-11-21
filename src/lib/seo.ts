@@ -35,7 +35,7 @@ export function breadcrumbLd(items: BreadcrumbItem[]): Record<string, any> {
 const SEGMENT_NAMES: Record<string, string> = {
   targets: 'Calibration targets',
   tools: 'Free tools',
-  guides: 'Calib Academy',
+  calibacademy: 'Calib Academy',
   collection: 'Collections',
   generator: 'Pattern generator',
   files: 'Files',

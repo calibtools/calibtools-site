@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-const FINISHED_GUIDE = '/guides/multi-board-marker-ids/';
+const FINISHED_GUIDE = '/calibacademy/multi-board-marker-ids/';
 
 // ---------------------------------------------------------------------------
 // Schema: all guides render without error
@@ -13,7 +13,7 @@ test('Guide pages render', async ({ page }) => {
     'composite-ceramic-or-glass',
     'printed-target-costs-half-a-pixel',
   ]) {
-    const res = await page.goto(`/guides/${slug}/`);
+    const res = await page.goto(`/calibacademy/${slug}/`);
     expect(res?.ok(), `Guide ${slug} returned ${res?.status()}`).toBe(true);
     await expect(page.locator('h1')).toBeVisible();
   }
@@ -57,7 +57,7 @@ test('No personal name in guide page', async ({ page }) => {
 // ---------------------------------------------------------------------------
 
 test('Guides index is sorted by updated desc', async ({ page }) => {
-  await page.goto('/guides/');
+  await page.goto('/calibacademy/');
   const dates = await page.locator('.spec').allTextContents();
   const dateStrings = dates.map((d) => d.match(/\d{4}-\d{2}-\d{2}/)?.[0]).filter(Boolean) as string[];
   expect(dateStrings.length).toBeGreaterThanOrEqual(2);

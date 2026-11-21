@@ -93,7 +93,7 @@ Angles for a full-frame sensor (36 × 24 mm) and for a 2/3" machine-vision senso
 
 A board that fills about 60 % of the frame is a good start: large enough for sharp corners, small enough to tilt and move into the corners of the image. Each marker bit should cover at least 3 pixels so the ArUco IDs decode.
 
-The [target size guide](/guides/calibration-target-size/) shows the test data behind these numbers.
+The [target size guide](/calibacademy/calibration-target-size/) shows the test data behind these numbers.
 
 The recommendation uses the stock [ChArUco composite board](/targets/charuco-composite/) sizes, and the [ceramic target](/targets/charuco-ceramic/) sizes when the field is too small for any composite board. The same layout can be printed free from the [pattern generator](/tools/generator/charuco/).
 
@@ -105,5 +105,5 @@ See the [heated thermal target](/targets/thermal-calibration-target/) and [NIR t
 
 ## Related guides
 
-- [How big should your calibration target be?](/guides/calibration-target-size/) — the 60 % rule with test data
-- [ChArUco vs checkerboard vs AprilGrid](/guides/charuco-vs-checkerboard-vs-aprilgrid/) — pattern selection after sizing
+- [How big should your calibration target be?](/calibacademy/calibration-target-size/) — the 60 % rule with test data
+- [ChArUco vs checkerboard vs AprilGrid](/calibacademy/charuco-vs-checkerboard-vs-aprilgrid/) — pattern selection after sizing

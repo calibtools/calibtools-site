@@ -29,10 +29,10 @@ relatedTargets:
   - { label: "Hand-eye calibration kit", href: "/targets/hand-eye-calibration-kit/", note: "Board and flange adapter for a camera on a robot." }
   - { label: "¼″ mounting fixture", href: "/targets/mounting-fixture/", note: "Clamps any board onto a tripod or lab post." }
 relatedGuides:
-  - { label: "Camera-IMU calibration with Kalibr", href: "/guides/kalibr-camera-imu-calibration/", note: "Target file, recording, running, reading the result." }
-  - { label: "ChArUco vs checkerboard vs AprilGrid", href: "/guides/charuco-vs-checkerboard-vs-aprilgrid/", note: "Which pattern for which job." }
-  - { label: "How big should your target be?", href: "/guides/calibration-target-size/", note: "The 60 % fill rule and pixels per marker bit." }
-  - { label: "Multi-board marker IDs", href: "/guides/multi-board-marker-ids/", note: "Several boards in one scene." }
+  - { label: "Camera-IMU calibration with Kalibr", href: "/calibacademy/kalibr-camera-imu-calibration/", note: "Target file, recording, running, reading the result." }
+  - { label: "ChArUco vs checkerboard vs AprilGrid", href: "/calibacademy/charuco-vs-checkerboard-vs-aprilgrid/", note: "Which pattern for which job." }
+  - { label: "How big should your target be?", href: "/calibacademy/calibration-target-size/", note: "The 60 % fill rule and pixels per marker bit." }
+  - { label: "Multi-board marker IDs", href: "/calibacademy/multi-board-marker-ids/", note: "Several boards in one scene." }
 ---
 
 ## What an AprilGrid is
@@ -41,7 +41,7 @@ An AprilGrid is a grid of AprilTag 36h11 markers with a small black square at ev
 
 Because each tag has its own ID, the board can be partly out of frame, partly covered by a hand, or seen for only a few frames, and the pose is still unambiguous. A [checkerboard](/targets/checkerboard-composite/) or a circle grid cannot do that.
 
-This is why [Kalibr](/guides/kalibr-camera-imu-calibration/) is built around it. Camera-IMU calibration needs fast motion on all axes, and during fast motion the board keeps leaving the image.
+This is why [Kalibr](/calibacademy/kalibr-camera-imu-calibration/) is built around it. Camera-IMU calibration needs fast motion on all axes, and during fast motion the board keeps leaving the image.
 
 The same board works outside Kalibr: OpenCV reads the tags with `cv2.aruco.DICT_APRILTAG_36h11`, and robotics stacks that already use AprilTag can detect it with their own detector.
 
@@ -101,11 +101,11 @@ The matte print matters here more than elsewhere: a sensor rig moving in front o
 
 ## Files and software
 
-Each board comes with `.kalibr.yaml`, `.opencv.json` and a `.dxf` of the pattern. The [Kalibr guide](/guides/kalibr-camera-imu-calibration/) covers the IMU noise file, the recording and how to read the result.
+Each board comes with `.kalibr.yaml`, `.opencv.json` and a `.dxf` of the pattern. The [Kalibr guide](/calibacademy/kalibr-camera-imu-calibration/) covers the IMU noise file, the recording and how to read the result.
 
 To rehearse the motion before the board arrives, print the same grid with the [AprilGrid generator](/tools/generator/aprilgrid/). If the same rig also needs a stereo or hand-eye calibration in OpenCV, the [ChArUco board](/targets/charuco-composite/) is the better fit for that step.
 
-If several boards share one scene, give each its own ID range; the [multi-board guide](/guides/multi-board-marker-ids/) explains how.
+If several boards share one scene, give each its own ID range; the [multi-board guide](/calibacademy/multi-board-marker-ids/) explains how.
 
 ## Care and storage
 

@@ -19,7 +19,7 @@ export function pageInfo(html) {
 
 const SECTIONS = [
   ['Free tools', (p) => p.startsWith('/tools/')],
-  ['Calib Academy (guides)', (p) => p.startsWith('/guides/')],
+  ['Calib Academy (guides)', (p) => p.startsWith('/calibacademy/')],
   ['Plumbline desktop software', (p) => p.startsWith('/plumbline/')],
   ['Calibration targets', (p) => p.startsWith('/targets/')],
   ['Applications', (p) => p.startsWith('/applications/')],

@@ -14,7 +14,7 @@ describe('sitemap lastmod sources', () => {
     expect(sourceFilesForPath('/tools/generator/charuco/'))
       .toEqual(['src/pages/tools/generator/charuco.astro', 'src/content/tools/generator-charuco.md']);
     expect(sourceFilesForPath('/tools/fov/')).toEqual(['src/pages/tools/fov.astro', 'src/content/tools/fov.md']);
-    expect(sourceFilesForPath('/guides/reprojection-error/')).toEqual(['src/content/guides/reprojection-error.md']);
+    expect(sourceFilesForPath('/calibacademy/reprojection-error/')).toEqual(['src/content/guides/reprojection-error.md']);
     expect(sourceFilesForPath('/')).toEqual(['src/pages/index.astro']);
   });
 });
@@ -32,7 +32,7 @@ describe('llms.txt', () => {
     const txt = buildLlmsTxt([
       { url: 'https://calib.tools/', title: 'Calibration targets', description: 'Targets and free tools.' },
       { url: 'https://calib.tools/tools/generator/charuco/', title: 'ChArUco generator', description: 'Free PDF.' },
-      { url: 'https://calib.tools/guides/reprojection-error/', title: 'Reprojection error', description: 'What it means.' },
+      { url: 'https://calib.tools/calibacademy/reprojection-error/', title: 'Reprojection error', description: 'What it means.' },
       { url: 'https://calib.tools/targets/charuco-composite/', title: 'ChArUco board, aluminum', description: 'Rigid board.' },
       { url: 'https://calib.tools/applications/robotics-calibration/', title: 'Robotics', description: 'Hand-eye.' },
       { url: 'https://calib.tools/plumbline/', title: 'Plumbline', description: 'Desktop software.' },

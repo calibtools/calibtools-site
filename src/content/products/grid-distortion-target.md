@@ -22,9 +22,9 @@ relatedTargets:
   - { label: "Backlit target", href: "/targets/backlit-target/", note: "Calibration patterns on a light source." }
   - { label: "Circle grid, aluminum", href: "/targets/circlegrid-composite/", note: "Dot grids for larger fields." }
 relatedGuides:
-  - { label: "Composite, ceramic or glass", href: "/guides/composite-ceramic-or-glass/", note: "Compare the tolerance with one pixel on the target." }
-  - { label: "What reprojection error tells you", href: "/guides/reprojection-error/", note: "Reading residuals." }
-  - { label: "OpenCV camera calibration", href: "/guides/opencv-camera-calibration/", note: "When you need the full camera model." }
+  - { label: "Composite, ceramic or glass", href: "/calibacademy/composite-ceramic-or-glass/", note: "Compare the tolerance with one pixel on the target." }
+  - { label: "What reprojection error tells you", href: "/calibacademy/reprojection-error/", note: "Reading residuals." }
+  - { label: "OpenCV camera calibration", href: "/calibacademy/opencv-camera-calibration/", note: "When you need the full camera model." }
 ---
 
 ## What distortion is, and how a grid shows it
@@ -61,7 +61,7 @@ The plate should cover the whole field with a margin. Distortion is largest in t
 
 On a small field, a few micrometers on the target are a visible fraction of a pixel. Lithographed chrome on glass places features far more exactly than print and keeps its size as the temperature changes.
 
-Glass also works with light from behind, which is how most telecentric measuring stations are lit. The [substrate guide](/guides/composite-ceramic-or-glass/) shows where print stops being good enough.
+Glass also works with light from behind, which is how most telecentric measuring stations are lit. The [substrate guide](/calibacademy/composite-ceramic-or-glass/) shows where print stops being good enough.
 
 ## Using it
 

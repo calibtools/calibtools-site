@@ -39,7 +39,7 @@ A stereo rig for industrial inspection at medium accuracy, indoors, using OpenCV
 
 ## Related guides
 
-- [Camera calibration with OpenCV](/guides/opencv-camera-calibration/) — the full procedure, step by step
+- [Camera calibration with OpenCV](/calibacademy/opencv-camera-calibration/) — the full procedure, step by step
 
 - [FOV calculator](/tools/fov/) — field of view, focal length and board size for your camera
 

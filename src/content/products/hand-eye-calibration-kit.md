@@ -22,16 +22,16 @@ relatedTargets:
   - { label: "Multi-camera target", href: "/targets/multi-camera-target/", note: "Several faces for cameras around a cell." }
   - { label: "¼″ mounting fixture", href: "/targets/mounting-fixture/", note: "Holds the plate on a tripod or post for eye-in-hand." }
 relatedGuides:
-  - { label: "Hand-eye calibration with OpenCV", href: "/guides/hand-eye-calibration-opencv/", note: "Poses, code and how to check the result." }
-  - { label: "How big should your target be?", href: "/guides/calibration-target-size/", note: "The 60 % fill rule and pixels per marker bit." }
-  - { label: "What reprojection error tells you", href: "/guides/reprojection-error/", note: "And what a low value can hide." }
+  - { label: "Hand-eye calibration with OpenCV", href: "/calibacademy/hand-eye-calibration-opencv/", note: "Poses, code and how to check the result." }
+  - { label: "How big should your target be?", href: "/calibacademy/calibration-target-size/", note: "The 60 % fill rule and pixels per marker bit." }
+  - { label: "What reprojection error tells you", href: "/calibacademy/reprojection-error/", note: "And what a low value can hide." }
 ---
 
 ## What hand-eye calibration needs from a target
 
 Hand-eye calibration finds where the camera sits relative to the robot. You move the robot through a set of poses, the camera measures the pose of a target in each one, and a solver works out the fixed transform that makes both sets of poses agree.
 
-The solver only learns from rotation. The [hand-eye guide](/guides/hand-eye-calibration-opencv/) recommends 15 to 25 poses with 30° to 45° of rotation between them, about all three axes.
+The solver only learns from rotation. The [hand-eye guide](/calibacademy/hand-eye-calibration-opencv/) recommends 15 to 25 poses with 30° to 45° of rotation between them, about all three axes.
 
 At those angles a board is often cut off by the image edge or by the gripper. A ChArUco board still returns identified corners when only part of it is visible, so those poses count. With a [checkerboard](/targets/checkerboard-composite/) they would be lost.
 

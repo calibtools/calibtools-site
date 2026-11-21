@@ -21,8 +21,8 @@ relatedTargets:
   - { label: "NIR calibration target", href: "/targets/nir-calibration-target/", note: "Patterns that keep contrast at 850 and 940 nm." }
   - { label: "Radar-camera target", href: "/targets/radar-camera-target/", note: "Corner reflectors for radar." }
 relatedGuides:
-  - { label: "LiDAR-camera calibration", href: "/guides/lidar-camera-calibration/", note: "Where intensity and geometry meet." }
-  - { label: "How big should your target be?", href: "/guides/calibration-target-size/", note: "Size against field of view." }
+  - { label: "LiDAR-camera calibration", href: "/calibacademy/lidar-camera-calibration/", note: "Where intensity and geometry meet." }
+  - { label: "How big should your target be?", href: "/calibacademy/calibration-target-size/", note: "Size against field of view." }
 ---
 
 ## What the panel is for

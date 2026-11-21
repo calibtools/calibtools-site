@@ -20,9 +20,9 @@ links:
   - { label: "FOV calculator", href: "/tools/fov/" }
   - { label: "Format converter", href: "/tools/convert/" }
   - { label: "Pattern generator", href: "/tools/generator/" }
-  - { label: "USAF 1951 lp/mm table", href: "/guides/usaf-1951-lp-mm-table/" }
-  - { label: "Line-scan camera calibration", href: "/guides/line-scan-camera-calibration/" }
-  - { label: "Board not detected? Troubleshooting", href: "/guides/corner-detection-troubleshooting/" }
+  - { label: "USAF 1951 lp/mm table", href: "/calibacademy/usaf-1951-lp-mm-table/" }
+  - { label: "Line-scan camera calibration", href: "/calibacademy/line-scan-camera-calibration/" }
+  - { label: "Board not detected? Troubleshooting", href: "/calibacademy/corner-detection-troubleshooting/" }
 selection:
   - { scenario: "HALCON measurement setup", pattern: "HALCON calibration plate", size: "Sized to the field", material: "Composite" }
   - { scenario: "Small field, high accuracy", pattern: "ChArUco or circle grid", size: "110 × 85 to 230 × 140 mm", material: "Alumina ceramic" }

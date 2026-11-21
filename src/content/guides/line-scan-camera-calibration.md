@@ -145,9 +145,9 @@ The squares need not be square in the image. We rendered the same board at 0.05,
 
 Place the board at a few degrees to the belt rather than aligned with it, so that each board axis has components along u and along v; the fit separates skew from the board's own rotation that way. Our board sat at 4°.
 
-Size the squares for the along-line resolution: 20 mm squares were 200 px here, which is more than enough; 50 px squares are fine for the detector. For how to size against the field and the lens, see [How big should your target be?](/guides/calibration-target-size/).
+Size the squares for the along-line resolution: 20 mm squares were 200 px here, which is more than enough; 50 px squares are fine for the detector. For how to size against the field and the lens, see [How big should your target be?](/calibacademy/calibration-target-size/).
 
-The board must be flat and lie in the plane you measure in; step 7 shows what height does. A printed sheet is not flat once it has been on a belt. The [composite boards](/targets/checkerboard-composite/) stay flat, and the [substrate guide](/guides/composite-ceramic-or-glass/) has the numbers.
+The board must be flat and lie in the plane you measure in; step 7 shows what height does. A printed sheet is not flat once it has been on a belt. The [composite boards](/targets/checkerboard-composite/) stay flat, and the [substrate guide](/calibacademy/composite-ceramic-or-glass/) has the numbers.
 
 ## 4. Fit the model
 
@@ -345,13 +345,13 @@ Before you use the model:
 
 ## Next steps
 
-- [Camera calibration with OpenCV](/guides/opencv-camera-calibration/) — the area-camera pipeline, for the frame cameras on the same line.
+- [Camera calibration with OpenCV](/calibacademy/opencv-camera-calibration/) — the area-camera pipeline, for the frame cameras on the same line.
 
-- [How big should your target be?](/guides/calibration-target-size/) — square size against sensor, lens and field.
+- [How big should your target be?](/calibacademy/calibration-target-size/) — square size against sensor, lens and field.
 
-- [Composite, ceramic or glass](/guides/composite-ceramic-or-glass/) — flatness and thermal expansion of the board materials against one pixel of the system.
+- [Composite, ceramic or glass](/calibacademy/composite-ceramic-or-glass/) — flatness and thermal expansion of the board materials against one pixel of the system.
 
-- [Why a printed target costs half a pixel](/guides/printed-target-costs-half-a-pixel/) — what a paper board on a belt does to the fit.
+- [Why a printed target costs half a pixel](/calibacademy/printed-target-costs-half-a-pixel/) — what a paper board on a belt does to the fit.
 
 - Our [line-scan strips](/targets/line-scan-target/) are chrome on glass with lines or dots at known pitch, 300 to 800 mm long; tell us the field width and the pixel count and we propose a pitch.
 

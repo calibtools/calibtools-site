@@ -40,7 +40,7 @@ The figure is a measurement, not a sketch. Each board was rendered with 45 % of 
 
 ## Picking square and marker size
 
-Start from the field of view. The board should cover about half of the image at your working distance; the [target size guide](/guides/calibration-target-size/) and the [FOV calculator](/tools/fov/) work out the board size for your camera and lens.
+Start from the field of view. The board should cover about half of the image at your working distance; the [target size guide](/calibacademy/calibration-target-size/) and the [FOV calculator](/tools/fov/) work out the board size for your camera and lens.
 
 Then check the smallest feature in pixels:
 

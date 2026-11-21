@@ -91,4 +91,4 @@ Printed tags are fine for localization and quick tests. For camera calibration, 
 
 - Calibrating a camera and IMU with Kalibr? Use the [AprilGrid generator](/tools/generator/aprilgrid/).
 - Using ArUco instead? See the [ArUco marker generator](/tools/generator/aruco/).
-- [ChArUco vs checkerboard vs AprilGrid](/guides/charuco-vs-checkerboard-vs-aprilgrid/)
+- [ChArUco vs checkerboard vs AprilGrid](/calibacademy/charuco-vs-checkerboard-vs-aprilgrid/)

@@ -204,8 +204,8 @@ Repeat the calibration after any change to the mount, lens focus or driver, and 
 
 ## Next steps
 
-- [Calibrate the camera with OpenCV](/guides/opencv-camera-calibration/) if you want to check Kalibr's intrinsics against an independent tool.
+- [Calibrate the camera with OpenCV](/calibacademy/opencv-camera-calibration/) if you want to check Kalibr's intrinsics against an independent tool.
 
-- [Choose a pattern](/guides/charuco-vs-checkerboard-vs-aprilgrid/) when the same rig also needs stereo or hand-eye calibration.
+- [Choose a pattern](/calibacademy/charuco-vs-checkerboard-vs-aprilgrid/) when the same rig also needs stereo or hand-eye calibration.
 
-- Robot-mounted sensors also need [hand-eye calibration](/guides/hand-eye-calibration-opencv/) to tie the IMU frame to the robot.
+- Robot-mounted sensors also need [hand-eye calibration](/calibacademy/hand-eye-calibration-opencv/) to tie the IMU frame to the robot.

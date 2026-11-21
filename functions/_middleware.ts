@@ -36,7 +36,7 @@ export function referrerCategory(referer: string | null): string {
     }
     const path = url.pathname;
     if (path.startsWith('/tools/generator/')) return 'generator';
-    if (path.startsWith('/guides/')) return 'guide';
+    if (path.startsWith('/calibacademy/')) return 'guide';
     if (path.startsWith('/targets/collection/')) return 'collection';
     return 'other';
   } catch {

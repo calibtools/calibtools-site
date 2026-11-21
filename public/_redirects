@@ -2,3 +2,6 @@
 /reviews-policy / 301
 /targets/ir-board/ /targets/thermal-calibration-target/ 301
 /targets/ir-board /targets/thermal-calibration-target/ 301
+# Guides moved to Calib Academy (owner decision 2026-11-22)
+/guides /calibacademy/ 301
+/guides/* /calibacademy/:splat 301

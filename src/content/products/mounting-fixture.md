@@ -17,14 +17,14 @@ relatedTargets:
   - { label: "AprilGrid, aluminum", href: "/targets/aprilgrid-composite/", note: "Stands still while the sensor rig moves." }
   - { label: "Hand-eye calibration kit", href: "/targets/hand-eye-calibration-kit/", note: "For a board on a robot flange instead of a tripod." }
 relatedGuides:
-  - { label: "OpenCV camera calibration", href: "/guides/opencv-camera-calibration/", note: "From images to a camera matrix, step by step." }
-  - { label: "Why your board is not detected", href: "/guides/corner-detection-troubleshooting/", note: "Measured limits for blur, tilt and resolution." }
-  - { label: "How big should your target be?", href: "/guides/calibration-target-size/", note: "The 60 % fill rule." }
+  - { label: "OpenCV camera calibration", href: "/calibacademy/opencv-camera-calibration/", note: "From images to a camera matrix, step by step." }
+  - { label: "Why your board is not detected", href: "/calibacademy/corner-detection-troubleshooting/", note: "Measured limits for blur, tilt and resolution." }
+  - { label: "How big should your target be?", href: "/calibacademy/calibration-target-size/", note: "The 60 % fill rule." }
 ---
 
 ## Why mount the board at all
 
-A hand-held board moves during the exposure. Even a small shake smears the corners, and a smeared corner is found a fraction of a pixel away from where it is. The [troubleshooting guide](/guides/corner-detection-troubleshooting/) shows how quickly blur costs you detections.
+A hand-held board moves during the exposure. Even a small shake smears the corners, and a smeared corner is found a fraction of a pixel away from where it is. The [troubleshooting guide](/calibacademy/corner-detection-troubleshooting/) shows how quickly blur costs you detections.
 
 On a tripod the board is still, so you can use a longer exposure and a smaller aperture. You also get both hands free to move the camera, and you can come back to the same setup the next day.
 

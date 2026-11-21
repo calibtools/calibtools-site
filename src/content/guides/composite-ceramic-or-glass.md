@@ -51,13 +51,13 @@ A target's tolerance only matters relative to what your camera can see. Work out
 
 The composite tolerance is a bound on any corner, not a typical error, and much of it is a scale error across the board.
 
-A pure scale error leaves the intrinsics and the reprojection error untouched and scales every distance the camera reports, as the [printed target guide](/guides/printed-target-costs-half-a-pixel/) shows; entering the measured board size removes it.
+A pure scale error leaves the intrinsics and the reprojection error untouched and scales every distance the camera reports, as the [printed target guide](/calibacademy/printed-target-costs-half-a-pixel/) shows; entering the measured board size removes it.
 
 What is left shows up as residual and as bias in the fitted model.
 
 So the rule of thumb: if the composite tolerance is below a pixel on the board, composite is enough. If it spans several pixels and the calibration feeds a measurement, ceramic takes the target out of your error budget.
 
-Ceramic also suits small fields of view for a practical reason: its largest board is 230 × 140 mm, which matches fields of view up to roughly 400 mm (see [choosing the target size](/guides/calibration-target-size/)).
+Ceramic also suits small fields of view for a practical reason: its largest board is 230 × 140 mm, which matches fields of view up to roughly 400 mm (see [choosing the target size](/calibacademy/calibration-target-size/)).
 
 ## Flatness: stable matters more than perfect
 
@@ -109,7 +109,7 @@ We do not publish gloss values for our surfaces yet. If your setup has a gloss l
 
 Composite boards run from 200 × 150 mm to 800 × 600 mm as standard and up to 1200 × 800 mm on request, at about 6.6 kg/m² (a 300 × 200 mm board weighs about 0.4 kg).
 
-For fields of view beyond about 1.3 m, several boards with distinct marker IDs work better than one huge panel; see the [multi-board guide](/guides/multi-board-marker-ids/).
+For fields of view beyond about 1.3 m, several boards with distinct marker IDs work better than one huge panel; see the [multi-board guide](/calibacademy/multi-board-marker-ids/).
 
 Ceramic stops at 230 × 140 mm. Glass is quoted per job; at about 2.5 g/cm³, a 3 mm glass plate weighs about 7.6 kg/m², close to composite, but it needs more care in handling and shipping.
 
@@ -137,4 +137,4 @@ For a backlit pattern with micron accuracy, use glass; see the [backlit target](
 
 **Choose glass** when you need backlighting, a transmissive target for a microscope or lens bench, or the low expansion of borosilicate glass. [Glass resolution and scale targets](/targets/resolution-targets-glass/), or [ask for a quote](/quote/) for a glass calibration pattern.
 
-If you are still on a printed sheet, start with the [printed target guide](/guides/printed-target-costs-half-a-pixel/): it shows which of the three failures of a print a rigid board removes.
+If you are still on a printed sheet, start with the [printed target guide](/calibacademy/printed-target-costs-half-a-pixel/): it shows which of the three failures of a print a rigid board removes.

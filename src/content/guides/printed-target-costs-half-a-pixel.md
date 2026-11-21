@@ -33,7 +33,7 @@ Twenty views per calibration, 550 to 950 mm away, tilted up to 40°, with 0.05 p
 
 In each scenario the *real* board was deformed, and the calibration was run with the *nominal* flat board, which is what happens when you describe a print by the parameters of the file you sent to the printer.
 
-Every number is the median of 30 random sets of views. "Edge error" is how far the fitted model is from the true one at the four frame corners, the same check we used in the [reprojection error guide](/guides/reprojection-error/).
+Every number is the median of 30 random sets of views. "Edge error" is how far the fitted model is from the true one at the four frame corners, the same check we used in the [reprojection error guide](/calibacademy/reprojection-error/).
 
 | Real board | RMS (px) | Focal length | fy/fx | Edge error (px) | Distance |
 |---|---|---|---|---|---|
@@ -176,7 +176,7 @@ It is the wrong target when the focal length or distances feed a measurement, wh
 
 That is where a rigid board with a measured geometry takes the three failures above off your list.
 
-Our [composite boards](/targets/collection/composite-boards/) are UV-printed on aluminum composite and measured before they ship; the [substrate guide](/guides/composite-ceramic-or-glass/) explains when ceramic or glass is worth the step up.
+Our [composite boards](/targets/collection/composite-boards/) are UV-printed on aluminum composite and measured before they ship; the [substrate guide](/calibacademy/composite-ceramic-or-glass/) explains when ceramic or glass is worth the step up.
 
 ## Method
 

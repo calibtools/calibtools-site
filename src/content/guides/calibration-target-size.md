@@ -90,9 +90,9 @@ Multiply the coverage long side by 0.6 and pick the nearest board. Rounding **do
 
 For the 587 mm coverage above, 0.6 × 587 = 352 mm, so the [300 × 200 composite board](/targets/charuco-composite/) is the pick, with the 400 × 300 as the alternative if you can move it a little further away.
 
-Ceramic boards are for small fields of view and for when position accuracy below a few micrometers matters; see the [ceramic ChArUco target](/targets/charuco-ceramic/), and [composite, ceramic or glass](/guides/composite-ceramic-or-glass/) for how the three substrates compare.
+Ceramic boards are for small fields of view and for when position accuracy below a few micrometers matters; see the [ceramic ChArUco target](/targets/charuco-ceramic/), and [composite, ceramic or glass](/calibacademy/composite-ceramic-or-glass/) for how the three substrates compare.
 
-For fields wider than about 1.3 m, use two or more boards with distinct marker IDs instead of one huge panel; the [multi-board guide](/guides/multi-board-marker-ids/) covers the setup.
+For fields wider than about 1.3 m, use two or more boards with distinct marker IDs instead of one huge panel; the [multi-board guide](/calibacademy/multi-board-marker-ids/) covers the setup.
 
 ## Step 3: check the pixels
 
@@ -114,9 +114,9 @@ The [FOV calculator](/tools/fov/) reports both numbers for each board it suggest
 
 **Stereo or multi-camera.** The board must be visible in both cameras at once, so size it for the shared field of view, which is narrower than either camera's. Expect to need more views to cover each camera's edges.
 
-**The board has to stay put (hand-eye, robot cells).** Fill applies to the camera's view at each robot pose; the [hand-eye guide](/guides/hand-eye-calibration-opencv/) explains how the poses are chosen.
+**The board has to stay put (hand-eye, robot cells).** Fill applies to the camera's view at each robot pose; the [hand-eye guide](/calibacademy/hand-eye-calibration-opencv/) explains how the poses are chosen.
 
-**Line-scan, telecentric and thermal cameras** each break one assumption above and have their own guides: [line-scan](/guides/line-scan-camera-calibration/) and [thermal](/guides/thermal-camera-geometric-calibration/) are written.
+**Line-scan, telecentric and thermal cameras** each break one assumption above and have their own guides: [line-scan](/calibacademy/line-scan-camera-calibration/) and [thermal](/calibacademy/thermal-camera-geometric-calibration/) are written.
 
 ## Views and tilt
 
@@ -128,7 +128,7 @@ Size gets the board into the frame; the views do the rest. Plan for:
 
 - a few near and far views to spread the depth
 
-The [OpenCV calibration guide](/guides/opencv-camera-calibration/) walks through capture and the per-view error check that catches a bad frame.
+The [OpenCV calibration guide](/calibacademy/opencv-camera-calibration/) walks through capture and the per-view error check that catches a bad frame.
 
 ## Common problems
 
@@ -145,6 +145,6 @@ The [OpenCV calibration guide](/guides/opencv-camera-calibration/) walks through
 
 - Open the [FOV calculator](/tools/fov/) with your sensor, lens and distance and read off the recommended board.
 
-- [Choose a pattern](/guides/charuco-vs-checkerboard-vs-aprilgrid/) for your software and lens.
+- [Choose a pattern](/calibacademy/charuco-vs-checkerboard-vs-aprilgrid/) for your software and lens.
 
-- Then follow the [OpenCV calibration guide](/guides/opencv-camera-calibration/) for capture and checks.
+- Then follow the [OpenCV calibration guide](/calibacademy/opencv-camera-calibration/) for capture and checks.

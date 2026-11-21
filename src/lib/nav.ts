@@ -6,7 +6,7 @@
 import { tools } from './tools';
 import { software } from './software';
 
-/** Name of the guides section (URL stays /guides/). Owner decision 2026-11-22. */
+/** Name of the guides section (URL stays /calibacademy/). Owner decision 2026-11-22. */
 export const ACADEMY_NAME = 'Calib Academy';
 
 // ── Types ────────────────────────────────────────────────────────────
@@ -93,7 +93,7 @@ export const toolsDropdown: NavItem[] = [
 // ── Support dropdown (Calib Academy first, separated like the generator in Tools) ──
 
 export const supportDropdown: NavItem[] = [
-  { label: ACADEMY_NAME, href: '/guides/' },
+  { label: ACADEMY_NAME, href: '/calibacademy/' },
   { label: 'FAQ', href: '/faq/' },
   { label: 'Shipping, duties & taxes', href: '/shipping/' },
   { label: 'Returns', href: '/returns/' },
@@ -137,6 +137,7 @@ export const footerGroups: FooterGroup[] = [
       { label: 'Detection check', href: '/tools/check/' },
       { label: 'Quality analyzer', href: '/tools/quality/' },
       { label: 'Capture assistant', href: '/tools/capture/' },
+      { label: software.name, href: software.href },
     ],
   },
   {
@@ -153,6 +154,7 @@ export const footerGroups: FooterGroup[] = [
   {
     heading: 'Support',
     items: [
+      { label: ACADEMY_NAME, href: '/calibacademy/' },
       { label: 'FAQ', href: '/faq/' },
       { label: 'Shipping, duties & taxes', href: '/shipping/' },
       { label: 'Returns', href: '/returns/' },

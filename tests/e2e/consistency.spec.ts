@@ -27,7 +27,7 @@ test('Certificate page contains ISO/IEC 17025', async ({ page }) => {
 // ---------------------------------------------------------------------------
 
 test('No "Germany", "Munich", "München", "EU stock" in dist', async ({ page }) => {
-  const pages = ['/', '/targets/', '/about/', '/shipping/', '/guides/'];
+  const pages = ['/', '/targets/', '/about/', '/shipping/', '/calibacademy/'];
   for (const path of pages) {
     await page.goto(path);
     const body = (await page.locator('body').textContent()) ?? '';

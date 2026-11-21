@@ -39,10 +39,10 @@ relatedTargets:
   - { label: "Depth and ToF camera targets", href: "/targets/depth-camera-target/", note: "For structured-light and time-of-flight cameras." }
   - { label: "¼″ mounting fixture", href: "/targets/mounting-fixture/", note: "Clamps any board onto a tripod or lab post." }
 relatedGuides:
-  - { label: "Why your board is not detected", href: "/guides/corner-detection-troubleshooting/", note: "Image problems and board-definition problems." }
-  - { label: "How big should your target be?", href: "/guides/calibration-target-size/", note: "The 60 % fill rule." }
-  - { label: "OpenCV camera calibration", href: "/guides/opencv-camera-calibration/", note: "From images to a camera matrix, step by step." }
-  - { label: "What reprojection error tells you", href: "/guides/reprojection-error/", note: "And what a low value can hide." }
+  - { label: "Why your board is not detected", href: "/calibacademy/corner-detection-troubleshooting/", note: "Image problems and board-definition problems." }
+  - { label: "How big should your target be?", href: "/calibacademy/calibration-target-size/", note: "The 60 % fill rule." }
+  - { label: "OpenCV camera calibration", href: "/calibacademy/opencv-camera-calibration/", note: "From images to a camera matrix, step by step." }
+  - { label: "What reprojection error tells you", href: "/calibacademy/reprojection-error/", note: "And what a low value can hide." }
 ---
 
 ## Why circles instead of corners
@@ -86,7 +86,7 @@ found, centers = cv2.findCirclesGrid(
 
 ## Choosing a size
 
-The field widths below assume the board fills about 60 % of the image, as in the [target size guide](/guides/calibration-target-size/). The image scales are the range that keeps the circles between 10 and 75 px with default settings; the [FOV calculator](/tools/fov/) gives yours.
+The field widths below assume the board fills about 60 % of the image, as in the [target size guide](/calibacademy/calibration-target-size/). The image scales are the range that keeps the circles between 10 and 75 px with default settings; the [FOV calculator](/tools/fov/) gives yours.
 
 **200 × 150 mm**, circles of 12 mm at a 20 mm pitch, about 0.2 kg, for a field about 330 mm wide. [Symmetric](#CT-CIR-P-200X150-SYM): 5 × 8, 40 circles. [Asymmetric](#CT-CIR-P-200X150-ASY): 5 × 4, 20 circles. Keep the image scale between 0.16 and 1.2 mm per pixel.
 
@@ -118,9 +118,9 @@ Circle centers are held to ±0.3 mm + 0.2 mm per meter of the nominal grid at 20
 
 Each board comes with `.opencv.json` and a `.dxf` of the pattern; symmetric boards also come with `.kalibr.yaml`. In HALCON, use the circle centers as a point-based calibration object.
 
-To try a layout before you order, print it with the [circle grid generator](/tools/generator/circles/). If the grid is not found, the [troubleshooting guide](/guides/corner-detection-troubleshooting/) separates image problems from board-definition problems.
+To try a layout before you order, print it with the [circle grid generator](/tools/generator/circles/). If the grid is not found, the [troubleshooting guide](/calibacademy/corner-detection-troubleshooting/) separates image problems from board-definition problems.
 
-After calibrating, read the result with the [reprojection error guide](/guides/reprojection-error/): a low number alone does not show that the model is right at the image edges.
+After calibrating, read the result with the [reprojection error guide](/calibacademy/reprojection-error/): a low number alone does not show that the model is right at the image edges.
 
 ## Care and storage
 

@@ -49,7 +49,7 @@ For a rigid board, a lens at its working focus, sharp images and 15 or more view
 
 These scale with resolution: 0.3 px on a 640 × 480 image is a different fraction of the frame than 0.3 px on 4000 × 3000. Quote the image size next to the number.
 
-The [printed target guide](/guides/printed-target-costs-half-a-pixel/) shows where paper stretch, printer scaling and a bowed board land on this table.
+The [printed target guide](/calibacademy/printed-target-costs-half-a-pixel/) shows where paper stretch, printer scaling and a bowed board land on this table.
 
 ## What it hides
 
@@ -156,7 +156,7 @@ That is single-corner precision. A measurement across the frame depends on how w
 
 | Symptom | Likely cause | Fix |
 |---|---|---|
-| RMS fine, straight lines bend after undistortion | Board never reached the edges | More views at edges and corners; see the [target size guide](/guides/calibration-target-size/) |
+| RMS fine, straight lines bend after undistortion | Board never reached the edges | More views at edges and corners; see the [target size guide](/calibacademy/calibration-target-size/) |
 | RMS fine, distances off by a constant factor | Wrong square size in the board definition | Measure the printed board; set `squareLength` in meters or millimeters consistently |
 | One view at 3× the others | Motion blur, moved board, reflection, ID mis-read | Drop it and recalibrate |
 | Residual grows with radius | Model too simple or no edge coverage | Edge views first; add k3 only if the trend remains |
@@ -166,8 +166,8 @@ That is single-corner precision. A measurement across the frame depends on how w
 
 ## Next steps
 
-- [Size the board](/guides/calibration-target-size/) so corners reach the frame edges.
+- [Size the board](/calibacademy/calibration-target-size/) so corners reach the frame edges.
 
-- [Calibrate step by step](/guides/opencv-camera-calibration/) with the per-view check built in.
+- [Calibrate step by step](/calibacademy/opencv-camera-calibration/) with the per-view check built in.
 
 - Compare the result against a [rigid board](/targets/charuco-composite/) if your numbers sit in the 0.5 px row.

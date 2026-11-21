@@ -13,7 +13,7 @@ const PAGES = [
   '/', '/targets/', '/targets/collection/composite-boards/',
   '/targets/charuco-composite/', '/targets/charuco-ceramic/', '/targets/ir-board/',
   '/tools/', '/tools/generator/charuco/', '/tools/fov/',
-  '/guides/', '/guides/multi-board-marker-ids/',
+  '/calibacademy/', '/calibacademy/multi-board-marker-ids/',
   '/quote/', '/faq/', '/cart/',
 ];
 

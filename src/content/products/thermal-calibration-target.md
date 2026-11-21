@@ -22,10 +22,10 @@ relatedTargets:
   - { label: "Multi-camera target", href: "/targets/multi-camera-target/", note: "Several faces for cameras around a rig." }
   - { label: "¼″ mounting fixture", href: "/targets/mounting-fixture/", note: "Holds a board on a tripod or lab post." }
 relatedGuides:
-  - { label: "Thermal camera geometric calibration", href: "/guides/thermal-camera-geometric-calibration/", note: "Contrast, 14-bit conversion and detector settings for LWIR." }
-  - { label: "OpenCV camera calibration", href: "/guides/opencv-camera-calibration/", note: "From images to a camera matrix." }
-  - { label: "Why your board is not detected", href: "/guides/corner-detection-troubleshooting/", note: "Blur, tilt and resolution limits." }
-  - { label: "What reprojection error tells you", href: "/guides/reprojection-error/", note: "And what a low value can hide." }
+  - { label: "Thermal camera geometric calibration", href: "/calibacademy/thermal-camera-geometric-calibration/", note: "Contrast, 14-bit conversion and detector settings for LWIR." }
+  - { label: "OpenCV camera calibration", href: "/calibacademy/opencv-camera-calibration/", note: "From images to a camera matrix." }
+  - { label: "Why your board is not detected", href: "/calibacademy/corner-detection-troubleshooting/", note: "Blur, tilt and resolution limits." }
+  - { label: "What reprojection error tells you", href: "/calibacademy/reprojection-error/", note: "And what a low value can hide." }
 facts:
   - { label: "Band", value: "Long-wave infrared, 8–14 µm" }
   - { label: "Pattern", value: "Checkerboard or circle grid" }
@@ -56,7 +56,7 @@ Heat spreads sideways in a plate, and thermal lenses are less sharp than visible
 
 A circle grid copes well with that: the center of a soft-edged dot is still in the right place. A checkerboard gives the detector a familiar pattern and works in every toolchain, as long as the squares are large enough in the image.
 
-Thermal sensors have far fewer pixels than visible ones. Plan for fewer, larger features than you would on a visible-light board; the [target size guide](/guides/calibration-target-size/) applies with your thermal resolution.
+Thermal sensors have far fewer pixels than visible ones. Plan for fewer, larger features than you would on a visible-light board; the [target size guide](/calibacademy/calibration-target-size/) applies with your thermal resolution.
 
 ## Using it
 

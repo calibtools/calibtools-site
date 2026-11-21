@@ -30,10 +30,10 @@ relatedTargets:
   - { label: "ChArUco, ceramic", href: "/targets/charuco-ceramic/", note: "The same pattern with a tighter tolerance." }
   - { label: "Multi-camera target", href: "/targets/multi-camera-target/", note: "Several boards with separate ID ranges." }
 relatedGuides:
-  - { label: "How big should your target be?", href: "/guides/calibration-target-size/", note: "The 60 % fill rule and pixels per square." }
-  - { label: "OpenCV camera calibration", href: "/guides/opencv-camera-calibration/", note: "Load the board file and run the calibration." }
-  - { label: "Hand-eye calibration with OpenCV", href: "/guides/hand-eye-calibration-opencv/", note: "Camera on a robot arm, step by step." }
-  - { label: "Multi-board marker IDs", href: "/guides/multi-board-marker-ids/", note: "Several boards in one scene." }
+  - { label: "How big should your target be?", href: "/calibacademy/calibration-target-size/", note: "The 60 % fill rule and pixels per square." }
+  - { label: "OpenCV camera calibration", href: "/calibacademy/opencv-camera-calibration/", note: "Load the board file and run the calibration." }
+  - { label: "Hand-eye calibration with OpenCV", href: "/calibacademy/hand-eye-calibration-opencv/", note: "Camera on a robot arm, step by step." }
+  - { label: "Multi-board marker IDs", href: "/calibacademy/multi-board-marker-ids/", note: "Several boards in one scene." }
 ---
 
 ## How a ChArUco board works
@@ -44,11 +44,11 @@ Because each corner is identified on its own, the board still gives you points w
 
 That difference matters most at the edges and corners of the frame, where lens distortion is strongest. Those are the views that pin down the distortion model, and they are the views where a checkerboard is most often lost.
 
-OpenCV reads the board natively through `cv2.aruco.CharucoBoard`, and MATLAB and most multi-camera toolchains support it too. For a side-by-side of the common patterns, see [ChArUco vs checkerboard vs AprilGrid](/guides/charuco-vs-checkerboard-vs-aprilgrid/).
+OpenCV reads the board natively through `cv2.aruco.CharucoBoard`, and MATLAB and most multi-camera toolchains support it too. For a side-by-side of the common patterns, see [ChArUco vs checkerboard vs AprilGrid](/calibacademy/charuco-vs-checkerboard-vs-aprilgrid/).
 
 ## Choosing a size
 
-Pick the board that fills about 60 % of the image at your working distance, with some views pushed into the corners. Each square should be at least 25 px across and each marker bit at least 3 px. The [target size guide](/guides/calibration-target-size/) explains where these numbers come from.
+Pick the board that fills about 60 % of the image at your working distance, with some views pushed into the corners. Each square should be at least 25 px across and each marker bit at least 3 px. The [target size guide](/calibacademy/calibration-target-size/) explains where these numbers come from.
 
 The [FOV calculator](/tools/fov/) turns your sensor, lens and distance into a field of view and mm per pixel. The figures below assume the default DICT_6X6_250 dictionary, where a marker is 8 bits wide including its border.
 
@@ -70,7 +70,7 @@ The dictionary is the last part of the part number. **D6** (DICT_6X6_250) is the
 
 **T36** places AprilTag 36h11 markers in the white squares instead of ArUco. All boards start at ID 0, run row-major over the white squares and follow the OpenCV 4.6 and later placement (`legacy_pattern: false`).
 
-If several boards share one scene, give each one its own ID range so the detector never confuses them. The [multi-board marker ID guide](/guides/multi-board-marker-ids/) shows how, and the [multi-camera target](/targets/multi-camera-target/) is built for that layout.
+If several boards share one scene, give each one its own ID range so the detector never confuses them. The [multi-board marker ID guide](/calibacademy/multi-board-marker-ids/) shows how, and the [multi-camera target](/targets/multi-camera-target/) is built for that layout.
 
 ## What is printed on the board
 
@@ -84,7 +84,7 @@ Boards from 300 × 200 mm up have four M4 threaded inserts on the rear. The [¼�
 
 Flatness is specified with the board resting on three points. A mount that pulls the board hard against an uneven surface can bend it beyond that, so tighten screws only until the board sits firmly.
 
-For a camera on a robot arm, the [hand-eye calibration kit](/targets/hand-eye-calibration-kit/) pairs a ChArUco board with an ISO 50 flange adapter, and the [hand-eye calibration guide](/guides/hand-eye-calibration-opencv/) walks through the OpenCV side.
+For a camera on a robot arm, the [hand-eye calibration kit](/targets/hand-eye-calibration-kit/) pairs a ChArUco board with an ISO 50 flange adapter, and the [hand-eye calibration guide](/calibacademy/hand-eye-calibration-opencv/) walks through the OpenCV side.
 
 ## Material and print
 
@@ -94,7 +94,7 @@ The matte finish keeps glare off the corners under bench lights. The board works
 
 Aluminum expands about 24 µm per meter per °C. On the 800 × 600 mm board, a 10 °C change moves the outer corners by about 0.19 mm, so let the board settle to room temperature before a precise run.
 
-If you need a tighter tolerance or near-zero expansion for close-range work, the [ceramic ChArUco target](/targets/charuco-ceramic/) uses the same pattern on a ceramic substrate. The [composite, ceramic or glass guide](/guides/composite-ceramic-or-glass/) compares the three.
+If you need a tighter tolerance or near-zero expansion for close-range work, the [ceramic ChArUco target](/targets/charuco-ceramic/) uses the same pattern on a ceramic substrate. The [composite, ceramic or glass guide](/calibacademy/composite-ceramic-or-glass/) compares the three.
 
 ## Measured before it ships
 
@@ -102,7 +102,7 @@ Every board is measured before it ships: dimensions, flatness and a visual check
 
 ## Files and software
 
-Each board comes with `.opencv.json`, `.ros2.yaml`, a HALCON point tuple (`.halcon.txt`) and a `.dxf` of the pattern. The [OpenCV calibration guide](/guides/opencv-camera-calibration/) shows how to load the board file and run the calibration.
+Each board comes with `.opencv.json`, `.ros2.yaml`, a HALCON point tuple (`.halcon.txt`) and a `.dxf` of the pattern. The [OpenCV calibration guide](/calibacademy/opencv-camera-calibration/) shows how to load the board file and run the calibration.
 
 Before you order, print a paper copy with the [ChArUco generator](/tools/generator/charuco/) to test detection. Once the board arrives, the [capture assistant](/tools/capture/) guides you through the poses.
 

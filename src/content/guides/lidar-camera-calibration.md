@@ -51,7 +51,7 @@ For a first experiment, cut holes in a foam board, glue markers from the [ArUco 
 
 ## 2. Calibrate the camera first
 
-The hole positions in the camera frame come from the marker pose, which depends on the intrinsics. Calibrate the camera at its working focus following the [OpenCV guide](/guides/opencv-camera-calibration/) and keep the result with this calibration.
+The hole positions in the camera frame come from the marker pose, which depends on the intrinsics. Calibrate the camera at its working focus following the [OpenCV guide](/calibacademy/opencv-camera-calibration/) and keep the result with this calibration.
 
 ## 3. Record the placements
 
@@ -239,8 +239,8 @@ Repeat the calibration after remounting either sensor, after a lens change, and 
 
 ## Next steps
 
-- Robot-mounted rigs also need [hand-eye calibration](/guides/hand-eye-calibration-opencv/) to bring the sensor frame into the robot base.
+- Robot-mounted rigs also need [hand-eye calibration](/calibacademy/hand-eye-calibration-opencv/) to bring the sensor frame into the robot base.
 
-- If an IMU is on the rig, [calibrate camera–IMU with Kalibr](/guides/kalibr-camera-imu-calibration/) and chain the transforms.
+- If an IMU is on the rig, [calibrate camera–IMU with Kalibr](/calibacademy/kalibr-camera-imu-calibration/) and chain the transforms.
 
 - For radar, the same idea applies with a corner reflector instead of holes; see the [radar–camera target](/targets/radar-camera-target/).

@@ -14,7 +14,7 @@ products:
   - "grid-distortion-target"
   - "focus-siemens-star-chart"
 links:
-  - { label: "USAF 1951 lp/mm table", href: "/guides/usaf-1951-lp-mm-table/" }
+  - { label: "USAF 1951 lp/mm table", href: "/calibacademy/usaf-1951-lp-mm-table/" }
   - { label: "FOV calculator", href: "/tools/fov/" }
   - { label: "Request a quote", href: "/quote/" }
 selection:

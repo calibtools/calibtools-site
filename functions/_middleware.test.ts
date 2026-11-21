@@ -164,7 +164,7 @@ describe('middleware', () => {
   });
 
   it('classifies guide referrer', () => {
-    expect(referrerCategory('https://calib.tools/guides/charuco-vs-checkerboard-vs-aprilgrid/')).toBe('guide');
+    expect(referrerCategory('https://calib.tools/calibacademy/charuco-vs-checkerboard-vs-aprilgrid/')).toBe('guide');
   });
 
   it('classifies collection referrer', () => {

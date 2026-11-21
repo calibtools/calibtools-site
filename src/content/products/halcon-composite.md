@@ -18,9 +18,9 @@ relatedTargets:
   - { label: "Hand-eye calibration kit", href: "/targets/hand-eye-calibration-kit/", note: "For calibrate_hand_eye on a robot." }
   - { label: "¼″ mounting fixture", href: "/targets/mounting-fixture/", note: "Clamps any board onto a tripod or lab post." }
 relatedGuides:
-  - { label: "How big should your target be?", href: "/guides/calibration-target-size/", note: "The 60 % fill rule." }
-  - { label: "Composite, ceramic or glass", href: "/guides/composite-ceramic-or-glass/", note: "Compare the tolerance with one pixel on the board." }
-  - { label: "What reprojection error tells you", href: "/guides/reprojection-error/", note: "And what a low value can hide." }
+  - { label: "How big should your target be?", href: "/calibacademy/calibration-target-size/", note: "The 60 % fill rule." }
+  - { label: "Composite, ceramic or glass", href: "/calibacademy/composite-ceramic-or-glass/", note: "Compare the tolerance with one pixel on the board." }
+  - { label: "What reprojection error tells you", href: "/calibacademy/reprojection-error/", note: "And what a low value can hide." }
 ---
 
 ## What makes a plate a HALCON plate
@@ -57,7 +57,7 @@ Five board sizes, with a layout that fits each as an example. The mark diameter 
 
 **[800 × 600 mm](#CT-HAL-P-800X600-STD)**: for example 11 × 8 marks, 60 mm apart, 30 mm in diameter.
 
-Pick the board so that it fills a good part of the image at your working distance; the [target size guide](/guides/calibration-target-size/) and the [FOV calculator](/tools/fov/) help with that.
+Pick the board so that it fills a good part of the image at your working distance; the [target size guide](/calibacademy/calibration-target-size/) and the [FOV calculator](/tools/fov/) help with that.
 
 More marks give more points per image, as long as each mark is still large enough in the image to be measured well.
 
@@ -73,7 +73,7 @@ In older programs the three steps are separate: `find_caltab`, `find_marks_and_p
 
 HALCON takes the mark positions from the description file, so the file has to match the plate you hold. On aluminum composite the marks are within ±0.3 mm + 0.2 mm/m of the nominal grid at 20 °C.
 
-Every plate is measured before it ships. If your field of view is so small that a few tenths of a millimeter cover more than a pixel, a printed composite plate is the wrong tool; the [substrate guide](/guides/composite-ceramic-or-glass/) shows where that point is.
+Every plate is measured before it ships. If your field of view is so small that a few tenths of a millimeter cover more than a pixel, a printed composite plate is the wrong tool; the [substrate guide](/calibacademy/composite-ceramic-or-glass/) shows where that point is.
 
 ## Material and mounting
 

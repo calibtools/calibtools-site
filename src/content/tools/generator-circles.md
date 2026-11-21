@@ -58,4 +58,4 @@ A paper print is fine for learning and quick checks. For results you rely on, th
 
 ## Related guides
 
-- [ChArUco vs checkerboard vs AprilGrid](/guides/charuco-vs-checkerboard-vs-aprilgrid/) — comparing pattern types
+- [ChArUco vs checkerboard vs AprilGrid](/calibacademy/charuco-vs-checkerboard-vs-aprilgrid/) — comparing pattern types

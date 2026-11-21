@@ -16,7 +16,7 @@ describe('isFileLink', () => {
     }
   });
   it('leaves pages, anchors and mail links alone', () => {
-    for (const h of ['/tools/generator/', '/files/', '#specs', 'mailto:hello@calib.tools', '/guides/pdf-printing/', '', undefined]) {
+    for (const h of ['/tools/generator/', '/files/', '#specs', 'mailto:hello@calib.tools', '/calibacademy/pdf-printing/', '', undefined]) {
       expect(isFileLink(h as string), String(h)).toBe(false);
     }
   });

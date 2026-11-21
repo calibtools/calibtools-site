@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { software, SAMPLE, coveragePercent } from './software';
-import { headerGroups, supportDropdown, ACADEMY_NAME } from './nav';
+import { headerGroups, footerGroups, supportDropdown, ACADEMY_NAME } from './nav';
 
 const root = resolve(__dirname, '..', '..');
 const page = resolve(root, 'src/pages/plumbline/index.astro');
@@ -63,8 +63,15 @@ describe('header navigation', () => {
 
   it('lists Calib Academy first under Support and lights Support on guide pages', () => {
     expect(ACADEMY_NAME).toBe('Calib Academy');
-    expect(supportDropdown[0]).toEqual({ label: ACADEMY_NAME, href: '/guides/' });
+    expect(supportDropdown[0]).toEqual({ label: ACADEMY_NAME, href: '/calibacademy/' });
     expect(headerGroups.find((g) => g.key === 'support')!.sections).toContain('guides');
     expect(headerGroups.some((g) => g.label === 'Guides')).toBe(false);
+  });
+
+  it('footer carries the same names: Calib Academy first under Support, Plumbline under Tools', () => {
+    const col = (h: string) => footerGroups.find((g) => g.heading === h)!.items;
+    expect(col('Support')[0]).toEqual({ label: ACADEMY_NAME, href: '/calibacademy/' });
+    expect(col('Tools').at(-1)).toEqual({ label: software.name, href: software.href });
+    expect(footerGroups.flatMap((g) => g.items).some((i) => i.label === 'Guides')).toBe(false);
   });
 });

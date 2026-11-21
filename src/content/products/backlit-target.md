@@ -21,9 +21,9 @@ relatedTargets:
   - { label: "Depth and ToF targets", href: "/targets/depth-camera-target/", note: "Boards and step blocks for depth cameras." }
   - { label: "Grid distortion target", href: "/targets/grid-distortion-target/", note: "Glass grids, often used on a back light." }
 relatedGuides:
-  - { label: "Why your board is not detected", href: "/guides/corner-detection-troubleshooting/", note: "Contrast, blur and exposure limits." }
-  - { label: "ChArUco vs checkerboard vs AprilGrid", href: "/guides/charuco-vs-checkerboard-vs-aprilgrid/", note: "Which pattern for which job." }
-  - { label: "OpenCV camera calibration", href: "/guides/opencv-camera-calibration/", note: "From images to a camera matrix." }
+  - { label: "Why your board is not detected", href: "/calibacademy/corner-detection-troubleshooting/", note: "Contrast, blur and exposure limits." }
+  - { label: "ChArUco vs checkerboard vs AprilGrid", href: "/calibacademy/charuco-vs-checkerboard-vs-aprilgrid/", note: "Which pattern for which job." }
+  - { label: "OpenCV camera calibration", href: "/calibacademy/opencv-camera-calibration/", note: "From images to a camera matrix." }
 ---
 
 ## When front lighting is the problem

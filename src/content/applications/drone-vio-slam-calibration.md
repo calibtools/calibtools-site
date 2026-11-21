@@ -12,11 +12,11 @@ products:
   - "thermal-calibration-target"
   - "multi-camera-target"
 links:
-  - { label: "Kalibr camera–IMU calibration", href: "/guides/kalibr-camera-imu-calibration/" }
+  - { label: "Kalibr camera–IMU calibration", href: "/calibacademy/kalibr-camera-imu-calibration/" }
   - { label: "AprilGrid generator", href: "/tools/generator/aprilgrid/" }
   - { label: "AprilTag generator", href: "/tools/generator/apriltag/" }
   - { label: "FOV calculator", href: "/tools/fov/" }
-  - { label: "Camera calibration with OpenCV", href: "/guides/opencv-camera-calibration/" }
+  - { label: "Camera calibration with OpenCV", href: "/calibacademy/opencv-camera-calibration/" }
 selection:
   - { scenario: "Camera–IMU with Kalibr", pattern: "AprilGrid 36h11", size: "400 × 300 to 600 × 400 mm", material: "Aluminum composite" }
   - { scenario: "Fisheye or wide stereo", pattern: "AprilGrid or ChArUco", size: "600 × 400 mm", material: "Aluminum composite" }
