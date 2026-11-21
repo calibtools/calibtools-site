@@ -324,8 +324,8 @@ export default function VariantPicker({ product, fixtureVariantId, fixturePrice 
         );
       })}
 
-      {/* Board set */}
-      {isBoardProduct && (
+      {/* Board set (not for quoted large formats: the quote covers sets) */}
+      {isBoardProduct && fromPrice === null && (
         <fieldset className="flex flex-col gap-2.5 border-0 p-0" disabled={!!boardSizeError}>
           <legend className="text-[13px] font-semibold">Board set</legend>
           {boardSizeError && <p className="m-0 text-sm text-brand">{boardSizeError}</p>}
@@ -373,7 +373,7 @@ export default function VariantPicker({ product, fixtureVariantId, fixturePrice 
       )}
 
       {/* Add-ons */}
-      {fixtureVariantId && (
+      {fixtureVariantId && fromPrice === null && (
         <fieldset className="flex flex-col gap-2.5 border-0 p-0">
           <legend className="text-[13px] font-semibold">Add-ons</legend>
           <label className="flex items-center gap-2.5 text-[15px] min-h-[44px] md:min-h-0">
@@ -445,7 +445,7 @@ export default function VariantPicker({ product, fixtureVariantId, fixturePrice 
       {generatorUrl && (
         <a href={generatorUrl} className="text-sm text-ink-soft no-underline hover:text-ink min-h-[24px] inline-flex items-center gap-1" data-testid="open-in-generator">Need a different size or layout? Open this pattern in the generator <ArrowRight size={14} strokeWidth={1.6} aria-hidden="true" /></a>
       )}
-      <a href="/quote/" className="text-sm text-ink-soft no-underline hover:text-ink min-h-[24px] inline-flex items-center gap-1">Need a quote or invoice/PO? <ArrowRight size={14} strokeWidth={1.6} aria-hidden="true" /></a>
+      {fromPrice === null && <a href="/quote/" className="text-sm text-ink-soft no-underline hover:text-ink min-h-[24px] inline-flex items-center gap-1">Need a quote or invoice/PO? <ArrowRight size={14} strokeWidth={1.6} aria-hidden="true" /></a>}
 
       <div className="grid grid-cols-2 gap-3 pt-2 text-sm text-ink-muted">
         <span className="flex items-start gap-1.5"><Check size={18} strokeWidth={1.6} className="mt-px shrink-0 text-brand" aria-hidden="true" /> {LEAD_TIME}</span>
