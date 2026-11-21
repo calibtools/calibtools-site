@@ -25,7 +25,7 @@ const BENEFITS: [string, string][] = [
   ['Saved patterns', 'Reopen any generator pattern on any computer.'],
   ['Quotes', 'Every quote and its status in one place.'],
   ['Orders', 'Follow payment and shipping.'],
-  ['No password', 'Sign in with a one-time code sent to your email.'],
+  ['No password', 'Sign in with Google, or with a one-time code sent to your email.'],
 ];
 
 const QUOTE_STATUS: Record<AccountSummary['quotes'][number]['status'], string> = {
@@ -163,7 +163,7 @@ export default function AccountPanel() {
           <a className="btn btn-md btn-secondary no-underline" href="/api/account/login?return=/account/">Sign in</a>
         </div>
         <p className="m-0 text-[13px] text-ink-muted">
-          Next page: enter your email, no Shop app needed. One cookie keeps you signed in, no tracking. <a href="/privacy/">Privacy policy</a>
+          Next page: continue with Google or enter your email. No Shop app needed. One cookie keeps you signed in, no tracking. <a href="/privacy/">Privacy policy</a>
         </p>
       </div>
     );
