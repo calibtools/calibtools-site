@@ -1,3 +1,4 @@
+import { ACCOUNT_LINE } from '@/lib/brand';
 import { patternViewPath } from '@/lib/patternLink';
 import { useEffect, useState, type ReactNode } from 'react';
 import type { AccountSummary } from '@/lib/accountApi';
@@ -25,7 +26,7 @@ const BENEFITS: [string, string][] = [
   ['Saved patterns', 'Reopen any generator pattern on any computer.'],
   ['Quotes', 'Every quote and its status in one place.'],
   ['Orders', 'Follow payment and shipping.'],
-  ['No password', 'Sign in with a one-time code sent to your email.'],
+  ['No password', 'Sign in with Google, or with a one-time code sent to your email.'],
 ];
 
 const QUOTE_STATUS: Record<AccountSummary['quotes'][number]['status'], string> = {
@@ -143,7 +144,8 @@ export default function AccountPanel() {
   if (state.kind === 'signedOut') {
     const msg = ERRORS[error] ?? (state.available ? '' : ERRORS.unavailable);
     return (
-      <div className="flex max-w-[560px] flex-col gap-6">
+      <div className="grid items-start gap-x-16 gap-y-8 lg:grid-cols-[minmax(0,560px)_minmax(0,1fr)]" data-rows="layout">
+      <div className="order-2 flex flex-col gap-6 lg:order-1">
         {msg && (
           <p className="m-0 border border-line-strong bg-sheet p-3 text-[14px]" role="alert">
             {msg}
@@ -163,8 +165,14 @@ export default function AccountPanel() {
           <a className="btn btn-md btn-secondary no-underline" href="/api/account/login?return=/account/">Sign in</a>
         </div>
         <p className="m-0 text-[13px] text-ink-muted">
-          Next page: enter your email, no Shop app needed. One cookie keeps you signed in, no tracking. <a href="/privacy/">Privacy policy</a>
+          Next page: continue with Google or enter your email. No Shop app needed. One cookie keeps you signed in, no tracking. <a href="/privacy/">Privacy policy</a>
         </p>
+      </div>
+      <div className="card bracket order-1 flex flex-col gap-5 p-6 [--bracket:14px] lg:order-2 lg:gap-7 lg:px-10 lg:py-11">
+        <span className="block h-3 w-3 bg-brand" aria-hidden="true" />
+        <p className="m-0 max-w-[14em] text-[22px] font-semibold leading-[1.25] tracking-[-0.01em] text-ink lg:text-[28px]">{ACCOUNT_LINE}</p>
+        <span className="spec-label">Calib.Tools</span>
+      </div>
       </div>
     );
   }
