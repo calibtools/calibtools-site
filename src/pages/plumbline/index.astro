@@ -5,7 +5,8 @@ import { software, NOTIFY_SUBJECT } from '@/lib/software';
 import { ACADEMY_NAME } from '@/lib/nav';
 
 const inDev = software.status === 'unreleased';
-const mailto = `mailto:${software.notifyEmail}?subject=${encodeURIComponent(NOTIFY_SUBJECT)}`;
+const notifyHref = (platform: string) =>
+  `mailto:${software.notifyEmail}?subject=${encodeURIComponent(`${NOTIFY_SUBJECT}: ${platform}`)}`;
 const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: software.name }]);
 // Describes the program without offers, version or download until a version ships.
 const appLd = {
@@ -35,17 +36,24 @@ const nextSteps = [
       <span class="eyebrow">Desktop software</span>
       {inDev && <span class="badge text-brand-dark">Not released yet</span>}
     </div>
-    <h1 class="h-display m-0 max-w-[880px] text-[36px] md:text-[48px]">{software.name}: camera calibration software for {software.platforms.join(', ').replace(/, (?=[^,]*$)/, ' and ')}</h1>
-    <p class="m-0 max-w-[760px] text-lg leading-relaxed text-ink-muted">
-      {software.name} is an open-source desktop program for calibrating cameras, made by Calib.Tools.
-      {inDev && ' The first version is not released yet, so there is nothing to download. This page lists what it is planned to do.'}
+    <h1 class="h-display m-0 flex flex-col gap-3">
+      <span class="text-[40px] leading-none md:text-[56px]">{software.name}</span>
+      <span class="text-[22px] font-medium leading-snug text-ink-muted md:text-[28px]">Camera calibration software for your computer</span>
+    </h1>
+    <p class="m-0 max-w-[680px] text-lg leading-relaxed text-ink-muted">
+      An open-source desktop program from Calib.Tools.
+      {inDev && ' The first version is not released yet. This page lists what it is planned to do.'}
     </p>
-    {inDev && (
-      <div class="flex flex-wrap items-center gap-4">
-        <a href={mailto} class="btn-md btn-primary">Tell me when it ships</a>
-        <span class="text-[15px] text-ink-muted">Opens an email to {software.notifyEmail}. We write back when the first version is out.</span>
+    <div class="flex flex-col gap-3">
+      <span class="spec-label">{inDev ? 'Tell me when it ships for' : 'Download for'}</span>
+      {/* One button per platform, from src/lib/software.ts. Before the first release each opens an email naming the platform. */}
+      <div class="grid max-w-[480px] grid-cols-3 gap-2">
+        {software.platforms.map((p) => (
+          <a href={inDev ? notifyHref(p) : software.href} class="btn-md btn-secondary w-full normal-case tracking-normal text-[14px]">{p}</a>
+        ))}
       </div>
-    )}
+      {inDev && <span class="text-[14px] text-ink-muted">Each button opens an email to {software.notifyEmail}. We write back once that version is out.</span>}
+    </div>
   </section>
 
   <section class="border-t border-line">
@@ -56,7 +64,6 @@ const nextSteps = [
       <table class="w-full max-w-[760px] border-collapse text-[14px]">
         <tbody>
           <tr class="border-b border-line"><th scope="row" class="align-top pt-[15px] w-[112px] py-3 pr-4 md:w-[180px] text-left font-mono text-[12px] font-medium uppercase tracking-[0.04em] text-ink-soft">Status</th><td class="py-3 align-top">{inDev ? 'Being built; no version released yet' : `Version ${software.version}`}</td></tr>
-          <tr class="border-b border-line"><th scope="row" class="align-top pt-[15px] py-3 pr-4 text-left font-mono text-[12px] font-medium uppercase tracking-[0.04em] text-ink-soft">Platforms</th><td class="py-3 align-top">{software.platforms.join(', ')}</td></tr>
           <tr class="border-b border-line"><th scope="row" class="align-top pt-[15px] py-3 pr-4 text-left font-mono text-[12px] font-medium uppercase tracking-[0.04em] text-ink-soft">Built on</th><td class="py-3 align-top">OpenCV and other open-source libraries, credited in the documentation</td></tr>
           <tr class="border-b border-line"><th scope="row" class="align-top pt-[15px] py-3 pr-4 text-left font-mono text-[12px] font-medium uppercase tracking-[0.04em] text-ink-soft">Made by</th><td class="py-3 align-top">Calib.Tools. Sales of calibration targets pay for its development.</td></tr>
         </tbody>
