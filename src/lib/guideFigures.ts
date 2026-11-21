@@ -421,3 +421,48 @@ export function lidarCameraFigureSvg(): string {
   const H = ty + 50;
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" font-family="Geist, system-ui, sans-serif" role="img"><rect width="${W}" height="${H}" fill="#fff"/>${o}</svg>`;
 }
+
+// ── Plumbline page: figures drawn from what the app reports for its sample images (src/lib/software.ts) ──
+
+const svgOpen = (w: number, h: number, label: string, x0 = 0, y0 = 0) =>
+  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${x0} ${y0} ${w} ${h}" role="img" aria-label="${label}">`;
+
+export const ERROR_BARS = { w: 480, h: 190, left: 42, top: 12, bottom: 26, max: 0.08, ticks: [0, 0.02, 0.04, 0.06, 0.08] };
+
+/** One bar per image, error in px. `leftOut` draws that image as a red outline marked "out". */
+export function errorBarsFigureSvg(errors: readonly number[], opts: { leftOut?: number; label: string }): string {
+  const B = ERROR_BARS;
+  const plotH = B.h - B.top - B.bottom, step = (B.w - B.left) / errors.length;
+  const y = (v: number) => +(B.top + plotH * (1 - v / B.max)).toFixed(2);
+  const two = (n: number) => String(n).padStart(2, '0');
+  let o = svgOpen(B.w, B.h, opts.label);
+  for (const t of B.ticks) {
+    o += `<line x1="${B.left}" x2="${B.w}" y1="${y(t)}" y2="${y(t)}" stroke="#D6D3CB" stroke-width="1"/>`;
+    o += `<text x="${B.left - 6}" y="${y(t) + 4.5}" text-anchor="end" font-size="13" fill="${MUTED}" ${MONO}>${t.toFixed(2)}</text>`;
+  }
+  errors.forEach((v, i) => {
+    const x = +(B.left + i * step + 3).toFixed(2), w = +(step - 6).toFixed(2), h = +(y(0) - y(v)).toFixed(2);
+    o += i === opts.leftOut
+      ? `<rect x="${x + 0.75}" y="${y(v) + 0.75}" width="${w - 1.5}" height="${h - 0.75}" fill="none" stroke="${RED}" stroke-width="1.5"/>`
+      : `<rect x="${x}" y="${y(v)}" width="${w}" height="${h}" fill="${INK}"/>`;
+  });
+  if (opts.leftOut === undefined) {
+    o += `<text x="${B.left}" y="${B.h - 7}" font-size="13" fill="${MUTED}" ${MONO}>image 01</text>`;
+    o += `<text x="${B.w}" y="${B.h - 7}" text-anchor="end" font-size="13" fill="${MUTED}" ${MONO}>image ${two(errors.length)}</text>`;
+  } else {
+    o += `<text x="${+(B.left + opts.leftOut * step + step / 2).toFixed(2)}" y="${B.h - 7}" text-anchor="middle" font-size="13" fill="${RED_TEXT}" ${MONO}>out</text>`;
+  }
+  return o + '</svg>';
+}
+
+/** Coverage map: cells shaded by corner count, empty cells outlined in red. */
+export function coverageMapFigureSvg(grid: readonly (readonly number[])[], label: string): string {
+  const C = 24, max = Math.max(...grid.flat());
+  let o = svgOpen(grid[0].length * C + 2, grid.length * C + 2, label, -1, -1);
+  grid.forEach((row, r) => row.forEach((n, c) => {
+    o += n > 0
+      ? `<rect x="${c * C + 1}" y="${r * C + 1}" width="${C - 2}" height="${C - 2}" fill="${INK}" opacity="${(0.14 + 0.86 * (n / max)).toFixed(2)}"/>`
+      : `<rect x="${c * C + 2}" y="${r * C + 2}" width="${C - 4}" height="${C - 4}" fill="none" stroke="${RED}" stroke-width="1.5"/>`;
+  }));
+  return o + '</svg>';
+}
