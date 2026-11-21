@@ -59,7 +59,7 @@ const tiles = await Promise.all(collections.map(async (c) => {
         : <div class="aspect-[3/2] w-[84px] shrink-0 items-end md:flex md:w-full [&>svg]:hidden md:[&>svg]:block" set:html={t.outline?.svg ?? ''} />}
       <span class="spec-label hidden md:block">{t.outline ? t.outline.caption : t.countLabel}</span>
       <div class="flex min-w-0 flex-1 flex-col gap-1 md:contents">
-        <strong class="text-[17px] leading-tight md:text-[20px]">{t.title}</strong>
+        <strong class="hyphens-auto break-words text-[17px] leading-tight md:text-[20px]">{t.title}</strong>
         <span class="text-[14px] leading-snug text-ink-muted">{t.description}</span>
       </div>
       <span class="shrink-0 font-mono text-[14px] font-semibold md:self-end md:pt-2">{t.price ? `from ${t.price}` : 'quote'}</span>
