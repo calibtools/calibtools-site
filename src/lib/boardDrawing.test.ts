@@ -19,6 +19,16 @@ function dims(svg: string): Dim[] {
 }
 const byName = (svg: string) => Object.fromEntries(dims(svg).map((d) => [d.name, d]));
 
+/** The two axis lines of a drawing. */
+function axes(svg: string) {
+  const line = (cls: string) => {
+    const m = new RegExp(`<line class="${cls}" x1="([-0-9.]+)" y1="([-0-9.]+)" x2="([-0-9.]+)" y2="([-0-9.]+)"`).exec(svg)!;
+    const [x1, y1, x2, y2] = m.slice(1).map(Number);
+    return { x1, y1, x2, y2 };
+  };
+  return { x: line('axis-x'), y: line('axis-y') };
+}
+
 describe('boardDrawingSvg', () => {
   it('draws every stock ChArUco board with dimensions equal to boardSizes.ts and to the drawn lengths (≤ 0.01 mm)', () => {
     const entries = CATALOG.filter((e) => e.spec.type === 'ChArUco');
@@ -62,15 +72,16 @@ describe('boardDrawingSvg', () => {
     expect(drawingForPartNumber('CT-CHA-P-400X300-D6')).not.toBe(svg);
   });
 
-  it('has one origin with X to the right in red and Y down in green, at the pattern origin', () => {
+  it('has X to the right in red and Y down in green, outside the board, starting level with the pattern origin', () => {
     const svg = drawingForPartNumber('CT-CHA-P-400X300-D5')!;
-    expect([...svg.matchAll(/class="origin"/g)].length).toBe(1);
-    const o = /<circle class="origin" cx="([0-9.]+)" cy="([0-9.]+)"/.exec(svg)!;
-    expect([Number(o[1]), Number(o[2])]).toEqual([20, 15]);
-    const x = /<line class="axis-x" x1="([0-9.]+)" y1="([0-9.]+)" x2="([0-9.]+)" y2="([0-9.]+)" stroke="#E60012"/.exec(svg)!.slice(1).map(Number);
-    expect(x[2]).toBeGreaterThan(x[0]); expect(x[3]).toBe(x[1]);
-    const y = /<line class="axis-y" x1="([0-9.]+)" y1="([0-9.]+)" x2="([0-9.]+)" y2="([0-9.]+)" stroke="#00A651"/.exec(svg)!.slice(1).map(Number);
-    expect(y[3]).toBeGreaterThan(y[1]); expect(y[2]).toBe(y[0]);
+    expect(svg.includes('class="origin"')).toBe(false);
+    const { x, y } = axes(svg);
+    expect(x.x1).toBe(20); expect(x.x2).toBeGreaterThan(x.x1); expect(x.y2).toBe(x.y1);
+    expect(x.y1).toBeLessThan(0); // above the board edge
+    expect(y.y1).toBe(15); expect(y.y2).toBeGreaterThan(y.y1); expect(y.x2).toBe(y.x1);
+    expect(y.x1).toBeLessThan(0); // left of the board edge
+    expect(/<line class="axis-x"[^>]* stroke="#E60012"/.test(svg)).toBe(true);
+    expect(/<line class="axis-y"[^>]* stroke="#00A651"/.test(svg)).toBe(true);
   });
 
   it('has an accessible name and no shadow, gradient or filter', () => {
@@ -129,7 +140,8 @@ describe('drawings for product cards', () => {
     const full = drawingForPartNumber('CT-CHA-P-400X300-D6')!;
     const compact = drawingForPartNumber('CT-CHA-P-400X300-D6', { dimensions: false })!;
     expect(compact).not.toContain('class="dim"');
-    expect(compact).toContain('class="origin"');
+    expect(compact.includes('class="origin"')).toBe(false);
+    expect(compact.includes('class="axis-x"')).toBe(true);
     expect(/<g class="pattern">.*?<\/g>/s.exec(compact)![0]).toBe(/<g class="pattern">.*?<\/g>/s.exec(full)![0]);
     expect(compact.length).toBeLessThan(full.length);
   });
@@ -205,21 +217,46 @@ describe('AprilGrid and circle-grid drawings', () => {
     }
   });
 
-  it('the origin dot sits on the first circle center for circle grids and on the bottom-left corner of tag 0 for AprilGrid', () => {
+  it('the axes start level with the first circle center for circle grids and with the bottom-left corner of tag 0 for AprilGrid', () => {
     const cir = drawingForPartNumber('CT-CIR-P-400X300-SYM')!;
     const first = /<g class="pattern"><circle cx="([0-9.]+)" cy="([0-9.]+)"/.exec(cir)!;
-    const o = /<circle class="origin" cx="([0-9.]+)" cy="([0-9.]+)"/.exec(cir)!;
-    expect(Number(o[1])).toBeCloseTo(Number(first[1]), 2);
-    expect(Number(o[2])).toBeCloseTo(Number(first[2]), 2);
+    const c = axes(cir);
+    expect(c.x.x1).toBeCloseTo(Number(first[1]), 2);
+    expect(c.y.y1).toBeCloseTo(Number(first[2]), 2);
     // AprilGrid uses Kalibr's frame: the origin is the bottom-left corner of the first tag (ID 0), y points up.
     const apr = drawingForPartNumber('CT-APR-P-400X300-T36')!;
     const tag = /<g class="pattern"><rect x="([0-9.]+)" y="([0-9.]+)" width="([0-9.]+)" height="([0-9.]+)"/.exec(apr)!;
-    const oa = /<circle class="origin" cx="([0-9.]+)" cy="([0-9.]+)"/.exec(apr)!;
-    expect(Number(oa[1])).toBeCloseTo(Number(tag[1]), 2);
-    expect(Number(oa[2])).toBeCloseTo(Number(tag[2]) + Number(tag[4]), 2);
-    const yAxis = /<line class="axis-y" x1="[0-9.]+" y1="([0-9.]+)" x2="[0-9.]+" y2="([0-9.]+)"/.exec(apr)!;
-    expect(Number(yAxis[1])).toBeCloseTo(Number(oa[2]), 2);
-    expect(Number(yAxis[2])).toBeLessThan(Number(yAxis[1]));
+    const a = axes(apr);
+    expect(a.x.x1).toBeCloseTo(Number(tag[1]), 2);
+    expect(a.x.y1).toBeGreaterThan(300); // below the board edge
+    expect(a.y.y1).toBeCloseTo(Number(tag[2]) + Number(tag[4]), 2);
+    expect(a.y.y2).toBeLessThan(a.y.y1);
+    expect(a.y.x1).toBeLessThan(0);
+  });
+
+  it('nothing but the pattern is drawn on the board: axes, arrow heads and their letters stay outside the outline, on every stock target', () => {
+    const entries = CATALOG.filter((e) => drawingForPartNumber(e.partNumber));
+    expect(entries.length).toBeGreaterThanOrEqual(50);
+    for (const e of entries) {
+      const m = /-(\d+)X(\d+)-/.exec(e.partNumber)!;
+      const W = Number(m[1]), H = Number(m[2]);
+      for (const dimensions of [true, false]) {
+        const svg = drawingForPartNumber(e.partNumber, { dimensions })!;
+        expect(svg.includes('class="origin"'), e.partNumber).toBe(false);
+        const vb = /viewBox="([-0-9.]+) ([-0-9.]+) ([0-9.]+) ([0-9.]+)"/.exec(svg)!.slice(1).map(Number);
+        const pts: [number, number][] = [];
+        const g = /<g class="axes"[^>]*>(.*?)<\/g>/s.exec(svg)![1];
+        for (const l of g.matchAll(/<line[^>]* x1="([-0-9.]+)" y1="([-0-9.]+)" x2="([-0-9.]+)" y2="([-0-9.]+)"/g)) pts.push([Number(l[1]), Number(l[2])], [Number(l[3]), Number(l[4])]);
+        for (const d of g.matchAll(/ d="([^"]+)"/g)) for (const q of d[1].matchAll(/[ML]([-0-9.]+) ([-0-9.]+)/g)) pts.push([Number(q[1]), Number(q[2])]);
+        for (const t of svg.matchAll(/<text [^>]*x="([-0-9.]+)" y="([-0-9.]+)"[^>]*>[XY]<\/text>/g)) pts.push([Number(t[1]), Number(t[2])]);
+        expect(pts.length, e.partNumber).toBeGreaterThanOrEqual(12);
+        for (const [x, y] of pts) {
+          const onBoard = x > 0 && x < W && y > 0 && y < H;
+          expect(onBoard, `${e.partNumber} dims=${dimensions} point ${x},${y}`).toBe(false);
+          expect(x).toBeGreaterThanOrEqual(vb[0]); expect(x).toBeLessThanOrEqual(vb[0] + vb[2]);
+          expect(y).toBeGreaterThanOrEqual(vb[1]); expect(y).toBeLessThanOrEqual(vb[1] + vb[3]);
+        }
+      }
+    }
   });
 });
-
