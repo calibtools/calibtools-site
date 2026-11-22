@@ -22,7 +22,7 @@ const byName = (svg: string) => Object.fromEntries(dims(svg).map((d) => [d.name,
 describe('boardDrawingSvg', () => {
   it('draws every stock ChArUco board with dimensions equal to boardSizes.ts and to the drawn lengths (≤ 0.01 mm)', () => {
     const entries = CATALOG.filter((e) => e.spec.type === 'ChArUco');
-    expect(entries.length).toBe(28);
+    expect(entries.length).toBe(25); // 17 composite + 8 ceramic
     for (const e of entries) {
       const svg = drawingForPartNumber(e.partNumber)!;
       expect(svg, e.partNumber).toBeTruthy();

@@ -35,6 +35,9 @@ for (const [w, h, rows, cols, square, marker] of [
   [600, 400, 9, 14, 40, 30], [800, 600, 11, 15, 50, 37],
 ] as const) {
   for (const [sfx, dict, opt] of DICTS) {
+    // DICT_4X4_50 has 50 markers; the grids from 400 × 300 up need 54, 63 and 82. Those three are not part
+    // numbers and the store does not offer them (data/part-numbers.csv).
+    if (sfx === 'D4' && Math.floor((rows * cols) / 2) > 50) continue;
     entries.push({
       partNumber: `CT-CHA-P-${w}X${h}-${sfx}`, handle: 'charuco-composite',
       options: { size: tight(w, h), dictionary: opt },

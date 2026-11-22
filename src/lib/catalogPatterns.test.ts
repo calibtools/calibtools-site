@@ -3,6 +3,8 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { CATALOG, matchCatalog, specFromEntry, productUrlFor, quoteSummary } from './catalogPatterns';
 import { markerForSquare } from './boardSizes';
+import { charucoMarkers } from './renderCharuco';
+import { dictMarkerCount } from './dicts/dicts';
 import type { PatternSpec } from './patterns';
 
 const sheets = readdirSync(resolve(__dirname, '../../docs/datasheets'))
@@ -23,13 +25,31 @@ const norm = (s: string) => s.toLowerCase().replace(/×/g, 'x').replace(/\s+/g, 
 const base: PatternSpec = { type: 'ChArUco', rows: 7, cols: 10, square: 25, marker: markerForSquare(25), dict: 'DICT_6X6_250', paper: 'A4', startId: 0, scaleBar: true };
 
 describe('catalogPatterns', () => {
-  it('lists every stock pattern target: 20 + 8 ChArUco, 10 checkerboard, 5 AprilGrid, 10 circle grid', () => {
+  it('lists every stock pattern target: 17 + 8 ChArUco, 10 checkerboard, 5 AprilGrid, 10 circle grid', () => {
     const by = (h: string) => CATALOG.filter((e) => e.handle === h).length;
-    expect(by('charuco-composite')).toBe(20);
+    expect(by('charuco-composite')).toBe(17);
     expect(by('charuco-ceramic')).toBe(8);
     expect(by('checkerboard-composite')).toBe(10);
     expect(by('aprilgrid-composite')).toBe(5);
     expect(by('circlegrid-composite')).toBe(10);
+  });
+
+  it('every stock target is an active part number in data/part-numbers.csv', () => {
+    const rows = readFileSync(resolve(__dirname, '../../data/part-numbers.csv'), 'utf-8').split('\n').slice(1).map((l) => l.split(','));
+    const active = new Set(rows.filter((r) => r[1] === 'active').map((r) => r[0]));
+    for (const e of CATALOG) expect(active.has(e.partNumber), e.partNumber).toBe(true);
+  });
+
+  it('no ChArUco stock target needs more markers than its dictionary has', () => {
+    for (const e of CATALOG.filter((x) => x.spec.type === 'ChArUco')) {
+      const spec = { ...base, ...specFromEntry(e) } as PatternSpec;
+      expect(charucoMarkers(spec).length, e.partNumber).toBeLessThanOrEqual(dictMarkerCount(spec.dict) ?? 0);
+    }
+  });
+
+  it('a DICT_4X4_50 grid with more than 50 markers is not a stock target', () => {
+    const m = matchCatalog({ ...base, rows: 9, cols: 12, square: 30, marker: 22, dict: 'DICT_4X4_50' });
+    expect(m.exact).toBeUndefined();
   });
 
   it('every part number family/size exists in the datasheets', () => {
