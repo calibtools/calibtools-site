@@ -68,15 +68,17 @@ If two sizes both fit, the larger squares are easier to detect at steep angles a
 
 The dictionary is the last part of the part number. **D6** (DICT_6X6_250) is the default and the most robust against false detections. **D5** (DICT_5X5_100) and **D4** (DICT_4X4_50) have fewer bits, so the markers decode at lower resolution, with fewer unique IDs.
 
+D4 is offered on the 200 × 150 and 300 × 200 mm boards, whose grids fit its 50 markers.
+
 **T36** places AprilTag 36h11 markers in the white squares instead of ArUco. All boards start at ID 0, run row-major over the white squares and follow the OpenCV 4.6 and later placement (`legacy_pattern: false`).
 
 If several boards share one scene, give each one its own ID range so the detector never confuses them. The [multi-board marker ID guide](/calibacademy/multi-board-marker-ids/) shows how, and the [multi-camera target](/targets/multi-camera-target/) is built for that layout.
 
 ## What is printed on the board
 
-The pattern is centered with a white quiet zone of at least one square on every side. Outside that zone, an edge strip carries the part number, the batch number and a 100 mm scale bar.
+The pattern is centered on the board with a white margin of at least half a square on every side. In that margin, a label line under the pattern carries the part number and the batch number, with a 100 mm scale bar above it.
 
-Grid size, square size and ID range are printed with it, so anyone picking the board up later can rebuild the configuration without searching for the order.
+Grid size, square size, marker size and dictionary are printed on the label line, so anyone picking the board up later can rebuild the configuration without searching for the order. Marker IDs start at 0.
 
 ## Mounting
 
