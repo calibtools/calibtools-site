@@ -1,12 +1,13 @@
 /**
  * Renderers for ChArUco boards and ArUco grids (GridBoard) —
  * black squares + real ArUco marker bits from dictionary JSON in white squares.
+ * OpenCV's DICT_APRILTAG_* dictionaries are drawn the same way, from the AprilTag family data.
  *
  * Marker IDs follow cv.aruco.CharucoBoard: row-major over white squares,
  * offset by PatternSpec.startId.
  */
 import type { PatternSpec } from './patterns';
-import { getArUcoDict, decodeMarkerBits } from './dicts/dicts';
+import { getMarkerDict, decodeMarkerBits } from './dicts/dicts';
 
 /** One marker on the board: ID, cell, and top-left corner in mm from the board's top-left corner. */
 export interface BoardMarker { id: number; row: number; col: number; x: number; y: number; size: number }
@@ -39,7 +40,7 @@ export function charucoMarkers(s: PatternSpec): BoardMarker[] {
 }
 
 /** One ArUco marker: black square with the one-cell border, white cells from the dictionary bits. Solid black when the ID is not in the dictionary. */
-function markerSvg(dict: ReturnType<typeof getArUcoDict>, markerId: number, mx: number, my: number, m: number): string {
+function markerSvg(dict: ReturnType<typeof getMarkerDict>, markerId: number, mx: number, my: number, m: number): string {
   let out = `<rect x="${mx}" y="${my}" width="${m}" height="${m}" fill="#000"/>`;
   if (dict && markerId < dict.count) {
     const bits = decodeMarkerBits(dict.bits[markerId], dict.markerSize);
@@ -76,14 +77,14 @@ export function gridBoardSeparation(s: Pick<PatternSpec, 'square' | 'marker'>): 
 
 /** Returns SVG elements for an ArUco grid (GridBoard): markers only, no squares. */
 export function renderArucoGridSvg(s: PatternSpec, ox: number, oy: number): string {
-  const dict = getArUcoDict(s.dict);
+  const dict = getMarkerDict(s.dict);
   return gridBoardMarkers(s).map((m) => markerSvg(dict, m.id, ox + m.x, oy + m.y, m.size)).join('');
 }
 
 /** Returns SVG elements for a ChArUco pattern. */
 export function renderCharucoSvg(s: PatternSpec, ox: number, oy: number): string {
   const parts: string[] = [];
-  const dict = getArUcoDict(s.dict);
+  const dict = getMarkerDict(s.dict);
 
   for (let r = 0; r < s.rows; r++) {
     for (let c = 0; c < s.cols; c++) {

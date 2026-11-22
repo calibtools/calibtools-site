@@ -14,7 +14,7 @@ import { SIGNATURE } from './signature';
 import { CUSTOM_ORDER_FINAL, PAID_REPAIR, PAYMENT_ACCEPTS_QUOTATION } from './orderTerms';
 import { patternShapes, fillRgb, shapeBox } from './patternShapes';
 import { specFromLink, patternId } from './patternLink';
-import { getArUcoDict } from './dicts/dicts';
+import { getMarkerDict } from './dicts/dicts';
 
 export interface OfferItem {
   partNo?: string;
@@ -410,7 +410,7 @@ export async function offerPdf(d: OfferData, fonts: OfferFonts): Promise<Uint8Ar
   // Pattern drawing, to scale, from the same shapes the generator exports.
   const spec = d.annex.pattern ? specFromLink(d.annex.pattern) : null;
   // A marker pattern is drawn only when its dictionary data is on hand; never with stand-in squares.
-  const drawable = !!spec && (!/^(ChArUco|ArUco grid)$/.test(spec.type) || !!getArUcoDict(spec.dict));
+  const drawable = !!spec && (!/^(ChArUco|ArUco grid)$/.test(spec.type) || !!getMarkerDict(spec.dict));
   if (spec && drawable) {
     const shapes = patternShapes({ ...spec, scaleBar: false }).filter((s) => s.kind !== 'text');
     const boxes = shapes.map(shapeBox);

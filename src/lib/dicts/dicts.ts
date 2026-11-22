@@ -147,3 +147,46 @@ export function decodeAprilBits(hex: string, d: number, bit_x?: number[], bit_y?
   }
   return grid;
 }
+
+const APRILTAG_AS_ARUCO = new Map<string, ArUcoDict>();
+
+/** A bit grid packed the way the dictionary JSON files store it: row by row, most significant bit first, each row padded to whole bytes. */
+function encodeMarkerBits(grid: number[][]): string {
+  let hex = '';
+  for (const row of grid) {
+    for (let c = 0; c < row.length; c += 8) {
+      let byte = 0;
+      for (let k = 0; k < 8; k++) byte = (byte << 1) | (row[c + k] ?? 0);
+      hex += byte.toString(16).padStart(2, '0');
+    }
+  }
+  return hex;
+}
+
+/**
+ * The dictionary a ChArUco board or an ArUco grid is drawn from.
+ *
+ * Besides the ArUco dictionaries this covers OpenCV's DICT_APRILTAG_<family>: the tags of that AprilTag family
+ * laid out as ArUco markers, the family's d × d bits inside a one-cell black border. They are built from the
+ * family data, so the codes exist in one file only. Undefined when the dictionary, or the bit layout of the
+ * family, is not on hand.
+ */
+export function getMarkerDict(name: string): ArUcoDict | undefined {
+  const plain = ARUCO_DICTS[name];
+  if (plain) return plain;
+  const m = /^DICT_APRILTAG_(\S+)$/.exec(name);
+  const family = m ? APRILTAG_FAMILIES[m[1]] : undefined;
+  if (!family || !family.bit_x || !family.bit_y) return undefined;
+  let dict = APRILTAG_AS_ARUCO.get(name);
+  if (!dict) {
+    dict = {
+      name,
+      markerSize: family.d,
+      maxCorrectionBits: 0, // as in OpenCV's predefined AprilTag dictionaries
+      count: family.count,
+      bits: family.codes.map((code) => encodeMarkerBits(decodeAprilBits(code, family.d, family.bit_x, family.bit_y))),
+    };
+    APRILTAG_AS_ARUCO.set(name, dict);
+  }
+  return dict;
+}
