@@ -26,6 +26,15 @@ interface TokenResponse {
   expires_in: number;
 }
 
+/**
+ * Shopify answers requests without a User-Agent with a 403 HTML page, and Cloudflare Workers send none
+ * by default (the same rule accountApi.ts follows for the Customer Account API).
+ */
+export const ADMIN_USER_AGENT = 'calib.tools site (+https://calib.tools/)';
+
+/** Marks a failure of the token exchange, so callers can tell it from a failed query. */
+export class AdminTokenError extends Error {}
+
 const KV_KEY = 'shopify_admin_token';
 const EXPIRY_BUFFER_S = 300;
 
@@ -46,7 +55,7 @@ function kv(env: Env): KVNamespace | undefined {
 async function fetchToken(domain: string, clientId: string, clientSecret: string): Promise<TokenResponse> {
   const res = await fetch(`https://${domain}/admin/oauth/access_token`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'User-Agent': ADMIN_USER_AGENT },
     body: new URLSearchParams({
       grant_type: 'client_credentials',
       client_id: clientId,
@@ -54,7 +63,7 @@ async function fetchToken(domain: string, clientId: string, clientSecret: string
     }),
   });
   if (!res.ok) {
-    throw new Error(`Token exchange failed: ${res.status} ${res.statusText}`);
+    throw new AdminTokenError(`Token exchange failed: ${res.status} ${res.statusText}`);
   }
   return res.json() as Promise<TokenResponse>;
 }
@@ -125,6 +134,7 @@ export async function adminFetch(
       headers: {
         'Content-Type': 'application/json',
         'X-Shopify-Access-Token': t,
+        'User-Agent': ADMIN_USER_AGENT,
       },
       body: JSON.stringify({ query, variables }),
     });

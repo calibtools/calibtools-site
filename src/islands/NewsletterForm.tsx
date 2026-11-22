@@ -84,8 +84,9 @@ export default function NewsletterForm({ heading = 'New tools and targets, month
         setMessage(data.message || 'Something went wrong.');
       }
     } catch {
+      // No answer, or one that is not ours (a network drop, an error page).
       setStatus('error');
-      setMessage('Something went wrong. Please try again.');
+      setMessage('Could not reach the server. Please try again.');
     }
   };
 
