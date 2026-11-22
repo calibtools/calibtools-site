@@ -47,8 +47,8 @@ export interface OfferEmailModel {
   /** Empty when there is no tax on the draft. */
   tax: string;
   total: string;
-  /** The shipping line is named DDP: duties and clearance are in the price. */
-  dutiesPaid: boolean;
+  /** Trade term named in the shipping line: DDP (duties in the price), DAP (duties paid by the recipient), or none. */
+  delivery: 'ddp' | 'dap' | 'other';
 }
 
 export type OfferRefusal = 'completed' | 'not-custom' | 'no-pdf' | 'no-recipient' | 'no-order-link';
@@ -67,6 +67,12 @@ export function formatMoney(amount: string | number | undefined, currency: strin
   const n = Number(amount ?? 0);
   const v = (Number.isFinite(n) ? n : 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   return !currency || currency === 'USD' ? `$${v}` : `${v} ${currency}`;
+}
+
+/** The trade term is read from the name of the draft order's shipping line, as a whole word. */
+export function deliveryTerm(title: string | undefined | null): 'ddp' | 'dap' | 'other' {
+  const t = String(title ?? '');
+  return /\bDDP\b/.test(t) ? 'ddp' : /\bDAP\b/.test(t) ? 'dap' : 'other';
 }
 
 const EMAIL_RE = /^[^\s@<>"]+@[^\s@<>"]+\.[^\s@<>"]+$/;
@@ -121,7 +127,7 @@ export function offerModel(d: DraftWebhook): { ok: true; model: OfferEmailModel 
       shipping: formatMoney(d.shipping_line?.price, currency),
       tax: tax > 0 ? formatMoney(tax, currency) : '',
       total: `${formatMoney(d.total_price, currency)}${currency === 'USD' ? ' USD' : ''}`,
-      dutiesPaid: /\bDDP\b/.test(String(d.shipping_line?.title ?? '')),
+      delivery: deliveryTerm(d.shipping_line?.title),
     },
   };
 }
@@ -139,7 +145,9 @@ const INTRO =
   'The quotation is attached to this email as a PDF and lists what we agreed. Check the specification, then confirm the order with the button. Production starts once the order is confirmed.';
 const DUTIES_EXTRA = 'Import duties and taxes of your country are not included unless the quotation says so.';
 const DUTIES_PAID = 'Delivered duty paid (DDP): freight, customs clearance and import duties are included. Nothing is due on delivery.';
-const dutiesLine = (m: OfferEmailModel): string => (m.dutiesPaid ? DUTIES_PAID : DUTIES_EXTRA);
+const DUTIES_ON_ARRIVAL = 'Delivered at place (DAP): import duties and taxes are not included and are paid by the recipient on arrival.';
+const dutiesLine = (m: OfferEmailModel): string =>
+  m.delivery === 'ddp' ? DUTIES_PAID : m.delivery === 'dap' ? DUTIES_ON_ARRIVAL : DUTIES_EXTRA;
 const QUESTIONS = ['Questions or changes? Reply to this email or write to ', 'hello@calib.tools', '. We answer within one business day.'] as const;
 
 const esc = (s: string): string =>

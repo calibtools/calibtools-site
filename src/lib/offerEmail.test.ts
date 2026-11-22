@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { offerTriggers, offerModel, offerEmailHtml, offerEmailText, offerEmailSubject, formatMoney, type DraftWebhook } from './offerEmail';
+import { offerTriggers, offerModel, offerEmailHtml, offerEmailText, offerEmailSubject, formatMoney, deliveryTerm, type DraftWebhook } from './offerEmail';
 import { CUSTOM_ORDER_FINAL, PAYMENT_ACCEPTS_QUOTATION } from './orderTerms';
 import { SIGN_OFF_LINE } from './brand';
 
@@ -155,23 +155,37 @@ describe('offer email', () => {
     expect(html).not.toContain('>Taxes<');
     expect(html).not.toContain('_quote_pdf');
   });
-  it('says duties are not included, unless the shipping line is DDP', () => {
+  it('words the duties line after the trade term in the shipping line: DDP, DAP or neither', () => {
     const plain = offerEmailHtml(model());
+    expect(model().delivery).toBe('other');
     expect(plain).toContain('Import duties and taxes of your country are not included unless the quotation says so.');
     expect(plain).not.toContain('Nothing is due on delivery');
 
-    const r = offerModel(sampleDraft({ shipping_line: { title: 'Delivery DDP Cambridge, MA: air freight, customs clearance, import duties', price: '5.00' } }));
-    if (!r.ok) throw new Error(r.reason);
-    expect(r.model.dutiesPaid).toBe(true);
-    for (const body of [offerEmailHtml(r.model), offerEmailText(r.model)]) {
+    const ddp = offerModel(sampleDraft({ shipping_line: { title: 'Delivery DDP Cambridge, MA: air freight, customs clearance, import duties', price: '5.00' } }));
+    if (!ddp.ok) throw new Error(ddp.reason);
+    expect(ddp.model.delivery).toBe('ddp');
+    for (const body of [offerEmailHtml(ddp.model), offerEmailText(ddp.model)]) {
       expect(body).toContain('Delivered duty paid (DDP): freight, customs clearance and import duties are included. Nothing is due on delivery.');
       expect(body).not.toContain('are not included');
     }
-    // the letters inside another word do not count
-    const other = offerModel(sampleDraft({ shipping_line: { title: 'Express via DDPX hub', price: '5.00' } }));
-    expect(other.ok && other.model.dutiesPaid).toBe(false);
+
+    const dap = offerModel(sampleDraft({ shipping_line: { title: 'DAP Bâtiment 507 (shipping included)', price: '0.00' } }));
+    if (!dap.ok) throw new Error(dap.reason);
+    expect(dap.model.delivery).toBe('dap');
+    for (const body of [offerEmailHtml(dap.model), offerEmailText(dap.model)]) {
+      expect(body).toContain('Delivered at place (DAP): import duties and taxes are not included and are paid by the recipient on arrival.');
+      expect(body).not.toContain('Nothing is due on delivery');
+      expect(body).not.toContain('unless the quotation says so');
+    }
+  });
+  it('reads the trade term as a whole word only', () => {
+    expect(deliveryTerm('Express via DDPX hub')).toBe('other');
+    expect(deliveryTerm('ADAPTER freight')).toBe('other');
+    expect(deliveryTerm('Shipping (DAP Cambridge, MA)')).toBe('dap');
+    expect(deliveryTerm('Shipping (DDP)')).toBe('ddp');
+    expect(deliveryTerm(undefined)).toBe('other');
     const none = offerModel(sampleDraft({ shipping_line: null }));
-    expect(none.ok && none.model.dutiesPaid).toBe(false);
+    expect(none.ok && none.model.delivery).toBe('other');
   });
   it('escapes what comes from the draft order', () => {
     const d = sampleDraft({ note: '<script>alert(1)</script>' });
