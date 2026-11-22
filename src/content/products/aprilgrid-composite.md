@@ -19,7 +19,7 @@ skus:
   - partNumber: "CT-APR-P-400X300-T36"
     title: "AprilGrid 6 × 8, 35 mm tags, 10.5 mm gap, 400 × 300 mm, 48 tags"
   - partNumber: "CT-APR-P-600X400-T36"
-    title: "AprilGrid 7 × 10, 45 mm tags, 13.5 mm gap, 600 × 400 mm, 70 tags"
+    title: "AprilGrid 6 × 10, 45 mm tags, 13.5 mm gap, 600 × 400 mm, 60 tags"
   - partNumber: "CT-APR-P-800X600-T36"
     title: "AprilGrid 9 × 12, 50 mm tags, 15 mm gap, 800 × 600 mm, 108 tags"
 relatedTargets:
@@ -57,7 +57,7 @@ The [FOV calculator](/tools/fov/) gives the field of view and the image scale fo
 
 **[CT-APR-P-400X300-T36](#CT-APR-P-400X300-T36)**, 6 × 8 tags of 35 mm with a 10.5 mm gap, 48 tags, about 0.8 kg. It fits a field about 670 mm wide at 1.17 mm per pixel or finer. The usual size for a drone or handheld camera-IMU unit at arm's length.
 
-**[CT-APR-P-600X400-T36](#CT-APR-P-600X400-T36)**, 7 × 10 tags of 45 mm with a 13.5 mm gap, 70 tags, about 1.6 kg. It fits a field about 1 m wide at 1.5 mm per pixel or finer. For wider lenses or longer distances; mount it on a wall or a stand.
+**[CT-APR-P-600X400-T36](#CT-APR-P-600X400-T36)**, 6 × 10 tags of 45 mm with a 13.5 mm gap, 60 tags, about 1.6 kg. It fits a field about 1 m wide at 1.5 mm per pixel or finer. For wider lenses or longer distances; mount it on a wall or a stand.
 
 **[CT-APR-P-800X600-T36](#CT-APR-P-800X600-T36)**, 9 × 12 tags of 50 mm with a 15 mm gap, 108 tags, about 3.2 kg. It fits a field about 1.3 m wide at 1.67 mm per pixel or finer. For vehicle-mounted rigs and wide baselines; fix it to a wall.
 
