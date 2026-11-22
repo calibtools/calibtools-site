@@ -13,7 +13,7 @@ interface Props {
   done?: string;
   /** Tag set on the subscriber in Shopify, e.g. "notify:plumbline". Also names the GA4 event's form. */
   tag?: string;
-  /** One line: email field and button side by side, no card, human check hidden unless needed. */
+  /** One line: email field and button side by side, no card. (The human check is hidden unless needed in both layouts.) */
   compact?: boolean;
   /** Prefix for the input id when two forms share a page. */
   id?: string;
@@ -151,10 +151,11 @@ export default function NewsletterForm({ heading = 'New tools and targets, month
         aria-hidden="true"
       />
 
-      <TurnstileBox onToken={onToken} resetKey={resetKey} />
+      {/* Hidden unless Cloudflare asks the visitor to confirm; a box that reloads under "Subscribed!" reads as unfinished. */}
+      <TurnstileBox onToken={onToken} resetKey={resetKey} quiet />
 
       {message && (
-        <p className={`m-0 text-sm ${status === 'success' ? 'text-green-700' : 'text-brand'}`}>
+        <p className={`m-0 text-sm ${status === 'success' ? 'text-ok' : 'text-brand-dark'}`} aria-live="polite">
           {message}
         </p>
       )}

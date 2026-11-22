@@ -1,0 +1,25 @@
+# Checks once a day that the live site can still reach the Shopify Admin API (the sign-up forms need it).
+# A failed run means a visitor's sign-up would fail too; the code in the answer says where it stops
+# (see functions/api/health.ts). Run by hand after changing the Shopify app or its credentials.
+
+name: Health
+
+on:
+  schedule:
+    - cron: '47 6 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: health
+  cancel-in-progress: false
+
+jobs:
+  shopify-admin:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: GET /api/health
+        run: |
+          body=$(curl -sS --max-time 30 -A 'calib.tools health check' https://calib.tools/api/health || true)
+          echo "answer: ${body:0:120}"
+          [ "$body" = '{"ok":true}' ]
