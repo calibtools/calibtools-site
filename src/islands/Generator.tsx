@@ -15,6 +15,8 @@ import { LEAD_TIME } from '@/lib/claims';
 import { GENERATOR_DEFAULT, specFromParams, specToParams, patternPath, patternId } from '@/lib/patternLink';
 import { track } from '@/lib/track';
 import { safeSpec, limitNote } from '@/lib/specLimits';
+import { markerCapacity } from '@/lib/renderCharuco';
+import { largerDictFor } from '@/lib/dicts/dicts';
 
 /**
  * Pattern generator.
@@ -23,7 +25,7 @@ import { safeSpec, limitNote } from '@/lib/specLimits';
  */
 const PATTERNS = ['Checkerboard', 'ChArUco', 'AprilGrid (Kalibr)', 'Asymmetric circles', 'Symmetric circles', 'ArUco grid', 'HALCON-style dots', 'Marker sheet'] as const;
 const DICTS = [
-  'DICT_4X4_50', 'DICT_5X5_100', 'DICT_5X5_1000', 'DICT_6X6_250', 'DICT_7X7_1000',
+  'DICT_4X4_50', 'DICT_4X4_100', 'DICT_4X4_250', 'DICT_5X5_100', 'DICT_5X5_1000', 'DICT_6X6_250', 'DICT_7X7_1000',
   'DICT_ARUCO_ORIGINAL', 'DICT_ARUCO_MIP_36h12',
   'DICT_APRILTAG_36h11',
 ];
@@ -179,6 +181,12 @@ export default function Generator({ initialSpec, heading = 'Pattern generator' }
     if (boardCount <= 1) return null;
     return computeSetBoards(spec, boardCount, boardStartIds.length >= boardCount ? boardStartIds : undefined);
   }, [spec, boardCount, boardStartIds]);
+
+  // Marker IDs against the dictionary: a marker whose ID the dictionary does not have cannot be drawn.
+  const capacity = markerCapacity(spec);
+  const lastIdUsed = Math.max(capacity?.lastId ?? 0, ...(boards ?? []).map((b) => markerCapacity(b.spec)?.lastId ?? 0));
+  const idsShort = !!capacity && lastIdUsed >= capacity.count;
+  const largerDict = idsShort ? largerDictFor(spec.dict, lastIdUsed + 1) : undefined;
 
   const field = 'w-full rounded border border-[#CFCFCF] bg-white px-3 py-[11px] text-[15px]';
   return (
@@ -471,10 +479,11 @@ export default function Generator({ initialSpec, heading = 'Pattern generator' }
 
         <div className="flex flex-col gap-2.5 border-t border-line pt-4">
           <span className="text-[13px] font-semibold">Download</span>
+          {idsShort && <p className="m-0 text-[13px] leading-snug text-brand-dark">Off until the marker IDs fit the dictionary. See the note by the preview.</p>}
           <div className="grid grid-cols-2 gap-2">
             <button type="button"
               className="col-span-2 rounded bg-ink px-3 py-[11px] text-sm font-semibold text-white disabled:opacity-50"
-              disabled={busy !== null}
+              disabled={busy !== null || idsShort}
               onClick={async () => {
                 setBusy('pdf');
                 try {
@@ -504,7 +513,7 @@ export default function Generator({ initialSpec, heading = 'Pattern generator' }
             {boards && boards.length >= 2 && (
               <button type="button"
                 className="col-span-2 rounded bg-brand px-3 py-[11px] text-sm font-semibold text-white disabled:opacity-50"
-                disabled={busy !== null}
+                disabled={busy !== null || idsShort}
                 onClick={async () => {
                   setBusy('pdf');
                   try {
@@ -527,7 +536,7 @@ export default function Generator({ initialSpec, heading = 'Pattern generator' }
                 Export set ({boardCount} boards .zip)
               </button>
             )}
-            <button type="button" className="rounded bg-brand px-3 py-[11px] text-sm font-semibold text-white disabled:opacity-50" disabled={busy !== null} onClick={async () => {
+            <button type="button" className="rounded bg-brand px-3 py-[11px] text-sm font-semibold text-white disabled:opacity-50" disabled={busy !== null || idsShort} onClick={async () => {
               setBusy('pdf');
               try {
                 const bytes = await exportPdf({ spec, pw, ph, layout });
@@ -538,8 +547,8 @@ export default function Generator({ initialSpec, heading = 'Pattern generator' }
                 URL.revokeObjectURL(a.href);
               } finally { setBusy(null); }
             }}>{busy === 'pdf' ? 'Generating…' : 'PDF (1:1)'}</button>
-            <button type="button" className="rounded border border-ink bg-white px-3 py-[11px] text-sm font-medium" onClick={() => download(`${slug}.svg`, svg, 'image/svg+xml')}>SVG</button>
-            <button type="button" className="rounded border border-ink bg-white px-3 py-[11px] text-sm font-medium disabled:opacity-50" disabled={busy !== null} onClick={async () => {
+            <button type="button" className="rounded border border-ink bg-white px-3 py-[11px] text-sm font-medium disabled:opacity-50" disabled={idsShort} onClick={() => download(`${slug}.svg`, svg, 'image/svg+xml')}>SVG</button>
+            <button type="button" className="rounded border border-ink bg-white px-3 py-[11px] text-sm font-medium disabled:opacity-50" disabled={busy !== null || idsShort} onClick={async () => {
               setBusy('png');
               try {
                 const blob = await exportPng({ svg, pw, ph });
@@ -550,7 +559,7 @@ export default function Generator({ initialSpec, heading = 'Pattern generator' }
                 URL.revokeObjectURL(a.href);
               } finally { setBusy(null); }
             }}>{busy === 'png' ? 'Generating…' : 'PNG (300 dpi)'}</button>
-            <button type="button" className="rounded border border-ink bg-white px-3 py-[11px] text-sm font-medium" onClick={() => download(`${slug}.dxf`, exportDxf({ spec, pw, ph, layout }), 'application/dxf')}>DXF</button>
+            <button type="button" className="rounded border border-ink bg-white px-3 py-[11px] text-sm font-medium disabled:opacity-50" disabled={idsShort} onClick={() => download(`${slug}.dxf`, exportDxf({ spec, pw, ph, layout }), 'application/dxf')}>DXF</button>
           </div>
           <span className="pt-1.5 text-[13px] font-semibold">Config files</span>
           <div className="flex flex-wrap gap-2 font-mono text-[13px]">
@@ -574,13 +583,25 @@ export default function Generator({ initialSpec, heading = 'Pattern generator' }
             <span className="text-sm font-medium text-green-700">Matches stock target {catalog.exact.partNumber}</span>
           )}
         </div>
+        {idsShort && capacity && (
+          <div role="alert" data-testid="ids-short" className="rounded border border-brand bg-brand-tint px-4 py-3 text-sm text-brand-dark">
+            <p className="m-0 font-semibold">{spec.dict} has {capacity.count} markers. {boards ? 'This set' : 'This grid'} uses IDs {capacity.firstId}–{lastIdUsed}.</p>
+            <p className="m-0 mt-1 text-[13px]">
+              Markers above ID {capacity.count - 1} cannot be drawn, so downloads are off.{' '}
+              {largerDict ? 'Use a larger dictionary, or fewer rows and columns.' : 'Use fewer rows and columns, or a lower start ID.'}
+            </p>
+            {largerDict && (
+              <button type="button" className="mt-1 inline-flex min-h-[44px] items-center text-[13px] font-semibold underline md:min-h-[24px]" onClick={() => set('dict', largerDict)}>Switch to {largerDict}</button>
+            )}
+          </div>
+        )}
         {!fits && (
           <div role="alert" className="rounded border border-brand bg-brand-tint px-4 py-3 text-sm text-brand-dark">
             <p className="m-0 mb-2 font-semibold">{fitNotice(boardW, boardH, spec.paper)}</p>
             <ul className="m-0 list-none space-y-1 pl-0 text-[13px]">
               <li>(a) <strong>Tile</strong> across {layout.tiling ? `${layout.tiling.cols} \u00D7 ${layout.tiling.rows} = ${layout.tiling.totalPages}` : ''} {spec.paper} sheets at 100 % scale with 10 mm overlap and crop marks.{' '}
                 {layout.tiling && (
-                  <button type="button" className="font-semibold underline min-h-[44px] md:min-h-[24px] inline-flex items-center" disabled={busy !== null} onClick={async () => {
+                  <button type="button" className="font-semibold underline min-h-[44px] md:min-h-[24px] inline-flex items-center" disabled={busy !== null || idsShort} onClick={async () => {
                     setBusy('pdf');
                     try {
                       const bytes = await exportTiledPdf({ spec, tiling: layout.tiling! });

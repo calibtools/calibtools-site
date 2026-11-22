@@ -26,6 +26,8 @@ export interface AprilTagFamily {
 
 // Static imports for ArUco dictionaries
 import DICT_4X4_50 from './DICT_4X4_50.json';
+import DICT_4X4_100 from './DICT_4X4_100.json';
+import DICT_4X4_250 from './DICT_4X4_250.json';
 import DICT_5X5_100 from './DICT_5X5_100.json';
 import DICT_5X5_1000 from './DICT_5X5_1000.json';
 import DICT_6X6_250 from './DICT_6X6_250.json';
@@ -43,6 +45,8 @@ import AT_36h11 from './apriltag-36h11.json';
 
 const ARUCO_DICTS: Record<string, ArUcoDict> = {
   DICT_4X4_50: DICT_4X4_50 as unknown as ArUcoDict,
+  DICT_4X4_100: DICT_4X4_100 as unknown as ArUcoDict,
+  DICT_4X4_250: DICT_4X4_250 as unknown as ArUcoDict,
   DICT_5X5_100: DICT_5X5_100 as unknown as ArUcoDict,
   DICT_5X5_1000: DICT_5X5_1000 as unknown as ArUcoDict,
   DICT_6X6_250: DICT_6X6_250 as unknown as ArUcoDict,
@@ -189,4 +193,18 @@ export function getMarkerDict(name: string): ArUcoDict | undefined {
     APRILTAG_AS_ARUCO.set(name, dict);
   }
   return dict;
+}
+
+/**
+ * The smallest ArUco dictionary with the same marker size as `name` that holds `needed` markers.
+ * OpenCV's sized dictionaries of one marker size start with the same markers, so IDs keep their bits.
+ * Undefined when `name` is unknown or no larger dictionary of that size is on hand.
+ */
+export function largerDictFor(name: string, needed: number): string | undefined {
+  const from = ARUCO_DICTS[name];
+  const family = /^(DICT_\d+X\d+)_\d+$/.exec(name)?.[1];
+  if (!from || !family) return undefined;
+  return Object.values(ARUCO_DICTS)
+    .filter((d) => d.name.startsWith(family + '_') && d.markerSize === from.markerSize && d.count > from.count && d.count >= needed)
+    .sort((a, b) => a.count - b.count)[0]?.name;
 }

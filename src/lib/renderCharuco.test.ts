@@ -3,8 +3,8 @@
  * laid out as ArUco markers with a one-cell border. They were once drawn as solid black squares.
  */
 import { describe, it, expect } from 'vitest';
-import { renderCharucoSvg, renderArucoGridSvg, charucoMarkers } from './renderCharuco';
-import { getMarkerDict, getAprilFamily, decodeAprilBits, decodeMarkerBits, getArUcoDict } from './dicts/dicts';
+import { renderCharucoSvg, renderArucoGridSvg, charucoMarkers, markerCapacity } from './renderCharuco';
+import { getMarkerDict, getAprilFamily, decodeAprilBits, decodeMarkerBits, getArUcoDict, largerDictFor } from './dicts/dicts';
 import { CATALOG, specFromEntry } from './catalogPatterns';
 import { GENERATOR_DEFAULT } from './patternLink';
 import type { PatternSpec } from './patterns';
@@ -83,5 +83,64 @@ describe('ArUco grid with DICT_APRILTAG_36h11', () => {
   it('draws coded markers', () => {
     const svg = renderArucoGridSvg({ ...BASE, type: 'ArUco grid', rows: 2, cols: 3, square: 30, marker: 24 }, 0, 0);
     expect((svg.match(/fill="#fff"/g) ?? []).length).toBeGreaterThan(6);
+  });
+});
+
+describe('markerCapacity', () => {
+  const big: PatternSpec = { ...BASE, rows: 9, cols: 12, square: 30, marker: 22, dict: 'DICT_4X4_50' };
+
+  it('reports a ChArUco grid that needs more markers than the dictionary has', () => {
+    expect(markerCapacity(big)).toEqual({ firstId: 0, lastId: 53, count: 50, short: true });
+  });
+
+  it('is fine when the last ID is the last marker of the dictionary', () => {
+    expect(markerCapacity({ ...big, cols: 11 })).toEqual({ firstId: 0, lastId: 48, count: 50, short: false });
+    expect(markerCapacity({ ...big, cols: 11, startId: 1 })).toEqual({ firstId: 1, lastId: 49, count: 50, short: false });
+    expect(markerCapacity({ ...big, cols: 11, startId: 2 })!.short).toBe(true);
+  });
+
+  it('counts one marker per cell for an ArUco grid', () => {
+    expect(markerCapacity({ ...big, type: 'ArUco grid', rows: 5, cols: 10 })).toEqual({ firstId: 0, lastId: 49, count: 50, short: false });
+    expect(markerCapacity({ ...big, type: 'ArUco grid', rows: 6, cols: 10 })!.short).toBe(true);
+  });
+
+  it('covers the AprilTag dictionaries', () => {
+    expect(markerCapacity({ ...BASE, rows: 11, cols: 15 })).toEqual({ firstId: 0, lastId: 81, count: 587, short: false });
+  });
+
+  it('says nothing for patterns without a dictionary', () => {
+    expect(markerCapacity({ ...BASE, type: 'Checkerboard' })).toBeNull();
+  });
+
+  it('the same marker beyond the dictionary is what the renderer draws solid', () => {
+    const svg = renderCharucoSvg(big, 0, 0);
+    const last = charucoMarkers(big).at(-1)!;
+    expect(last.id).toBe(53);
+    expect(whiteCells(svg, last.x, last.y, last.size, 4).size).toBe(0);
+    const ok = renderCharucoSvg({ ...big, dict: 'DICT_4X4_100' }, 0, 0);
+    expect(whiteCells(ok, last.x, last.y, last.size, 4).size).toBeGreaterThan(0);
+  });
+});
+
+describe('largerDictFor', () => {
+  it('names the smallest dictionary of the same marker size that holds the IDs', () => {
+    expect(largerDictFor('DICT_4X4_50', 54)).toBe('DICT_4X4_100');
+    expect(largerDictFor('DICT_4X4_50', 101)).toBe('DICT_4X4_250');
+    expect(largerDictFor('DICT_4X4_100', 101)).toBe('DICT_4X4_250');
+    expect(largerDictFor('DICT_5X5_100', 150)).toBe('DICT_5X5_1000');
+  });
+
+  it('has nothing to offer when no larger dictionary of that size is on hand', () => {
+    expect(largerDictFor('DICT_4X4_250', 300)).toBeUndefined();
+    expect(largerDictFor('DICT_6X6_250', 300)).toBeUndefined();
+    expect(largerDictFor('DICT_NOPE', 10)).toBeUndefined();
+  });
+
+  it('the larger 4 × 4 dictionaries start with the same 50 markers', () => {
+    const a = getArUcoDict('DICT_4X4_50')!, b = getArUcoDict('DICT_4X4_100')!, c = getArUcoDict('DICT_4X4_250')!;
+    expect(b.count).toBe(100);
+    expect(c.count).toBe(250);
+    expect(b.bits.slice(0, 50)).toEqual(a.bits);
+    expect(c.bits.slice(0, 100)).toEqual(b.bits);
   });
 });

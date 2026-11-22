@@ -116,3 +116,20 @@ function markerIndex(s: PatternSpec, r: number, c: number): number {
   }
   return idx;
 }
+
+/** The marker IDs a pattern uses against what its dictionary holds. */
+export interface MarkerCapacity { firstId: number; lastId: number; count: number; short: boolean }
+
+/**
+ * Whether the dictionary holds every marker ID of a ChArUco board or an ArUco grid.
+ * `short` means some IDs are beyond the dictionary; the renderer draws those markers solid.
+ * Null for patterns without a dictionary, and when the dictionary is not on hand.
+ */
+export function markerCapacity(s: PatternSpec): MarkerCapacity | null {
+  if (s.type !== 'ChArUco' && s.type !== 'ArUco grid') return null;
+  const dict = getMarkerDict(s.dict);
+  if (!dict) return null;
+  const n = s.type === 'ChArUco' ? charucoMarkers(s).length : s.rows * s.cols;
+  const lastId = s.startId + n - 1;
+  return { firstId: s.startId, lastId, count: dict.count, short: lastId >= dict.count };
+}
