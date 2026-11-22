@@ -283,7 +283,7 @@ function chaCProductRendering(): string {
     W: 185, H: 110, rows: 7, cols: 12, sq: 14,
     marker: mk185, mx: 8.5, my: 6,
     dict_name: 'DICT_6X6_250', start_id: 0,
-    label, label_w: 168, axes_spec: [4.5, 4.5, 6.5, 0.6],
+    label, label_w: 168, axes_spec: null, // the board carries the pattern and the label line; the axes are shown beside it
     mode: 'print', width_mm: 125,
   });
   const coord = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 38" width="43mm" height="27.2mm">
@@ -432,7 +432,7 @@ function chaCDeliverablesBox(): string {
     ['Files', '<span class="mono">.opencv.json \u00b7 .ros2.yaml \u00b7 .halcon.txt</span> (from the pattern generator)'],
   ]) + '</div>';
   const right = '<div>' + tag('Configuration & service') + kv([
-    ['Marking on board', 'Label line with part / pattern / batch number / Rev; printed X / Y arrows.'],
+    ['Marking on board', 'Label line with part / pattern / batch number / Rev.'],
     ['Lead time', LEAD_TIME + '.'],
     ['Options', 'Fixture \u00b7 custom NRE.'],
   ]) + '</div>';

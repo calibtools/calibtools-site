@@ -36,7 +36,7 @@ const SAMPLE_MEAS: IRMeasurements = {
     { check: 'Edge chamfer', criterion: '0.5 \u00d7 45\u00b0 on all edges, no chips > 0.3 mm', result: 'PASS' },
     { check: 'Surface defects', criterion: 'No scratches or pinholes in the pattern area', result: 'PASS' },
     { check: 'Print / edge definition', criterion: 'Square edges sharp, no ink bleed at 10\u00d7 loupe', result: 'PASS' },
-    { check: 'Marking legibility', criterion: 'Label line, X / Y arrows and SN legible', result: 'PASS' },
+    { check: 'Marking legibility', criterion: 'Label line legible', result: 'PASS' },
   ],
   traceability: {
     instrument_cert: 'OCMM-01 \u00b7 certificate K-2026-03-0141 \u00b7 valid to 2027-03',

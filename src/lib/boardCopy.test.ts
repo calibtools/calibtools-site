@@ -108,3 +108,16 @@ describe('user manual: identification', () => {
     expect(line.includes('100 mm scale bar')).toBe(true);
   });
 });
+
+describe('ceramic datasheet: marking on the board', () => {
+  const src = readFileSync(resolve(ROOT, 'src/docs/build/ct-ds.ts'), 'utf-8');
+  it('lists the label line and no printed axis arrows', () => {
+    const row = src.split('\n').find((l) => l.includes("'Marking on board'"))!;
+    expect(/arrows/i.test(row)).toBe(false);
+    expect(row.includes('Label line with part / pattern / batch number / Rev.')).toBe(true);
+  });
+  it('the rendering of the printed board carries no axes', () => {
+    const call = /const board = board_svg\(\{[\s\S]*?mode: 'print'[\s\S]*?\}\);/.exec(src)![0];
+    expect(call.includes('axes_spec: null')).toBe(true);
+  });
+});
