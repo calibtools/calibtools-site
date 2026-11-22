@@ -30,6 +30,8 @@ describe('brand statements', () => {
     expect(read('src/pages/about.astro')).toContain('{MISSION_LINE}');
     expect(read('src/components/Footer.astro')).toContain('{MISSION_LINE}');
     expect(read('docs/offers/draft-order-invoice-offer.liquid')).toContain(SIGN_OFF_LINE);
+    expect(read('src/lib/offerEmail.ts')).toContain('SIGN_OFF_LINE');
+    expect(read('src/lib/offerEmail.ts')).not.toContain('target you can trust');
     for (const rel of ['src/pages/about.astro', 'src/components/Footer.astro']) {
       expect(read(rel)).not.toContain('make machines see');
     }

@@ -52,6 +52,9 @@ describe('custom orders are final once paid (2026-11-21)', () => {
     const { CUSTOM_ORDER_FINAL } = await import('./orderTerms');
     const email = read('docs/offers/draft-order-invoice-offer.liquid').replace(/&rsquo;/g, '’');
     expect(email).toContain(CUSTOM_ORDER_FINAL);
+    // The offer email the site sends takes the sentence from the constant.
+    expect(read('src/lib/offerEmail.ts')).toContain('CUSTOM_ORDER_FINAL');
+    expect(read('src/lib/offerEmail.ts')).not.toMatch(/canceled, returned or exchanged/);
   });
   it('offers paid repair for damage caused in use, with shipping both ways on the customer', async () => {
     const { PAID_REPAIR } = await import('./orderTerms');
@@ -66,6 +69,7 @@ describe('custom orders are final once paid (2026-11-21)', () => {
     expect(PAYMENT_ACCEPTS_QUOTATION).toMatch(/^Paying the order confirms/);
     expect(read('src/lib/offerPdf.ts')).toContain('PAYMENT_ACCEPTS_QUOTATION');
     expect(read('docs/offers/draft-order-invoice-offer.liquid')).toContain(PAYMENT_ACCEPTS_QUOTATION);
+    expect(read('src/lib/offerEmail.ts')).toContain('PAYMENT_ACCEPTS_QUOTATION');
     expect(read('src/pages/terms.astro')).toMatch(/paying the order accepts the specification/);
   });
   it('product pages take the warranty and return window from the shared constants', () => {

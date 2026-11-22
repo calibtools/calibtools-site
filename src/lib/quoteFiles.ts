@@ -43,11 +43,7 @@ function toBase64(text: string): string {
   return btoa(bin);
 }
 
-export function bytesToBase64(bytes: Uint8Array): string {
-  let bin = '';
-  for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
-  return btoa(bin);
-}
+export { bytesToBase64 } from './base64';
 
 /** The text files: quick to build, so they go out with the first internal email. */
 export function quoteAttachments(spec: PatternSpec, quoteId: string): EmailAttachment[] {
