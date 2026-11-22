@@ -32,8 +32,23 @@ interface TokenResponse {
  */
 export const ADMIN_USER_AGENT = 'calib.tools site (+https://calib.tools/)';
 
-/** Marks a failure of the token exchange, so callers can tell it from a failed query. */
-export class AdminTokenError extends Error {}
+/** Marks a failure of the token exchange, so callers can tell it from a failed query. Carries Shopify's HTTP status. */
+export class AdminTokenError extends Error {
+  constructor(message: string, readonly status: number) { super(message); }
+}
+
+/** The shop's permanent myshopify.com domain. Not a secret: it shows in every checkout URL. */
+export const MYSHOPIFY_DOMAIN = '7ape7i-8e.myshopify.com';
+
+/**
+ * Host for the token exchange and the Admin API. Both live on the shop's myshopify.com domain only;
+ * the storefront domain (shop.calib.tools) answers /admin/… with a redirect, which a POST does not survive.
+ * A myshopify.com domain in SHOPIFY_STORE_DOMAIN is used as it is; anything else falls back to the shop's own.
+ */
+export function adminHost(env: { SHOPIFY_STORE_DOMAIN?: string }): string {
+  const given = (env.SHOPIFY_STORE_DOMAIN ?? '').trim().toLowerCase().replace(/^https?:\/\//, '').replace(/\/.*$/, '');
+  return /^[a-z0-9][a-z0-9-]*\.myshopify\.com$/.test(given) ? given : MYSHOPIFY_DOMAIN;
+}
 
 const KV_KEY = 'shopify_admin_token';
 const EXPIRY_BUFFER_S = 300;
@@ -55,6 +70,7 @@ function kv(env: Env): KVNamespace | undefined {
 async function fetchToken(domain: string, clientId: string, clientSecret: string): Promise<TokenResponse> {
   const res = await fetch(`https://${domain}/admin/oauth/access_token`, {
     method: 'POST',
+    redirect: 'manual', // a redirect here is a wrong host, not something to follow
     headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'User-Agent': ADMIN_USER_AGENT },
     body: new URLSearchParams({
       grant_type: 'client_credentials',
@@ -63,7 +79,7 @@ async function fetchToken(domain: string, clientId: string, clientSecret: string
     }),
   });
   if (!res.ok) {
-    throw new AdminTokenError(`Token exchange failed: ${res.status} ${res.statusText}`);
+    throw new AdminTokenError(`Token exchange failed: ${res.status} ${res.statusText}`, res.status);
   }
   return res.json() as Promise<TokenResponse>;
 }
@@ -72,7 +88,7 @@ async function fetchToken(domain: string, clientId: string, clientSecret: string
  * Obtain a valid Admin API access token, caching in KV or memory.
  */
 export async function getAdminToken(env: Env): Promise<string> {
-  const domain = env.SHOPIFY_STORE_DOMAIN;
+  const domain = env.SHOPIFY_STORE_DOMAIN ? adminHost(env) : undefined;
   const clientId = env.SHOPIFY_CLIENT_ID;
   const clientSecret = env.SHOPIFY_CLIENT_SECRET;
   if (!domain || !clientId || !clientSecret) {
@@ -124,7 +140,7 @@ export async function adminFetch(
   query: string,
   variables: Record<string, unknown> = {},
 ): Promise<any> {
-  const domain = env.SHOPIFY_STORE_DOMAIN!;
+  const domain = adminHost(env);
   const token = await getAdminToken(env);
   const url = `https://${domain}/admin/api/2025-07/graphql.json`;
 

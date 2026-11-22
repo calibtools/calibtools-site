@@ -5,7 +5,9 @@
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { onRequestPost } from './subscribe';
-import { _resetMemCache } from '../../src/lib/shopifyAdmin';
+import { _resetMemCache, adminHost } from '../../src/lib/shopifyAdmin';
+
+const ADMIN_HOST = '7ape7i-8e.myshopify.com';
 
 interface Shop {
   customers: Map<string, { id: string; tags: string[]; consent?: string }>;
@@ -28,7 +30,12 @@ beforeEach(() => {
     const u = String(url);
     const headers = new Headers(init.headers);
     if (u.includes('siteverify')) return new Response(JSON.stringify({ success: human }));
-    if (!u.startsWith('https://shop.calib.tools/')) throw new Error('unexpected fetch ' + u);
+    // The storefront domain does not serve the Admin API: like the real one, it redirects to the admin.
+    if (u.startsWith('https://shop.calib.tools/admin/')) {
+      shop.calls.push('storefront-domain');
+      return new Response(null, { status: 301, headers: { Location: u.replace('shop.calib.tools', ADMIN_HOST) } });
+    }
+    if (!u.startsWith(`https://${ADMIN_HOST}/`)) throw new Error('unexpected fetch ' + u);
     if (!headers.get('User-Agent')) return html403();
     if (u.endsWith('/admin/oauth/access_token')) {
       shop.calls.push('token');
@@ -140,8 +147,10 @@ describe('POST /api/subscribe: each failure has its own reference', () => {
     const r = await post({ email: 'eng@example-robotics.com', ...(tag ? { tag } : {}) });
     expect(r.status).toBe(500);
     expect(r.data.ok).toBe(false);
-    expect(r.data.code).toBe(code);
-    expect(r.data.message).toBe(`Something went wrong (${code}). Please try again.`);
+    // a failed token exchange carries the HTTP status Shopify answered with
+    const shown = step === 'token' ? 'S1-400' : code;
+    expect(r.data.code).toBe(shown);
+    expect(r.data.message).toBe(`Something went wrong (${shown}). Please try again.`);
   });
 
   it('the references are all different', () => {
@@ -161,5 +170,21 @@ describe('POST /api/subscribe: each failure has its own reference', () => {
     expect(logged).toContain('S3');
     expect(logged).toContain('Access denied for customerCreate field.');
     expect(logged.includes('example-robotics')).toBe(false);
+  });
+});
+
+describe('Admin API host', () => {
+  it('is the myshopify.com domain, also when the settings name the storefront domain', () => {
+    expect(adminHost({ SHOPIFY_STORE_DOMAIN: 'shop.calib.tools' })).toBe(ADMIN_HOST);
+    expect(adminHost({})).toBe(ADMIN_HOST);
+  });
+  it('takes a myshopify.com domain from the settings as it is', () => {
+    expect(adminHost({ SHOPIFY_STORE_DOMAIN: 'other-shop.myshopify.com' })).toBe('other-shop.myshopify.com');
+    expect(adminHost({ SHOPIFY_STORE_DOMAIN: 'https://Other-Shop.myshopify.com/' })).toBe('other-shop.myshopify.com');
+  });
+  it('a sign-up with the storefront domain in the settings never calls that domain', async () => {
+    const r = await post({ email: 'eng@example-robotics.com', tag: 'notify:plumbline' });
+    expect(r.data.ok).toBe(true);
+    expect(shop.calls.includes('storefront-domain')).toBe(false);
   });
 });
