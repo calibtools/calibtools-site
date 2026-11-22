@@ -41,7 +41,7 @@ beforeEach(() => {
       shop.calls.push('token');
       const form = new URLSearchParams(String(init.body));
       if (shop.fail.token || form.get('grant_type') !== 'client_credentials' || form.get('client_id') !== 'id' || form.get('client_secret') !== 'secret') {
-        return new Response(JSON.stringify({ error: 'invalid_client' }), { status: 400 });
+        return new Response(JSON.stringify({ error: 'shop_not_permitted', error_description: 'Client credentials cannot be performed on this shop.' }), { status: 400 });
       }
       return new Response(JSON.stringify({ access_token: 'tok', expires_in: 3600 }));
     }
@@ -147,8 +147,8 @@ describe('POST /api/subscribe: each failure has its own reference', () => {
     const r = await post({ email: 'eng@example-robotics.com', ...(tag ? { tag } : {}) });
     expect(r.status).toBe(500);
     expect(r.data.ok).toBe(false);
-    // a failed token exchange carries the HTTP status Shopify answered with
-    const shown = step === 'token' ? 'S1-400' : code;
+    // a failed token exchange carries the HTTP status and the error name Shopify answered with
+    const shown = step === 'token' ? 'S1-400-shop_not_permitted' : code;
     expect(r.data.code).toBe(shown);
     expect(r.data.message).toBe(`Something went wrong (${shown}). Please try again.`);
   });

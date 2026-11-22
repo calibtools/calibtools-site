@@ -32,9 +32,23 @@ interface TokenResponse {
  */
 export const ADMIN_USER_AGENT = 'calib.tools site (+https://calib.tools/)';
 
-/** Marks a failure of the token exchange, so callers can tell it from a failed query. Carries Shopify's HTTP status. */
+/**
+ * Marks a failure of the token exchange, so callers can tell it from a failed query. Carries Shopify's HTTP
+ * status and, when Shopify named one, its error name (for example shop_not_permitted). Never the credentials.
+ */
 export class AdminTokenError extends Error {
-  constructor(message: string, readonly status: number) { super(message); }
+  constructor(message: string, readonly status: number, readonly reason = '') { super(message); }
+}
+
+/**
+ * Shopify's own name for a refused token exchange. The answer is JSON ({"error": "…"}) or an HTML page
+ * ("Oauth error …"); anything else gives ''. Only a short lowercase name is passed on, never the rest of the body.
+ */
+export function oauthErrorName(body: string): string {
+  let name = '';
+  try { name = String((JSON.parse(body) as { error?: unknown }).error ?? ''); } catch { /* not JSON */ }
+  if (!name) name = /Oauth error ([a-z_]+)/i.exec(body)?.[1] ?? '';
+  return /^[a-z][a-z_]{1,39}$/.test(name) ? name : '';
 }
 
 /** The shop's permanent myshopify.com domain. Not a secret: it shows in every checkout URL. */
@@ -79,7 +93,8 @@ async function fetchToken(domain: string, clientId: string, clientSecret: string
     }),
   });
   if (!res.ok) {
-    throw new AdminTokenError(`Token exchange failed: ${res.status} ${res.statusText}`, res.status);
+    const reason = oauthErrorName(await res.text().catch(() => ''));
+    throw new AdminTokenError(`Token exchange failed: ${res.status} ${reason || res.statusText}`, res.status, reason);
   }
   return res.json() as Promise<TokenResponse>;
 }
