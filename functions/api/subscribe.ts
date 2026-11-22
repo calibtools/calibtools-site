@@ -13,7 +13,7 @@
  * 3. (Optional) KV namespace QUOTES bound for rate limiting / token caching
  */
 
-import { adminFetch } from '../../src/lib/shopifyAdmin';
+import { adminFetch, AdminTokenError } from '../../src/lib/shopifyAdmin';
 import { verifyTurnstile } from '../../src/lib/turnstile';
 import { cleanTag, isNotifyOnly } from '../../src/lib/subscribeTags';
 
@@ -63,105 +63,110 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
     await ctx.env.QUOTES.put(rateKey, String(count + 1), { expirationTtl: 3600 });
   }
 
+  // Every failure has its own reference, shown in the message and written to the log with the reason
+  // (never the email address), so one screenshot tells which step broke.
+  //   S0 settings missing · S1 access token · S2 customer search · S3 customer create (request failed)
+  //   S4 customer create (refused by Shopify) · S5 marketing consent · S6 tag
+  const fail = (code: string, reason: unknown, status = 500) => {
+    console.error(`[subscribe] ${code}: ${reason instanceof Error ? reason.message : String(reason)}`);
+    const message = status === 503 ? `Sign-up is temporarily unavailable (${code}).` : `Something went wrong (${code}). Please try again.`;
+    return json('error', { ok: false, code, message }, status);
+  };
+  /** Run one Shopify step; a failed token exchange is S1 whichever step asked for the token. */
+  const step = async <T>(code: string, run: () => Promise<T>): Promise<{ ok: true; value: T } | { ok: false; res: Response }> => {
+    try {
+      return { ok: true, value: await run() };
+    } catch (err) {
+      return { ok: false, res: fail(err instanceof AdminTokenError ? 'S1' : code, err) };
+    }
+  };
+
   if (!ctx.env.SHOPIFY_STORE_DOMAIN || !ctx.env.SHOPIFY_CLIENT_ID || !ctx.env.SHOPIFY_CLIENT_SECRET) {
-    return json('error', { ok: false, message: 'Newsletter signup is temporarily unavailable.' }, 503);
+    return fail('S0', 'Shopify settings missing', 503);
   }
 
-  try {
-    // Find existing customer
-    const searchData = await adminFetch(ctx.env, `
-      query FindCustomer($query: String!) {
-        customers(first: 1, query: $query) { nodes { id } }
-      }
-    `, { query: `email:${email}` });
-
-    let customerId: string;
-    const existing = searchData.customers.nodes[0];
-
-    if (existing) {
-      customerId = existing.id;
-    } else {
-      // Create customer
-      const createData = await adminFetch(ctx.env, `
-        mutation CustomerCreate($input: CustomerInput!) {
-          customerCreate(input: $input) {
-            customer { id }
-            userErrors { field message }
-          }
-        }
-      `, { input: { email } });
-
-      const created = createData.customerCreate.customer;
-      if (!created) {
-        const ue = createData.customerCreate.userErrors?.[0];
-        // Don't expose Shopify error details
-        if (ue?.message?.toLowerCase().includes('taken')) {
-          // Race condition — customer was just created, try search again
-          const retry = await adminFetch(ctx.env, `
-            query FindCustomer($query: String!) {
-              customers(first: 1, query: $query) { nodes { id } }
-            }
-          `, { query: `email:${email}` });
-          customerId = retry.customers.nodes[0]?.id;
-          if (!customerId) return json('error', { ok: false, message: 'Something went wrong. Please try again.' }, 500);
-        } else {
-          return json('error', { ok: false, message: 'Something went wrong. Please try again.' }, 500);
-        }
-      } else {
-        customerId = created.id;
-      }
+  const FIND = `
+    query FindCustomer($query: String!) {
+      customers(first: 1, query: $query) { nodes { id } }
     }
+  `;
 
-    // A "notify:" tag is one release notification, not a newsletter signup: no marketing consent is set.
-    const tag = cleanTag(body.tag);
-    const notifyOnly = isNotifyOnly(tag);
-    let state = 'NOTIFY';
+  // Find existing customer
+  const found = await step('S2', () => adminFetch(ctx.env, FIND, { query: `email:${email}` }));
+  if (!found.ok) return found.res;
 
-    if (!notifyOnly) {
-      // Update marketing consent
-      const consentData = await adminFetch(ctx.env, `
-        mutation UpdateConsent($input: CustomerEmailMarketingConsentUpdateInput!) {
-          customerEmailMarketingConsentUpdate(input: $input) {
-            customer {
-              id
-              emailMarketingConsent { marketingState consentUpdatedAt }
-            }
-            userErrors { field message }
-          }
+  let customerId: string | undefined = found.value.customers.nodes[0]?.id;
+
+  if (!customerId) {
+    const made = await step('S3', () => adminFetch(ctx.env, `
+      mutation CustomerCreate($input: CustomerInput!) {
+        customerCreate(input: $input) {
+          customer { id }
+          userErrors { field message }
         }
-      `, {
-        input: {
-          customerId,
-          emailMarketingConsent: {
-            marketingState: 'SUBSCRIBED',
-            marketingOptInLevel: 'SINGLE_OPT_IN',
-            consentUpdatedAt: new Date().toISOString(),
-          },
+      }
+    `, { input: { email } }));
+    if (!made.ok) return made.res;
+
+    customerId = made.value.customerCreate.customer?.id;
+    if (!customerId) {
+      const ue = made.value.customerCreate.userErrors?.[0];
+      if (ue?.message?.toLowerCase().includes('taken')) {
+        // Race: the customer was created a moment ago, so look it up again.
+        const again = await step('S2', () => adminFetch(ctx.env, FIND, { query: `email:${email}` }));
+        if (!again.ok) return again.res;
+        customerId = again.value.customers.nodes[0]?.id;
+      }
+      // Shopify's reason goes to the log, not to the visitor.
+      if (!customerId) return fail('S4', ue?.message ?? 'customerCreate returned no customer');
+    }
+  }
+
+  // A "notify:" tag is one release notification, not a newsletter signup: no marketing consent is set.
+  const tag = cleanTag(body.tag);
+  const notifyOnly = isNotifyOnly(tag);
+  let state = 'NOTIFY';
+
+  if (!notifyOnly) {
+    const id = customerId;
+    const consented = await step('S5', () => adminFetch(ctx.env, `
+      mutation UpdateConsent($input: CustomerEmailMarketingConsentUpdateInput!) {
+        customerEmailMarketingConsentUpdate(input: $input) {
+          customer {
+            id
+            emailMarketingConsent { marketingState consentUpdatedAt }
+          }
+          userErrors { field message }
+        }
+      }
+    `, {
+      input: {
+        customerId: id,
+        emailMarketingConsent: {
+          marketingState: 'SUBSCRIBED',
+          marketingOptInLevel: 'SINGLE_OPT_IN',
+          consentUpdatedAt: new Date().toISOString(),
         },
-      });
-
-      const consent = consentData.customerEmailMarketingConsentUpdate.customer?.emailMarketingConsent;
-      state = consent?.marketingState ?? 'SUBSCRIBED';
-    }
-
-    // Apply optional tag (e.g. "revision:charuco-composite", "notify:plumbline")
-    if (tag && customerId) {
-      try {
-        await adminFetch(ctx.env, `
-          mutation AddTag($id: ID!, $tags: [String!]!) {
-            tagsAdd(id: $id, tags: $tags) {
-              userErrors { field message }
-            }
-          }
-        `, { id: customerId, tags: [tag] });
-      } catch {
-        // For a newsletter signup the tag is extra. For a notify request it is the whole point.
-        if (notifyOnly) return json('error', { ok: false, message: 'Something went wrong. Please try again.' }, 500);
-      }
-    }
-
-    return json('ok', { ok: true, state });
-  } catch {
-    return json('error', { ok: false, message: 'Something went wrong. Please try again.' }, 500);
+      },
+    }));
+    if (!consented.ok) return consented.res;
+    const consent = consented.value.customerEmailMarketingConsentUpdate.customer?.emailMarketingConsent;
+    state = consent?.marketingState ?? 'SUBSCRIBED';
   }
+
+  // Apply optional tag (e.g. "revision:charuco-composite", "notify:plumbline")
+  if (tag) {
+    const id = customerId;
+    const tagged = await step('S6', () => adminFetch(ctx.env, `
+      mutation AddTag($id: ID!, $tags: [String!]!) {
+        tagsAdd(id: $id, tags: $tags) {
+          userErrors { field message }
+        }
+      }
+    `, { id, tags: [tag] }));
+    // For a newsletter signup the tag is extra. For a notify request it is the whole point.
+    if (!tagged.ok && notifyOnly) return tagged.res;
+  }
+
+  return json('ok', { ok: true, state });
 };

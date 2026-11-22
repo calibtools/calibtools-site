@@ -1,5 +1,7 @@
 import { useState, useRef } from 'react';
 import TurnstileBox from './TurnstileBox';
+import { TURNSTILE_SITE_KEY } from '@/lib/turnstileClient';
+import { waitForValue } from '@/lib/waitFor';
 import { track } from '@/lib/track';
 
 interface Props {
@@ -29,6 +31,9 @@ export default function NewsletterForm({ heading = 'New tools and targets, month
   const [resetKey, setResetKey] = useState(0);
   const [message, setMessage] = useState('');
   const honeypotRef = useRef<HTMLInputElement>(null);
+  // The latest token, readable from inside a submit that is waiting for it.
+  const tokenRef = useRef('');
+  const onToken = (t: string) => { tokenRef.current = t; setTurnstile(t); };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -42,13 +47,27 @@ export default function NewsletterForm({ heading = 'New tools and targets, month
     setStatus('busy');
     setMessage('');
 
+    // The human check answers in the background shortly after the page loads. A visitor who is quicker
+    // than that waits a moment here instead of being told to complete a check that is not on screen.
+    let token = turnstile;
+    if (TURNSTILE_SITE_KEY && !token) {
+      token = await waitForValue(() => tokenRef.current, 6000);
+      if (!token) {
+        setStatus('error');
+        setMessage('Tick the box to confirm you are human, then press the button again.');
+        return;
+      }
+    }
+
     try {
       const res = await fetch('/api/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: trimmed, honeypot: honeypotRef.current?.value ?? '', turnstile, ...(tag ? { tag } : {}) }),
+        body: JSON.stringify({ email: trimmed, honeypot: honeypotRef.current?.value ?? '', turnstile: token, ...(tag ? { tag } : {}) }),
       });
       const data = await res.json();
+      tokenRef.current = '';
+      setTurnstile('');
       setResetKey((k) => k + 1);
 
       if (data.ok) {
@@ -65,8 +84,9 @@ export default function NewsletterForm({ heading = 'New tools and targets, month
         setMessage(data.message || 'Something went wrong.');
       }
     } catch {
+      // No answer, or one that is not ours (a network drop, an error page).
       setStatus('error');
-      setMessage('Something went wrong. Please try again.');
+      setMessage('Could not reach the server. Please try again.');
     }
   };
 
@@ -89,7 +109,7 @@ export default function NewsletterForm({ heading = 'New tools and targets, month
           </button>
         </div>
         <input ref={honeypotRef} type="text" name="website" tabIndex={-1} autoComplete="off" className="absolute -left-[9999px] h-0 w-0 overflow-hidden" aria-hidden="true" />
-        <TurnstileBox onToken={setTurnstile} resetKey={resetKey} quiet />
+        <TurnstileBox onToken={onToken} resetKey={resetKey} quiet />
         <p className={`m-0 text-[13px] empty:hidden ${message ? (status === 'success' ? 'text-ok' : 'text-brand-dark') : 'text-ink-muted'}`} aria-live="polite">{message || note}</p>
       </form>
     );
@@ -131,7 +151,7 @@ export default function NewsletterForm({ heading = 'New tools and targets, month
         aria-hidden="true"
       />
 
-      <TurnstileBox onToken={setTurnstile} resetKey={resetKey} />
+      <TurnstileBox onToken={onToken} resetKey={resetKey} />
 
       {message && (
         <p className={`m-0 text-sm ${status === 'success' ? 'text-green-700' : 'text-brand'}`}>
