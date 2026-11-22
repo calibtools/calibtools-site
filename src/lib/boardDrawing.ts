@@ -143,22 +143,23 @@ export function boardDrawingSvg({ boardW, boardH, spec, label, dimensions = true
   const thin = 0.45 * u;
   const d1 = 14 * u, d2 = 31 * u; // offsets of the inner (pattern) and outer (board) dimension lines
   const over = 3 * u;
-  const padL = 6 * u, padB = 6 * u;
-  const padT = dimensions ? d2 + 8 * u : 6 * u, padR = dimensions ? d2 + 8 * u : 6 * u;
+  // Room around the outline: the axes sit there, off the board, so nothing but the pattern is drawn on it.
+  const padL = 9 * u, padB = 9 * u;
+  const padT = dimensions ? d2 + 8 * u : 9 * u, padR = dimensions ? d2 + 8 * u : 6 * u;
 
   // The pattern, from the shared renderer; black is drawn in ink so the drawing matches the page.
   const pattern = render(spec, rx, ry).replaceAll('fill="#000"', `fill="${INK}"`);
 
   const axisLen = Math.min(patW, patH) * 0.16;
-  const gapX = Math.min(oy, 6 * u) / 2 + 1.5 * u; // X arrow sits in the top margin, Y arrow in the left margin
-  const gapY = Math.min(ox, 6 * u) / 2 + 1.5 * u;
+  const off = 4.5 * u; // distance of the axes from the board outline
   const head = 2.6 * u;
-  // OpenCV frame: X arrow in the top margin, Y arrow down the left margin from the top.
-  // Kalibr frame (AprilGrid): X arrow in the bottom margin, Y arrow up the left margin from the bottom.
+  // The axes are a note on the drawing, not ink on the board: they run outside the outline and start level
+  // with the pattern origin. OpenCV frame: X above the top edge, Y down the left edge.
+  // Kalibr frame (AprilGrid): X below the bottom edge, Y up the left edge.
   const up = f.yUp === true;
-  const oyAxis = r2(ry + f.origin.y);
-  const xa = { x1: ox, y: up ? r2(oyAxis + gapX) : r2(oy - gapX), x2: r2(ox + axisLen) };
-  const ya = { x: r2(ox - gapY), y1: up ? oyAxis : oy, y2: up ? r2(oyAxis - axisLen) : r2(oy + axisLen) };
+  const originX = r2(rx + f.origin.x), originY = r2(ry + f.origin.y);
+  const xa = { x1: originX, y: up ? r2(boardH + off) : r2(-off), x2: r2(originX + axisLen) };
+  const ya = { x: r2(-off), y1: originY, y2: up ? r2(originY - axisLen) : r2(originY + axisLen) };
   const yHead = up ? -head : head; // arrow head points along the axis
   const yLabel = up ? r2(ya.y2 - 3 * u) : r2(ya.y2 + 8 * u);
 
@@ -169,7 +170,7 @@ export function boardDrawingSvg({ boardW, boardH, spec, label, dimensions = true
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${fmt(-padL)} ${fmt(-padT)} ${fmt(boardW + padL + padR)} ${fmt(boardH + padT + padB)}" role="img" aria-label="Line drawing of ${label}: board ${fmt(boardW)} × ${fmt(boardH)} mm, pattern area ${fmt(patW)} × ${fmt(patH)} mm, ${spec.cols} × ${spec.rows} squares of ${fmt(spec.square)} mm" font-family="${MONO}" fill="${INK}">`,
     `<rect class="board" x="0" y="0" width="${fmt(boardW)}" height="${fmt(boardH)}" fill="#fff" stroke="${INK}" stroke-width="${fmt(1.2 * u)}"/>`,
     `<g class="pattern">${pattern}</g>`,
-    // Origin and axes, as printed on the boards: X right in red, Y in green (down, or up for the Kalibr frame)
+    // Axes of the pattern frame: X right in red, Y in green (down, or up for the Kalibr frame)
     `<g class="axes" stroke-width="${fmt(0.9 * u)}" fill="none">`,
     `<line class="axis-x" x1="${fmt(xa.x1)}" y1="${fmt(xa.y)}" x2="${fmt(xa.x2)}" y2="${fmt(xa.y)}" stroke="${RED}"/>`,
     `<path d="M${fmt(xa.x2 - head)} ${fmt(xa.y - head * 0.5)}L${fmt(xa.x2)} ${fmt(xa.y)}L${fmt(xa.x2 - head)} ${fmt(xa.y + head * 0.5)}" stroke="${RED}"/>`,
@@ -178,7 +179,6 @@ export function boardDrawingSvg({ boardW, boardH, spec, label, dimensions = true
     `</g>`,
     `<text x="${fmt(xa.x2 + 2 * u)}" y="${fmt(xa.y + 2.2 * u)}" font-size="${fmt(6 * u)}" fill="${RED}">X</text>`,
     `<text x="${fmt(ya.x)}" y="${fmt(yLabel)}" font-size="${fmt(6 * u)}" text-anchor="middle" fill="#007A3D">Y</text>`,
-    `<circle class="origin" cx="${fmt(rx + f.origin.x)}" cy="${fmt(ry + f.origin.y)}" r="${fmt(1.7 * u)}" fill="${RED}"/>`,
     ...(dimensions ? [
     // Dimension and extension lines
     `<g class="dims" stroke="${INK}" stroke-width="${fmt(thin)}">`,
