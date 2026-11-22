@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { getAdminToken, adminFetch, _resetMemCache, type KVNamespace } from './shopifyAdmin';
+import { getAdminToken, adminFetch, oauthErrorName, _resetMemCache, type KVNamespace } from './shopifyAdmin';
 
 // --- helpers ---
 
@@ -29,7 +29,7 @@ function stubFetch(...responses: Array<{ status: number; body: unknown }>) {
     const url = typeof input === 'string' ? input : input.url ?? String(input);
     fetchCalls.push({ url, init: init ?? {} });
     const r = responses[Math.min(i++, responses.length - 1)];
-    return { ok: r.status >= 200 && r.status < 300, status: r.status, statusText: 'test', json: async () => r.body } as Response;
+    return { ok: r.status >= 200 && r.status < 300, status: r.status, statusText: 'test', json: async () => r.body, text: async () => (typeof r.body === 'string' ? r.body : JSON.stringify(r.body)) } as Response;
   }) as any;
 }
 
@@ -83,6 +83,25 @@ describe('getAdminToken', () => {
     expect(t2).toBe('tok-kv');
     // Only 1 fetch total — second came from KV
     expect(fetchCalls).toHaveLength(1);
+  });
+});
+
+describe('a refused token exchange', () => {
+  it('carries the status and the error name Shopify gave', async () => {
+    stubFetch({ status: 400, body: { error: 'app_not_installed', error_description: 'The application is not installed on this shop.' } });
+    const err = await getAdminToken(mockEnv()).catch((e) => e);
+    expect(err.status).toBe(400);
+    expect(err.reason).toBe('app_not_installed');
+  });
+  it('reads the name from the JSON answer and from the HTML page', () => {
+    expect(oauthErrorName('{"error":"shop_not_permitted","error_description":"x"}')).toBe('shop_not_permitted');
+    expect(oauthErrorName('<h1>400 - Oauth error application_cannot_be_found</h1><p>Could not find …</p>')).toBe('application_cannot_be_found');
+  });
+  it('passes nothing on when the answer has no short lowercase name', () => {
+    expect(oauthErrorName('')).toBe('');
+    expect(oauthErrorName('<html>Bad Request</html>')).toBe('');
+    expect(oauthErrorName('{"error":"Could not find app with api_key 0123abcd"}')).toBe('');
+    expect(oauthErrorName('{"error":{"a":1}}')).toBe('');
   });
 });
 
