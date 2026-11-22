@@ -563,10 +563,10 @@ export default function Generator({ initialSpec, heading = 'Pattern generator' }
           </div>
           <span className="pt-1.5 text-[13px] font-semibold">Config files</span>
           <div className="flex flex-wrap gap-2 font-mono text-[13px]">
-            <button type="button" className="rounded bg-ground-panel px-2.5 py-1.5" onClick={() => download(`${slug}.opencv.json`, opencvJson(spec), 'application/json')}>opencv.json</button>
-            {kalibrSupported(spec) && <button type="button" className="rounded bg-ground-panel px-2.5 py-1.5" onClick={() => download(`${slug}.kalibr.yaml`, kalibrYaml(spec), 'text/yaml')}>kalibr.yaml</button>}
-            {ros2Supported(spec) && <button type="button" className="rounded bg-ground-panel px-2.5 py-1.5" onClick={() => download(`${slug}.ros2.yaml`, ros2Yaml(spec), 'text/yaml')}>ros2.yaml</button>}
-            {halconSupported(spec) && <button type="button" className="rounded bg-ground-panel px-2.5 py-1.5" onClick={() => download(`${slug}.halcon.txt`, halconCode(spec), 'text/plain')}>halcon.txt</button>}
+            <button type="button" className="rounded bg-ground-panel px-2.5 py-1.5 disabled:opacity-50" disabled={idsShort} onClick={() => download(`${slug}.opencv.json`, opencvJson(spec), 'application/json')}>opencv.json</button>
+            {kalibrSupported(spec) && <button type="button" className="rounded bg-ground-panel px-2.5 py-1.5 disabled:opacity-50" disabled={idsShort} onClick={() => download(`${slug}.kalibr.yaml`, kalibrYaml(spec), 'text/yaml')}>kalibr.yaml</button>}
+            {ros2Supported(spec) && <button type="button" className="rounded bg-ground-panel px-2.5 py-1.5 disabled:opacity-50" disabled={idsShort} onClick={() => download(`${slug}.ros2.yaml`, ros2Yaml(spec), 'text/yaml')}>ros2.yaml</button>}
+            {halconSupported(spec) && <button type="button" className="rounded bg-ground-panel px-2.5 py-1.5 disabled:opacity-50" disabled={idsShort} onClick={() => download(`${slug}.halcon.txt`, halconCode(spec), 'text/plain')}>halcon.txt</button>}
           </div>
           {spec.type === 'ChArUco' && <p className="m-0 font-sans text-xs text-ink-muted">Kalibr has no ChArUco target model. For camera–IMU calibration with Kalibr, use an <a href="/tools/generator/aprilgrid/">AprilGrid</a>.</p>}
           {spec.type === 'HALCON-style dots' && <p className="m-0 font-sans text-xs text-ink-muted">This dot grid has no MVTec border or orientation mark, so HALCON's find_caltab will not detect it. For a HALCON plate, create the .descr and pattern with gen_caltab.</p>}
