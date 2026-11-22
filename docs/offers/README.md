@@ -16,9 +16,8 @@ The key exists only in the link. Anyone who lists the metaobjects sees ciphertex
 who can write to the store can publish an offer.
 
 ## Using it with a Shopify draft order
-Put the link in a line-item attribute named `_quote_pdf`. The draft-order invoice email shows
-"Download the quotation (PDF)" above the order button. Attributes whose name starts with `_`
-are not listed in the email.
+Put the link in a line-item attribute named `_quote_pdf`. The offer email (see "Offer email" below)
+attaches the PDF it points to. Attributes whose name starts with `_` are not listed in the email.
 
 ## Local commands
     npx tsx scripts/offer.ts check   offer.json
@@ -67,14 +66,38 @@ the pattern fits on at 100 %. `offer.ts check` refuses a link that does not and 
 (`smallestFittingPaper` in `src/lib/patternLinkFit.ts`). The paper is not part of the Pattern ID.
 
 ## Offer email
-The Shopify "Draft order invoice" notification uses `draft-order-invoice-offer.liquid` for drafts whose lines
-carry custom attributes (wrapped in `{% if has_custom_spec %} … {% else %} Shopify default {% endif %}`, placed
-right before `{% capture email_title %}`). It follows the site's visual rules: paper ground, framed wordmark,
-red square button, mono labels. Shopify has no API for notification templates; paste it in
-Settings → Notifications → Draft order invoice → Edit code, then check with `draftOrderInvoicePreview`.
-Line items are the unlisted "quote-item" products with `priceOverride`, so every surface shows a picture.
+The site sends the offer email itself, so the quotation PDF travels as an attachment (Shopify notifications
+can only link to a file). `functions/api/offer-email.ts` receives Shopify's "Draft order update" webhook and
+acts on a tag of the draft order:
 
-The email repeats `PAYMENT_ACCEPTS_QUOTATION` and `CUSTOM_ORDER_FINAL` under the order summary. The template can't
-import from the repo, so the words are typed into the `.liquid` file (`policy-consistency.test.ts` fails if they drift): when `orderTerms.ts` changes, update this file
-and paste it into Shopify again (then reopen the editor to confirm it saved). Templates restyled for the site carry a
-`/* ct-vi */` block before `</style>` and a sign-off line above the footer table.
+| Tag | What happens |
+|---|---|
+| `offer-test` | The email with the PDF goes to hello@calib.tools only, subject starts with `TEST:`. Repeats at most every two minutes. |
+| `offer-send` | The email goes to the draft order's customer, with a blind copy to hello@calib.tools. Sent once. |
+| `offer-send-2`, `offer-send-3` … | A deliberate resend (after a revision, for example). Each tag sends once. |
+
+Send `offer-test` first, read the email, then add `offer-send`. Editing the draft later does not send again.
+The draft order needs: a line item with at least one custom attribute, `Quotation` (the number shown in the
+email; the draft name is used without it), `_quote_pdf` (the link from `offer.ts encrypt`), a customer email
+and no "completed" status. If something is missing, nothing goes to the customer and hello@calib.tools gets a
+note that names the reason. The email has no link to the PDF; the "Confirm your order" button opens Shopify's
+invoice page. Shopify does not mark the draft "Invoice sent"; the blind copy is the record.
+
+Text and layout live in `src/lib/offerEmail.ts` (paper ground, wordmark on its own white row with the
+quotation number below it, red square button, mono labels). `PAYMENT_ACCEPTS_QUOTATION`, `CUSTOM_ORDER_FINAL`
+and the sign-off line are imported, not typed. Line items show no picture.
+
+Setup in Shopify, once: Settings → Notifications → Webhooks → Create webhook, event "Draft order update",
+format JSON, URL `https://calib.tools/api/offer-email`. It is signed with the same secret as the other
+webhooks (`SHOPIFY_WEBHOOK_SECRET`); the function also needs `RESEND_API_KEY` and the `QUOTES` KV binding.
+
+### Shopify's own draft-order invoice email (fallback)
+Do not use "Send invoice" in Shopify for a custom offer: the customer would get a second email, without the
+attachment. The "Draft order invoice" notification still carries `draft-order-invoice-offer.liquid` for
+drafts whose lines have custom attributes (wrapped in `{% if has_custom_spec %} … {% else %} Shopify default
+{% endif %}`, placed right before `{% capture email_title %}`), in case the site cannot send. Shopify has no
+API for notification templates; paste it in Settings → Notifications → Draft order invoice → Edit code, then
+check with `draftOrderInvoicePreview`. The template can't import from the repo, so the order terms are typed
+into the `.liquid` file (`policy-consistency.test.ts` fails if they drift): when `orderTerms.ts` changes,
+update this file and paste it into Shopify again (then reopen the editor to confirm it saved). Templates
+restyled for the site carry a `/* ct-vi */` block before `</style>` and a sign-off line above the footer table.
