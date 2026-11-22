@@ -147,8 +147,9 @@ describe('POST /api/subscribe: each failure has its own reference', () => {
     const r = await post({ email: 'eng@example-robotics.com', ...(tag ? { tag } : {}) });
     expect(r.status).toBe(500);
     expect(r.data.ok).toBe(false);
-    // a failed token exchange carries the HTTP status and the error name Shopify answered with
-    const shown = step === 'token' ? 'S1-400-shop_not_permitted' : code;
+    // a failed token exchange shows the HTTP status; Shopify's error name stays in the log
+    const shown = step === 'token' ? 'S1-400' : code;
+    expect(JSON.stringify(r.data)).not.toContain('shop_not_permitted');
     expect(r.data.code).toBe(shown);
     expect(r.data.message).toBe(`Something went wrong (${shown}). Please try again.`);
   });

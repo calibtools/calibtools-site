@@ -65,7 +65,7 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
 
   // Every failure has its own reference, shown in the message and written to the log with the reason
   // (never the email address), so one screenshot tells which step broke.
-  //   S0 settings missing · S1-<HTTP status>[-<Shopify's error name>] access token · S2 customer search · S3 customer create (request failed)
+  //   S0 settings missing · S1-<HTTP status> access token (Shopify's error name goes to the log only) · S2 customer search · S3 customer create (request failed)
   //   S4 customer create (refused by Shopify) · S5 marketing consent · S6 tag
   const fail = (code: string, reason: unknown, status = 500) => {
     console.error(`[subscribe] ${code}: ${reason instanceof Error ? reason.message : String(reason)}`);
@@ -77,7 +77,7 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
     try {
       return { ok: true, value: await run() };
     } catch (err) {
-      return { ok: false, res: fail(err instanceof AdminTokenError ? `S1-${err.status}${err.reason ? `-${err.reason}` : ''}` : code, err) };
+      return { ok: false, res: fail(err instanceof AdminTokenError ? `S1-${err.status}` : code, err) };
     }
   };
 
