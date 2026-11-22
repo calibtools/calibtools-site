@@ -1,6 +1,6 @@
 /**
  * Factory artwork for a catalog board: 1:1 mm print file (SVG + PDF) with the
- * pattern from src/lib geometry and the brand label line, plus an A3 approval
+ * pattern from src/lib geometry, the brand label line and a 100 mm scale bar, plus an A3 approval
  * drawing (dimensions, tolerances, marker ID map) and the OpenCV JSON.
  *
  * Usage:
@@ -25,6 +25,7 @@ import { opencvJson } from '../src/lib/exportConfig';
 import { wordmarkSvgGroup, WORDMARK_VB, WORDMARK_ASPECT } from '../src/lib/exportBrand';
 import type { PatternSpec } from '../src/lib/patterns';
 import { COMPOSITE_FLATNESS, COMPOSITE_TOLERANCE } from '../src/lib/claims';
+import { factoryScaleBar, factoryScaleBarRect } from '../src/lib/factoryStrip';
 
 // ---------------------------------------------------------------------------
 // Arguments
@@ -113,11 +114,16 @@ for (const field of [PN, summary, `${MARK} · Rev ${REV}`]) {
 }
 if (lx > boardW - ox) console.warn(`[factory] label line is ${(lx - ox).toFixed(1)} mm, wider than the pattern (${patW} mm)`);
 
+// 100 mm scale bar in the margin above the pattern, with its length written after it
+const bar = factoryScaleBar({ boardW, boardH, ox, oy });
+const scaleBarParts = factoryScaleBarRect(bar) + text(bar.caption.text, mono, bar.caption.size, bar.caption.x, bar.caption.baseline);
+
 const artworkSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="${boardW}mm" height="${boardH}mm" viewBox="0 0 ${boardW} ${boardH}">
   <title>${PN} artwork, 1:1 mm</title>
   <rect width="${boardW}" height="${boardH}" fill="#FFFFFF"/>
   <g id="pattern">${renderCharucoSvg(spec, ox, oy)}</g>
   <g id="label">${labelParts.join('')}</g>
+  <g id="scale">${scaleBarParts}</g>
 </svg>`;
 writeFileSync(resolve(OUT, `${PN}-artwork.svg`), artworkSvg);
 
@@ -205,6 +211,7 @@ const drawingSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="${A3W}mm" hei
     <rect width="${boardW}" height="${boardH}" fill="#FFFFFF" stroke="#111111" stroke-width="0.4"/>
     ${renderCharucoSvg(spec, ox, oy)}
     <g>${labelParts.join('')}</g>
+    <g>${scaleBarParts}</g>
     <rect x="${ox}" y="${oy}" width="${patW}" height="${patH}" fill="none" stroke="#B3000E" stroke-width="0.3" stroke-dasharray="3 2"/>
   </g>
   ${dim(dx, dy, dx + bw, dy, `${boardW}`, -10, true)}
