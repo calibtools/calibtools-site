@@ -26,9 +26,9 @@ const APRILTAG_CHECKSUMS: Record<string, {code0: string; code1: string}> = {
 };
 
 describe('ArUco dictionaries', () => {
-  it('all 7 dictionaries load', () => {
+  it('all 9 dictionaries load', () => {
     const names = arucoDictNames();
-    expect(names).toHaveLength(7);
+    expect(names).toHaveLength(9);
     expect(names).toContain('DICT_6X6_250');
     expect(names).toContain('DICT_7X7_1000');
     expect(names).toContain('DICT_ARUCO_MIP_36h12');
