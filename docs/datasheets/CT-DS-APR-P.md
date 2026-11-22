@@ -18,7 +18,7 @@ AprilGrid uses AprilTag 36h11 markers arranged in a regular grid. It is the stan
 | CT-APR-P-200X150-T36 | 200 × 150 mm | 4 × 6 | 25 / 7.5 mm | 24 |
 | CT-APR-P-300X200-T36 | 300 × 200 mm | 5 × 7 | 30 / 9 mm | 35 |
 | CT-APR-P-400X300-T36 | 400 × 300 mm | 6 × 8 | 35 / 10.5 mm | 48 |
-| CT-APR-P-600X400-T36 | 600 × 400 mm | 7 × 10 | 45 / 13.5 mm | 70 |
+| CT-APR-P-600X400-T36 | 600 × 400 mm | 6 × 10 | 45 / 13.5 mm | 60 |
 | CT-APR-P-800X600-T36 | 800 × 600 mm | 9 × 12 | 50 / 15 mm | 108 |
 
 Dictionary: AprilTag 36h11. Tag spacing ratio 0.3 (gap = 0.3 × tag side). IDs start at 0 at the bottom-left tag and run left to right, then upward, as Kalibr numbers them; the origin is the bottom-left tag corner, x right, y up. Kalibr `tagSpacing` parameter equals the gap divided by the tag side (0.3). Other grid sizes or spacing ratios: custom order (CUS).

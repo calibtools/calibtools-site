@@ -70,7 +70,7 @@ for (const [w, h, fr, fc, fs, cr, cc, cs] of [
 
 // AprilGrid, aluminum composite (CT-DS-APR-P): AprilTag 36h11, spacing ratio 0.3
 for (const [w, h, rows, cols, tag] of [
-  [200, 150, 4, 6, 25], [300, 200, 5, 7, 30], [400, 300, 6, 8, 35], [600, 400, 7, 10, 45], [800, 600, 9, 12, 50],
+  [200, 150, 4, 6, 25], [300, 200, 5, 7, 30], [400, 300, 6, 8, 35], [600, 400, 6, 10, 45], [800, 600, 9, 12, 50],
 ] as const) {
   entries.push({
     partNumber: `CT-APR-P-${w}X${h}-T36`, handle: 'aprilgrid-composite', options: { size: spaced(w, h) },

@@ -63,7 +63,7 @@ export const APRILGRID_SIZES: AprilGridSize[] = [
   { label: '200 × 150', rows: 4, cols: 6,  tagSize: 25, gap: 7.5 },
   { label: '300 × 200', rows: 5, cols: 7,  tagSize: 30, gap: 9 },
   { label: '400 × 300', rows: 6, cols: 8,  tagSize: 35, gap: 10.5 },
-  { label: '600 × 400', rows: 7, cols: 10, tagSize: 45, gap: 13.5 },
+  { label: '600 × 400', rows: 6, cols: 10, tagSize: 45, gap: 13.5 },
   { label: '800 × 600', rows: 9, cols: 12, tagSize: 50, gap: 15 },
 ];
 
