@@ -19,7 +19,7 @@ Check the board on arrival: no dents on edges, no delamination, print intact. Re
 
 ## 2. Identification
 
-Every target carries an edge strip with: brand · full part number (e.g. `CT-CHA-P-300X200-D6`) · pattern summary (rows × columns · square / marker size · dictionary · start ID) · batch number (`B` + year + week, e.g. `B2647`; custom targets carry the quotation number instead) · datasheet revision · a 100 mm scale bar.
+Every target carries, in the white margin around the pattern: brand · full part number (e.g. `CT-CHA-P-300X200-D6`) · pattern summary (columns × rows · square / marker size · dictionary) · batch number (`B` + year + week, e.g. `B2647`; custom targets carry the quotation number instead) · datasheet revision · a 100 mm scale bar.
 
 Quote your order number and the batch number in any support request.
 
