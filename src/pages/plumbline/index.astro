@@ -107,10 +107,12 @@ const faqLd = {
       <div class="flex min-w-0 flex-col gap-5">
         <span class="section-no">Public beta</span>
         <span class="section-rule"></span>
-        <h2 class="m-0 text-[24px] font-semibold md:text-[28px]">What to know about version {RELEASE.version}</h2>
-        <p class="m-0 text-[17px] leading-[1.65] text-ink-muted">This is a public test version. Its results have been checked with rendered images whose true camera is known. Checks with photographs of real boards are under way. For work that matters, compare the result with a method you already trust.</p>
+        <h2 class="m-0 text-[24px] font-semibold md:text-[28px]">Built for the people who make machines see</h2>
+        <p class="m-0 text-[17px] leading-[1.65] text-ink-muted">A machine that sees is only as good as its calibration, and checking one properly should not depend on your budget. That is why {software.name} costs nothing, runs on your own computer and sends nothing anywhere.</p>
+        <p class="m-0 text-[17px] leading-[1.65] text-ink-muted">We need your help with one thing. Version {RELEASE.version} is a public test version. It has been checked with rendered images whose true camera is known, not yet with photographs of real boards.</p>
+        <p class="m-0 text-[17px] leading-[1.65] text-ink-muted">So run it on a camera you have already calibrated another way, and tell us whether the numbers agree. In the app, open About and click Report a problem: it opens an email to <a href="mailto:hello@calib.tools">hello@calib.tools</a> with your version filled in.</p>
+        <p class="m-0 text-[15px] leading-relaxed text-ink-muted">We read every report, and what we change goes into the <a href={RELEASE.notes}>list of changes</a>. Until real photographs are in, compare the result with a method you already trust for work that matters.</p>
         <p class="m-0 text-[15px] leading-relaxed text-ink-muted">The installers are not signed yet, so Windows and macOS ask before the first start. They were built and started on {RELEASE.builtOn}.</p>
-        <p class="m-0 text-[15px] leading-relaxed text-ink-muted">Found a problem? Write to <a href="mailto:hello@calib.tools">hello@calib.tools</a>, or use About, Report a problem in the app.</p>
       </div>
       <div class="flex min-w-0 flex-col gap-5">
         <h3 class="m-0 text-[18px] font-semibold">The first time you open it</h3>
