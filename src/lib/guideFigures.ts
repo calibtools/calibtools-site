@@ -229,6 +229,43 @@ export function hiddenErrorFigureSvg(rows: HiddenErrorRow[]): string {
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" font-family="Geist, system-ui, sans-serif" role="img"><rect width="${W}" height="${H}" fill="#fff"/>${o}</svg>`;
 }
 
+/* ---- Board-motion guide: what the report shows beside what the calibration is off by ---- */
+
+export interface BoardMotionRow { label: string; rms: number; lensMean: number; lensMax: number; principalPoint: number; tallest: number; sessions: number }
+
+/** The table under "The numbers" in how-still-calibration-board.md. */
+export function boardMotionRowsFromGuide(markdown: string): BoardMotionRow[] {
+  const from = markdown.indexOf('## The numbers');
+  const part = markdown.slice(from, markdown.indexOf('\n## ', from + 1));
+  const rows: BoardMotionRow[] = [];
+  for (const line of part.split('\n')) {
+    const r = line.match(/^\| ([^|]+?) \| ([\d.]+) \| ([\d.]+) \| ([\d.]+) \| ([\d.]+) \| (\d+) of (\d+) \|$/);
+    if (r) rows.push({ label: r[1], rms: +r[2], lensMean: +r[3], lensMax: +r[4], principalPoint: +r[5], tallest: +r[6], sessions: +r[7] });
+  }
+  return rows;
+}
+
+export const BOARD_MOTION_SCALE = { rmsMax: 0.25, lensMax: 2, barMax: 232 };
+
+/** Same layout as the reprojection-error figure, both scales linear. */
+export function boardMotionFigureSvg(rows: BoardMotionRow[]): string {
+  const { rmsMax, lensMax, barMax } = BOARD_MOTION_SCALE;
+  const W = 640, x1 = 20, x2 = 336, rowH = 54;
+  const w = (v: number, max: number) => Math.max(+(Math.min(v, max) / max * barMax).toFixed(1), 2);
+  let o = `<text x="${x1}" y="26" font-size="16" font-weight="600" fill="${INK}">Reprojection error</text><text x="${x1}" y="48" font-size="14" fill="${INK}">RMS in px, what the report shows</text>`;
+  o += `<text x="${x2}" y="26" font-size="16" font-weight="600" fill="${INK}">Lens-model error, worst point</text><text x="${x2}" y="48" font-size="14" fill="${INK}">px, what the calibration is off by</text>`;
+  o += `<line x1="${x1}" y1="62" x2="${W - 20}" y2="62" stroke="${INK}" stroke-width="1"/>`;
+  let y = 74;
+  for (const r of rows) {
+    o += `<text x="${x1}" y="${y + 14}" font-size="15" fill="${INK}">${r.label[0].toUpperCase() + r.label.slice(1)}</text>`;
+    o += `<rect x="${x1}" y="${y + 22}" width="${w(r.rms, rmsMax)}" height="16" fill="${INK}"/><text x="${x1 + w(r.rms, rmsMax) + 6}" y="${y + 35}" font-size="14" fill="${INK}" ${MONO}>${r.rms}</text>`;
+    o += `<rect x="${x2}" y="${y + 22}" width="${w(r.lensMax, lensMax)}" height="16" fill="${RED}"/><text x="${x2 + w(r.lensMax, lensMax) + 6}" y="${y + 35}" font-size="14" fill="${INK}" ${MONO}>${r.lensMax}</text>`;
+    y += rowH;
+  }
+  const H = y + 4;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" font-family="Geist, system-ui, sans-serif" role="img"><rect width="${W}" height="${H}" fill="#fff"/>${o}</svg>`;
+}
+
 /* ---- Camera calibration guide: where the board goes in the frame ---- */
 
 type Quad = [number, number][];
