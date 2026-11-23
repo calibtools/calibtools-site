@@ -81,8 +81,11 @@ const faqLd = {
       </p>
     </div>
     <div id="download" class="card bracket flex scroll-mt-24 flex-col gap-4 p-6">
-      <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
-        {beta && <span class="badge text-brand-dark">Beta</span>}
+      <div class="flex flex-col gap-2">
+        <div class="flex items-center gap-3">
+          <span class="text-[20px] font-semibold leading-none">{software.name}</span>
+          {beta && <span class="badge text-brand-dark">Beta</span>}
+        </div>
         <span class="font-mono text-[13px] text-ink-muted">Version {RELEASE.version} · {RELEASE.released}</span>
       </div>
       <ul class="m-0 flex list-none flex-col gap-4 p-0">
