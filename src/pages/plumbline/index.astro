@@ -108,19 +108,7 @@ const faqLd = {
         <span class="section-no">Public beta</span>
         <span class="section-rule"></span>
         <h2 class="m-0 text-[24px] font-semibold md:text-[28px]">Built for the people who make machines see</h2>
-        <p class="m-0 text-[17px] leading-[1.65] text-ink-muted">A machine that sees is only as good as its calibration, and checking one properly should not depend on your budget. That is why {software.name} costs nothing, runs on your own computer and sends nothing anywhere.</p>
-        <p class="m-0 text-[17px] leading-[1.65] text-ink-muted">Help us make it better: run it on a camera you have already calibrated another way, and tell us whether the numbers agree.</p>
-        <details class="group border border-line bg-sheet">
-          <summary class="flex cursor-pointer list-none items-center justify-between gap-4 px-4 py-3 text-[15px] font-semibold select-none hover:bg-ground-alt [&::-webkit-details-marker]:hidden">
-            <span>How to tell us, and what to know about this beta</span>
-            <ChevronDown class="h-4 w-4 shrink-0 text-ink-soft transition-transform group-open:rotate-180" />
-          </summary>
-          <div class="flex flex-col gap-3 px-4 pb-4 text-[15px] leading-[1.65] text-ink-muted">
-            <p class="m-0">In the app, open About and click Report a problem. It opens an email to <a href="mailto:hello@calib.tools">hello@calib.tools</a> with your version filled in. We read every report, and what we change goes into the <a href={RELEASE.notes}>list of changes</a>.</p>
-            <p class="m-0">Version {RELEASE.version} is a public test version. Until it has been checked with photographs of real boards, compare the result with a method you already trust for work that matters.</p>
-            <p class="m-0">The installers are not signed yet, so Windows and macOS ask before the first start. They were built and started on {RELEASE.builtOn}.</p>
-          </div>
-        </details>
+        <p class="m-0 text-[17px] leading-[1.65] text-ink-muted">A machine that sees is only as good as its calibration, and checking one properly should not depend on your budget. That is why {software.name} costs nothing, runs on your own computer and sends nothing anywhere. Help us make it better.</p>
       </div>
       <div class="flex min-w-0 flex-col gap-5">
         <h3 class="m-0 text-[18px] font-semibold">The first time you open it</h3>
@@ -293,6 +281,7 @@ const faqLd = {
           <dd class="m-0">
             <ul class="m-0 flex list-disc flex-col gap-1 pl-5 text-[15px] leading-relaxed text-ink-muted">
               {RELEASE.limits.map((it) => <li>{it}</li>)}
+              <li>Built and started on {RELEASE.builtOn}; older systems were not tried</li>
             </ul>
           </dd>
         </div>
