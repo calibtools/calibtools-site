@@ -9,11 +9,18 @@ import { errorBarsFigureSvg, coverageMapFigureSvg } from '@/lib/guideFigures';
 const unreleased = software.status === 'unreleased';
 // Figures are drawn from SAMPLE (what the app reports for its own sample images), never typed in.
 const errors = SAMPLE.errorsPx;
-const LEFT_OUT = 3; // image 04, the one left out in the third figure
+const kept = SAMPLE.kept;
+// The two images spoiled on purpose (SAMPLE.spoiledImages, counted from 1): the ones left out in the third figure.
+const out = SAMPLE.spoiledImages.map((n) => n - 1);
+const two = (n: number) => String(n).padStart(2, '0');
+const outNames = SAMPLE.spoiledImages.map(two).join(' and ');
+// After leaving them out: the other images carry their new error (SAMPLE.kept.errorsPx), the two keep their old bar as an outline.
+let k = 0;
+const errorsAfter = errors.map((v, i) => (out.includes(i) ? v : SAMPLE.kept.errorsPx[k++]));
 const grid = SAMPLE.coverage;
 const covered = coveragePercent(grid);
 const barsSvg = errorBarsFigureSvg(errors, { label: `Bar chart of the reprojection error of ${errors.length} sample images, between ${Math.min(...errors).toFixed(3)} and ${Math.max(...errors).toFixed(3)} px` });
-const barsOutSvg = errorBarsFigureSvg(errors, { leftOut: LEFT_OUT, label: `The same bar chart with image 0${LEFT_OUT + 1} drawn as an outline: it is left out of the calibration` });
+const barsOutSvg = errorBarsFigureSvg(errorsAfter, { leftOut: out, label: `The same bar chart with images ${outNames} drawn as outlines: they are left out of the calibration, and the error of the set falls from ${SAMPLE.rmsPx.toFixed(3)} to ${kept.rmsPx.toFixed(3)} px` });
 const coverageSvg = coverageMapFigureSvg(grid, `Coverage map: ${covered} percent of the image has corners; the cells along the edges are empty`);
 
 const BOARD_PN = 'CT-CHA-P-400X300-D6';
@@ -93,7 +100,7 @@ const faqLd = {
       </div>
       <figure class="card p-5 m-0 flex flex-col gap-3">
         <div class="[&>svg]:block [&>svg]:h-auto [&>svg]:w-full" set:html={barsSvg} />
-        <figcaption class="text-[13px] text-ink-muted">Reprojection error of the {errors.length} sample images, in pixels. Whole set: <span class="font-pixel" data-unit="px">{SAMPLE.rmsPx.toFixed(3)} px</span> RMS.</figcaption>
+        <figcaption class="text-[13px] text-ink-muted">Reprojection error of the {errors.length} sample images, in pixels. Whole set: <span class="font-pixel" data-unit="px">{SAMPLE.rmsPx.toFixed(3)} px</span> RMS. Images {outNames} are spoiled on purpose.</figcaption>
       </figure>
     </div>
   </section>
@@ -125,7 +132,7 @@ const faqLd = {
       </div>
       <figure class="card p-5 m-0 flex flex-col gap-3">
         <div class="[&>svg]:block [&>svg]:h-auto [&>svg]:w-full" set:html={barsOutSvg} />
-        <figcaption class="text-[13px] text-ink-muted">Image 0{LEFT_OUT + 1} is left out. The other {errors.length - 1} images are used for the result.</figcaption>
+        <figcaption class="text-[13px] text-ink-muted">Images {outNames} are left out. The other {kept.errorsPx.length} images give <span class="font-pixel" data-unit="px">{kept.rmsPx.toFixed(3)} px</span> RMS, down from <span class="font-pixel" data-unit="px">{SAMPLE.rmsPx.toFixed(3)} px</span>.</figcaption>
       </figure>
     </div>
   </section>
@@ -159,8 +166,8 @@ const faqLd = {
         <p class="m-0 text-[17px] leading-[1.65] text-ink-muted">Export the camera matrix and distortion coefficients as OpenCV YAML or JSON, or as a ROS camera_info file that camera drivers load as it is.</p>
       </div>
       <figure class="card p-5 m-0 flex min-w-0 flex-col gap-3">
-        <code class="block max-w-full whitespace-pre-wrap [overflow-wrap:anywhere] font-mono text-[12px] leading-[1.6] text-ink">{SAMPLE.cameraInfo}</code>
-        <figcaption class="text-[13px] text-ink-muted">The start of the camera_info file {software.name} writes for the sample images.</figcaption>
+        <code class="block max-w-full whitespace-pre-wrap [overflow-wrap:anywhere] font-mono text-[12px] leading-[1.6] text-ink">{SAMPLE.kept.cameraInfo}</code>
+        <figcaption class="text-[13px] text-ink-muted">The start of the camera_info file {software.name} writes for the sample images, with images {outNames} left out.</figcaption>
       </figure>
     </div>
   </section>
@@ -171,7 +178,7 @@ const faqLd = {
       <span class="section-no">Check it yourself</span>
       <span class="section-rule"></span>
       <h2 class="m-0 text-[24px] font-semibold md:text-[28px]">Sample images with a known answer</h2>
-      <p class="m-0 max-w-[760px] text-[17px] leading-[1.65] text-ink-muted">{software.name} comes with {errors.length} sample images rendered from a camera whose focal length is known. Run them yourself and compare.</p>
+      <p class="m-0 max-w-[760px] text-[17px] leading-[1.65] text-ink-muted">{software.name} comes with {errors.length} sample images rendered from a camera whose focal length is known. In two of them the board moves {SAMPLE.spoiledShiftMm}&nbsp;mm while the image is read out, as with a hand-held board. Run them, leave the two out and compare.</p>
       <dl class="m-0 grid max-w-[760px] grid-cols-1 gap-px border border-line bg-line md:grid-cols-3">
         <div class="rows-3 gap-y-1 bg-sheet p-3">
           <dt class="spec-label">True focal length</dt>
@@ -181,17 +188,17 @@ const faqLd = {
           </dd>
         </div>
         <div class="rows-3 gap-y-1 bg-sheet p-3">
-          <dt class="spec-label">{software.name} finds</dt>
+          <dt class="spec-label">All {errors.length} images</dt>
           <dd class="contents">
-            <span class="font-pixel text-[18px] leading-snug text-ink" data-unit="px">{SAMPLE.focalPx.toFixed(1)} px</span>
-            <span class="spec-cond">from {errors.length} images, {SAMPLE.corners.toLocaleString('en-US')} corners</span>
+            <span class="font-pixel text-[18px] leading-snug text-ink" data-unit="px">{SAMPLE.focalPx.toFixed(2)} px</span>
+            <span class="spec-cond">error <span class="font-pixel" data-unit="px">{SAMPLE.rmsPx.toFixed(3)} px</span> RMS, {SAMPLE.corners.toLocaleString('en-US')} corners</span>
           </dd>
         </div>
         <div class="rows-3 gap-y-1 bg-sheet p-3">
-          <dt class="spec-label">Reprojection error</dt>
+          <dt class="spec-label">Without images {outNames}</dt>
           <dd class="contents">
-            <span class="font-pixel text-[18px] leading-snug text-ink" data-unit="px">{SAMPLE.rmsPx.toFixed(3)} px</span>
-            <span class="spec-cond">RMS per point, as OpenCV reports it</span>
+            <span class="font-pixel text-[18px] leading-snug text-ink" data-unit="px">{kept.focalPx.toFixed(2)} px</span>
+            <span class="spec-cond">error <span class="font-pixel" data-unit="px">{kept.rmsPx.toFixed(3)} px</span> RMS, {kept.corners.toLocaleString('en-US')} corners</span>
           </dd>
         </div>
       </dl>

@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { software, SAMPLE, coveragePercent } from './software';
+import { errorBarsFigureSvg, errorBarsScale } from './guideFigures';
 import { headerGroups, footerGroups, supportDropdown, ACADEMY_NAME } from './nav';
 
 const root = resolve(__dirname, '..', '..');
@@ -21,9 +22,9 @@ describe('software (Plumbline single source)', () => {
   it('page offers no download before the first release and reads its figures from SAMPLE', () => {
     const src = readFileSync(page, 'utf-8');
     if (software.status === 'unreleased') expect(src).not.toMatch(/download now|downloadUrl/i);
-    for (const key of ['SAMPLE.errorsPx', 'SAMPLE.coverage', 'SAMPLE.rmsPx', 'SAMPLE.focalPx', 'SAMPLE.cameraInfo']) expect(src).toContain(key);
+    for (const key of ['SAMPLE.errorsPx', 'SAMPLE.coverage', 'SAMPLE.rmsPx', 'SAMPLE.focalPx', 'SAMPLE.spoiledImages', 'SAMPLE.kept.errorsPx', 'kept.rmsPx', 'kept.focalPx', 'SAMPLE.kept.cameraInfo']) expect(src).toContain(key);
     // numbers are not typed into the page
-    expect(src).not.toMatch(/0\.048|1499\.7|77\s*(&nbsp;)?%/);
+    expect(src).not.toMatch(/0\.048|0\.116|149[89]\.\d|77\s*(&nbsp;)?%|\b0?7 and 18\b/);
   });
 
   it('page is written for users: no licence, source or progress talk', () => {
@@ -33,11 +34,27 @@ describe('software (Plumbline single source)', () => {
 });
 
 describe('sample result', () => {
-  it('is one consistent run: 24 images, overall RMS between the per-image extremes', () => {
+  const out = SAMPLE.spoiledImages.map((n) => n - 1);
+
+  it('first run: 24 images, and the two spoiled ones are the two tallest bars', () => {
     expect(SAMPLE.errorsPx).toHaveLength(24);
     expect(SAMPLE.rmsPx).toBeGreaterThan(Math.min(...SAMPLE.errorsPx));
     expect(SAMPLE.rmsPx).toBeLessThan(Math.max(...SAMPLE.errorsPx));
-    expect(Math.abs(SAMPLE.focalPx - SAMPLE.trueFocalPx)).toBeLessThan(1);
+    const tallest = [...SAMPLE.errorsPx.keys()].sort((a, b) => SAMPLE.errorsPx[b] - SAMPLE.errorsPx[a]).slice(0, out.length).sort((a, b) => a - b);
+    expect(tallest).toEqual(out);
+    const rest = SAMPLE.errorsPx.filter((_, i) => !out.includes(i));
+    expect(Math.min(...out.map((i) => SAMPLE.errorsPx[i]))).toBeGreaterThan(3 * Math.max(...rest));
+  });
+
+  it('second run: without the two, the error falls by more than half and the focal length is closer to the truth', () => {
+    expect(SAMPLE.kept.errorsPx).toHaveLength(SAMPLE.errorsPx.length - out.length);
+    expect(SAMPLE.kept.rmsPx).toBeLessThan(SAMPLE.rmsPx / 2);
+    expect(SAMPLE.kept.rmsPx).toBeGreaterThan(Math.min(...SAMPLE.kept.errorsPx));
+    expect(SAMPLE.kept.rmsPx).toBeLessThan(Math.max(...SAMPLE.kept.errorsPx));
+    expect(SAMPLE.kept.corners).toBeLessThan(SAMPLE.corners);
+    const off = (f: number) => Math.abs(f - SAMPLE.trueFocalPx);
+    expect(off(SAMPLE.kept.focalPx)).toBeLessThan(off(SAMPLE.focalPx));
+    expect(off(SAMPLE.kept.focalPx)).toBeLessThan(1);
   });
 
   it('coverage map is 16 x 12 and 77 % covered', () => {
@@ -46,9 +63,34 @@ describe('sample result', () => {
     expect(coveragePercent(SAMPLE.coverage)).toBe(77);
   });
 
-  it('camera_info snippet carries the same focal length', () => {
-    expect(SAMPLE.cameraInfo).toContain('distortion_model: plumb_bob');
-    expect(SAMPLE.cameraInfo).toContain(`data: [${SAMPLE.focalPx}`);
+  it('camera_info snippet is the second run: same focal length, no version line', () => {
+    expect(SAMPLE.kept.cameraInfo).toContain('distortion_model: plumb_bob');
+    expect(SAMPLE.kept.cameraInfo.startsWith('image_width: 1280')).toBe(true);
+    const fx = Number(/camera_matrix:[\s\S]*?data: \[([0-9.]+)/.exec(SAMPLE.kept.cameraInfo)![1]);
+    expect(fx).toBeCloseTo(SAMPLE.kept.focalPx, 2);
+  });
+});
+
+describe('error bar figure', () => {
+  const out = SAMPLE.spoiledImages.map((n) => n - 1);
+
+  it('keeps the fine scale for a clean set and widens it when a bar is taller', () => {
+    expect(errorBarsScale(SAMPLE.kept.errorsPx).max).toBe(0.08);
+    const wide = errorBarsScale(SAMPLE.errorsPx);
+    expect(wide.max).toBeGreaterThanOrEqual(Math.max(...SAMPLE.errorsPx));
+    expect(wide.ticks[0]).toBe(0);
+    expect(wide.ticks.at(-1)).toBe(wide.max);
+  });
+
+  it('no bar leaves the plot, and every left-out image is an outline marked "out"', () => {
+    const svg = errorBarsFigureSvg(SAMPLE.errorsPx, { leftOut: out, label: 'x' });
+    const heights = [...svg.matchAll(/<rect [^>]*height="([0-9.]+)"/g)].map((m) => Number(m[1]));
+    expect(heights).toHaveLength(SAMPLE.errorsPx.length);
+    expect(Math.max(...heights)).toBeLessThanOrEqual(152);
+    expect(svg.match(/fill="none"/g)).toHaveLength(out.length);
+    expect(svg.match(/>out<\/text>/g)).toHaveLength(out.length);
+    const one = errorBarsFigureSvg(SAMPLE.errorsPx, { leftOut: out[0], label: 'x' });
+    expect(one.match(/fill="none"/g)).toHaveLength(1);
   });
 });
 
