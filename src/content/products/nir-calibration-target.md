@@ -22,6 +22,7 @@ relatedTargets:
   - { label: "Thermal calibration target", href: "/targets/thermal-calibration-target/", note: "For long-wave infrared cameras." }
   - { label: "¼″ mounting fixture", href: "/targets/mounting-fixture/", note: "Holds a board on a tripod or lab post." }
 relatedGuides:
+  - { label: "In-cabin NIR camera calibration (850/940 nm)", href: "/calibacademy/in-cabin-850-940nm-camera-calibration/", note: "Fisheye model, board contrast in the NIR, illuminator glare." }
   - { label: "Why your board is not detected", href: "/calibacademy/corner-detection-troubleshooting/", note: "Contrast, blur and resolution limits." }
   - { label: "ChArUco vs checkerboard vs AprilGrid", href: "/calibacademy/charuco-vs-checkerboard-vs-aprilgrid/", note: "Which pattern for which job." }
   - { label: "How big should your target be?", href: "/calibacademy/calibration-target-size/", note: "The 60 % fill rule." }

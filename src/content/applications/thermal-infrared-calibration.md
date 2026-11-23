@@ -14,6 +14,7 @@ products:
 links:
   - { label: "Thermal camera geometric calibration", href: "/calibacademy/thermal-camera-geometric-calibration/" }
   - { label: "Camera calibration with OpenCV", href: "/calibacademy/opencv-camera-calibration/" }
+  - { label: "In-cabin NIR camera calibration (850/940 nm)", href: "/calibacademy/in-cabin-850-940nm-camera-calibration/" }
   - { label: "FOV calculator", href: "/tools/fov/" }
   - { label: "Pattern generator", href: "/tools/generator/" }
 selection:

@@ -15,6 +15,7 @@ products:
   - "reflectance-panel"
 links:
   - { label: "LiDAR–camera extrinsic calibration", href: "/calibacademy/lidar-camera-calibration/" }
+  - { label: "In-cabin NIR camera calibration (850/940 nm)", href: "/calibacademy/in-cabin-850-940nm-camera-calibration/" }
   - { label: "Camera calibration with OpenCV", href: "/calibacademy/opencv-camera-calibration/" }
   - { label: "ChArUco vs checkerboard vs AprilGrid", href: "/calibacademy/charuco-vs-checkerboard-vs-aprilgrid/" }
   - { label: "FOV calculator", href: "/tools/fov/" }

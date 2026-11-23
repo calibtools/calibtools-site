@@ -5,7 +5,7 @@ date: 2026-11-18
 updated: 2026-11-18
 readingTime: "14 min"
 keyRule: "Take the board's pose from the amplitude image and the intrinsics, never from the depth channel; then the depth channel can be checked against it. In our test the check tracked a depth error that swung between 12 and 31 mm to within 3 mm over 0.5 to 2.5 m, and a distance table at 0.25 m steps left 3 mm of it."
-related: ["opencv-camera-calibration", "charuco-vs-checkerboard-vs-aprilgrid", "calibration-target-size", "reprojection-error", "thermal-camera-geometric-calibration", "lidar-camera-calibration"]
+related: ["opencv-camera-calibration", "charuco-vs-checkerboard-vs-aprilgrid", "calibration-target-size", "reprojection-error", "thermal-camera-geometric-calibration", "lidar-camera-calibration", "in-cabin-850-940nm-camera-calibration"]
 products: ["depth-camera-target", "nir-calibration-target", "charuco-composite"]
 sampleFiles: []
 faq:
