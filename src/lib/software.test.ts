@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { software, SAMPLE, coveragePercent } from './software';
+import { software, SAMPLE, coveragePercent, RELEASE, fileUrl, sizeMb, downloadsByPlatform } from './software';
 import { errorBarsFigureSvg, errorBarsScale } from './guideFigures';
 import { headerGroups, footerGroups, supportDropdown, ACADEMY_NAME } from './nav';
 
@@ -14,17 +14,53 @@ describe('software (Plumbline single source)', () => {
     expect(existsSync(page)).toBe(true);
   });
 
-  it('has no version before the first release', () => {
-    if (software.status === 'unreleased') expect(software.version).toBeNull();
-    else expect(software.version).toMatch(/^\d+\.\d+/);
+  it('version, tag and file names say the same thing', () => {
+    expect(software.version).toBe(RELEASE.version);
+    expect(software.status).toBe(RELEASE.stage);
+    expect(RELEASE.version).toMatch(/^\d+\.\d+\.\d+( (beta|rc) \d+)?$/);
+    expect(RELEASE.fileVersion).toBe(RELEASE.version.replace(/ (beta|rc) /, '-$1.'));
+    expect(RELEASE.tag).toBe(`v${RELEASE.fileVersion}`);
+    expect(RELEASE.base).toBe(`https://github.com/calibtools/plumbline/releases/download/${RELEASE.tag}/`);
+    expect(RELEASE.released).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    for (const f of RELEASE.files) {
+      expect(f.file.startsWith(`Plumbline-${RELEASE.fileVersion}-`)).toBe(true);
+      expect(f.sha256).toMatch(/^[0-9a-f]{64}$/);
+      expect(fileUrl(f)).toBe(RELEASE.base + f.file);
+    }
+    expect(new Set(RELEASE.files.map((f) => f.file)).size).toBe(RELEASE.files.length);
+    expect(new Set(RELEASE.files.map((f) => f.sha256)).size).toBe(RELEASE.files.length);
   });
 
-  it('page offers no download before the first release and reads its figures from SAMPLE', () => {
+  it('every platform has exactly one button file; sizes are shown in MB of 1,048,576 bytes', () => {
+    const d = downloadsByPlatform();
+    expect(d.map((x) => x.platform)).toEqual(software.platforms);
+    for (const x of d) expect(RELEASE.files.filter((f) => f.platform === x.platform && f.primary)).toHaveLength(1);
+    expect(d.map((x) => x.main.file.split('-').slice(3).join('-'))).toEqual(['windows-x64-setup.exe', 'macos-arm64.dmg', 'linux-x86_64.AppImage']);
+    expect(d.map((x) => x.other?.label)).toEqual([undefined, 'Intel Mac', '.tar.xz']);
+    // beta 1, as listed in the handover of 2026-11-23
+    if (RELEASE.fileVersion === '0.1.0-beta.1') expect(RELEASE.files.map((f) => sizeMb(f.bytes))).toEqual(['66.5 MB', '46.7 MB', '66.7 MB', '134.3 MB', '101.5 MB']);
+    expect(sizeMb(1_048_576)).toBe('1.0 MB');
+  });
+
+  it('page builds its downloads from RELEASE and reads its figures from SAMPLE', () => {
     const src = readFileSync(page, 'utf-8');
-    if (software.status === 'unreleased') expect(src).not.toMatch(/download now|downloadUrl/i);
+    for (const key of ['downloadsByPlatform()', 'fileUrl(d.main)', 'sizeMb(d.main.bytes)', 'RELEASE.version', 'RELEASE.released', 'RELEASE.notes', 'RELEASE.checksums', 'RELEASE.contents', 'RELEASE.limits', 'RELEASE.builtOn']) expect(src).toContain(key);
+    // version, file names and addresses are not typed into the page
+    expect(src).not.toMatch(/0\.1\.0|beta[ .-]?\d|github\.com|\.exe|\.dmg|\.AppImage|\d MB/);
     for (const key of ['SAMPLE.errorsPx', 'SAMPLE.coverage', 'SAMPLE.rmsPx', 'SAMPLE.focalPx', 'SAMPLE.spoiledImages', 'SAMPLE.kept.errorsPx', 'kept.rmsPx', 'kept.focalPx', 'SAMPLE.kept.cameraInfo']) expect(src).toContain(key);
     // numbers are not typed into the page
     expect(src).not.toMatch(/0\.048|0\.116|149[89]\.\d|77\s*(&nbsp;)?%|\b0?7 and 18\b/);
+  });
+
+  it('beta page says what a beta is, how to open an unsigned app, and that signing up is optional', () => {
+    const src = readFileSync(page, 'utf-8');
+    expect(src).toContain('public test version');
+    expect(src).toContain('rendered images');
+    expect(src).toContain('Run anyway');
+    expect(src).toContain('Open Anyway');
+    expect(src).toContain('chmod +x');
+    expect(src).not.toMatch(/right-click|Control-click/i); // no longer works on current macOS
+    expect(src).toContain('You do not need to sign up to download');
   });
 
   it('page is written for users: no licence, source or progress talk', () => {

@@ -1,12 +1,21 @@
 ---
 import Base from '@/layouts/Base.astro';
 import { breadcrumbLd } from '@/lib/seo';
-import { software, COMING_SOON_LABEL, NOTIFY_TAG, SAMPLE, coveragePercent } from '@/lib/software';
+import { software, RELEASE, NOTIFY_TAG, SAMPLE, coveragePercent, downloadsByPlatform, fileUrl, sizeMb } from '@/lib/software';
 import NewsletterForm from '@/islands/NewsletterForm';
+import { ChevronDown } from 'lucide-astro';
+import { fileLinkHint } from '../../../scripts/file-links.mjs';
 import { drawingForPartNumber } from '@/lib/boardDrawing';
 import { errorBarsFigureSvg, coverageMapFigureSvg } from '@/lib/guideFigures';
 
-const unreleased = software.status === 'unreleased';
+const beta = software.status === 'beta';
+const downloads = downloadsByPlatform();
+// What the system shows the first time an unsigned app is opened, and how to get past it.
+const firstOpen = [
+  { os: 'Windows', steps: 'When "Windows protected your PC" appears, click More info, then Run anyway.' },
+  { os: 'macOS', steps: `When "Apple could not verify ${software.name} is free of malware" appears, click Done. Open System Settings, go to Privacy & Security, and under Security click Open Anyway beside ${software.name}. Confirm once more. You only do this once.` },
+  { os: 'Linux', steps: `Make the file executable, then run it: chmod +x ${downloads.find((d) => d.platform === 'Linux')!.main.file}` },
+];
 // Figures are drawn from SAMPLE (what the app reports for its own sample images), never typed in.
 const errors = SAMPLE.errorsPx;
 const kept = SAMPLE.kept;
@@ -29,10 +38,11 @@ const boardSvg = drawingForPartNumber(BOARD_PN);
 const faqs = [
   { q: 'Is Plumbline free?', a: 'Yes. It costs nothing, for commercial work too.' },
   { q: 'Are my images uploaded?', a: 'No. Plumbline runs on your computer and works offline. Your images and results stay there.' },
-  { q: 'Which lenses does it handle?', a: 'Standard lenses, with the OpenCV camera model and its optional k3, tangential, rational and thin-prism terms. Fisheye lenses are not supported yet.' },
-  { q: 'Which boards can I use?', a: 'ChArUco boards and checkerboards, printed yourself or bought. You enter the square count, the sizes and the dictionary.' },
+  { q: 'Which lenses does it handle?', a: 'Standard lenses, with the OpenCV camera model and its optional k3, tangential, rational and thin-prism terms, and fisheye lenses.' },
+  { q: 'Which boards can I use?', a: 'ChArUco boards, checkerboards, circle grids, asymmetric circle grids, AprilGrids in the Kalibr layout and ArUco grids, printed yourself or bought. You enter the counts, the sizes and the dictionary.' },
   { q: 'Will the result work with OpenCV and ROS?', a: 'Yes. The calibration runs on OpenCV, and the export is an OpenCV YAML or JSON file or a ROS camera_info file.' },
-  { q: 'When can I download it?', a: 'Plumbline is not released yet. Leave your email at the top of this page and we send you the download link on the day it ships. It will run on Windows, macOS and Linux.' },
+  { q: 'Is the beta safe to rely on?', a: `Version ${RELEASE.version} is a public beta. Its results have been checked with rendered images whose true camera is known; checks with photographs of real boards are under way. For work that matters, compare the result with a method you already trust.` },
+  { q: 'Why does my computer warn me when I open it?', a: 'The installers of the beta are not signed, so Windows and macOS ask before the first start. The steps are under "The first time you open it" on this page.' },
 ];
 
 const bcLd = breadcrumbLd([{ name: 'Home', url: '/' }, { name: software.name }]);
@@ -43,6 +53,10 @@ const appLd = {
   url: `https://calib.tools${software.href}`,
   applicationCategory: 'DeveloperApplication',
   operatingSystem: software.platforms.join(', '),
+  softwareVersion: RELEASE.version,
+  datePublished: RELEASE.released,
+  downloadUrl: `https://calib.tools${software.href}#download`,
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
   publisher: { '@type': 'Organization', name: 'Calib.Tools', url: 'https://calib.tools' },
 };
 const faqLd = {
@@ -66,27 +80,67 @@ const faqLd = {
         {software.name} shows the error of every image and how much of the frame your corners cover. You see which images to retake before the numbers go into your pipeline.
       </p>
     </div>
-    {unreleased ? (
-      <div id="notify" class="card bracket flex scroll-mt-24 flex-col gap-4 p-6">
-        <div><span class="badge text-brand-dark">{COMING_SOON_LABEL}</span></div>
-        <p class="m-0 text-[18px] font-semibold leading-snug">Be the first to get {software.name}</p>
-        <NewsletterForm
-          client:load
-          compact
-          id="pl"
-          tag={NOTIFY_TAG}
-          heading="Email for the release notification"
-          note=""
-          button="Notify me"
-          done="Done. We email you the day Plumbline is out."
-        />
-        <p class="m-0 border-t border-line pt-4 text-[13px] text-ink-muted">Support for {software.platforms.join(', ')}</p>
+    <div id="download" class="card bracket flex scroll-mt-24 flex-col gap-4 p-6">
+      <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
+        {beta && <span class="badge text-brand-dark">Beta</span>}
+        <span class="font-mono text-[13px] text-ink-muted">Version {RELEASE.version} · {RELEASE.released}</span>
       </div>
-    ) : (
-      <div class="grid grid-cols-3 gap-2">
-        {software.platforms.map((p) => <a href={software.href} class="btn-md btn-secondary w-full normal-case tracking-normal text-[14px]">{p}</a>)}
+      <ul class="m-0 flex list-none flex-col gap-4 p-0">
+        {downloads.map((d) => (
+          <li class="flex flex-col gap-1.5">
+            <a href={fileUrl(d.main)} class="btn-md btn-primary w-full normal-case tracking-normal" data-download={d.platform}>Download for {d.main.label}</a>
+            <span class="text-[13px] leading-snug text-ink-muted">
+              {d.main.fits}, {sizeMb(d.main.bytes)}{d.other && <>. Also: <a href={fileUrl(d.other)} class="whitespace-nowrap" data-download={d.platform}>{d.other.label}</a> ({sizeMb(d.other.bytes)})</>}
+            </span>
+          </li>
+        ))}
+      </ul>
+      <p class="m-0 border-t border-line pt-4 text-[13px] leading-relaxed text-ink-muted">
+        <a href={RELEASE.notes}>What changed</a> · <a href={fileUrl(RELEASE.checksums)} target="_blank" rel="noopener">{RELEASE.checksums}<span class="sr-only">{fileLinkHint(fileUrl(RELEASE.checksums))}</span></a>
+      </p>
+    </div>
+  </section>
+
+  {/* ── Beta notice, first start, new-version email ── */}
+  <section class="border-t border-line bg-ground-alt">
+    <div class="container-x grid gap-x-14 gap-y-10 py-[var(--section-y)] lg:grid-cols-[minmax(0,6fr)_minmax(0,5fr)]" data-rows="layout">
+      <div class="flex min-w-0 flex-col gap-5">
+        <span class="section-no">Public beta</span>
+        <span class="section-rule"></span>
+        <h2 class="m-0 text-[24px] font-semibold md:text-[28px]">What to know about version {RELEASE.version}</h2>
+        <p class="m-0 text-[17px] leading-[1.65] text-ink-muted">This is a public test version. Its results have been checked with rendered images whose true camera is known. Checks with photographs of real boards are under way. For work that matters, compare the result with a method you already trust.</p>
+        <p class="m-0 text-[15px] leading-relaxed text-ink-muted">The installers are not signed yet, so Windows and macOS ask before the first start. They were built and started on {RELEASE.builtOn}.</p>
+        <p class="m-0 text-[15px] leading-relaxed text-ink-muted">Found a problem? Write to <a href="mailto:hello@calib.tools">hello@calib.tools</a>, or use About, Report a problem in the app.</p>
       </div>
-    )}
+      <div class="flex min-w-0 flex-col gap-5">
+        <h3 class="m-0 text-[18px] font-semibold">The first time you open it</h3>
+        <div class="flex flex-col border border-line bg-sheet">
+          {firstOpen.map((f, i) => (
+            <details class:list={['group', i > 0 && 'border-t border-line']}>
+              <summary class="flex cursor-pointer list-none items-center justify-between gap-4 px-4 py-3 text-[15px] font-semibold select-none hover:bg-ground-alt [&::-webkit-details-marker]:hidden">
+                <span>{f.os}</span>
+                <ChevronDown class="h-4 w-4 shrink-0 text-ink-soft transition-transform group-open:rotate-180" />
+              </summary>
+              <div class="px-4 pb-4 text-[15px] leading-[1.65] text-ink-muted [overflow-wrap:anywhere]">{f.steps}</div>
+            </details>
+          ))}
+        </div>
+        <div id="notify" class="flex scroll-mt-24 flex-col gap-3 border-t border-line pt-5">
+          <p class="m-0 text-[15px] font-semibold">Hear about new versions</p>
+          <NewsletterForm
+            client:load
+            compact
+            id="pl"
+            tag={NOTIFY_TAG}
+            heading="Email for news about new versions"
+            note=""
+            button="Notify me"
+            done="Done. We email you when a new version is out."
+          />
+          <p class="m-0 text-[13px] text-ink-muted">Optional. You do not need to sign up to download.</p>
+        </div>
+      </div>
+    </div>
   </section>
 
   {/* ── 1 Error for every image ── */}
@@ -150,7 +204,8 @@ const faqLd = {
         <span class="section-no">Target</span>
         <span class="section-rule"></span>
         <h2 class="m-0 text-[24px] font-semibold md:text-[28px]">Describe your board once</h2>
-        <p class="m-0 text-[17px] leading-[1.65] text-ink-muted">{software.name} works with ChArUco boards and checkerboards, printed or bought. Enter the squares across and down, the square size, and for ChArUco the marker size and dictionary. It then states the corner count and marker IDs it expects, so a wrong entry shows before you calibrate.</p>
+        <p class="m-0 text-[17px] leading-[1.65] text-ink-muted">{software.name} works with ChArUco boards, checkerboards, circle grids, AprilGrids and ArUco grids, printed or bought. Enter the squares across and down, the square size, and for ChArUco the marker size and dictionary.</p>
+        <p class="m-0 text-[17px] leading-[1.65] text-ink-muted">It then states the corner count and marker IDs it expects, so a wrong entry shows before you calibrate.</p>
         <p class="m-0 text-[15px] text-ink-muted">No board yet? <a href="/tools/generator/charuco/">Print one with the pattern generator</a>.</p>
       </div>
     </div>
@@ -163,7 +218,7 @@ const faqLd = {
         <span class="section-no">Export</span>
         <span class="section-rule"></span>
         <h2 class="m-0 text-[24px] font-semibold md:text-[28px]">Get a file your pipeline reads</h2>
-        <p class="m-0 text-[17px] leading-[1.65] text-ink-muted">Export the camera matrix and distortion coefficients as OpenCV YAML or JSON, or as a ROS camera_info file that camera drivers load as it is.</p>
+        <p class="m-0 text-[17px] leading-[1.65] text-ink-muted">Export the camera matrix and distortion coefficients as OpenCV YAML, XML or JSON, or as a ROS camera_info file that camera drivers load as it is.</p>
       </div>
       <figure class="card p-5 m-0 flex min-w-0 flex-col gap-3">
         <code class="block max-w-full whitespace-pre-wrap [overflow-wrap:anywhere] font-mono text-[12px] leading-[1.6] text-ink">{SAMPLE.kept.cameraInfo}</code>
@@ -206,6 +261,36 @@ const faqLd = {
     </div>
   </section>
 
+  {/* ── In this version ── */}
+  <section class="border-t border-line">
+    <div class="container-x flex flex-col gap-5 py-[var(--section-y)]">
+      <span class="section-no">Version {RELEASE.version}</span>
+      <span class="section-rule"></span>
+      <h2 class="m-0 text-[24px] font-semibold md:text-[28px]">What is in this version</h2>
+      <dl class="m-0 flex max-w-[760px] flex-col border-t border-line">
+        {RELEASE.contents.map((c) => (
+          <div class="flex flex-col gap-2 border-b border-line py-4">
+            <dt class="font-medium">{c.group}</dt>
+            <dd class="m-0">
+              <ul class="m-0 flex list-disc flex-col gap-1 pl-5 text-[15px] leading-relaxed text-ink-muted">
+                {c.items.map((it) => <li>{it}</li>)}
+              </ul>
+            </dd>
+          </div>
+        ))}
+        <div class="flex flex-col gap-2 border-b border-line py-4">
+          <dt class="font-medium">Known limits</dt>
+          <dd class="m-0">
+            <ul class="m-0 flex list-disc flex-col gap-1 pl-5 text-[15px] leading-relaxed text-ink-muted">
+              {RELEASE.limits.map((it) => <li>{it}</li>)}
+            </ul>
+          </dd>
+        </div>
+      </dl>
+      <p class="m-0 text-[15px] text-ink-muted"><a href={RELEASE.notes}>Full list of changes</a></p>
+    </div>
+  </section>
+
   {/* ── 7 Questions ── */}
   <section class="border-t border-line">
     <div class="container-x flex flex-col gap-5 py-[var(--section-y)]">
@@ -226,9 +311,9 @@ const faqLd = {
   {/* ── Closing ── */}
   <section class="border-t border-line">
     <div class="container-x flex flex-col gap-5 py-[var(--section-y)]">
-      <h2 class="m-0 text-[24px] font-semibold md:text-[28px]">{unreleased ? `Get ${software.name} when it ships` : `Download ${software.name}`}</h2>
-      {unreleased && <div><a href="#notify" class="btn-md btn-primary">Notify me</a></div>}
-      <p class="m-0 max-w-[760px] text-[15px] text-ink-muted">Until then, the <a href="/tools/quality/">calibration quality analyzer</a> checks a calibration you already ran, in your browser.</p>
+      <h2 class="m-0 text-[24px] font-semibold md:text-[28px]">Download {software.name}</h2>
+      <div><a href="#download" class="btn-md btn-primary">Go to the downloads</a></div>
+      <p class="m-0 max-w-[760px] text-[15px] text-ink-muted">Already have a calibration? The <a href="/tools/quality/">calibration quality analyzer</a> checks it in your browser.</p>
     </div>
   </section>
 </Base>
