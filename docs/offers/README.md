@@ -82,6 +82,11 @@ email; the draft name is used without it), `_quote_pdf` (the link from `offer.ts
 and no "completed" status. If something is missing, nothing goes to the customer and hello@calib.tools gets a
 note that names the reason. The email has no link to the PDF; the "Confirm your order" button opens Shopify's
 invoice page. Shopify does not mark the draft "Invoice sent"; the blind copy is the record.
+The line under the total follows the trade term in the name of the draft order's shipping line: with
+"DDP" it says freight, clearance and duties are included and nothing is due on delivery; with "DAP" it says
+duties and taxes are paid by the recipient on arrival; with neither it says they are not included unless
+the quotation says so. Name the shipping line after the term agreed with the customer, and keep it the same
+as the Incoterms line in the quotation PDF (the two are filled in separately).
 
 Text and layout live in `src/lib/offerEmail.ts` (paper ground, wordmark on its own white row with the
 quotation number below it, red square button, mono labels). `PAYMENT_ACCEPTS_QUOTATION`, `CUSTOM_ORDER_FINAL`
