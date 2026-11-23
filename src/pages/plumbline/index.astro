@@ -98,9 +98,6 @@ const faqLd = {
           </li>
         ))}
       </ul>
-      <p class="m-0 border-t border-line pt-4 text-[13px] leading-relaxed text-ink-muted">
-        <a href={RELEASE.notes}>What changed</a> · <a href={fileUrl(RELEASE.checksums)} target="_blank" rel="noopener">{RELEASE.checksums}<span class="sr-only">{fileLinkHint(fileUrl(RELEASE.checksums))}</span></a>
-      </p>
     </div>
   </section>
 
@@ -290,7 +287,7 @@ const faqLd = {
           </dd>
         </div>
       </dl>
-      <p class="m-0 text-[15px] text-ink-muted"><a href={RELEASE.notes}>Full list of changes</a></p>
+      <p class="m-0 text-[15px] text-ink-muted"><a href={RELEASE.notes}>Full list of changes</a> · <a href={fileUrl(RELEASE.checksums)} target="_blank" rel="noopener">Checksums of the downloads (SHA-256)<span class="sr-only">{fileLinkHint(fileUrl(RELEASE.checksums))}</span></a></p>
     </div>
   </section>
 
