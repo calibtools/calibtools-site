@@ -1,0 +1,5 @@
+all 24 views:   RMS 0.167 px, fx 1497.9, cx 646.1, cy 483.3
+per view: 0.08 0.07 0.08 0.08 0.07 0.08 0.72 0.08 0.10 0.08 0.08 0.08 0.07 0.07 0.08 0.07 0.08 0.13 0.07 0.07 0.08 0.08 0.07 0.08
+views above 3x the median: [7]
+without them:   RMS 0.074 px, fx 1499.6, cx 640.0, cy 480.2
+true camera:    fx 1500.0, cx 640.0, cy 480.0
