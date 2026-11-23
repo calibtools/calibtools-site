@@ -50,7 +50,7 @@ def per_view_rms(obj, img, K, dist, rvecs, tvecs):
 
 
 def calibrate(img_points):
-    obj = [BOARD] * len(img_points)
+    obj = [BOARD for _ in img_points]
     rms, K, dist, rvecs, tvecs = cv2.calibrateCamera(obj, img_points, (W, H), None, None)
     return rms, K, per_view_rms(obj, img_points, K, dist, rvecs, tvecs)
 

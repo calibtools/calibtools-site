@@ -1,6 +1,6 @@
 ---
-title: "How still does the calibration board have to be?"
-description: "We moved a calibration board by 0.25 to 4 mm during two of 24 images. Blur did almost nothing. A rolling shutter left the images sharp and moved the principal point by 2 px."
+title: "How still does a calibration board have to be?"
+description: "We moved a board 0.25 to 4 mm during two of 24 calibration images. Blur did almost nothing. Rolling-shutter motion shifted the principal point by 2 px."
 date: 2026-11-23
 updated: 2026-11-23
 readingTime: "9 min"
@@ -194,7 +194,7 @@ def per_view_rms(obj, img, K, dist, rvecs, tvecs):
 
 
 def calibrate(img_points):
-    obj = [BOARD] * len(img_points)
+    obj = [BOARD for _ in img_points]
     rms, K, dist, rvecs, tvecs = cv2.calibrateCamera(obj, img_points, (W, H), None, None)
     return rms, K, per_view_rms(obj, img_points, K, dist, rvecs, tvecs)
 
