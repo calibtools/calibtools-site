@@ -126,18 +126,18 @@ const faqLd = {
           ))}
         </div>
         <div id="notify" class="flex scroll-mt-24 flex-col gap-3 border-t border-line pt-5">
-          <p class="m-0 text-[15px] font-semibold">Get the next version when it is out</p>
+          <p class="m-0 text-[15px] font-semibold">Sign up and help improve {software.name}</p>
           <NewsletterForm
             client:load
             compact
             id="pl"
             tag={NOTIFY_TAG}
-            heading="Email for news about new versions"
+            heading="Email to sign up for the beta"
             note=""
-            button="Notify me"
-            done="Done. We email you when a new version is out."
+            button="Sign up"
+            done="Thank you. We email you when a new version is out."
           />
-          <p class="m-0 text-[13px] leading-relaxed text-ink-muted">{software.name} is in beta and new versions will follow. Leave your email and we tell you when one is out. We use it for nothing else.</p>
+          <p class="m-0 text-[13px] leading-relaxed text-ink-muted">{software.name} is in beta, and what you tell us shapes the next version. Leave your email: we let you know when a new version is out and may ask how this one worked for you. We use it for nothing else.</p>
         </div>
       </div>
     </div>
