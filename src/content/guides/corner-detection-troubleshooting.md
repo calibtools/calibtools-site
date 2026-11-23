@@ -297,10 +297,10 @@ The browser [detection check](/tools/check/) runs the same OpenCV detectors on a
 
 ## Next steps
 
-- [Camera calibration with OpenCV](/calibacademy/opencv-camera-calibration/) — the full pipeline once every frame detects.
+- [Camera calibration with OpenCV](/calibacademy/opencv-camera-calibration/): the full pipeline once every frame detects.
 
-- [How big should your target be?](/calibacademy/calibration-target-size/) — turn the pixels-per-bit requirement into a board size.
+- [How big should your target be?](/calibacademy/calibration-target-size/): turn the pixels-per-bit requirement into a board size.
 
-- [ChArUco vs checkerboard vs AprilGrid](/calibacademy/charuco-vs-checkerboard-vs-aprilgrid/) — when the robustness trade-offs above should change your pattern.
+- [ChArUco vs checkerboard vs AprilGrid](/calibacademy/charuco-vs-checkerboard-vs-aprilgrid/): when the robustness trade-offs above should change your pattern.
 
 - Several boards in one scene: [give each board its own marker IDs](/calibacademy/multi-board-marker-ids/) so the detector cannot confuse them.

@@ -250,8 +250,8 @@ describe('hand-eye figure', () => {
         expect(svg).toContain('>' + name + '<');
       }
     }
-    expect(md).toMatch(/Eye-in-hand\*\* — .*`T_cam2gripper`/);
-    expect(md).toMatch(/Eye-to-hand\*\* — .*`T_cam2base`/);
+    expect(md).toMatch(/Eye-in-hand\.\*\* .*`T_cam2gripper`/);
+    expect(md).toMatch(/Eye-to-hand\.\*\* .*`T_cam2base`/);
   });
 });
 

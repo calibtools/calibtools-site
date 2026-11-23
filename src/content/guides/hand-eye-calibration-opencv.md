@@ -27,9 +27,9 @@ This guide covers both arrangements with OpenCV and Python: what to record, how 
 
 ## The two arrangements
 
-**Eye-in-hand** — the camera is mounted on the robot flange or gripper and the calibration target sits still in the cell. The unknown is the camera pose relative to the gripper, `T_cam2gripper`.
+**Eye-in-hand.** The camera is mounted on the robot flange or gripper and the calibration target sits still in the cell. The unknown is the camera pose relative to the gripper, `T_cam2gripper`.
 
-**Eye-to-hand** — the camera is fixed (on a stand or the ceiling) and the target is mounted on the gripper. The unknown is the camera pose relative to the robot base, `T_cam2base`.
+**Eye-to-hand.** The camera is fixed (on a stand or the ceiling) and the target is mounted on the gripper. The unknown is the camera pose relative to the robot base, `T_cam2base`.
 
 Both are solved by the same function. The only difference is which robot transform you feed it, and what the result means.
 
@@ -39,9 +39,9 @@ Both are solved by the same function. The only difference is which robot transfo
 
 For every robot pose you record two transforms:
 
-- **Robot pose** `T_gripper2base` — where the flange is, read from the controller.
+- **Robot pose** `T_gripper2base`: where the flange is, read from the controller.
 
-- **Target pose** `T_target2cam` — where the board is as seen by the camera, from `solvePnP` on the detected corners.
+- **Target pose** `T_target2cam`: where the board is as seen by the camera, from `solvePnP` on the detected corners.
 
 The camera must be calibrated first (intrinsics and distortion). Follow the [camera calibration guide](/calibacademy/opencv-camera-calibration/) with the lens locked at its production focus; a poor intrinsic calibration shows up directly as hand-eye error.
 

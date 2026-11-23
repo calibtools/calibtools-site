@@ -138,11 +138,11 @@ Time offset estimation is on by default; add `--no-time-calibration` only if the
 
 The run takes a few minutes and writes three files next to the bag:
 
-- `camchain-imucam-dynamic.yaml` — the camera chain with `T_cam_imu` and `timeshift_cam_imu` added per camera.
+- `camchain-imucam-dynamic.yaml`: the camera chain with `T_cam_imu` and `timeshift_cam_imu` added per camera.
 
-- `results-imucam-dynamic.txt` — the numbers in plain text.
+- `results-imucam-dynamic.txt`: the numbers in plain text.
 
-- `report-imucam-dynamic.pdf` — plots to inspect before you trust anything.
+- `report-imucam-dynamic.pdf`: plots to inspect before you trust anything.
 
 ## 6. Read the result
 
