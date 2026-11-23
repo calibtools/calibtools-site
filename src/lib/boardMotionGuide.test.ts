@@ -115,7 +115,4 @@ describe('board-motion figure', () => {
   it('no bar is clipped by the scale', () => {
     for (const r of rows) { expect(r.rms).toBeLessThanOrEqual(BOARD_MOTION_SCALE.rmsMax); expect(r.lensMax).toBeLessThanOrEqual(BOARD_MOTION_SCALE.lensMax); }
   });
-  it('the guide is a draft until the owner releases it', () => {
-    expect(md).toMatch(/^draft: true$/m);
-  });
 });

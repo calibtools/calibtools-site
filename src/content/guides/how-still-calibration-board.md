@@ -8,7 +8,6 @@ keyRule: "Blur you can see is not the motion to worry about. A board that moves 
 related: ["reprojection-error", "corner-detection-troubleshooting", "opencv-camera-calibration"]
 products: ["charuco-composite"]
 sampleFiles: []
-draft: true
 faq:
   - q: "Does motion blur spoil a camera calibration?"
     a: "In our test, much less than expected. A board that moved 4 mm during a global-shutter exposure in two of 24 images left the result within noise of a still session. The smear is symmetric, so the detected corner sits in the middle of it and the whole board is simply seen at its average position. Heavy blur does cost corners: 4 of our 40 blurred images were not detected at all."
