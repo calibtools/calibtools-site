@@ -1,33 +1,125 @@
 /**
  * Single source of truth for Plumbline, the Calib.Tools desktop calibration software.
- * Read by the header navigation and /plumbline/. Every page that mentions Plumbline reads its
- * status from here, so the wording switches in one place when the first version ships.
+ * Read by the header navigation, /plumbline/ and scripts/check-downloads.ts. For a new build
+ * (beta 2, rc 1, the release) change RELEASE below and nothing else: the page, the file links and the
+ * structured data are all built from it.
  *
- * Status 2026-11-22: not released yet. Until then /plumbline/ shows a sign-up for the release email.
+ * Status 2026-11-23: 0.1.0 beta 1 is out as a public beta. Installers are not signed.
  */
-export type SoftwareStatus = 'unreleased' | 'released';
+export type SoftwareStatus = 'beta' | 'released';
 
 export interface SoftwareDef {
   name: string;
   href: string;
   status: SoftwareStatus;
-  /** Version string of the latest release; null before the first one. */
-  version: string | null;
+  /** Version as people read it, e.g. "0.1.0 beta 1". */
+  version: string;
   platforms: readonly string[];
 }
+
+export type Platform = 'Windows' | 'macOS' | 'Linux';
+
+export interface ReleaseFile {
+  platform: Platform;
+  /** What the main button or the side link says. */
+  label: string;
+  /** Who this file is for, shown beside the size. */
+  fits: string;
+  file: string;
+  bytes: number;
+  sha256: string;
+  /** The file the platform's button points to; the other one is offered as a link beside it. */
+  primary: boolean;
+}
+
+const VERSION = '0.1.0 beta 1';
+const FILE_VERSION = '0.1.0-beta.1';
+const TAG = `v${FILE_VERSION}`;
+const REPO = 'https://github.com/calibtools/plumbline';
+
+/**
+ * The current build. File names, sizes in bytes and SHA-256 values are those of the GitHub release
+ * (calibtools/plumbline, tag v0.1.0-beta.1, commit a45b113), read back on 2026-11-23.
+ */
+export const RELEASE = {
+  version: VERSION,
+  fileVersion: FILE_VERSION,
+  tag: TAG,
+  stage: 'beta',
+  released: '2026-11-23',
+  base: `${REPO}/releases/download/${TAG}/`,
+  notes: `${REPO}/blob/main/CHANGELOG.md`,
+  checksums: 'SHA256SUMS.txt',
+  /** Systems the installers were built and started on. Older systems were not tried. */
+  builtOn: 'Windows 11, macOS 15 and Ubuntu 22.04',
+  files: [
+    { platform: 'Windows', label: 'Windows', fits: '64-bit installer', file: `Plumbline-${FILE_VERSION}-windows-x64-setup.exe`, bytes: 69_727_262, sha256: 'deeffc0548fd6120f403b934b899aac597eb9b5cde2b8e63674ada7ddaef6326', primary: true },
+    { platform: 'macOS', label: 'macOS', fits: 'Apple silicon', file: `Plumbline-${FILE_VERSION}-macos-arm64.dmg`, bytes: 49_010_123, sha256: 'd048a9ef4e6652e47b76565d9818a12660c16afe82394ce81f5d2d7a63be1506', primary: true },
+    { platform: 'macOS', label: 'Intel Mac', fits: 'Intel', file: `Plumbline-${FILE_VERSION}-macos-x64.dmg`, bytes: 69_902_247, sha256: '2b9b25ce6d0e29a32623902556dc2de430848472e2ae3be15d3d368ae264320d', primary: false },
+    { platform: 'Linux', label: 'Linux', fits: 'AppImage, 64-bit x86', file: `Plumbline-${FILE_VERSION}-linux-x86_64.AppImage`, bytes: 140_827_128, sha256: 'c1f354ab5e593bcab021e4b85079eaca9c26f56b7050d71431d520a7bed4f88f', primary: true },
+    { platform: 'Linux', label: '.tar.xz', fits: 'archive, 64-bit x86', file: `Plumbline-${FILE_VERSION}-linux-x86_64.tar.xz`, bytes: 106_457_488, sha256: '0b8145eb3b1cf587f37d36c40e451bcdf4525e8bf5cdb7729b21292ff0c0870a', primary: false },
+  ] as readonly ReleaseFile[],
+  /** The 0.1.0 section of CHANGELOG.md at the tag, in its own wording. Not rewritten for the page. */
+  contents: [
+    { group: 'One camera', items: [
+      'Targets: ChArUco, checkerboard, circle grid, asymmetric circle grid, AprilGrid (Kalibr layout), ArUco grid; Calib.Tools boards by part number',
+      'Lens models: OpenCV standard (optional k3, tangential, rational, thin prism) and fisheye',
+      'Error for every image; leave an image out and solve again; coverage map',
+      'A ± for every parameter, and a map of how well the result is pinned down across the image',
+      'Residuals map with a hint when the lens model does not fit',
+      'A board that is not flat is noticed; its shape can be solved together with the camera',
+      'A misplaced point of the board is found; a row or column that no image shows is pointed out',
+      'A few far-off points that steer the result are pointed out',
+      'Corrected view of any image',
+    ] },
+    { group: 'Several cameras', items: [
+      'Two to eight cameras, told apart and matched by file name; standard and fisheye lenses can be mixed',
+      'Where every camera sits relative to camera 1, with ±',
+      'Two cameras: row-aligned images and a short example program',
+      'Check with images that took no part: lengths on the board, measured by the cameras',
+    ] },
+    { group: 'Several boards', items: [
+      'Up to four boards of the same kind in every image, each found by its own marker numbers',
+      'Boards fixed to each other can be solved as one object',
+    ] },
+    { group: 'Files', items: [
+      'OpenCV YAML and XML, JSON, ROS camera_info, Excel, PDF report, lookup tables, Python example, project file',
+      'Files are named by project and revision and never overwrite older ones',
+    ] },
+    { group: 'App', items: [
+      'Built-in samples for one camera and for two',
+      'About window with version details and a way to report a problem',
+    ] },
+  ],
+  limits: [
+    'Checked with rendered images only; photographs of real boards are still to come',
+    'Installers are not signed: Windows and macOS warn when the app is first opened',
+  ],
+} as const;
 
 export const software: SoftwareDef = {
   name: 'Plumbline',
   href: '/plumbline/',
-  status: 'unreleased',
-  version: null,
+  status: RELEASE.stage,
+  version: RELEASE.version,
   platforms: ['Windows', 'macOS', 'Linux'],
 };
 
-/** Shown where the download buttons will be, until the first release. The only place this wording is allowed (scripts/check-prose.mjs). */
-export const COMING_SOON_LABEL = 'Coming soon';
+/** Download address of one release file. */
+export const fileUrl = (f: Pick<ReleaseFile, 'file'> | string): string => RELEASE.base + (typeof f === 'string' ? f : f.file);
 
-/** Tag set on people who ask to be told about the release (POST /api/subscribe). */
+/** File size as shown on the page: 1 MB = 1,048,576 bytes, one decimal. */
+export const sizeMb = (bytes: number): string => `${(bytes / 1_048_576).toFixed(1)} MB`;
+
+/** The button file and the side-link file of each platform, in page order. */
+export function downloadsByPlatform(): { platform: Platform; main: ReleaseFile; other?: ReleaseFile }[] {
+  return (software.platforms as readonly Platform[]).map((platform) => {
+    const files = RELEASE.files.filter((f) => f.platform === platform);
+    return { platform, main: files.find((f) => f.primary)!, other: files.find((f) => !f.primary) };
+  });
+}
+
+/** Tag set on people who ask to be told about new versions (POST /api/subscribe). */
 export const NOTIFY_TAG = 'notify:plumbline';
 
 /**
