@@ -55,7 +55,9 @@ describe('software (Plumbline single source)', () => {
   it('beta page says what a beta is, how to open an unsigned app, and what the sign-up email is used for', () => {
     const src = readFileSync(page, 'utf-8');
     expect(src).toContain('public test version');
-    expect(src).toContain('rendered images');
+    // the page lists RELEASE.limits, which says what the beta was checked with
+    expect(src).toContain('RELEASE.limits');
+    expect(RELEASE.limits.join(' ')).toContain('rendered images');
     expect(src).toContain('Run anyway');
     expect(src).toContain('Open Anyway');
     expect(src).toContain('chmod +x');
