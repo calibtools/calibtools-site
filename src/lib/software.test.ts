@@ -162,4 +162,13 @@ describe('header navigation', () => {
     expect(col('Tools').at(-1)).toEqual({ label: software.name, href: software.href });
     expect(footerGroups.flatMap((g) => g.items).some((i) => i.label === 'Guides')).toBe(false);
   });
+
+  it('sample figures are those of the released build (v0.1.0-beta.1, OpenCV 5.0.0)', () => {
+    const run = JSON.parse(readFileSync('docs/plumbline/sample-figures/v0.1.0-beta.1-opencv-5.0.0.json', 'utf-8'));
+    expect(run.opencv).toBe('5.0.0');
+    for (const k of ['focalPx', 'rmsPx', 'corners', 'errorsPx', 'coverage'] as const) expect(SAMPLE[k]).toEqual(run[k]);
+    for (const k of ['focalPx', 'rmsPx', 'corners', 'errorsPx'] as const) expect(SAMPLE.kept[k]).toEqual(run.kept[k]);
+    const ros: string = run.kept.cameraInfo;
+    expect(ros.slice(ros.indexOf('image_width'), ros.indexOf('\nrectification_matrix'))).toBe(SAMPLE.kept.cameraInfo);
+  });
 });
