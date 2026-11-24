@@ -1,0 +1,2 @@
+bow 0.0-1.0 mm varying  plain: RMS 0.427 fx -1.26% edge   44.7px | RO: RMS 0.231 fx -0.05% edge   58.0px
+bow 0.0-2.0 mm varying  plain: RMS 0.844 fx -2.47% edge   88.9px | RO: RMS 0.444 fx -0.08% edge  107.5px

@@ -1,0 +1,7 @@
+None 0     plain: RMS 0.069 fx +0.00% edge    1.0px | RO: RMS 0.066 fx +0.01% edge    2.5px
+bow 1.0    plain: RMS 0.805 fx -2.17% edge   99.1px | RO: RMS 0.066 fx +0.01% edge    2.5px
+bow 2.0    plain: RMS 1.608 fx -4.26% edge  190.6px | RO: RMS 0.066 fx +0.01% edge    2.5px
+dome 2.0   plain: RMS 1.196 fx -3.96% edge  171.3px | RO: RMS 0.066 fx +0.01% edge    2.5px
+wave 0.5   plain: RMS 0.717 fx -0.01% edge    6.3px | RO: RMS 0.066 fx +0.00% edge    2.5px
+aniso 0.003 plain: RMS 0.095 fx -0.11% edge    6.0px | RO: RMS 0.066 fx +0.01% edge    2.5px
+combo 1    plain: RMS 1.602 fx -4.42% edge  186.6px | RO: RMS 0.066 fx +0.01% edge    2.4px
