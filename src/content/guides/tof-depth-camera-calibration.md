@@ -324,13 +324,13 @@ Before you trust a depth table:
 
 ## Next steps
 
-- [Camera calibration with OpenCV](/calibacademy/opencv-camera-calibration/) — the full intrinsics pipeline that step 2 condenses.
+- [Camera calibration with OpenCV](/calibacademy/opencv-camera-calibration/): the full intrinsics pipeline that step 2 condenses.
 
-- [ChArUco, checkerboard or AprilGrid?](/calibacademy/charuco-vs-checkerboard-vs-aprilgrid/) — why a ChArUco board survives a partial view at 0.5 m and a checkerboard does not.
+- [ChArUco, checkerboard or AprilGrid?](/calibacademy/charuco-vs-checkerboard-vs-aprilgrid/): why a ChArUco board survives a partial view at 0.5 m and a checkerboard does not.
 
-- [How big should your target be?](/calibacademy/calibration-target-size/) — square and marker size for a given sensor, lens and distance.
+- [How big should your target be?](/calibacademy/calibration-target-size/): square and marker size for a given sensor, lens and distance.
 
-- [Thermal camera geometric calibration](/calibacademy/thermal-camera-geometric-calibration/) — the same stereoCalibrate step aligns a ToF camera with a color camera: detect the board in both, fix the intrinsics, solve R and T.
+- [Thermal camera geometric calibration](/calibacademy/thermal-camera-geometric-calibration/): the same stereoCalibrate step aligns a ToF camera with a color camera: detect the board in both, fix the intrinsics, solve R and T.
 
 - Our [depth camera targets](/targets/depth-camera-target/) pair a ChArUco board with an NIR-uniform finish and a step block with known heights; tell us the sensor, lens and working range and we size the markers for the far end.
 

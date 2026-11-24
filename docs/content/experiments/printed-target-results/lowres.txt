@@ -1,0 +1,12 @@
+OpenCV 5.0.0 camera 1280 x 1071
+scenario                                RMS px    fx %  fy/fx %  edge px  dist %
+Flat, exact board (reference)            0.069    0.01    0.001     0.93    0.01
+One direction +0.1 %                     0.070   -0.03    0.102     1.38   -0.02
+One direction +0.3 %                     0.078   -0.09    0.302     3.22   -0.09
+One direction +0.5 %                     0.092   -0.14    0.501     5.31   -0.15
+Cylindrical bow 0.5 mm                   0.217   -1.13   -0.094    26.73   -1.24
+Cylindrical bow 1 mm                     0.420   -2.25   -0.174    52.95   -2.46
+Cylindrical bow 2 mm                     0.831   -4.38   -0.341   102.54   -4.78
+Cylindrical bow 4 mm                     1.658   -8.41   -0.577   187.00   -9.10
+Cockle ±0.2 mm                           0.162   -0.01    0.001     1.58   -0.00
+Cockle ±0.5 mm                           0.374   -0.01   -0.001     3.11   -0.01

@@ -29,7 +29,7 @@ Print at 100 % ("actual size") and measure one square before you enter its size 
 
 ## Why partial views matter more than you think
 
-Lens distortion is strongest in the corners of the image, and that is exactly where a plain checkerboard can't be used — the detector needs every inner corner visible. Coded patterns let you push the board right to the edge, which is where the distortion model actually gets constrained.
+Lens distortion is strongest in the corners of the image, and that is exactly where a plain checkerboard can't be used: the detector needs every inner corner visible. Coded patterns let you push the board right to the edge, which is where the distortion model actually gets constrained.
 
 ![Three boards with 45 % of their width outside the camera frame and the points OpenCV still returns: none on the checkerboard, 24 of 54 inner corners on the ChArUco board, 60 of 140 tag corners on the AprilGrid.](../../assets/guides/partial-view-detection.svg)
 

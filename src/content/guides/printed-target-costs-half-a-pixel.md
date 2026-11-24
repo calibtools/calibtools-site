@@ -1,11 +1,11 @@
 ---
-title: "Why your printed target is costing you 0.5 px"
-description: "Paper stretches, printers scale, foam board bows. What each does to reprojection error and focal length, measured in a synthetic test, and when a print will do."
+title: "Is a printed calibration target good enough?"
+description: "A 96 % print kept the RMS and put distances 4.2 % off. A 1 mm bow cost 0.8 px and 2.2 % of focal length. A simulated test of what paper does to calibration."
 date: 2026-10-22
-updated: 2026-11-11
-readingTime: "10 min"
+updated: 2026-11-24
+readingTime: "11 min"
 keyRule: "A uniform scale error hides in your distances, a one-direction stretch hides in your aspect ratio, and a bow shows up as reprojection error and a wrong focal length. Measure the print in both directions and check it against a straightedge before you calibrate."
-related: ["reprojection-error", "composite-ceramic-or-glass", "calibration-target-size", "opencv-camera-calibration"]
+related: ["reprojection-error", "composite-ceramic-or-glass", "how-still-calibration-board", "opencv-camera-calibration"]
 products: ["checkerboard-composite", "charuco-composite"]
 sampleFiles: []
 faq:
@@ -21,9 +21,15 @@ faq:
     a: "If the board keeps the same shape in every image, yes: in our test it recovered the focal length to within 0.01 % for bows up to 2 mm. If the sheet flexes between images, it halves the RMS but the model stays wrong at the frame edges."
 ---
 
-A printed target is the first calibration board almost everyone uses, and it often works. When it does not, the failure is quiet: the calibration converges, the reprojection error looks acceptable, and the focal length or the measured distances are off by a few percent.
+Often, yes. But a print can be wrong in three ways, and only one of them shows in the reprojection error.
 
-This guide separates the three things that go wrong with a print (scale, stretch and shape), shows what each one does to an OpenCV calibration in a synthetic test, and gives the checks that tell you whether your print is good enough.
+In a simulated test, a print that came out at 96 % of its size left the intrinsics and the RMS untouched and put every measured distance 4.2 % off.
+
+A sheet stretched 0.3 % in one direction hid the error in the aspect ratio. A 1 mm bow did show, as 0.8 px of RMS, and made the focal length 2.2 % short.
+
+Someone asked on OpenCV's Q&A site in 2016 whether a paper printed chessboard could [affect a calibration](https://answers.opencv.org/question/101400/can-a-paper-printed-chessboard-affect-camera-calibration), worried about wrinkles at the edges.
+
+The answers said yes and to glue the sheet to something straight. This page puts numbers on that, and gives the checks that tell you whether your print will do.
 
 ## The test
 
@@ -33,12 +39,12 @@ Twenty views per calibration, 550 to 950 mm away, tilted up to 40°, with 0.05 p
 
 In each scenario the *real* board was deformed, and the calibration was run with the *nominal* flat board, which is what happens when you describe a print by the parameters of the file you sent to the printer.
 
-Every number is the median of 30 random sets of views. "Edge error" is how far the fitted model is from the true one at the four frame corners, the same check we used in the [reprojection error guide](/calibacademy/reprojection-error/).
+Every number in the first two tables is the median of 30 random sets of views. "Edge error" is how far the fitted model is from the true one at the four frame corners, the same check we used in the [reprojection error guide](/calibacademy/reprojection-error/).
 
 | Real board | RMS (px) | Focal length | fy/fx | Edge error (px) | Distance |
 |---|---|---|---|---|---|
-| Flat and exact (reference) | 0.07 | 0.00 % | 0.000 % | 1.0 | 0.0 % |
-| Uniform scale 96 % | 0.07 | 0.00 % | 0.000 % | 1.1 | +4.2 % |
+| Flat and exact (reference) | 0.07 | 0.00 % | 0.001 % | 1.0 | 0.0 % |
+| Uniform scale 96 % | 0.07 | 0.00 % | 0.001 % | 1.1 | +4.2 % |
 | Stretched 0.1 % in one direction | 0.07 | −0.03 % | +0.10 % | 2.4 | 0.0 % |
 | Stretched 0.3 % in one direction | 0.10 | −0.09 % | +0.30 % | 6.0 | −0.1 % |
 | Stretched 0.5 % in one direction | 0.13 | −0.15 % | +0.50 % | 9.7 | −0.1 % |
@@ -47,7 +53,7 @@ Every number is the median of 30 random sets of views. "Edge error" is how far t
 | Bowed 2 mm | 1.59 | −4.4 % | −0.35 % | 194 | −4.8 % |
 | Domed 1 mm | 0.60 | −2.0 % | −0.08 % | 90 | −2.2 % |
 | Wavy ±0.2 mm (60 mm pitch) | 0.29 | 0.0 % | 0.000 % | 2.2 | 0.0 % |
-| Wavy ±0.5 mm (60 mm pitch) | 0.71 | 0.0 % | 0.000 % | 5.1 | 0.0 % |
+| Wavy ±0.5 mm (60 mm pitch) | 0.71 | 0.0 % | −0.001 % | 5.1 | 0.0 % |
 
 Bow is the sag at the center of the 216 mm corner span, with the sheet bent around one axis like a page that will not lie flat. Dome is the same sag in both directions. Wavy is the cockle a sheet gets from heavy ink and humidity.
 
@@ -57,7 +63,9 @@ Three different failures come out of this table.
 
 ## Scale: invisible in the calibration, visible in every measurement
 
-Printing a PDF with "Fit to page" or "Shrink to printable area" switched on, which many print dialogs do by default, shrinks the page to keep it inside the printer's margins; a square that comes out at 94 to 96 % of its stated size is the usual sign.
+Printing a PDF with "Fit to page" or "Shrink to printable area" switched on, which many print dialogs do by default, shrinks the page to keep it inside the printer's margins.
+
+Print guides put the result at [roughly 94 to 97 %](https://calendars.timvandevall.com/guides/how-to-print-a-calendar-at-100-percent-scale) of the stated size.
 
 Even at 100 %, the printed scale can be slightly off, so measure it.
 
@@ -69,7 +77,9 @@ What changes is every distance the camera reports: with a 96 % print, the board 
 
 ## Stretch: hidden in the aspect ratio
 
-Paper changes size with humidity, and not equally in both directions. Typical coefficients are 0.03 to 0.06 % per percent of moisture change along the grain and 0.07 to 0.17 % across it, and a 10 % change in relative humidity moves the moisture content of paper by about 1 %.
+Paper changes size with humidity, and not equally in both directions.
+
+[Typical coefficients](https://www.paperonweb.com/Articles/PTN98W2_ASPECTS_of_DIM_STAB.pdf) are 0.03 to 0.06 % per percent of moisture change along the grain and 0.07 to 0.17 % across it, and a 10 % change in relative humidity moves the moisture content of paper by about 1 %.
 
 A sheet printed in a dry office and used in a humid lab can therefore stretch a few tenths of a percent more in one direction than in the other. The printer adds its own one-direction error, because one axis is set by the print head and the other by the paper feed.
 
@@ -81,7 +91,7 @@ Unless you know your pixels are square and look at fy/fx, nothing tells you. The
 
 If your sensor has square pixels, an fy/fx far from 1 after calibration is a hint to remeasure the print.
 
-## Shape: the 0.5 px
+## Shape: the one the reprojection error shows
 
 A bowed board is the one failure the reprojection error does see. The calibration fits a flat board to corners that are not flat, and the misfit shows up as residual: 0.5 mm of bow cost 0.4 px, 1 mm cost 0.8 px.
 
@@ -112,7 +122,7 @@ A print that "looks fine" at 0.4 px on a low-resolution camera carries the same 
 
 ## Can the calibration fix the board?
 
-OpenCV's `calibrateCameraRO` (the object-releasing method) estimates the board's real 3D shape together with the camera. We ran it on the same data:
+OpenCV's `calibrateCameraRO` (the object-releasing method) estimates the board's real 3D shape together with the camera. We ran it on the same setup, 15 sets of views each, which is why the standard columns differ slightly from the first table:
 
 | Real board | RMS, standard | Focal length, standard | RMS, RO | Focal length, RO | Edge error, RO |
 |---|---|---|---|---|---|
@@ -178,12 +188,26 @@ That is where a rigid board with a measured geometry takes the three failures ab
 
 Our [composite boards](/targets/collection/composite-boards/) are UV-printed on aluminum composite and measured before they ship; the [substrate guide](/calibacademy/composite-ceramic-or-glass/) explains when ceramic or glass is worth the step up.
 
+## What this test is not
+
+It is a simulation. The corners are projected through a known camera and moved by Gaussian noise; no print was photographed and no real sheet was measured. The bow, dome and cockle are ideal shapes, where a real sheet is less regular.
+
+It is one camera and one board size: a 5 MP sensor with a 12 mm lens, a 1.3 MP version of it, and an A4 grid. A wide-angle or fisheye lens, a larger print and a ChArUco board seen only in part were not tested.
+
+The edge error compares the two models at the frame corners as they are, without first turning one camera to match the other.
+
+That makes it larger than the aligned comparison in our [board-motion test](/calibacademy/how-still-calibration-board/), so compare its sizes within this page, not across pages.
+
 ## Method
 
-The test projects the deformed board through the true camera, adds Gaussian noise and calibrates with `cv2.calibrateCamera` and the standard five-parameter distortion model, OpenCV 5.0. Write to hello@calib.tools if you want the scripts.
+The test projects the deformed board through the true camera, adds Gaussian noise and calibrates with `cv2.calibrateCamera` and the standard five-parameter distortion model, with OpenCV 5.0.0.
+
+The scripts and their output are public: [printed-target-sim.py](https://github.com/calibtools/calibtools-site/blob/main/docs/content/experiments/printed-target-sim.py) makes the first two tables.
+
+[ro-check.py](https://github.com/calibtools/calibtools-site/blob/main/docs/content/experiments/ro-check.py) and [ro-varying.py](https://github.com/calibtools/calibtools-site/blob/main/docs/content/experiments/ro-varying.py) make the third.
+
+Every number on this page is checked against [their saved output](https://github.com/calibtools/calibtools-site/tree/main/docs/content/experiments/printed-target-results).
 
 Bow keeps the arc length of the sheet; a print that bows also gets very slightly shorter in projection, which is included.
 
-The paper coefficients are typical values for machine-made paper from the dimensional-stability literature (coefficient of moisture expansion, valid from 0 to 65 % RH); the 94–96 % figure is the usual result of fit-to-page printing on A4 or Letter.
-
-Your paper, printer and room will differ, which is why the checks above measure your print rather than assume it.
+The paper coefficients are typical values for machine-made paper, valid from 0 to 65 % RH. Your paper, printer and room will differ, which is why the checks above measure your print rather than assume it.

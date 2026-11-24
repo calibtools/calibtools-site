@@ -2,15 +2,15 @@
 title: "Reprojection error: what it tells you"
 description: "Reprojection error explained: how RMS is computed, what counts as good, why a low value can hide a wrong model, and the per-view and radius checks that show it."
 date: 2026-11-07
-updated: 2026-11-15
+updated: 2026-11-23
 readingTime: "12 min"
 keyRule: "RMS is measured only where the board was. Look at the error per view and per image radius, and verify the model where it will be used, not where it was fitted."
-related: ["calibration-target-size", "opencv-camera-calibration", "printed-target-costs-half-a-pixel"]
+related: ["calibration-target-size", "opencv-camera-calibration", "printed-target-costs-half-a-pixel", "how-still-calibration-board"]
 products: ["charuco-composite", "charuco-ceramic"]
 sampleFiles: []
 faq:
   - q: "What is a good reprojection error?"
-    a: "For a rigid board, a calibrated lens at its working focus and 15 or more views, 0.1 to 0.3 px RMS is typical. 0.3 to 0.5 px is usable; above that, look for a bad view, a bent board or motion blur. The number depends on resolution, so quote it with the image size."
+    a: "For a rigid board, a calibrated lens at its working focus and 15 or more views, 0.1 to 0.3 px RMS is typical. 0.3 to 0.5 px is usable; above that, look for a bad view, a bent board or a board that moved during the frame. The number depends on resolution, so quote it with the image size."
   - q: "Can a low reprojection error still mean a bad calibration?"
     a: "Yes. The error is averaged over the corners that were detected. If no corners reached the frame edges, or if the model has more parameters than the views constrain, the fit is good where it was measured and wrong everywhere else."
   - q: "Should I use the rational or thin-prism distortion model?"
@@ -86,7 +86,9 @@ The overall RMS moved by 0.07 px. The per-view errors told the story: fourteen v
 
 ## Check 1: error per view
 
-`calibrateCamera` returns the pose of every view, so you can compute the error per view yourself. One view far above the rest is a frame to drop: motion blur, the board moved, a reflection, a mis-detected ID.
+`calibrateCamera` returns the pose of every view, so you can compute the error per view yourself. One view far above the rest is a frame to drop: the board moved during the frame, a reflection, a mis-detected ID.
+
+The image can look sharp and still be the bad one; our [board-motion test](/calibacademy/how-still-calibration-board/) shows how.
 
 ```python
 import cv2
@@ -158,7 +160,7 @@ That is single-corner precision. A measurement across the frame depends on how w
 |---|---|---|
 | RMS fine, straight lines bend after undistortion | Board never reached the edges | More views at edges and corners; see the [target size guide](/calibacademy/calibration-target-size/) |
 | RMS fine, distances off by a constant factor | Wrong square size in the board definition | Measure the printed board; set `squareLength` in meters or millimeters consistently |
-| One view at 3× the others | Motion blur, moved board, reflection, ID mis-read | Drop it and recalibrate |
+| One view at 3× the others | Board moved during the frame, reflection, ID mis-read | Drop it and recalibrate |
 | Residual grows with radius | Model too simple or no edge coverage | Edge views first; add k3 only if the trend remains |
 | RMS drops when adding rational terms, verification gets worse | Over-parameterized | Return to the five-parameter model |
 | RMS 0.5 px or more with every view similar | Board not flat, or printed and scaled | Rigid board; measure the print |

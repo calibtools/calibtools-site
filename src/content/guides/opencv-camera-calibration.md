@@ -2,10 +2,10 @@
 title: "Camera calibration with OpenCV: step by step"
 description: "Calibrate a camera with OpenCV and Python: pick and size a target, capture good images, detect corners, run calibrateCamera and check the result."
 date: 2026-11-07
-updated: 2026-11-12
+updated: 2026-11-23
 readingTime: "12 min"
 keyRule: "Fill the image corners with board views, keep focus and zoom fixed, and judge the result by per-view error, not the overall RMS alone."
-related: ["calibration-target-size", "reprojection-error", "charuco-vs-checkerboard-vs-aprilgrid", "corner-detection-troubleshooting", "thermal-camera-geometric-calibration", "tof-depth-camera-calibration", "line-scan-camera-calibration", "in-cabin-850-940nm-camera-calibration"]
+related: ["calibration-target-size", "reprojection-error", "how-still-calibration-board", "charuco-vs-checkerboard-vs-aprilgrid", "corner-detection-troubleshooting", "thermal-camera-geometric-calibration", "tof-depth-camera-calibration", "line-scan-camera-calibration", "in-cabin-850-940nm-camera-calibration"]
 products: ["charuco-composite", "charuco-ceramic", "checkerboard-composite"]
 sampleFiles: []
 faq:
@@ -31,11 +31,11 @@ This guide walks through the whole job in OpenCV with Python: choosing and sizin
 
 `cv2.calibrateCamera` returns three things:
 
-- **Camera matrix** `K` — focal lengths `fx`, `fy` and principal point `cx`, `cy`, all in pixels.
+- **Camera matrix** `K`: focal lengths `fx`, `fy` and principal point `cx`, `cy`, all in pixels.
 
-- **Distortion coefficients** — by default `k1, k2, p1, p2, k3`: radial (barrel or pincushion) and tangential distortion.
+- **Distortion coefficients**: by default `k1, k2, p1, p2, k3`: radial (barrel or pincushion) and tangential distortion.
 
-- **Pose per image** — rotation and translation of the board in each view, plus the RMS reprojection error over all views.
+- **Pose per image**: rotation and translation of the board in each view, plus the RMS reprojection error over all views.
 
 With `K` and the distortion coefficients you can undistort images, measure in millimeters, estimate object poses with `solvePnP`, and feed stereo calibration.
 
@@ -63,11 +63,11 @@ For repeatable results, especially below 0.2 px, use a rigid board made to known
 
 The images decide the result. Before you start, fix the camera settings you will use in production:
 
-- **Focus and zoom fixed** — turn autofocus off. Any change afterwards invalidates the calibration.
+- **Focus and zoom fixed**: turn autofocus off. Any change afterwards invalidates the calibration.
 
-- **Full resolution** — calibrate at the resolution you will run at, or rescale `K` correctly.
+- **Full resolution**: calibrate at the resolution you will run at, or rescale `K` correctly.
 
-- **Sharp, evenly lit images** — short exposure, no motion blur, no glare on the board.
+- **Sharp, evenly lit images, board at rest**: short exposure, no glare, and a board that is not moving when the frame is taken. With a rolling shutter a moving board gives a sharp but sheared image; see [how still the board has to be](/calibacademy/how-still-calibration-board/).
 
 Then take 15 to 30 views and vary them deliberately:
 
@@ -152,13 +152,13 @@ for i, (o, p) in enumerate(zip(obj_all, img_all)):
 
 Then run a few sanity checks:
 
-- **A few views much worse than the rest** — usually blur or a bad detection. Remove them and calibrate again.
+- **A few views much worse than the rest**: usually a bad detection, glare, or a board that moved during the frame. Remove them and calibrate again.
 
-- **Principal point** — `cx`, `cy` should sit near the image center, typically within a few percent of the width.
+- **Principal point**: `cx`, `cy` should sit near the image center, typically within a few percent of the width.
 
-- **fx and fy** — nearly equal for square pixels.
+- **fx and fy**: nearly equal for square pixels.
 
-- **Straight lines** — undistort an image of a straight edge and check it is straight right out to the corners.
+- **Straight lines**: undistort an image of a straight edge and check it is straight right out to the corners.
 
 With a rigid board and a sharp lens, an RMS well under 0.5 px is common. Above 1 px, look for blur, a bent or mis-measured target, or poor coverage of the image corners.
 
@@ -182,7 +182,7 @@ A calibration that runs without an error can still be wrong. Work through these 
 
 1. **Coverage.** Plot where the detected corners fall in the image. If the corners of the frame are empty, the distortion there is a guess. Add views at the edges and corners, tilted.
 
-2. **Sharpness.** Open the images at 100 %. Motion blur and glare move the detected corners; drop those views.
+2. **Sharpness.** Open the images at 100 %. Glare moves the detected corners and heavy blur loses them; drop those views. A sharp image does not prove the board was still: with a rolling shutter, [motion during readout](/calibacademy/how-still-calibration-board/) leaves no blur.
 
 3. **The board.** Measure one printed square and compare it with the size in your code. Lay a straightedge across the board: in [our test with a printed board](/calibacademy/printed-target-costs-half-a-pixel/) a bow of 1 mm made the focal length 2.2 % short.
 

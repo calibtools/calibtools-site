@@ -338,13 +338,13 @@ Before the intrinsics go into the product:
 
 ## Next steps
 
-- [Camera calibration with OpenCV](/calibacademy/opencv-camera-calibration/) — the full intrinsics pipeline that step 4 condenses, including the standard model for narrower lenses.
+- [Camera calibration with OpenCV](/calibacademy/opencv-camera-calibration/): the full intrinsics pipeline that step 4 condenses, including the standard model for narrower lenses.
 
-- [Why your board is not detected](/calibacademy/corner-detection-troubleshooting/) — contrast, blur and resolution limits of the detectors, with numbers.
+- [Why your board is not detected](/calibacademy/corner-detection-troubleshooting/): contrast, blur and resolution limits of the detectors, with numbers.
 
-- [How big should your target be?](/calibacademy/calibration-target-size/) — square and marker size for a given sensor, lens and distance.
+- [How big should your target be?](/calibacademy/calibration-target-size/): square and marker size for a given sensor, lens and distance.
 
-- [ToF depth camera calibration](/calibacademy/tof-depth-camera-calibration/) — the same NIR illumination and the same marker-size limit, with a depth channel on top.
+- [ToF depth camera calibration](/calibacademy/tof-depth-camera-calibration/): the same NIR illumination and the same marker-size limit, with a depth channel on top.
 
 - Our [NIR calibration targets](/targets/nir-calibration-target/) keep their contrast at 850 and 940 nm on a matte surface; tell us the wavelength, lens and working distance and we size the markers for the far end of your cabin.
 

@@ -21,7 +21,7 @@ faq:
 
 ## Why boards in one rig need distinct ID ranges
 
-When you use multiple calibration boards simultaneously — for example, in a multi-camera rig or a large-volume calibration setup — every ArUco marker or AprilTag across all boards must have a unique ID.
+When you use multiple calibration boards simultaneously, for example in a multi-camera rig or a large-volume calibration setup, every ArUco marker or AprilTag across all boards must have a unique ID.
 
 If two boards share the same IDs, the detector cannot tell which board a marker belongs to, and your calibration will fail silently or produce incorrect results.
 
@@ -77,7 +77,7 @@ tagCols: 6
 tagSize: 0.030000
 tagSpacing: 0.300000
 
-# board2.yaml — same geometry, different start ID
+# board2.yaml: same geometry, different start ID
 target_type: 'aprilgrid'
 tagRows: 6
 tagCols: 6
@@ -86,7 +86,7 @@ tagSpacing: 0.300000
 # Start at tag 36 (6×6 = 36 tags per board)
 ```
 
-Kalibr doesn't have a native `tagStartId` field — you need to print the board with the correct IDs using the generator.
+Kalibr doesn't have a native `tagStartId` field. You need to print the board with the correct IDs using the generator.
 
 ## Using the set mode in our generator
 
