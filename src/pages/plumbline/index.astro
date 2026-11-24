@@ -72,7 +72,7 @@ const faqLd = {
   jsonLd={[bcLd, appLd, faqLd]}
 >
   {/* ── Hero ── */}
-  <section class="container-x grid grid-cols-1 items-end gap-x-14 gap-y-10 pt-[var(--section-y)] pb-[var(--section-y)] lg:grid-cols-[minmax(0,7fr)_minmax(0,4fr)]" data-rows="layout">
+  <section class="container-x grid grid-cols-1 items-start gap-x-14 gap-y-10 py-10 md:py-14 lg:grid-cols-[minmax(0,7fr)_minmax(0,4fr)]" data-rows="layout">
     <div class="flex min-w-0 flex-col gap-6">
       <span class="eyebrow">{software.name} · camera calibration software</span>
       <h1 class="h-display m-0 text-[36px] leading-[1.1] md:text-[56px]">Is your calibration as good as its error says?</h1>
@@ -107,10 +107,8 @@ const faqLd = {
       <div class="flex min-w-0 flex-col gap-5">
         <span class="section-no">Public beta</span>
         <span class="section-rule"></span>
-        <h2 class="m-0 text-[24px] font-semibold md:text-[28px]">What to know about version {RELEASE.version}</h2>
-        <p class="m-0 text-[17px] leading-[1.65] text-ink-muted">This is a public test version. Its results have been checked with rendered images whose true camera is known. Checks with photographs of real boards are under way. For work that matters, compare the result with a method you already trust.</p>
-        <p class="m-0 text-[15px] leading-relaxed text-ink-muted">The installers are not signed yet, so Windows and macOS ask before the first start. They were built and started on {RELEASE.builtOn}.</p>
-        <p class="m-0 text-[15px] leading-relaxed text-ink-muted">Found a problem? Write to <a href="mailto:hello@calib.tools">hello@calib.tools</a>, or use About, Report a problem in the app.</p>
+        <h2 class="m-0 text-[24px] font-semibold md:text-[28px]">Built for the people who make machines see</h2>
+        <p class="m-0 text-[17px] leading-[1.65] text-ink-muted">A machine that sees is only as good as its calibration, and checking one properly should not depend on your budget. That is why {software.name} costs nothing, runs on your own computer and sends nothing anywhere. Help us make it better.</p>
       </div>
       <div class="flex min-w-0 flex-col gap-5">
         <h3 class="m-0 text-[18px] font-semibold">The first time you open it</h3>
@@ -126,18 +124,18 @@ const faqLd = {
           ))}
         </div>
         <div id="notify" class="flex scroll-mt-24 flex-col gap-3 border-t border-line pt-5">
-          <p class="m-0 text-[15px] font-semibold">Hear about new versions</p>
+          <p class="m-0 text-[15px] font-semibold">Sign up and help improve {software.name}</p>
           <NewsletterForm
             client:load
             compact
             id="pl"
             tag={NOTIFY_TAG}
-            heading="Email for news about new versions"
+            heading="Email to sign up for the beta"
             note=""
-            button="Notify me"
-            done="Done. We email you when a new version is out."
+            button="Sign up"
+            done="Thank you. We email you when a new version is out."
           />
-          <p class="m-0 text-[13px] text-ink-muted">Optional. You do not need to sign up to download.</p>
+          <p class="m-0 text-[13px] leading-relaxed text-ink-muted">{software.name} is in beta, and what you tell us shapes the next version. Leave your email: we let you know when a new version is out and may ask how this one worked for you. We use it for nothing else.</p>
         </div>
       </div>
     </div>
@@ -283,6 +281,7 @@ const faqLd = {
           <dd class="m-0">
             <ul class="m-0 flex list-disc flex-col gap-1 pl-5 text-[15px] leading-relaxed text-ink-muted">
               {RELEASE.limits.map((it) => <li>{it}</li>)}
+              <li>Built and started on {RELEASE.builtOn}; older systems were not tried</li>
             </ul>
           </dd>
         </div>

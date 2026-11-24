@@ -52,15 +52,17 @@ describe('software (Plumbline single source)', () => {
     expect(src).not.toMatch(/0\.048|0\.116|149[89]\.\d|77\s*(&nbsp;)?%|\b0?7 and 18\b/);
   });
 
-  it('beta page says what a beta is, how to open an unsigned app, and that signing up is optional', () => {
+  it('beta page says what a beta is, how to open an unsigned app, and what the sign-up email is used for', () => {
     const src = readFileSync(page, 'utf-8');
-    expect(src).toContain('public test version');
-    expect(src).toContain('rendered images');
+    expect(src).toContain('Public beta');
+    // the page lists RELEASE.limits, which says what the beta was checked with
+    expect(src).toContain('RELEASE.limits');
+    expect(RELEASE.limits.join(' ')).toContain('rendered images');
     expect(src).toContain('Run anyway');
     expect(src).toContain('Open Anyway');
     expect(src).toContain('chmod +x');
     expect(src).not.toMatch(/right-click|Control-click/i); // no longer works on current macOS
-    expect(src).toContain('You do not need to sign up to download');
+    expect(src).toContain('We use it for nothing else');
   });
 
   it('page is written for users: no licence, source or progress talk', () => {
