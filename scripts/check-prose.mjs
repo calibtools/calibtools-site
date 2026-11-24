@@ -71,9 +71,6 @@ const ALLOWLIST = [
   'DAkkS-accredited laboratory',
   'DAkkS-calibrated',
   'certificate from a DAkkS-accredited laboratory',
-  // Owner decision 2026-11-22: the /plumbline/ badge reads "Coming soon". Only the constant's own line in
-  // src/lib/software.ts is allowed; the words stay banned everywhere else.
-  "COMING_SOON_LABEL = 'Coming soon'",
 ];
 
 /**
