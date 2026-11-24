@@ -3,7 +3,7 @@
  * choice allows analytics and a tag is configured (src/lib/consent.ts, src/lib/tags.ts).
  * Events say that something happened, not what was typed: no names, email addresses or messages.
  */
-export type TrackEvent = 'generate_lead' | 'add_to_cart' | 'file_download' | 'save_pattern';
+export type TrackEvent = 'generate_lead' | 'add_to_cart' | 'file_download' | 'save_pattern' | 'plumbline_download';
 
 type Value = string | number | boolean;
 

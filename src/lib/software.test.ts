@@ -52,6 +52,14 @@ describe('software (Plumbline single source)', () => {
     expect(src).not.toMatch(/0\.048|0\.116|149[89]\.\d|77\s*(&nbsp;)?%|\b0?7 and 18\b/);
   });
 
+  it('every installer link is counted: platform, file and version on the link, one plumbline_download event per click', () => {
+    const src = readFileSync(page, 'utf-8');
+    expect(src).toMatch(/href=\{fileUrl\(d\.main\)\}[^>]*data-download=\{d\.platform\} data-file=\{d\.main\.file\} data-version=\{RELEASE\.version\}/);
+    expect(src).toMatch(/href=\{fileUrl\(d\.other\)\}[^>]*data-download=\{d\.platform\} data-file=\{d\.other\.file\} data-version=\{RELEASE\.version\}/);
+    expect(src).toContain("querySelectorAll<HTMLAnchorElement>('a[data-download][data-file]')");
+    expect(src).toContain("track('plumbline_download', { platform: a.dataset.download, file_name: a.dataset.file, version: a.dataset.version })");
+  });
+
   it('beta page says what a beta is, how to open an unsigned app, and what the sign-up email is used for', () => {
     const src = readFileSync(page, 'utf-8');
     expect(src).toContain('Public beta');
@@ -153,5 +161,14 @@ describe('header navigation', () => {
     expect(col('Support')[0]).toEqual({ label: ACADEMY_NAME, href: '/calibacademy/' });
     expect(col('Tools').at(-1)).toEqual({ label: software.name, href: software.href });
     expect(footerGroups.flatMap((g) => g.items).some((i) => i.label === 'Guides')).toBe(false);
+  });
+
+  it('sample figures are those of the released build (v0.1.0-beta.1, OpenCV 5.0.0)', () => {
+    const run = JSON.parse(readFileSync('docs/plumbline/sample-figures/v0.1.0-beta.1-opencv-5.0.0.json', 'utf-8'));
+    expect(run.opencv).toBe('5.0.0');
+    for (const k of ['focalPx', 'rmsPx', 'corners', 'errorsPx', 'coverage'] as const) expect(SAMPLE[k]).toEqual(run[k]);
+    for (const k of ['focalPx', 'rmsPx', 'corners', 'errorsPx'] as const) expect(SAMPLE.kept[k]).toEqual(run.kept[k]);
+    const ros: string = run.kept.cameraInfo;
+    expect(ros.slice(ros.indexOf('image_width'), ros.indexOf('\nrectification_matrix'))).toBe(SAMPLE.kept.cameraInfo);
   });
 });

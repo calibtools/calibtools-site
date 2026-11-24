@@ -91,9 +91,9 @@ const faqLd = {
       <ul class="m-0 flex list-none flex-col gap-4 p-0">
         {downloads.map((d) => (
           <li class="flex flex-col gap-1.5">
-            <a href={fileUrl(d.main)} class="btn-md btn-primary w-full normal-case tracking-normal" data-download={d.platform}>Download for {d.main.label}</a>
+            <a href={fileUrl(d.main)} class="btn-md btn-primary w-full normal-case tracking-normal" data-download={d.platform} data-file={d.main.file} data-version={RELEASE.version}>Download for {d.main.label}</a>
             <span class="text-[13px] leading-snug text-ink-muted">
-              {d.main.fits}, {sizeMb(d.main.bytes)}{d.other && <>. Also: <a href={fileUrl(d.other)} class="whitespace-nowrap" data-download={d.platform}>{d.other.label}</a> ({sizeMb(d.other.bytes)})</>}
+              {d.main.fits}, {sizeMb(d.main.bytes)}{d.other && <>. Also: <a href={fileUrl(d.other)} class="whitespace-nowrap" data-download={d.platform} data-file={d.other.file} data-version={RELEASE.version}>{d.other.label}</a> ({sizeMb(d.other.bytes)})</>}
             </span>
           </li>
         ))}
@@ -315,4 +315,14 @@ const faqLd = {
       <p class="m-0 max-w-[760px] text-[15px] text-ink-muted">Already have a calibration? The <a href="/tools/quality/">calibration quality analyzer</a> checks it in your browser.</p>
     </div>
   </section>
+  <script>
+    import { track } from '@/lib/track';
+    // One event per click on an installer link, so downloads can be counted in GA4 (sent only when
+    // the visitor's choice allows analytics; see src/lib/track.ts).
+    document.querySelectorAll<HTMLAnchorElement>('a[data-download][data-file]').forEach((a) => {
+      a.addEventListener('click', () => {
+        track('plumbline_download', { platform: a.dataset.download, file_name: a.dataset.file, version: a.dataset.version });
+      });
+    });
+  </script>
 </Base>

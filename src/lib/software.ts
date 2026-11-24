@@ -128,9 +128,10 @@ export const NOTIFY_TAG = 'notify:plumbline';
  * Images 07 and 18 are spoiled on purpose: the board moves 2 mm while the rows of the image are read
  * out. The top-level values are the first calibration, with all 24 images; `kept` is the calibration
  * after those two are left out.
- * Worked out with the app's own code on 2026-11-23 (calibtools/plumbline, sample-with-spoiled-images,
- * OpenCV 5.1.0): per-image RMS error in px, corners counted per cell of the coverage map, and the
- * ROS export. The figures on /plumbline/ are drawn from these values; do not edit them by hand.
+ * Worked out with the released code (calibtools/plumbline v0.1.0-beta.1, OpenCV 5.0.0, the version in
+ * the installers) by docs/plumbline/sample-figures/sample_figures.py; its output is saved beside it and
+ * software.test.ts checks these values against it. cameraInfo is the ROS export up to the distortion
+ * coefficients. The figures on /plumbline/ are drawn from these values; do not edit them by hand.
  */
 export const SAMPLE = {
   trueFocalPx: 1500,
@@ -146,7 +147,7 @@ export const SAMPLE = {
     rmsPx: 0.048,
     corners: 1497,
     errorsPx: [0.0192, 0.0581, 0.0469, 0.0622, 0.037, 0.0393, 0.0577, 0.0618, 0.0509, 0.0214, 0.0545, 0.0206, 0.0516, 0.0203, 0.0653, 0.0328, 0.036, 0.0334, 0.0516, 0.0613, 0.0489, 0.0614],
-    cameraInfo: "image_width: 1280\nimage_height: 960\ncamera_name: camera\ncamera_matrix:\n  rows: 3\n  cols: 3\n  data: [1499.5475706376997, 0.0, 639.824967856241, 0.0, 1499.5528430324414, 480.3392134285066, 0.0, 0.0, 1.0]\ndistortion_model: plumb_bob\ndistortion_coefficients:\n  rows: 1\n  cols: 5\n  data: [-0.12068437643973873, 0.10299901617553982, 0.000504761913876782, -0.0003330052302586648, 0.0]",
+    cameraInfo: "image_width: 1280\nimage_height: 960\ncamera_name: camera\ncamera_matrix:\n  rows: 3\n  cols: 3\n  data: [1499.5475706376997, 0.0, 639.8249678562416, 0.0, 1499.5528430324414, 480.3392134285066, 0.0, 0.0, 1.0]\ndistortion_model: plumb_bob\ndistortion_coefficients:\n  rows: 1\n  cols: 5\n  data: [-0.12068437643973885, 0.10299901617553887, 0.0005047619138768041, -0.0003330052302585554, 0.0]",
   },
 } as const;
 
