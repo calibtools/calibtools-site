@@ -15,6 +15,12 @@ describe('track', () => {
     track('file_download', { file_extension: 'pdf', pattern_type: 'ChArUco' });
     expect(gtag).toHaveBeenCalledWith('event', 'file_download', { file_extension: 'pdf', pattern_type: 'ChArUco' });
   });
+  it('sends the Plumbline download event with platform, file and version', () => {
+    const gtag = vi.fn();
+    vi.stubGlobal('window', { gtag });
+    track('plumbline_download', { platform: 'macOS', file_name: 'Plumbline-0.1.0-beta.1-macos-arm64.dmg', version: '0.1.0 beta 1' });
+    expect(gtag).toHaveBeenCalledWith('event', 'plumbline_download', { platform: 'macOS', file_name: 'Plumbline-0.1.0-beta.1-macos-arm64.dmg', version: '0.1.0 beta 1' });
+  });
   it('never throws into the page', () => {
     vi.stubGlobal('window', { gtag: () => { throw new Error('blocked'); } });
     expect(() => track('add_to_cart')).not.toThrow();
