@@ -1,6 +1,7 @@
 import type { PatternSpec } from './patterns';
 import { idRange, type IdRangeResult } from './idRange';
 import { BRAND_NAME, SITE_URL } from './exportBrand';
+import { opencvJson } from './exportConfig';
 
 export interface SetBoard {
   index: number;
@@ -18,7 +19,7 @@ export function computeSetBoards(
   count: number,
   overrideStartIds?: number[],
 ): SetBoard[] {
-  const range = idRange(baseSpec);
+  const range = idRange({ ...baseSpec, tagIdList: undefined });
   if (!range) return [];
 
   const markersPerBoard = range.count;
@@ -26,7 +27,8 @@ export function computeSetBoards(
 
   for (let k = 0; k < count; k++) {
     const startId = overrideStartIds?.[k] ?? (baseSpec.startId + k * markersPerBoard);
-    const spec = { ...baseSpec, startId };
+    // A set numbers its boards one after the other, so a typed ID list does not carry over to the boards.
+    const spec = { ...baseSpec, startId, tagIdList: undefined };
     const boardRange = idRange(spec)!;
     boards.push({ index: k, startId, idRange: boardRange, spec });
   }
@@ -34,16 +36,17 @@ export function computeSetBoards(
   return boards;
 }
 
+/** What every board of the set shares, as opencv.json states it: no IDs, no file header. */
+function boardFields(spec: PatternSpec): Record<string, unknown> {
+  const { _generator, start_id, ids, id_range, axes, ...shared } = JSON.parse(opencvJson(spec));
+  return shared;
+}
+
 /** Build set-manifest.json string. */
 export function buildSetManifest(baseSpec: PatternSpec, boards: SetBoard[]): string {
   return JSON.stringify({
     _generator: { name: BRAND_NAME, url: `https://${SITE_URL}`, generated: new Date().toISOString().slice(0, 10) },
-    pattern: baseSpec.type,
-    rows: baseSpec.rows,
-    cols: baseSpec.cols,
-    square_mm: baseSpec.square,
-    marker_mm: baseSpec.marker,
-    dictionary: baseSpec.dict,
+    ...boardFields(baseSpec),
     board_count: boards.length,
     boards: boards.map(b => ({
       index: b.index,

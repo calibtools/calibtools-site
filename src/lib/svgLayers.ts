@@ -162,10 +162,7 @@ function layoutBrandFooter(ctx: SvgContext): string {
   const { spec: s } = ctx;
   const b = ctx.brand!;
   const parts: string[] = [];
-  const summary = patternSummary({
-    type: s.type, rows: s.rows, cols: s.cols, square: s.square,
-    marker: s.marker, dict: s.dict, startId: s.startId,
-  });
+  const summary = patternSummary(s);
   const provenance = provenanceLine('generator');
 
   parts.push('<g id="calibtools-brand">');
@@ -184,10 +181,7 @@ function legacyFullBrandFooter(ctx: SvgContext, footerY: number): string {
   const { spec: s, pw, ox, bw } = ctx;
   const parts: string[] = [];
   const wmHeight = 5;
-  const summary = patternSummary({
-    type: s.type, rows: s.rows, cols: s.cols, square: s.square,
-    marker: s.marker, dict: s.dict, startId: s.startId,
-  });
+  const summary = patternSummary(s);
   const provenance = provenanceLine('generator');
   parts.push('<g id="calibtools-brand">');
   parts.push(wordmarkSvgGroup({ x: ox, y: footerY, heightMm: wmHeight }));
@@ -203,10 +197,7 @@ function legacyCompactBrandFooter(ctx: SvgContext, footerY: number): string {
   const { spec: s, ox } = ctx;
   const parts: string[] = [];
   const wmHeight = 3;
-  const summary = patternSummary({
-    type: s.type, rows: s.rows, cols: s.cols, square: s.square,
-    marker: s.marker, dict: s.dict, startId: s.startId,
-  });
+  const summary = patternSummary(s);
   const provenance = provenanceLine('generator');
   parts.push('<g id="calibtools-brand">');
   parts.push(wordmarkSvgGroup({ x: ox, y: footerY, heightMm: wmHeight }));

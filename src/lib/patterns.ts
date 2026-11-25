@@ -23,8 +23,8 @@ export interface PatternSpec {
   scaleBar: boolean;
 
   // Checkerboard options (Step 1)
-  finderMarkers?: boolean;   // OpenCV CALIB_CB_MARKER layout — 3 circles
-  radonCheckers?: boolean;   // Radon (rounded) checkers
+  finderMarkers?: boolean;   // three marked cells in the middle, for cv.findChessboardCornersSB with CALIB_CB_MARKER
+  radonCheckers?: boolean;   // OpenCV radon checkerboard: rounded outline, square inner corners
   invert?: boolean;          // swap black/white
 
   // ChArUco options (Step 2)

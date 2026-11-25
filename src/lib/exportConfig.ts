@@ -4,9 +4,11 @@
  */
 import type { PatternSpec } from './patterns';
 import { BRAND_NAME, SITE_URL, patternSummary, provenanceLine } from './exportBrand';
-import { idRange } from './idRange';
+import { idRange, markerIds, idsAreOneRun } from './idRange';
+import { sheetSource, sheetMarkerSize } from './renderMarkerSheet';
 import { innerCorners } from './patterns';
 import { isKalibrFrame } from './renderAprilGrid';
+import { finderMarkerCells } from './renderCheckerboard';
 
 function brandHeader(s: PatternSpec, commentChar = '#'): string {
   const summary = patternSummary(s);
@@ -18,18 +20,38 @@ function brandHeader(s: PatternSpec, commentChar = '#'): string {
   ].join('\n');
 }
 
+/**
+ * Why Kalibr cannot use this target, or null when it can. Kalibr reads three targets: aprilgrid, checkerboard
+ * and symmetric circlegrid.
+ *
+ * Its AprilGrid detector is built for tag36h11 with a two-bit black border and takes neither as a setting
+ * (GridCalibrationTargetAprilgrid.cpp: AprilTags::tagCodes36h11, blackTagBorder = 2). It finds a tag's place
+ * on the grid from its ID and drops every ID from rows x cols upward (computeObservation:
+ * `iter->id >= size() / 4`), so the IDs have to run from 0 with none left out.
+ * It finds a checkerboard with cv::findChessboardCorners, which does not read OpenCV's radon checkerboard
+ * reliably (rounded outline; made for findChessboardCornersSB).
+ */
+export function kalibrUnsupported(s: PatternSpec): string | null {
+  switch (s.type) {
+    case 'Checkerboard':
+      return s.radonCheckers ? 'Kalibr finds a checkerboard with findChessboardCorners, which does not read a radon checkerboard reliably.' : null;
+    case 'AprilGrid (Kalibr)': {
+      const family = s.aprilFamily ?? '36h11';
+      if (family !== '36h11') return `Kalibr reads tag36h11 only; this grid is tag${family}.`;
+      if ((s.borderBits ?? 2) !== 2) return 'Kalibr expects a two-bit black border around each tag; this grid has one bit.';
+      const ids = markerIds(s) ?? [];
+      return ids[0] === 0 && idsAreOneRun(ids) ? null : 'Kalibr places each tag by its ID, so the IDs have to run from 0 with none left out.';
+    }
+    case 'Symmetric circles':
+      return (s.circleSpacingX ?? s.square) === (s.circleSpacingY ?? s.square) ? null : 'Kalibr takes one spacing for both directions.';
+    default:
+      return `Kalibr has no target model for ${s.type}. It reads AprilGrid, checkerboard and symmetric circle grid targets.`;
+  }
+}
+
 /** Pattern types Kalibr can use directly (aprilgrid, checkerboard, symmetric circlegrid). */
 export function kalibrSupported(s: PatternSpec): boolean {
-  if (s.type === 'Checkerboard') return true;
-  // Kalibr's AprilGrid detector is built for tag36h11 with a two-bit black border and takes neither as a setting
-  // (GridCalibrationTargetAprilgrid.cpp: AprilTags::tagCodes36h11, blackTagBorder = 2).
-  if (s.type === 'AprilGrid (Kalibr)') return (s.aprilFamily ?? '36h11') === '36h11' && (s.borderBits ?? 2) === 2;
-  if (s.type === 'Symmetric circles') {
-    const sx = s.circleSpacingX ?? s.square;
-    const sy = s.circleSpacingY ?? s.square;
-    return sx === sy;
-  }
-  return false;
+  return kalibrUnsupported(s) === null;
 }
 
 /**
@@ -44,9 +66,8 @@ export function kalibrSupported(s: PatternSpec): boolean {
  * Kalibr has no ChArUco, ArUco or HALCON target model; those throw.
  */
 export function kalibrYaml(s: PatternSpec): string {
-  if (!kalibrSupported(s)) {
-    throw new Error(`Kalibr has no target model for ${s.type}. Use a tag36h11 AprilGrid with a two-bit border, a checkerboard or a symmetric circle grid.`);
-  }
+  const why = kalibrUnsupported(s);
+  if (why) throw new Error(why);
   const lines: string[] = [brandHeader(s), ''];
 
   if (s.type === 'Checkerboard') {
@@ -96,7 +117,7 @@ export function ros2Unsupported(s: PatternSpec): string | null {
   const sx = s.circleSpacingX ?? s.square, sy = s.circleSpacingY ?? s.square;
   switch (s.type) {
     case 'Checkerboard':
-      return null;
+      return s.radonCheckers ? 'ROS camera_calibration finds a chessboard with findChessboardCorners, which does not read a radon checkerboard reliably. Use findChessboardCornersSB in OpenCV.' : null;
     case 'ChArUco':
       if (!rosArucoDict(s.dict)) return `ROS camera_calibration has no dictionary ${s.dict}.`;
       if (s.startId !== 0) return 'ROS camera_calibration builds its ChArUco board with marker IDs from 0; this board starts at another ID.';
@@ -162,7 +183,7 @@ export function ros2Yaml(s: PatternSpec): string {
     const range = idRange(s);
     if (range) lines.push(`  # id_range: ${range.min}-${range.max} (${range.count} markers)`);
   }
-  if (s.finderMarkers) lines.push('# Finder markers are printed on the board; camera_calibration ignores them.');
+  if (s.type === 'Checkerboard' && finderMarkerCells(s)) lines.push('# Finder markers are printed on the board; camera_calibration ignores them.');
   lines.push('');
   return lines.join('\n') + '\n';
 }
@@ -247,10 +268,21 @@ export function opencvJson(s: PatternSpec): string {
     // Circle grids: the pitch between lattice positions along x.
     square_mm: circles ? sx : s.square,
   };
-  if (aruco) {
+  const ids = markerIds(s);
+  const listed = !!ids && !idsAreOneRun(ids); // IDs typed in as a list: there is no single start ID
+  if (s.type === 'Marker sheet') {
+    // A sheet has no squares; with a tag family chosen its markers are OpenCV's DICT_APRILTAG_<family>.
+    const source = sheetSource(s);
+    obj.square_mm = undefined;
+    obj.marker_mm = sheetMarkerSize(s);
+    obj.dictionary = source.name;
+    obj.border_bits = source.borderBits; // cv.aruco.DetectorParameters.markerBorderBits
+  } else if (aruco) {
     obj.marker_mm = s.marker;
     obj.dictionary = s.dict;
-    obj.start_id = s.startId;
+  }
+  if (aruco && ids) {
+    if (listed) obj.ids = ids; else obj.start_id = ids[0];
   }
   if (s.type === 'Checkerboard') obj.opencv_pattern_size = [s.cols - 1, s.rows - 1]; // findChessboardCorners: interior corners, (columns, rows)
   if (s.type === 'ChArUco') obj.opencv_board_size = [s.cols, s.rows]; // CharucoBoard: squares, (columns, rows)
@@ -265,7 +297,7 @@ export function opencvJson(s: PatternSpec): string {
     obj.tag_spacing = ratio;                 // Kalibr tagSpacing: gap / tag side
     obj.tag_gap_mm = Math.round(s.square * ratio * 1e6) / 1e6;
     obj.border_bits = s.borderBits ?? 2;
-    obj.start_id = s.startId;
+    if (ids && listed) obj.ids = ids; else obj.start_id = ids?.[0] ?? s.startId;
     obj.id_order = 'first ID at the bottom-left tag, left to right, then upward (Kalibr)';
     if (s.symmetricCorners) obj.corner_squares = true;
   }
@@ -284,11 +316,20 @@ export function opencvJson(s: PatternSpec): string {
   if (range) {
     obj.id_range = [range.min, range.max];
   }
-  if (s.finderMarkers) obj.marker = true;
+  // Finder markers: three marked cells, (column, row) from the top-left square; detect with CALIB_CB_MARKER.
+  const markerCells = s.type === 'Checkerboard' ? finderMarkerCells(s) : null;
+  if (markerCells) {
+    obj.marker = true;
+    obj.marker_cells = markerCells;
+    obj.opencv_flags = 'CALIB_CB_MARKER'; // cv.findChessboardCornersSB
+  }
   // OpenCV <= 4.5 ChArUco layout: call board.setLegacyPattern(True) in OpenCV >= 4.6. It only differs on boards with an even number of rows.
   if (s.legacyLayout && s.type === 'ChArUco') obj.legacy_pattern = true;
-  if (s.radonCheckers) obj.radon = true;
-  if (s.invert) obj.inverted = true;
+  if (s.radonCheckers && s.type === 'Checkerboard') {
+    obj.radon = true;
+    obj.opencv_function = 'findChessboardCornersSB'; // the classic findChessboardCorners does not read the rounded outline reliably
+  }
+  if (s.invert && (s.type === 'Checkerboard' || circles)) obj.inverted = true;
   if (s.showAxes !== false) {
     const isKalibr = isKalibrFrame(s);
     obj.axes = {

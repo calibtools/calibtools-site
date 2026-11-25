@@ -3,7 +3,8 @@
  * laid out as ArUco markers with a one-cell border. They were once drawn as solid black squares.
  */
 import { describe, it, expect } from 'vitest';
-import { renderCharucoSvg, renderArucoGridSvg, charucoMarkers, markerCapacity } from './renderCharuco';
+import { renderCharucoSvg, renderArucoGridSvg, charucoMarkers } from './renderCharuco';
+import { markerCapacity } from './idRange';
 import { getMarkerDict, getAprilFamily, decodeAprilBits, decodeMarkerBits, getArUcoDict, largerDictFor } from './dicts/dicts';
 import { CATALOG, specFromEntry } from './catalogPatterns';
 import { GENERATOR_DEFAULT } from './patternLink';
@@ -144,3 +145,18 @@ describe('largerDictFor', () => {
     expect(c.bits.slice(0, 100)).toEqual(b.bits);
   });
 });
+
+describe('markerCapacity: AprilGrid tag families run out like dictionaries', () => {
+  const grid = { type: 'AprilGrid (Kalibr)', rows: 6, cols: 6, square: 30, marker: 0, dict: '', paper: 'A3', startId: 0, scaleBar: true } as const;
+  it('tag16h5 has 30 tags: a 6 x 6 grid is short, a 5 x 6 grid fits', () => {
+    expect(markerCapacity({ ...grid, aprilFamily: '16h5' })).toEqual({ firstId: 0, lastId: 35, count: 30, short: true });
+    expect(markerCapacity({ ...grid, aprilFamily: '16h5', rows: 5 })).toEqual({ firstId: 0, lastId: 29, count: 30, short: false });
+    expect(markerCapacity({ ...grid, aprilFamily: '16h5', rows: 5, startId: 1 })!.short).toBe(true);
+  });
+  it('tag25h9 has 35 tags; tag36h11 (the default) has 587', () => {
+    expect(markerCapacity({ ...grid, aprilFamily: '25h9' })).toMatchObject({ count: 35, short: true });
+    expect(markerCapacity({ ...grid, aprilFamily: '25h9', rows: 5, cols: 7 })).toMatchObject({ count: 35, short: false });
+    expect(markerCapacity(grid)).toMatchObject({ count: 587, short: false });
+  });
+});
+

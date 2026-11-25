@@ -6,7 +6,7 @@ import { exportPdf, exportTiledPdf } from '@/lib/exportPdf';
 import { exportPng } from '@/lib/exportPng';
 import { exportDxf } from '@/lib/exportDxf';
 import { matchCatalog, productUrlFor, specFromEntry, quoteSummary } from '@/lib/catalogPatterns';
-import { kalibrYaml, kalibrSupported, ros2Yaml, ros2Supported, halconCode, halconSupported, opencvJson } from '@/lib/exportConfig';
+import { kalibrYaml, kalibrSupported, kalibrUnsupported, ros2Yaml, ros2Supported, halconCode, halconSupported, opencvJson } from '@/lib/exportConfig';
 import { exportZip } from '@/lib/exportZip';
 import { patternSummary } from '@/lib/brand';
 import { computeSetBoards, buildSetManifest, setBoardFilename } from '@/lib/exportSet';
@@ -15,7 +15,9 @@ import { LEAD_TIME } from '@/lib/claims';
 import { GENERATOR_DEFAULT, specFromParams, specToParams, patternPath, patternId } from '@/lib/patternLink';
 import { track } from '@/lib/track';
 import { safeSpec, limitNote } from '@/lib/specLimits';
-import { markerCapacity } from '@/lib/renderCharuco';
+import { featureCounts } from '@/lib/patternFacts';
+import { finderMarkerCells, FINDER_MIN_SQUARES } from '@/lib/renderCheckerboard';
+import { markerCapacity, markerSource, markerIds, idsAreOneRun } from '@/lib/idRange';
 import { largerDictFor } from '@/lib/dicts/dicts';
 
 /**
@@ -162,8 +164,8 @@ export default function Generator({ initialSpec, heading = 'Pattern generator' }
   }, [autoSize, boardW, boardH, spec.scaleBar]);
 
   const isSheet = spec.type === 'Marker sheet';
-  const corners = isSheet ? 0 : (spec.rows - 1) * (spec.cols - 1);
-  const markers = isSheet ? spec.rows * spec.cols : Math.floor((spec.rows * spec.cols) / 2);
+  // "Fits up to N squares" counts squares of the square size; tags with gaps, markers and circles are spaced differently.
+  const madeOfSquares = spec.type === 'Checkerboard' || spec.type === 'ChArUco' || spec.type === 'PuzzleBoard';
   const fits = layout.fit === 'single';
   const maxSquare = Math.floor(Math.min((pw - 2 * layout.margin) / spec.cols, (ph - 2 * layout.margin - layout.quietZone * 2) / spec.rows) * 10) / 10;
 
@@ -177,16 +179,25 @@ export default function Generator({ initialSpec, heading = 'Pattern generator' }
   };
   const slug = `${spec.type.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${spec.rows}x${spec.cols}-${spec.square}mm`;
 
+  // IDs typed in as a list belong to one board; a set numbers its boards one after the other.
+  const idsListed = useMemo(() => { const ids = markerIds(spec); return !!ids && !idsAreOneRun(ids); }, [spec]);
   const boards = useMemo(() => {
-    if (boardCount <= 1) return null;
+    if (boardCount <= 1 || idsListed) return null;
     return computeSetBoards(spec, boardCount, boardStartIds.length >= boardCount ? boardStartIds : undefined);
-  }, [spec, boardCount, boardStartIds]);
+  }, [spec, boardCount, boardStartIds, idsListed]);
 
   // Marker IDs against the dictionary: a marker whose ID the dictionary does not have cannot be drawn.
   const capacity = markerCapacity(spec);
   const lastIdUsed = Math.max(capacity?.lastId ?? 0, ...(boards ?? []).map((b) => markerCapacity(b.spec)?.lastId ?? 0));
   const idsShort = !!capacity && lastIdUsed >= capacity.count;
-  const largerDict = idsShort ? largerDictFor(spec.dict, lastIdUsed + 1) : undefined;
+  // An AprilGrid always takes its tags from a family; a marker sheet does once a family is chosen.
+  const isApril = spec.type === 'AprilGrid (Kalibr)' || (isSheet && !!spec.aprilFamily);
+  const largerDict = idsShort && !isApril ? largerDictFor(spec.dict, lastIdUsed + 1) : undefined;
+  // tag16h5 has 30 tags and tag25h9 has 35; tag36h11 (587) is the family to move to when a grid needs more.
+  const largerFamily = idsShort && isApril && (spec.aprilFamily ?? '36h11') !== '36h11' && lastIdUsed < 587 ? '36h11' : undefined;
+  const idSource = isApril ? `tag${spec.aprilFamily ?? '36h11'}` : (markerSource(spec)?.name ?? spec.dict);
+  const idNoun = isApril ? 'tags' : 'markers';
+  const idThing = spec.type === 'AprilGrid (Kalibr)' ? 'grid' : isSheet ? 'sheet' : 'board';
 
   const field = 'w-full rounded border border-[#CFCFCF] bg-white px-3 py-[11px] text-[15px]';
   return (
@@ -403,11 +414,14 @@ export default function Generator({ initialSpec, heading = 'Pattern generator' }
                 onChange={(e) => set('finderMarkers', e.target.checked)} />
               Finder markers (CALIB_CB_MARKER)
             </label>
+            {spec.finderMarkers && !finderMarkerCells(spec) && (
+              <p className="m-0 text-[13px] leading-snug text-brand-dark">Finder markers need at least {FINDER_MIN_SQUARES} × {FINDER_MIN_SQUARES} squares. This board is drawn without them.</p>
+            )}
             <label className="flex items-center gap-2.5 text-sm font-normal min-h-[44px] md:min-h-0">
               <input type="checkbox" className="h-[18px] w-[18px]"
                 checked={spec.radonCheckers ?? false}
                 onChange={(e) => set('radonCheckers', e.target.checked)} />
-              Radon (rounded) checkers
+              Radon checkerboard (rounded outline)
             </label>
           </div>
         )}
@@ -447,6 +461,9 @@ export default function Generator({ initialSpec, heading = 'Pattern generator' }
                   setBoardStartIds([]);
                 }} />
             </label>
+            {boardCount > 1 && idsListed && (
+              <p className="m-0 text-[13px] leading-snug text-ink-muted">A set numbers its boards one after the other. Clear the tag ID list to export a set.</p>
+            )}
             {boards && boards.length >= 2 && (
               <div className="rounded border border-line bg-ground-panel p-3">
                 <table className="w-full text-sm">
@@ -479,7 +496,7 @@ export default function Generator({ initialSpec, heading = 'Pattern generator' }
 
         <div className="flex flex-col gap-2.5 border-t border-line pt-4">
           <span className="text-[13px] font-semibold">Download</span>
-          {idsShort && <p className="m-0 text-[13px] leading-snug text-brand-dark">Off until the marker IDs fit the dictionary. See the note by the preview.</p>}
+          {idsShort && <p className="m-0 text-[13px] leading-snug text-brand-dark">Off until the {isApril ? 'tag IDs fit the tag family' : 'marker IDs fit the dictionary'}. See the note by the preview.</p>}
           <div className="grid grid-cols-2 gap-2">
             <button type="button"
               className="col-span-2 rounded bg-ink px-3 py-[11px] text-sm font-semibold text-white disabled:opacity-50"
@@ -568,6 +585,7 @@ export default function Generator({ initialSpec, heading = 'Pattern generator' }
             {ros2Supported(spec) && <button type="button" className="rounded bg-ground-panel px-2.5 py-1.5 disabled:opacity-50" disabled={idsShort} onClick={() => download(`${slug}.ros2.yaml`, ros2Yaml(spec), 'text/yaml')}>ros2.yaml</button>}
             {halconSupported(spec) && <button type="button" className="rounded bg-ground-panel px-2.5 py-1.5 disabled:opacity-50" disabled={idsShort} onClick={() => download(`${slug}.halcon.txt`, halconCode(spec), 'text/plain')}>halcon.txt</button>}
           </div>
+          {spec.type === 'AprilGrid (Kalibr)' && kalibrUnsupported(spec) && <p className="m-0 font-sans text-xs text-ink-muted" data-testid="kalibr-note">No kalibr.yaml for this grid: {kalibrUnsupported(spec)}</p>}
           {spec.type === 'ChArUco' && <p className="m-0 font-sans text-xs text-ink-muted">Kalibr has no ChArUco target model. For camera–IMU calibration with Kalibr, use an <a href="/tools/generator/aprilgrid/">AprilGrid</a>.</p>}
           {spec.type === 'HALCON-style dots' && <p className="m-0 font-sans text-xs text-ink-muted">This dot grid has no MVTec border or orientation mark, so HALCON's find_caltab will not detect it. For a HALCON plate, create the .descr and pattern with gen_caltab.</p>}
         </div>
@@ -576,20 +594,23 @@ export default function Generator({ initialSpec, heading = 'Pattern generator' }
       <div className="flex min-w-0 flex-1 basis-[520px] flex-col gap-4">
         <div className="flex flex-wrap justify-between gap-3 text-sm text-ink-muted">
           {!compactInfo && (
-            <span>Preview · {spec.paper} {layout.orientation} · {spec.rows} × {spec.cols} {spec.type}, {isSheet ? `${spec.marker || spec.square} mm markers` : spec.type === 'ArUco grid' ? `${spec.marker} mm markers, ${+(spec.square - spec.marker).toFixed(2)} mm apart` : `${spec.square} mm squares`}{layout.usableGrid && !isSheet ? ` · ${layout.usableGrid}` : ''}</span>
+            <span>Preview · {spec.paper} {layout.orientation} · {patternSummary(spec)}{layout.usableGrid && madeOfSquares ? ` · ${layout.usableGrid}` : ''}</span>
           )}
-          <span className="font-mono">Board {boardW} × {boardH} mm <span className="text-ink-soft">({mmToIn(boardW)} × {mmToIn(boardH)} in)</span> {isSheet ? '' : ` · ${corners} corners`} · {markers} {markers === 1 ? 'marker' : 'markers'}</span>
+          <span className="font-mono">Board {boardW} × {boardH} mm <span className="text-ink-soft">({mmToIn(boardW)} × {mmToIn(boardH)} in)</span> {' '}· {featureCounts(spec)}</span>
           {catalog.exact && (
             <span className="text-sm font-medium text-green-700">Matches stock target {catalog.exact.partNumber}</span>
           )}
         </div>
         {idsShort && capacity && (
           <div role="alert" data-testid="ids-short" className="rounded border border-brand bg-brand-tint px-4 py-3 text-sm text-brand-dark">
-            <p className="m-0 font-semibold">{spec.dict} has {capacity.count} markers. {boards ? 'This set' : 'This grid'} uses IDs {capacity.firstId}–{lastIdUsed}.</p>
+            <p className="m-0 font-semibold">{idSource} has {capacity.count} {idNoun}. {boards ? 'This set' : `This ${idThing}`} uses IDs {capacity.firstId}–{lastIdUsed}.</p>
             <p className="m-0 mt-1 text-[13px]">
-              Markers above ID {capacity.count - 1} cannot be drawn, so downloads are off.{' '}
-              {largerDict ? 'Use a larger dictionary, or fewer rows and columns.' : 'Use fewer rows and columns, or a lower start ID.'}
+              {isApril ? 'Tags' : 'Markers'} above ID {capacity.count - 1} cannot be drawn, so downloads are off.{' '}
+              {largerDict ? 'Use a larger dictionary, or fewer rows and columns.' : largerFamily ? 'Use a larger tag family, or fewer rows and columns.' : 'Use fewer rows and columns, or a lower start ID.'}
             </p>
+            {largerFamily && (
+              <button type="button" className="mt-1 inline-flex min-h-[44px] items-center text-[13px] font-semibold underline md:min-h-[24px]" onClick={() => set('aprilFamily', largerFamily)}>Switch to tag{largerFamily}</button>
+            )}
             {largerDict && (
               <button type="button" className="mt-1 inline-flex min-h-[44px] items-center text-[13px] font-semibold underline md:min-h-[24px]" onClick={() => set('dict', largerDict)}>Switch to {largerDict}</button>
             )}
@@ -625,7 +646,7 @@ export default function Generator({ initialSpec, heading = 'Pattern generator' }
                 </li>
               )}
             </ul>
-{maxSquare >= 1 && (
+{maxSquare >= 1 && madeOfSquares && (
                         <p className="m-0 mt-2 text-[12px] text-ink-muted">Or use squares ≤ {maxSquare} mm.{' '}
               <button type="button" className="font-semibold underline min-h-[44px] md:min-h-[24px] inline-flex items-center" onClick={() => set('square', maxSquare)}>Set {maxSquare} mm</button>
             </p>
