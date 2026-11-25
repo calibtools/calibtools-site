@@ -43,6 +43,7 @@ relatedGuides:
   - { label: "How big should your target be?", href: "/calibacademy/calibration-target-size/", note: "The 60 % fill rule and pixels per square." }
   - { label: "OpenCV camera calibration", href: "/calibacademy/opencv-camera-calibration/", note: "From images to a camera matrix, step by step." }
   - { label: "Why your board is not detected", href: "/calibacademy/corner-detection-troubleshooting/", note: "Measured limits for blur, tilt and resolution." }
+  - { label: "Which software reads which target?", href: "/calibacademy/calibration-software-target-compatibility/", note: "Squares or corners, and why one side should be odd." }
 ---
 
 ## When a checkerboard is the right pattern

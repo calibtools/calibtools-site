@@ -42,4 +42,5 @@ You have a Kalibr checkerboard YAML from an existing setup and need the same boa
 ## Related guides
 
 - [ChArUco vs checkerboard vs AprilGrid](/calibacademy/charuco-vs-checkerboard-vs-aprilgrid/) — choosing the right pattern before converting
+- [Which software reads which calibration target?](/calibacademy/calibration-software-target-compatibility/): what each program counts, and the files it writes
 

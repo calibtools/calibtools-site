@@ -21,6 +21,7 @@ links:
   - { label: "AprilTag generator", href: "/tools/generator/apriltag/" }
   - { label: "Multiple boards in one rig", href: "/calibacademy/multi-board-marker-ids/" }
   - { label: "Board not detected? Troubleshooting", href: "/calibacademy/corner-detection-troubleshooting/" }
+  - { label: "Which software reads which target?", href: "/calibacademy/calibration-software-target-compatibility/" }
 selection:
   - { scenario: "Hand-eye, camera on the arm", pattern: "ChArUco, fixed in the cell", size: "200 × 150 to 400 × 300 mm", material: "Ceramic or composite" }
   - { scenario: "Hand-eye, board on the flange", pattern: "ChArUco with flange adapter", size: "200 × 150 to 300 × 200 mm", material: "Ceramic (light, stable)" }

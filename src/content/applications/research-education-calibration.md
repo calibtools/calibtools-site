@@ -16,6 +16,7 @@ links:
   - { label: "Pattern generator", href: "/tools/generator/" }
   - { label: "FOV calculator", href: "/tools/fov/" }
   - { label: "Detection check", href: "/tools/check/" }
+  - { label: "Which software reads which target?", href: "/calibacademy/calibration-software-target-compatibility/" }
 selection:
   - { scenario: "First experiments", pattern: "Printed ChArUco from the generator", size: "A4 / A3", material: "Paper on a flat board" }
   - { scenario: "Repeatable lab results", pattern: "ChArUco or checkerboard", size: "300 × 200 mm", material: "Aluminum composite" }

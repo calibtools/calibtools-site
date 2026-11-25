@@ -5,7 +5,7 @@ date: 2026-11-07
 updated: 2026-11-23
 readingTime: "12 min"
 keyRule: "Fill the image corners with board views, keep focus and zoom fixed, and judge the result by per-view error, not the overall RMS alone."
-related: ["calibration-target-size", "reprojection-error", "how-still-calibration-board", "charuco-vs-checkerboard-vs-aprilgrid", "corner-detection-troubleshooting", "thermal-camera-geometric-calibration", "tof-depth-camera-calibration", "line-scan-camera-calibration", "in-cabin-850-940nm-camera-calibration"]
+related: ["calibration-target-size", "reprojection-error", "how-still-calibration-board", "charuco-vs-checkerboard-vs-aprilgrid", "corner-detection-troubleshooting", "thermal-camera-geometric-calibration", "tof-depth-camera-calibration", "line-scan-camera-calibration", "in-cabin-850-940nm-camera-calibration", "calibration-software-target-compatibility"]
 products: ["charuco-composite", "charuco-ceramic", "checkerboard-composite"]
 sampleFiles: []
 faq:

@@ -5,7 +5,7 @@ date: 2026-11-07
 updated: 2026-11-07
 readingTime: "13 min"
 keyRule: "Calibrate the camera on a static sequence first, then move the sensor, not the board, and judge the result by the report plots rather than by the fact that it converged."
-related: ["opencv-camera-calibration", "charuco-vs-checkerboard-vs-aprilgrid", "hand-eye-calibration-opencv"]
+related: ["opencv-camera-calibration", "charuco-vs-checkerboard-vs-aprilgrid", "hand-eye-calibration-opencv", "calibration-software-target-compatibility"]
 products: ["aprilgrid-composite", "charuco-composite"]
 sampleFiles: []
 faq:

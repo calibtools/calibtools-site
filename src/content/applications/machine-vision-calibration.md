@@ -19,6 +19,7 @@ products:
 links:
   - { label: "FOV calculator", href: "/tools/fov/" }
   - { label: "Format converter", href: "/tools/convert/" }
+  - { label: "Which software reads which target?", href: "/calibacademy/calibration-software-target-compatibility/" }
   - { label: "Pattern generator", href: "/tools/generator/" }
   - { label: "USAF 1951 lp/mm table", href: "/calibacademy/usaf-1951-lp-mm-table/" }
   - { label: "Line-scan camera calibration", href: "/calibacademy/line-scan-camera-calibration/" }
