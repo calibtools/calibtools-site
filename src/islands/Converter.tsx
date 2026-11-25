@@ -160,7 +160,7 @@ export default function Converter() {
         <div className="card p-5">
           <h3 className="m-0 mb-3 text-sm font-semibold">Parsed values</h3>
           <p className="m-0 mb-3 font-mono text-[13px]" data-testid="parsed-summary">{patternSummary(toSpec(parsed))}</p>
-          <div className="grid grid-cols-3 gap-2 text-xs md:grid-cols-6">
+          <div className="grid grid-cols-2 gap-2 text-xs md:grid-cols-4">
             {patternFacts(toSpec(parsed)).filter(([k]) => k !== 'Pattern ID' && k !== 'Pattern field').map(([k, v]) => <Pill key={k} label={k} value={v} />)}
           </div>
         </div>
