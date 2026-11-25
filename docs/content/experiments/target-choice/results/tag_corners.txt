@@ -1,0 +1,4 @@
+no refinement          3840 corners   RMS 0.77 px   mean shift (-0.01, -0.00) px   RMS without the shift 0.77 px
+CORNER_REFINE_SUBPIX   3840 corners   RMS 0.45 px   mean shift (-0.00, -0.00) px   RMS without the shift 0.45 px
+CORNER_REFINE_CONTOUR  3840 corners   RMS 0.76 px   mean shift (-0.00, +0.00) px   RMS without the shift 0.76 px
+CORNER_REFINE_APRILTAG 3840 corners   RMS 0.70 px   mean shift (+0.48, +0.49) px   RMS without the shift 0.14 px
