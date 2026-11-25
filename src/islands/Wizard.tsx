@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { SENSOR_PRESETS } from '@/lib/fov';
 import { ListChecks } from '@/lib/icons';
 import {
-  recommend, MATERIALS,
+  recommend, recommendationLink, MATERIALS,
   type WizardAnswers, type Application, type AccuracyNeed,
   type CameraType, type Environment, type ToolChain, type Recommendation,
 } from '@/lib/wizard';
@@ -188,7 +188,7 @@ function StepCard<T extends string>({ title, options, onSelect }: {
 
 function ResultView({ result, onRestart }: { result: Recommendation; onRestart: () => void }) {
   const mat = MATERIALS[result.material];
-  const genUrl = `/tools/generator/?type=${encodeURIComponent(result.pattern)}&rows=${result.rows}&cols=${result.cols}&square=${result.square}&marker=${result.marker}&dict=${result.dict}&paper=${result.paper}`;
+  const genUrl = recommendationLink(result);
 
   return (
     <div>

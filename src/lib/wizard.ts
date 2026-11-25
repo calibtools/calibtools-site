@@ -3,6 +3,9 @@
  * Pure logic, no DOM.
  */
 import { DEFAULT_MARKER_RATIO, markerForSquare } from './boardSizes';
+import type { PatternSpec } from './patterns';
+import { computeLayout, PAPERS } from './pageLayout';
+import { GENERATOR_DEFAULT, patternPath } from './patternLink';
 
 export type Application = 'robotics' | 'industrial' | 'automotive' | 'drone' | 'medical' | 'research' | 'other';
 export type AccuracyNeed = 'high' | 'medium' | 'low';
@@ -127,7 +130,32 @@ export function recommend(a: WizardAnswers): Recommendation {
   // Ensure marker < square
   if (marker >= square) marker = markerForSquare(square);
 
+  // The page named here is the page the generator opens with: take the smallest one the pattern fits on at 100 %.
+  const fitted = smallestPaperFor({ pattern, rows, cols, square, marker, dict }, paper);
+  if (fitted !== paper) {
+    reasoning.push(fitted
+      ? `At this size the pattern needs ${fitted}; it does not fit ${paper} at 100 %.`
+      : `At this size the pattern is larger than A0. The generator tiles it across several ${paper} sheets, or we make it on a rigid board.`);
+    if (fitted) paper = fitted;
+  }
+
   return { pattern, rows, cols, square, marker, dict, paper, material, reasoning };
+}
+
+const PAPER_ORDER = ['A4', 'A3', 'A2', 'A1', 'A0'];
+
+/** The generator's own pattern for a recommendation, so the page check is the one the generator makes. */
+export function recommendedSpec(r: Pick<Recommendation, 'pattern' | 'rows' | 'cols' | 'square' | 'marker' | 'dict'>, paper: string): PatternSpec {
+  return { ...GENERATOR_DEFAULT, type: r.pattern as PatternSpec['type'], rows: r.rows, cols: r.cols, square: r.square, marker: r.marker, dict: r.dict, paper };
+}
+
+/** The smallest A-size page, from `from` upward, that holds the pattern on one sheet; null when even A0 is too small. */
+function smallestPaperFor(r: Pick<Recommendation, 'pattern' | 'rows' | 'cols' | 'square' | 'marker' | 'dict'>, from: string): string | null {
+  for (const name of PAPER_ORDER.slice(Math.max(0, PAPER_ORDER.indexOf(from)))) {
+    const [w, h] = PAPERS[name];
+    if (computeLayout(recommendedSpec(r, name), w, h, 'auto').fit === 'single') return name;
+  }
+  return null;
 }
 
 /** Material descriptions for display. */
@@ -137,3 +165,8 @@ export const MATERIALS: Record<Material, { label: string; description: string }>
   aluminum: { label: 'Aluminum composite', description: 'Rigid and durable, flat to ≤ 0.5 mm per meter (see datasheet). Ships ready to use.' },
   glass: { label: 'Glass plate', description: 'Very flat and dimensionally stable. Fragile.' },
 };
+
+/** Link that opens the generator with exactly the recommended pattern. */
+export function recommendationLink(r: Recommendation): string {
+  return patternPath(recommendedSpec(r, r.paper));
+}

@@ -1,5 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { recommend, type WizardAnswers } from './wizard';
+import { recommend, recommendedSpec, recommendationLink, type WizardAnswers } from './wizard';
+import { computeLayout, PAPERS } from './pageLayout';
+import { specFromLink } from './patternLink';
+import { markerCapacity } from './idRange';
+import { kalibrSupported } from './exportConfig';
 
 const base: WizardAnswers = {
   application: 'robotics',
@@ -73,5 +77,33 @@ describe('recommend', () => {
   it('always returns non-empty reasoning', () => {
     const r = recommend(base);
     expect(r.reasoning.length).toBeGreaterThanOrEqual(1);
+  });
+});
+
+describe('the page the wizard names is a page the pattern fits on', () => {
+  const answers: WizardAnswers[] = [];
+  for (const toolchain of ['opencv', 'ros', 'kalibr', 'halcon', 'matlab', 'other'] as const)
+    for (const camera of ['mono', 'fisheye', 'stereo', 'multi'] as const)
+      for (const accuracy of ['low', 'medium', 'high'] as const)
+        for (const distance of [undefined, 300, 1000, 3000])
+          answers.push({ ...base, toolchain, camera, accuracy, ...(distance ? { sensorW: 7.2, focal: 8, distance } : {}) });
+
+  it('the opening recommendation, a 7 × 10 ChArUco of 25 mm squares, is on A3: it does not fit A4', () => {
+    const r = recommend({ ...base, accuracy: 'low' });
+    expect([r.rows, r.cols, r.square, r.paper]).toEqual([7, 10, 25, 'A3']);
+    expect(r.reasoning.join(' ')).toContain('does not fit A4');
+  });
+
+  it.each(answers.map((a) => [`${a.toolchain}, ${a.camera}, ${a.accuracy}, ${a.distance ?? 'no'} distance`, a] as const))('%s', (_n, a) => {
+    const r = recommend(a);
+    const spec = recommendedSpec(r, r.paper);
+    const [w, h] = PAPERS[r.paper];
+    const fits = computeLayout(spec, w, h, 'auto').fit === 'single';
+    // one sheet, unless the wizard says the pattern is larger than A0
+    expect(fits || r.reasoning.some((t) => t.includes('larger than A0'))).toBe(true);
+    // the link opens that very pattern, and the generator can draw every marker of it
+    expect(specFromLink(recommendationLink(r))).toMatchObject({ type: r.pattern, rows: r.rows, cols: r.cols, square: r.square, paper: r.paper });
+    expect(markerCapacity(spec)?.short ?? false).toBe(false);
+    if (a.toolchain === 'kalibr') expect(kalibrSupported(spec)).toBe(true);
   });
 });
