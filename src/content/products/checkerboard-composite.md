@@ -114,7 +114,7 @@ Remember that OpenCV counts inner corners, not squares: a 9 × 14 board is `(13,
 
 To try a grid before you order, print it with the [checkerboard generator](/tools/generator/checkerboard/). A paper print is good for testing detection; the [printed target guide](/calibacademy/printed-target-costs-half-a-pixel/) shows what it costs in accuracy.
 
-If detection fails, the [detection check](/tools/check/) shows what the detector sees, and the [troubleshooting guide](/calibacademy/corner-detection-troubleshooting/) lists the usual causes with measured limits.
+If detection fails, the [troubleshooting guide](/calibacademy/corner-detection-troubleshooting/) lists the usual causes with measured limits.
 
 ## Care and storage
 

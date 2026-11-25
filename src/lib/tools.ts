@@ -17,7 +17,7 @@ export const tools: ToolDef[] = [
   { key: 'fov', href: '/tools/fov/', title: 'FOV & resolution calculator', body: 'Sensor, lens and working distance in — field of view, mm per pixel and target size out.', cta: 'Calculate', live: true },
   { key: 'wizard', href: '/tools/wizard/', title: 'Target selection wizard', body: 'Five questions, one recommendation: pattern, size, material.', cta: 'Start', live: true },
   { key: 'convert', href: '/tools/convert/', title: 'Format converter', body: 'OpenCV ↔ ROS camera_info ↔ Kalibr ↔ HALCON ↔ COLMAP intrinsics.', cta: 'Convert', live: true },
-  { key: 'check', href: '/tools/check/', title: 'Detection check', body: 'Upload a photo of your board and see what the detector finds.', cta: 'Check', live: true },
+  { key: 'check', href: '/tools/check/', title: 'Detection check', body: 'See which markers OpenCV reads in a photo of your ChArUco, ArUco or AprilGrid board.', cta: 'Check', live: true },
   { key: 'quality', href: '/tools/quality/', title: 'Calibration quality analyzer', body: 'Coverage heatmap, reprojection error, parameter correlation — in your browser.', cta: 'Analyze', live: true },
   { key: 'capture', href: '/tools/capture/', title: 'Capture assistant', body: 'Guided calibration image capture with 15 poses for optimal coverage.', cta: 'Capture', live: true },
 ];

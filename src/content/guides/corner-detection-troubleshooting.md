@@ -280,7 +280,7 @@ Run the diagnostic on every image and reject frames where the ChArUco corner cou
 - white squares between about 180 and 220, black squares above about 20, nothing clipped;
 - the sharpest frames you can get, with the board held still.
 
-The browser [detection check](/tools/check/) runs the same OpenCV detectors on a photo without uploading it, and the [quality analyzer](/tools/quality/) flags blur and exposure across a whole set.
+The browser [detection check](/tools/check/) reads the markers of a ChArUco, ArUco or AprilGrid board in a photo with OpenCV, without uploading it, and the [quality analyzer](/tools/quality/) flags blur and exposure across a whole set.
 
 ## Common problems
 

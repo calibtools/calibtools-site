@@ -208,4 +208,4 @@ The [reprojection error guide](/calibacademy/reprojection-error/) shows how to d
 
 - [Run several boards in one rig](/calibacademy/multi-board-marker-ids/) without marker ID clashes.
 
-- Check your images with the [detection check](/tools/check/) and [quality analyzer](/tools/quality/) before calibrating.
+- Check your images with the [quality analyzer](/tools/quality/) before calibrating. For a ChArUco board, the [detection check](/tools/check/) shows which markers and corners are read in a photo.

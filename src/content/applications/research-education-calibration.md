@@ -38,4 +38,4 @@ Paper bends and printers scale slightly. When you need results that repeat betwe
 
 ## Common problems
 
-Most beginner problems are detection failures: the wrong pattern size, a missing white border, the wrong dictionary or a board that is too small in the image. The free [detection check](/tools/check/) shows whether a pattern is detected before you collect a full data set.
+Most beginner problems are detection failures: the wrong pattern size, a missing white border, the wrong dictionary or a board that is too small in the image. The free [detection check](/tools/check/) shows which markers of a ChArUco or AprilGrid board are read before you collect a full data set.

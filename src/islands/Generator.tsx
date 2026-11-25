@@ -26,11 +26,7 @@ import { largerDictFor } from '@/lib/dicts/dicts';
  * config file downloads (OpenCV, Kalibr, ROS 2, HALCON).
  */
 const PATTERNS = ['Checkerboard', 'ChArUco', 'AprilGrid (Kalibr)', 'Asymmetric circles', 'Symmetric circles', 'ArUco grid', 'HALCON-style dots', 'Marker sheet'] as const;
-const DICTS = [
-  'DICT_4X4_50', 'DICT_4X4_100', 'DICT_4X4_250', 'DICT_5X5_100', 'DICT_5X5_1000', 'DICT_6X6_250', 'DICT_7X7_1000',
-  'DICT_ARUCO_ORIGINAL', 'DICT_ARUCO_MIP_36h12',
-  'DICT_APRILTAG_36h11',
-];
+import { DICTS } from '@/lib/dictNames';
 // PAPERS imported from pageLayout.ts
 
 interface GeneratorProps {
