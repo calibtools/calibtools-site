@@ -4,7 +4,7 @@ description: "When running multiple calibration boards in one rig, each board ne
 date: 2026-10-24
 updated: 2026-10-25
 readingTime: "3 min"
-related: ["charuco-vs-checkerboard-vs-aprilgrid"]
+related: ["charuco-vs-checkerboard-vs-aprilgrid", "calibration-software-target-compatibility"]
 keyRule: "Each board's start ID = board index × markers per board. A 7×10 ChArUco has 35 markers, so board 2 starts at 35."
 products: ["charuco-composite"]
 sampleFiles: []

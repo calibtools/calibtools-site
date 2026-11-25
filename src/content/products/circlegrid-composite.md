@@ -43,6 +43,7 @@ relatedGuides:
   - { label: "How big should your target be?", href: "/calibacademy/calibration-target-size/", note: "The 60 % fill rule." }
   - { label: "OpenCV camera calibration", href: "/calibacademy/opencv-camera-calibration/", note: "From images to a camera matrix, step by step." }
   - { label: "What reprojection error tells you", href: "/calibacademy/reprojection-error/", note: "And what a low value can hide." }
+  - { label: "Which software reads which target?", href: "/calibacademy/calibration-software-target-compatibility/", note: "Symmetric or asymmetric, and what each program counts." }
 ---
 
 ## Why circles instead of corners

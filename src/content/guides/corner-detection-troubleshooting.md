@@ -5,7 +5,7 @@ date: 2026-11-09
 updated: 2026-11-09
 readingTime: "12 min"
 keyRule: "Count markers and corners separately: markers found but no corners is a board-definition problem; nothing found is an image problem or the wrong dictionary."
-related: ["opencv-camera-calibration", "calibration-target-size", "charuco-vs-checkerboard-vs-aprilgrid", "multi-board-marker-ids", "thermal-camera-geometric-calibration", "in-cabin-850-940nm-camera-calibration"]
+related: ["opencv-camera-calibration", "calibration-target-size", "charuco-vs-checkerboard-vs-aprilgrid", "multi-board-marker-ids", "thermal-camera-geometric-calibration", "in-cabin-850-940nm-camera-calibration", "calibration-software-target-compatibility"]
 products: ["charuco-composite", "checkerboard-composite", "aprilgrid-composite"]
 sampleFiles: []
 faq:

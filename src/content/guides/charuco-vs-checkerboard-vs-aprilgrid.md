@@ -4,7 +4,7 @@ description: "Checkerboard, ChArUco, AprilGrid and circle grids compared: partia
 date: 2026-10-22
 updated: 2026-11-15
 readingTime: "8 min"
-related: ["corner-detection-troubleshooting", "calibration-target-size", "opencv-camera-calibration"]
+related: ["corner-detection-troubleshooting", "calibration-target-size", "opencv-camera-calibration", "calibration-software-target-compatibility"]
 products: ["charuco-composite", "checkerboard-composite", "aprilgrid-composite", "circlegrid-composite"]
 sampleFiles: []
 ---

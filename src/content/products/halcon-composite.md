@@ -21,6 +21,7 @@ relatedGuides:
   - { label: "How big should your target be?", href: "/calibacademy/calibration-target-size/", note: "The 60 % fill rule." }
   - { label: "Composite, ceramic or glass", href: "/calibacademy/composite-ceramic-or-glass/", note: "Compare the tolerance with one pixel on the board." }
   - { label: "What reprojection error tells you", href: "/calibacademy/reprojection-error/", note: "And what a low value can hide." }
+  - { label: "Which software reads which target?", href: "/calibacademy/calibration-software-target-compatibility/", note: "HALCON plates, point objects and the other programs." }
 ---
 
 ## What makes a plate a HALCON plate
