@@ -248,10 +248,7 @@ function entitiesSection(spec: PatternSpec, pw: number, ph: number, layout?: Pag
 
   // Text lines below wordmark
   const textBaseY = footerTopDxf - wmHMm - 2;
-  const summary = patternSummary({
-    type: spec.type, rows: spec.rows, cols: spec.cols, square: spec.square,
-    marker: spec.marker, dict: spec.dict, startId: spec.startId,
-  });
+  const summary = patternSummary(spec);
   const centrePt = ox + bw / 2;
   parts.push(textCentre('CALIBTOOLS_BRAND', centrePt, textBaseY, 2.2, summary));
 
@@ -329,10 +326,7 @@ function entitiesSection(spec: PatternSpec, pw: number, ph: number, layout?: Pag
 export function exportDxf({ spec, pw: rawPw, ph: rawPh, layout }: DxfExportOptions): string {
   const pw = layout?.pw ?? rawPw;
   const ph = layout?.ph ?? rawPh;
-  const summary = patternSummary({
-    type: spec.type, rows: spec.rows, cols: spec.cols, square: spec.square,
-    marker: spec.marker, dict: spec.dict, startId: spec.startId,
-  });
+  const summary = patternSummary(spec);
   const comment = brandLine({ summary });
 
   const parts: string[] = [];

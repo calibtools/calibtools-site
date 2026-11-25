@@ -7,7 +7,8 @@
  * offset by PatternSpec.startId.
  */
 import type { PatternSpec } from './patterns';
-import { getMarkerDict, decodeMarkerBits } from './dicts/dicts';
+import { getMarkerDict, decodeMarkerBits, getAprilFamily } from './dicts/dicts';
+import { aprilGridTags } from './renderAprilGrid';
 
 /** One marker on the board: ID, cell, and top-left corner in mm from the board's top-left corner. */
 export interface BoardMarker { id: number; row: number; col: number; x: number; y: number; size: number }
@@ -126,6 +127,14 @@ export interface MarkerCapacity { firstId: number; lastId: number; count: number
  * Null for patterns without a dictionary, and when the dictionary is not on hand.
  */
 export function markerCapacity(s: PatternSpec): MarkerCapacity | null {
+  if (s.type === 'AprilGrid (Kalibr)') {
+    // A tag family is as limited as a dictionary: tag16h5 has 30 tags, tag25h9 has 35, tag36h11 has 587.
+    const family = getAprilFamily(s.aprilFamily ?? '36h11');
+    if (!family) return null;
+    const ids = aprilGridTags(s).map((t) => t.id);
+    const lastId = Math.max(...ids);
+    return { firstId: Math.min(...ids), lastId, count: family.count, short: lastId >= family.count };
+  }
   if (s.type !== 'ChArUco' && s.type !== 'ArUco grid') return null;
   const dict = getMarkerDict(s.dict);
   if (!dict) return null;
