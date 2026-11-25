@@ -333,7 +333,7 @@ Dropping `k3` for Kalibr is harmless when OpenCV returned it near zero, as it do
 
 - For HALCON, use the description file that came with the plate; for Cognex, tell the tool whether the fiducial is there; for pylon, use the `.pcal` file and cover the field of view.
 
-- Run one detection on the first print before the batch, with the detection check at [/tools/check/](/tools/check/) or your own code, and compare the corner count to what the geometry says it should be.
+- Run one detection on the first print before the batch, with your own code or, for a board with markers, the detection check at [/tools/check/](/tools/check/), and compare the count to what the geometry says it should be.
 
 ## Common problems
 

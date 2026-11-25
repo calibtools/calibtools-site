@@ -20,3 +20,6 @@ out/
 # Ready-made pattern PDFs, written by scripts/pattern-pdfs.ts in prebuild
 public/files/patterns/
 __pycache__/
+
+# OpenCV.js for the detection check, copied from node_modules by scripts/copy-opencv.mjs in prebuild
+public/vendor/

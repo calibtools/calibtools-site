@@ -1,35 +1,41 @@
 ---
-seoTitle: "Detection check — verify pattern detection"
-seoDescription: "Upload a calibration board photo and see what the OpenCV detector finds. Detected corners and markers overlaid. Free, in your browser, nothing uploaded."
+seoTitle: "Detection check — which markers are read"
+seoDescription: "Open a photo of a ChArUco, ArUco or AprilGrid board and see which markers and corners OpenCV reads. Runs in your browser; the photo is not uploaded."
 h1: "Detection check"
 faq:
   - q: "What does the detection check use?"
-    a: "OpenCV.js compiled to WebAssembly, running in your browser. It uses cv::findChessboardCorners for checkerboards and cv::aruco for ChArUco and ArUco patterns."
+    a: "OpenCV 4.12 compiled to WebAssembly, running in your browser: cv::aruco::ArucoDetector for ArUco grids, AprilGrids and marker sheets, and cv::aruco::CharucoDetector for ChArUco boards."
+  - q: "Which patterns can it check?"
+    a: "Patterns with markers: ChArUco, ArUco grid, AprilGrid and marker sheets, in every dictionary and tag family the generator offers. Checkerboards and circle grids are not checked here; Plumbline, our desktop app, detects both."
   - q: "Does my image get uploaded?"
-    a: "No. The image stays in your browser. OpenCV runs client-side via WebAssembly."
-  - q: "Why are some corners not detected?"
-    a: "Common causes: motion blur, uneven lighting, the board is too small in the frame, or the pattern parameters (rows, columns, dictionary) don't match the physical board."
+    a: "No. The photo stays in your browser. The detector is loaded from calib.tools and runs on your device."
+  - q: "Why are some markers not read?"
+    a: "Common causes: motion blur, uneven light or glare, a board that is small in the frame, or settings that do not match the board (rows, columns, dictionary or tag family, border bits, start ID)."
   - q: "Which image formats work?"
-    a: "JPEG and PNG. The image is loaded as an HTML Image element and drawn onto a canvas for OpenCV processing."
+    a: "JPEG and PNG. A photo with a longer side above 2400 pixels is scaled down to that size for the check."
 ---
 
 ## What it does
 
-The detection check loads OpenCV.js in your browser and runs the appropriate corner or marker detector on a photo of your calibration board. It draws an overlay of detected corners — green when all expected corners are found, yellow when partial.
+The detection check looks for the markers of your pattern in a photo and tells you which ones OpenCV reads. Every marker it reads is outlined on the photo with its ID. On a ChArUco board it also places the inner corners and counts them.
 
-The tool reports the number of corners or markers found versus expected and gives a pass/fail status.
+The result lists the IDs that were not read, and any IDs that were read but do not belong to the pattern, which points to a wrong start ID or the wrong number of rows and columns.
+
+It checks patterns with markers: ChArUco, ArUco grid, AprilGrid and marker sheets. Checkerboards and circle grids are not checked in the browser; [Plumbline](/plumbline/) detects both.
 
 ## How to use it
 
-**Pattern settings** — select the same pattern type, rows, columns, square size, marker size and dictionary that match your physical board. Mismatched parameters will cause detection to fail even if the board is clearly visible.
+**Pattern settings** — set the pattern type, rows, columns, dictionary or tag family, border bits and start ID of your board. If the pattern came from the [generator](/tools/generator/), choose **Take settings from opencv.json** and pick the file that was downloaded with it; every setting is filled in from the file.
 
-**Upload** — drag and drop or click to select a JPEG or PNG image. The first run downloads OpenCV.js (~8 MB), which is cached for subsequent uses.
+**Photo** — drop a JPEG or PNG on the page or choose one. The first check loads the detector (about 11 MB), which the browser keeps for later checks.
 
-**Result** — the overlay shows detected corners with numbering. The status reports found vs expected and whether the detection passed.
+**Result** — green outlines are markers of your pattern, red outlines are markers the pattern does not have. Change a setting and choose **Check again** to run the same photo with the new settings.
 
 ## Worked example
 
-You printed a 7 × 10 ChArUco, DICT_6X6_250 on A3. Take a photo with your phone, upload it, set 7 × 10 / 25 mm / 18 mm / DICT_6X6_250, and check that all 54 corners and 35 markers are detected. If some are missing, try improving lighting or moving the board closer.
+You printed a 7 × 10 ChArUco board, 25 mm squares, 18 mm markers, DICT_6X6_250, on A3. Take a photo with your phone, set 7 × 10, 25 mm, 18 mm and DICT_6X6_250, and open the photo.
+
+A good photo reads all 35 markers and all 54 inner corners. If some are missing, the result names their IDs: look at that part of the board for glare, blur or a fold.
 
 ## Related guides
 
