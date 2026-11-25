@@ -5,18 +5,17 @@
  * Round-trip error < 1e-9 for numeric values.
  */
 import type { PatternSpec } from './patterns';
-import { kalibrYaml, ros2Yaml, halconCode } from './exportConfig';
+import { kalibrYaml, ros2Yaml, halconCode, opencvJson } from './exportConfig';
 
-/** Canonical internal representation — a subset of PatternSpec. */
-export interface CalibConfig {
-  type: PatternSpec['type'];
-  rows: number;
-  cols: number;
-  square: number;   // mm
-  marker: number;   // mm
-  dict: string;
-  startId: number;
-}
+/**
+ * What a file describes: the whole pattern, as the generator holds it, without the page it is printed on.
+ *
+ * It used to be seven fields (type, rows, columns, square, marker, dictionary, start ID). Everything else a
+ * file said was dropped on the way in, so a tag16h5 AprilGrid came out as a Kalibr file, which Kalibr cannot
+ * read, and a marker sheet came out as a ChArUco board. Now every field is kept and every output is written
+ * by the generator's own functions, which refuse what the target tool cannot use.
+ */
+export type CalibConfig = Omit<PatternSpec, 'paper' | 'scaleBar'>;
 
 export type Format = 'opencv-json' | 'kalibr-yaml' | 'ros2-yaml' | 'halcon-hdev';
 
@@ -44,27 +43,17 @@ export function parse(text: string, format?: Format): CalibConfig {
   }
 }
 
-/** Serialize canonical config to the target format. */
+/** The pattern a config describes, on a page, as the generator's functions take it. */
+export function toSpec(config: CalibConfig): PatternSpec {
+  return { ...config, paper: 'A4', scaleBar: true };
+}
+
+/** Serialize canonical config to the target format. Throws, with the reason, when the target tool cannot use the pattern. */
 export function serialize(config: CalibConfig, format: Format): string {
-  const spec: PatternSpec = {
-    ...config,
-    paper: 'A4',
-    scaleBar: true,
-    // For an AprilGrid the config carries the gap in mm as `marker`; Kalibr wants it as a ratio of the tag side.
-    ...(config.type === 'AprilGrid (Kalibr)' && config.marker > 0 && config.square > 0 ? { tagSpacing: config.marker / config.square } : {}),
-  };
+  const spec = toSpec(config);
   switch (format) {
     case 'opencv-json':
-      return JSON.stringify({
-        pattern: config.type,
-        rows: config.rows,
-        cols: config.cols,
-        square_mm: config.square,
-        marker_mm: config.marker,
-        dictionary: config.dict,
-        start_id: config.startId,
-        generator: 'Calib.Tools',
-      }, null, 2) + '\n';
+      return opencvJson(spec) + '\n';
     case 'kalibr-yaml':
       return kalibrYaml(spec);
     case 'ros2-yaml':
@@ -81,18 +70,53 @@ export function convert(text: string, to: Format, from?: Format): string {
 
 // --- Parsers ---
 
+const TYPES: readonly PatternSpec['type'][] = ['Checkerboard', 'ChArUco', 'AprilGrid (Kalibr)', 'Asymmetric circles', 'Symmetric circles', 'ArUco grid', 'HALCON-style dots', 'Marker sheet', 'PuzzleBoard'];
+
+/** Reads what opencvJson() writes, field for field, and the plainer JSON this page wrote before 2026-11-25. */
 function parseOpencvJson(text: string): CalibConfig {
   const obj = JSON.parse(text);
-  return {
-    type: mapPatternType(obj.pattern ?? obj.type ?? 'ChArUco'),
-    rows: obj.rows,
-    cols: obj.cols,
-    square: obj.square_mm ?? obj.square ?? obj.squareSize,
-    // AprilGrid files give the gap as a ratio of the tag side; the config carries it in mm.
-    marker: obj.marker_mm ?? obj.marker ?? obj.markerSize ?? (obj.tag_gap_mm ?? 0),
-    dict: obj.dictionary ?? obj.dict ?? 'DICT_6X6_250',
-    startId: obj.start_id ?? obj.startId ?? 0,
+  const named = obj.pattern ?? obj.type ?? 'ChArUco';
+  const type = (TYPES as readonly string[]).includes(named) ? named as PatternSpec['type'] : mapPatternType(String(named));
+  const size = obj.square_mm ?? obj.square ?? obj.squareSize;
+  const ids: number[] | undefined = Array.isArray(obj.ids) ? obj.ids : undefined;
+  const out: CalibConfig = {
+    type, rows: obj.rows, cols: obj.cols, square: size, marker: 0, dict: '',
+    startId: ids ? ids[0] : (obj.start_id ?? obj.startId ?? 0),
   };
+  const hasMarkers = type === 'ChArUco' || type === 'ArUco grid' || type === 'Marker sheet';
+  if (hasMarkers) {
+    out.marker = obj.marker_mm ?? obj.marker ?? obj.markerSize ?? 0;
+    out.dict = obj.dictionary ?? obj.dict ?? 'DICT_6X6_250';
+  }
+  if (type === 'ChArUco' && obj.legacy_pattern) out.legacyLayout = true;
+  if (type === 'Marker sheet') {
+    out.square = out.marker;
+    // A sheet of AprilTags is written as OpenCV's DICT_APRILTAG_<family> with its border width.
+    const fam = /^DICT_APRILTAG_(\S+)$/.exec(out.dict)?.[1];
+    if (fam) { out.aprilFamily = fam; out.borderBits = obj.border_bits ?? 1; }
+    if (ids) out.tagIdList = ids.join(',');
+  }
+  if (type === 'AprilGrid (Kalibr)') {
+    out.square = obj.tag_size_mm ?? size;
+    out.aprilFamily = String(obj.tag_family ?? 'tag36h11').replace(/^tag/, '');
+    out.borderBits = obj.border_bits ?? 2;
+    // Older files of this page carried the gap in mm as marker_mm.
+    const gap = obj.tag_gap_mm ?? obj.marker_mm;
+    out.tagSpacing = obj.tag_spacing ?? (gap > 0 && out.square > 0 ? gap / out.square : 0.3);
+    if (obj.corner_squares) out.symmetricCorners = true;
+    if (ids) out.tagIdList = ids.join(',');
+  }
+  if (type === 'Checkerboard') {
+    if (obj.marker === true) out.finderMarkers = true;
+    if (obj.radon) out.radonCheckers = true;
+  }
+  const circles = type === 'Symmetric circles' || type === 'Asymmetric circles' || type === 'HALCON-style dots';
+  if (circles) {
+    if (obj.spacing_y_mm !== undefined) { out.circleSpacingX = size; out.circleSpacingY = obj.spacing_y_mm; }
+    if (obj.circle_diameter_mm !== undefined) out.circleDiameter = obj.circle_diameter_mm;
+  }
+  if (obj.inverted && (circles || type === 'Checkerboard')) out.invert = true;
+  return out;
 }
 
 function parseKalibrYaml(text: string): CalibConfig {
@@ -100,14 +124,14 @@ function parseKalibrYaml(text: string): CalibConfig {
   const targetType = v['target_type']?.replace(/['"]/g, '') ?? 'checkerboard';
 
   if (targetType === 'aprilgrid') {
-    const square = num(v['tagSize']) * 1000;
+    // Kalibr's AprilGrid is tag36h11 with a two-bit border and IDs from 0; the file has no field for anything else.
     return {
       type: 'AprilGrid (Kalibr)',
       rows: num(v['tagRows']), cols: num(v['tagCols']),
-      square,
-      marker: v['tagSpacing'] ? square * num(v['tagSpacing']) : 0,
-      dict: 'DICT_APRILTAG_36h11',
-      startId: 0,
+      square: num(v['tagSize']) * 1000,
+      marker: 0, dict: '', startId: 0,
+      aprilFamily: '36h11', borderBits: 2,
+      tagSpacing: v['tagSpacing'] ? num(v['tagSpacing']) : 0.3,
     };
   }
   if (targetType === 'circlegrid') {
@@ -118,7 +142,7 @@ function parseKalibrYaml(text: string): CalibConfig {
       type: 'Symmetric circles',
       rows: num(v['targetRows']), cols: num(v['targetCols']),
       square: num(v['spacingMeters']) * 1000,
-      marker: 0, dict: 'DICT_6X6_250', startId: 0,
+      marker: 0, dict: '', startId: 0,
     };
   }
   // checkerboard: targetRows/targetCols are internal corners → squares = +1
@@ -127,7 +151,7 @@ function parseKalibrYaml(text: string): CalibConfig {
     rows: num(v['targetRows']) + 1,
     cols: num(v['targetCols']) + 1,
     square: num(v['rowSpacingMeters'] ?? v['colSpacingMeters']) * 1000,
-    marker: 0, dict: 'DICT_6X6_250', startId: 0,
+    marker: 0, dict: '', startId: 0,
   };
 }
 
@@ -136,20 +160,18 @@ function parseRos2Yaml(text: string): CalibConfig {
   const boardType = v['type'] ?? 'chessboard';
   const cols = num(v['cols']), rows = num(v['rows']);
   const square = num(v['square_size']) * 1000;
-  const marker = v['marker_size'] ? num(v['marker_size']) * 1000 : 0;
-  const dict = v['dictionary'] ?? 'DICT_6X6_250';
-  const startId = v['start_id'] ? num(v['start_id']) : 0;
-  const rest = { square, marker, dict, startId };
+  const plain = { square, marker: 0, dict: '', startId: 0 };
 
   // Files written before 2026-11-12 have no `size` line and give interior corners for every pattern.
   const counted = v['size'] !== undefined;
   if (boardType.includes('charuco')) {
-    return counted ? { type: 'ChArUco', rows, cols, ...rest } : { type: 'ChArUco', rows: rows + 1, cols: cols + 1, ...rest };
+    const board = { square, marker: v['marker_size'] ? num(v['marker_size']) * 1000 : 0, dict: v['dictionary'] ?? 'DICT_6X6_250', startId: v['start_id'] ? num(v['start_id']) : 0 };
+    return counted ? { type: 'ChArUco', rows, cols, ...board } : { type: 'ChArUco', rows: rows + 1, cols: cols + 1, ...board };
   }
-  if (boardType === 'acircles') return { type: 'Asymmetric circles', rows, cols: cols * 2, ...rest };
-  if (boardType === 'circles') return { type: 'Symmetric circles', rows, cols, ...rest };
+  if (boardType === 'acircles') return { type: 'Asymmetric circles', rows, cols: cols * 2, ...plain };
+  if (boardType === 'circles') return { type: 'Symmetric circles', rows, cols, ...plain };
   // chessboard: interior corners, so squares = +1
-  return { type: 'Checkerboard', rows: rows + 1, cols: cols + 1, ...rest };
+  return { type: 'Checkerboard', rows: rows + 1, cols: cols + 1, ...plain };
 }
 
 // --- Helpers ---
@@ -161,6 +183,7 @@ function mapPatternType(s: string): PatternSpec['type'] {
   if (lower.includes('checker') || lower.includes('chess')) return 'Checkerboard';
   if (lower.includes('asym')) return 'Asymmetric circles';
   if (lower.includes('circle') || lower.includes('sym')) return 'Symmetric circles';
+  if (lower.includes('sheet')) return 'Marker sheet';
   if (lower.includes('aruco')) return 'ArUco grid';
   if (lower.includes('halcon') || lower.includes('dot')) return 'HALCON-style dots';
   return 'ChArUco';

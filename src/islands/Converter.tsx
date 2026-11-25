@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { ArrowLeftRight } from '@/lib/icons';
-import { parse, serialize, detectFormat, FORMAT_LABELS, type Format, type CalibConfig } from '@/lib/convert';
+import { parse, serialize, toSpec, detectFormat, FORMAT_LABELS, type Format, type CalibConfig } from '@/lib/convert';
+import { patternSummary } from '@/lib/brand';
+import { patternFacts } from '@/lib/patternFacts';
 import { markerForSquare } from '@/lib/boardSizes';
 
 const FORMATS: Format[] = ['opencv-json', 'kalibr-yaml', 'ros2-yaml', 'halcon-hdev'];
@@ -157,13 +159,9 @@ export default function Converter() {
       {parsed && (
         <div className="card p-5">
           <h3 className="m-0 mb-3 text-sm font-semibold">Parsed values</h3>
+          <p className="m-0 mb-3 font-mono text-[13px]" data-testid="parsed-summary">{patternSummary(toSpec(parsed))}</p>
           <div className="grid grid-cols-3 gap-2 text-xs md:grid-cols-6">
-            <Pill label="Type" value={parsed.type} />
-            <Pill label="Rows" value={String(parsed.rows)} />
-            <Pill label="Cols" value={String(parsed.cols)} />
-            <Pill label="Square" value={`${parsed.square} mm`} />
-            <Pill label="Marker" value={`${parsed.marker} mm`} />
-            <Pill label="Dict" value={parsed.dict} />
+            {patternFacts(toSpec(parsed)).filter(([k]) => k !== 'Pattern ID' && k !== 'Pattern field').map(([k, v]) => <Pill key={k} label={k} value={v} />)}
           </div>
         </div>
       )}
