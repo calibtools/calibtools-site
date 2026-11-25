@@ -8,6 +8,8 @@
  */
 import type { PatternSpec } from './patterns';
 import { GENERATOR_DEFAULT, patternPath } from './patternLink';
+import { markerIds, idsAreOneRun, formatIds } from './idRange';
+import { sheetSource, sheetMarkerSize } from './renderMarkerSheet';
 
 export interface CatalogEntry {
   partNumber: string;
@@ -196,13 +198,23 @@ export function quoteSummary(s: PatternSpec): string {
       return `ChArUco ${grid}, ${n(s.square)} / ${n(s.marker)} mm, ${s.dict}, start ID ${s.startId ?? 0}`;
     case 'Checkerboard':
       return `Checkerboard ${grid}, ${n(s.square)} mm squares`;
-    case 'AprilGrid (Kalibr)':
-      return `AprilGrid ${grid}, ${n(s.square)} mm tags, spacing ${n(s.tagSpacing ?? 0.3)}, tag${s.aprilFamily ?? '36h11'}`;
+    case 'AprilGrid (Kalibr)': {
+      const ids = markerIds(s) ?? [];
+      const fromZero = ids[0] === 0 && idsAreOneRun(ids);
+      return `AprilGrid ${grid}, ${n(s.square)} mm tags, spacing ${n(s.tagSpacing ?? 0.3)}, tag${s.aprilFamily ?? '36h11'}${(s.borderBits ?? 2) === 1 ? ', 1-bit border' : ''}${fromZero ? '' : `, IDs ${formatIds(ids)}`}`;
+    }
     case 'ArUco grid':
       return `ArUco grid ${grid}, ${n(s.marker)} mm markers, ${n(s.square - s.marker)} mm apart, ${s.dict}, start ID ${s.startId ?? 0}`;
     case 'Symmetric circles':
     case 'Asymmetric circles':
-      return `${s.type} ${grid}, ⌀${n(s.circleDiameter ?? s.square * 0.56)} / ${n(s.square)} mm pitch`;
+    case 'HALCON-style dots': {
+      const sx = s.circleSpacingX ?? s.square, sy = s.circleSpacingY ?? s.square;
+      return `${s.type} ${grid}, ⌀${n(s.circleDiameter ?? s.square * 0.56)} / ${sx === sy ? n(sx) : `${n(sx)} × ${n(sy)}`} mm pitch`;
+    }
+    case 'Marker sheet': {
+      const source = sheetSource(s);
+      return `Marker sheet ${grid}, ${n(sheetMarkerSize(s))} mm markers, ${source.name}${source.borderBits === 2 ? ', 2-bit border' : ''}, IDs ${formatIds(markerIds(s) ?? [])}`;
+    }
     default:
       return `${s.type} ${grid}, ${n(s.square)} mm`;
   }

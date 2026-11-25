@@ -3,7 +3,9 @@
  * Used by all export formats (PDF, SVG, PNG, DXF, config files, zip).
  */
 
-import { idRange } from './idRange';
+import type { PatternSpec } from './patterns';
+import { markerIds, idsAreOneRun, formatIds } from './idRange';
+import { sheetSource, sheetMarkerSize } from './renderMarkerSheet';
 
 // ---------------------------------------------------------------------------
 // Color constants
@@ -53,57 +55,54 @@ export const ONE_LINER =
 // Pattern summary
 // ---------------------------------------------------------------------------
 
-interface PatternSummaryOpts {
-  type: string;
-  rows: number;
-  cols: number;
-  square: number;
-  marker?: number;
-  dict?: string;
-  startId?: number;
-  aprilFamily?: string;
-  tagSpacing?: number;
-}
+const mmText = (v: number) => String(Math.round(v * 1000) / 1000);
 
 /**
- * Human-readable pattern summary.
+ * One line that says what the pattern is. Printed under every pattern and written into every file, so it
+ * takes the whole pattern: a copy with only some of the fields used to fall back to tag36h11 and a 0.3 gap
+ * for an AprilGrid of another family (fixed 2026-11-25). Every value is read from where the renderers
+ * read it; nothing here has a default of its own.
  *
- * ChArUco (or any type with marker+dict):
- *   "ChArUco 7×10 · 25/18 mm · DICT_6X6_250 · id 0"
- *
- * Checkerboard (no marker/dict):
+ *   "ChArUco 7×10 · 25/18 mm · DICT_6X6_250 · IDs 0–34"
+ *   "AprilGrid (Kalibr) 5×6 · 20 mm tags, 6 mm gap · tag16h5 · IDs 0–29"
+ *   "Marker sheet 3×2 · 60 mm · DICT_APRILTAG_36h11 · IDs 0–5"
+ *   "Symmetric circles 7×10 · 30 × 20 mm spacing"
  *   "Checkerboard 7×10 · 25 mm"
  *
  * Note: uses × (U+00D7), not ASCII x.
  */
-export function patternSummary(opts: PatternSummaryOpts): string {
-  const { type, rows, cols, square, marker, dict, startId } = opts;
-  const grid = `${rows}\u00D7${cols}`;
-  if (type === 'AprilGrid (Kalibr)') {
-    // Tags, not squares and ArUco markers: tag side, gap and AprilTag family; IDs run over every cell.
-    const first = startId ?? 0;
-    const gap = Math.round(square * (opts.tagSpacing ?? 0.3) * 1000) / 1000;
-    return `${type} ${grid} \u00B7 ${square} mm tags, ${gap} mm gap \u00B7 tag${opts.aprilFamily ?? '36h11'} \u00B7 IDs ${first}\u2013${first + rows * cols - 1}`;
+export function patternSummary(s: PatternSpec): string {
+  const grid = `${s.rows}\u00D7${s.cols}`;
+  const ids = markerIds(s);
+  const idText = ids && ids.length > 0 ? ` \u00B7 IDs ${idsAreOneRun(ids) ? `${ids[0]}\u2013${ids[ids.length - 1]}` : formatIds(ids)}` : '';
+  switch (s.type) {
+    case 'AprilGrid (Kalibr)': {
+      // Tags, not squares and ArUco markers: tag side, gap and AprilTag family; IDs run over every cell.
+      const gap = mmText(s.square * (s.tagSpacing ?? 0.3));
+      const border = (s.borderBits ?? 2) === 1 ? ' \u00B7 1-bit border' : '';
+      return `${s.type} ${grid} \u00B7 ${mmText(s.square)} mm tags, ${gap} mm gap \u00B7 tag${s.aprilFamily ?? '36h11'}${border}${idText}`;
+    }
+    case 'Marker sheet': {
+      // A marker sheet has no squares: its one size is the marker.
+      const source = sheetSource(s);
+      const border = source.borderBits === 2 ? ' \u00B7 2-bit border' : '';
+      return `${s.type} ${grid} · ${mmText(sheetMarkerSize(s))} mm · ${source.name}${border}${idText}`;
+    }
+    case 'ChArUco': {
+      const legacy = s.legacyLayout && s.rows % 2 === 0 ? ' · legacy layout' : '';
+      return `${s.type} ${grid} · ${s.square}/${s.marker} mm · ${s.dict}${idText}${legacy}`;
+    }
+    case 'ArUco grid':
+      return `${s.type} ${grid} · ${s.square}/${s.marker} mm · ${s.dict}${idText}`;
+    case 'Symmetric circles':
+    case 'Asymmetric circles':
+    case 'HALCON-style dots': {
+      const sx = s.circleSpacingX ?? s.square, sy = s.circleSpacingY ?? s.square;
+      return `${s.type} ${grid} · ${sx === sy ? mmText(sx) : `${mmText(sx)} \u00D7 ${mmText(sy)}`} mm spacing`;
+    }
+    default:
+      return `${s.type} ${grid} · ${s.square} mm`;
   }
-  // Only patterns that carry markers name a marker size, a dictionary and IDs. A checkerboard or a circle grid
-  // made in the generator still has those fields filled from the page's starting values; they are not part of it.
-  const hasMarkers = type === 'ChArUco' || type === 'ArUco grid' || type === 'Marker sheet';
-  const hasMarker = hasMarkers && marker !== undefined && marker > 0;
-  const hasDict = dict !== undefined && dict !== '';
-
-  if (hasMarker && hasDict) {
-    // Compute ID range for display
-    const range = idRange({
-      type: type as any, rows, cols, square, marker, dict,
-      paper: '', startId: startId ?? 0, scaleBar: false,
-    });
-    const idStr = range ? `IDs ${range.min}\u2013${range.max}` : `id ${startId ?? 0}`;
-    // A marker sheet has no squares: its one size is the marker.
-    const size = type === 'Marker sheet' ? `${marker} mm` : `${square}/${marker} mm`;
-    return `${type} ${grid} · ${size} · ${dict} · ${idStr}`;
-  }
-  if (type.includes('circles') || type.includes('dots')) return `${type} ${grid} · ${square} mm spacing`;
-  return `${type} ${grid} · ${square} mm`;
 }
 
 // ---------------------------------------------------------------------------

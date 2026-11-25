@@ -18,6 +18,16 @@ function attrs(raw: string): Record<string, string> {
   return out;
 }
 
+/**
+ * The attributes each element may carry. Anything else (a corner radius, a transform, a stroke) would show in
+ * the SVG and the PNG and be dropped from the PDF and the DXF, so the formats would disagree: the reader stops instead.
+ */
+const KNOWN_ATTRS: Record<string, readonly string[]> = {
+  rect: ['x', 'y', 'width', 'height', 'fill', 'class'],
+  circle: ['cx', 'cy', 'r', 'fill', 'class'],
+  text: ['x', 'y', 'fill', 'class', 'font-family', 'font-size', 'text-anchor'],
+};
+
 function num(a: Record<string, string>, key: string, tag: string): number {
   const v = Number(a[key]);
   if (!Number.isFinite(v)) throw new Error(`patternShapes: <${tag}> has no usable ${key}`);
@@ -33,6 +43,8 @@ export function patternShapes(spec: PatternSpec, ox = 0, oy = 0): Shape[] {
     const [whole, tag, rawAttrs, , body] = m;
     covered += whole.length;
     const a = attrs(rawAttrs);
+    const unread = Object.keys(a).filter((k) => !(KNOWN_ATTRS[tag] ?? []).includes(k));
+    if (KNOWN_ATTRS[tag] && unread.length > 0) throw new Error(`patternShapes: <${tag}> carries ${unread.join(', ')}, which PDF and DXF export would not draw`);
     const fill = a.fill ?? '#000';
     if (tag === 'rect') shapes.push({ kind: 'rect', x: num(a, 'x', tag), y: num(a, 'y', tag), w: num(a, 'width', tag), h: num(a, 'height', tag), fill });
     else if (tag === 'circle') shapes.push({ kind: 'circle', cx: num(a, 'cx', tag), cy: num(a, 'cy', tag), r: num(a, 'r', tag), fill });

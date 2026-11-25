@@ -91,6 +91,11 @@ def measure(pdf_path: str):
         avg_size = sum(sizes) / len(sizes)
         # Filter to pattern squares (within 20% of average)
         pattern_sq = [s for s in black_squares if abs(s['size'] - avg_size) / avg_size < 0.2]
+        # A radon checkerboard draws its edge squares as quarter squares, which pull the average down:
+        # when nothing is near the average, the pattern squares are the largest ones.
+        if not pattern_sq:
+            top = max(sizes)
+            pattern_sq = [s for s in black_squares if abs(s['size'] - top) / top < 0.2]
 
         if pattern_sq:
             xs = [s['x'] for s in pattern_sq]

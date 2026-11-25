@@ -93,7 +93,7 @@ describe('PatternSpec new optional fields', () => {
 });
 
 describe('checkerboard finder markers', () => {
-  it('finder markers adds 3 circles at CALIB_CB_MARKER positions', () => {
+  it('three marked cells that touch in an L, in the middle of the board', () => {
     const spec: PatternSpec = {
       type: 'Checkerboard', rows: 7, cols: 10, square: 25, marker: 18,
       dict: '', paper: 'A4', startId: 0, scaleBar: false,
@@ -102,6 +102,23 @@ describe('checkerboard finder markers', () => {
     const svg = checkerboardSvg(spec, 210, 297);
     const circles = svg.match(/<circle[^>]*class="finder-marker"[^>]*\/>/g);
     expect(circles).toHaveLength(3);
+  });
+
+  it('are the cells of OpenCV\'s own example (-c 15 -r 10 -m 7 4 7 5 8 5), white on black and black on white', async () => {
+    const { finderMarkerCells, renderCheckerboardSvg } = await import('./renderCheckerboard');
+    const spec: PatternSpec = { type: 'Checkerboard', rows: 10, cols: 15, square: 20, marker: 0, dict: '', paper: 'A3', startId: 0, scaleBar: false, finderMarkers: true };
+    expect(finderMarkerCells(spec)).toEqual([[7, 4], [7, 5], [8, 5]]);
+    const dots = [...renderCheckerboardSvg(spec, 0, 0).matchAll(/<circle cx="([\d.]+)" cy="([\d.]+)" r="([\d.]+)" fill="(#\w+)" class="finder-marker"\/>/g)].map((m) => [+m[1], +m[2], +m[3], m[4]]);
+    // cell centers, radius 0.17 of the square; (7,4) is a white square, (7,5) black, (8,5) white
+    expect(dots).toEqual([[150, 90, 3.4, '#000'], [150, 110, 3.4, '#fff'], [170, 110, 3.4, '#000']]);
+  });
+
+  it('a board under 6 × 6 squares gets none: OpenCV does not find them there reliably', async () => {
+    const { finderMarkerCells, renderCheckerboardSvg } = await import('./renderCheckerboard');
+    const small: PatternSpec = { type: 'Checkerboard', rows: 5, cols: 8, square: 20, marker: 0, dict: '', paper: 'A4', startId: 0, scaleBar: false, finderMarkers: true };
+    expect(finderMarkerCells(small)).toBeNull();
+    expect(renderCheckerboardSvg(small, 0, 0)).not.toContain('finder-marker');
+    expect(finderMarkerCells({ ...small, rows: 6, cols: 6 })).toHaveLength(3);
   });
 });
 
@@ -285,16 +302,33 @@ describe('circle grid options', () => {
   });
 });
 
-describe('checkerboard Radon (rounded)', () => {
-  it('Radon checkers adds rx/ry attributes to squares', () => {
-    const spec: PatternSpec = {
-      type: 'Checkerboard', rows: 4, cols: 4, square: 25, marker: 18,
-      dict: '', paper: 'A4', startId: 0, scaleBar: false,
-      radonCheckers: true,
-    };
+describe('radon checkerboard (OpenCV generate_pattern.py --type radon_checkerboard)', () => {
+  const spec: PatternSpec = { type: 'Checkerboard', rows: 4, cols: 5, square: 20, marker: 0, dict: '', paper: 'A4', startId: 0, scaleBar: false, radonCheckers: true };
+
+  it('squares inside the board stay square, so every inner corner is a clean crossing', async () => {
+    const { patternShapes } = await import('./patternShapes');
+    const shapes = patternShapes(spec);
+    // black inner squares of a 4 × 5 board: (1,1), (1,3), (2,2)
+    const full = shapes.filter((s) => s.kind === 'rect' && s.w === 20);
+    expect(full.map((s) => s.kind === 'rect' && [s.x, s.y])).toEqual([[20, 20], [60, 20], [40, 40]]);
+  });
+
+  it('a black square on the edge is a disc of half the square plus the quarters that are not on the outline', async () => {
+    const { patternShapes } = await import('./patternShapes');
+    const shapes = patternShapes(spec);
+    const discs = shapes.filter((s) => s.kind === 'circle');
+    // black edge squares: row 0 at columns 0, 2, 4; row 2 at columns 0, 4; row 3 at columns 1, 3
+    expect(discs).toHaveLength(7);
+    for (const d of discs) expect(d.kind === 'circle' && d.r).toBe(10);
+    const quarters = shapes.filter((s) => s.kind === 'rect' && s.w === 10);
+    // corner square (0,0): only its inner quarter stays; (0,2) on the top edge keeps its two lower quarters
+    expect(quarters.filter((s) => s.kind === 'rect' && s.x < 20 && s.y < 20).map((s) => s.kind === 'rect' && [s.x, s.y])).toEqual([[10, 10]]);
+    expect(quarters.filter((s) => s.kind === 'rect' && s.x >= 40 && s.x < 60 && s.y < 20).map((s) => s.kind === 'rect' && [s.x, s.y])).toEqual([[50, 10], [40, 10]]);
+  });
+
+  it('carries no corner radius: PDF and DXF read rects and circles only', () => {
     const svg = checkerboardSvg(spec, 210, 297);
-    expect(svg).toContain('rx="');
-    expect(svg).toContain('ry="');
+    expect(svg).not.toMatch(/<rect[^>]* rx="/);
   });
 });
 

@@ -85,9 +85,12 @@ describe('exportBrand helpers', () => {
   });
 });
 
+// patternSummary takes the whole pattern (a partial one is a type error); these fill what a test leaves out.
+const PAGE = { marker: 0, dict: '', startId: 0, paper: 'A4', scaleBar: true } as const;
+
 describe('patternSummary', () => {
   it('formats ChArUco with dict and id', () => {
-    const s = patternSummary({
+    const s = patternSummary({ ...PAGE,
       type: 'ChArUco',
       rows: 7,
       cols: 10,
@@ -100,18 +103,18 @@ describe('patternSummary', () => {
   });
 
   it('uses × (U+00D7) not x', () => {
-    const s = patternSummary({ type: 'Checkerboard', rows: 7, cols: 10, square: 25 });
+    const s = patternSummary({ ...PAGE, type: 'Checkerboard', rows: 7, cols: 10, square: 25 });
     expect(s).toContain('×');
     expect(s).not.toMatch(/\d+x\d+/);
   });
 
   it('formats Checkerboard without dict/marker', () => {
-    const s = patternSummary({ type: 'Checkerboard', rows: 7, cols: 10, square: 25 });
+    const s = patternSummary({ ...PAGE, type: 'Checkerboard', rows: 7, cols: 10, square: 25 });
     expect(s).toBe('Checkerboard 7×10 · 25 mm');
   });
 
   it('formats ChArUco with startId other than 0', () => {
-    const s = patternSummary({
+    const s = patternSummary({ ...PAGE,
       type: 'ChArUco',
       rows: 5,
       cols: 8,
@@ -163,7 +166,7 @@ describe('brandLine', () => {
 
 describe('patternSummary with ID ranges', () => {
   it('ChArUco shows "IDs 0\u201334" instead of "id 0"', () => {
-    const s = patternSummary({
+    const s = patternSummary({ ...PAGE,
       type: 'ChArUco', rows: 7, cols: 10, square: 25,
       marker: 18, dict: 'DICT_6X6_250', startId: 0,
     });
@@ -172,7 +175,7 @@ describe('patternSummary with ID ranges', () => {
   });
 
   it('ChArUco with startId=10 shows "IDs 10\u201344"', () => {
-    const s = patternSummary({
+    const s = patternSummary({ ...PAGE,
       type: 'ChArUco', rows: 7, cols: 10, square: 25,
       marker: 18, dict: 'DICT_6X6_250', startId: 10,
     });
@@ -180,7 +183,7 @@ describe('patternSummary with ID ranges', () => {
   });
 
   it('Checkerboard has no ID in summary', () => {
-    const s = patternSummary({
+    const s = patternSummary({ ...PAGE,
       type: 'Checkerboard', rows: 7, cols: 10, square: 25,
     });
     expect(s).not.toContain('ID');
@@ -192,21 +195,21 @@ describe('patternSummary names only what the pattern has', () => {
   const leftovers = { rows: 7, cols: 10, square: 25, marker: 18, dict: 'DICT_6X6_250', startId: 0 };
 
   it('a checkerboard has no marker size, dictionary or ID', () => {
-    expect(patternSummary({ ...leftovers, type: 'Checkerboard' })).toBe('Checkerboard 7×10 · 25 mm');
+    expect(patternSummary({ ...PAGE, ...leftovers, type: 'Checkerboard' })).toBe('Checkerboard 7×10 · 25 mm');
   });
 
   it('circle grids and HALCON-style dots give their spacing only', () => {
-    expect(patternSummary({ ...leftovers, type: 'Asymmetric circles' })).toBe('Asymmetric circles 7×10 · 25 mm spacing');
-    expect(patternSummary({ ...leftovers, type: 'Symmetric circles' })).toBe('Symmetric circles 7×10 · 25 mm spacing');
-    expect(patternSummary({ ...leftovers, type: 'HALCON-style dots' })).toBe('HALCON-style dots 7×10 · 25 mm spacing');
+    expect(patternSummary({ ...PAGE, ...leftovers, type: 'Asymmetric circles' })).toBe('Asymmetric circles 7×10 · 25 mm spacing');
+    expect(patternSummary({ ...PAGE, ...leftovers, type: 'Symmetric circles' })).toBe('Symmetric circles 7×10 · 25 mm spacing');
+    expect(patternSummary({ ...PAGE, ...leftovers, type: 'HALCON-style dots' })).toBe('HALCON-style dots 7×10 · 25 mm spacing');
   });
 
   it('a marker sheet gives the marker size, not a square size', () => {
-    expect(patternSummary({ type: 'Marker sheet', rows: 3, cols: 2, square: 120, marker: 60, dict: 'DICT_APRILTAG_36h11', startId: 0 })).toBe('Marker sheet 3×2 · 60 mm · DICT_APRILTAG_36h11 · IDs 0–5');
+    expect(patternSummary({ ...PAGE, type: 'Marker sheet', rows: 3, cols: 2, square: 120, marker: 60, dict: 'DICT_APRILTAG_36h11', startId: 0 })).toBe('Marker sheet 3×2 · 60 mm · DICT_APRILTAG_36h11 · IDs 0–5');
   });
 
   it('ChArUco and ArUco grid keep marker size, dictionary and IDs', () => {
-    expect(patternSummary({ ...leftovers, type: 'ChArUco' })).toBe('ChArUco 7×10 · 25/18 mm · DICT_6X6_250 · IDs 0–34');
-    expect(patternSummary({ ...leftovers, type: 'ArUco grid' })).toBe('ArUco grid 7×10 · 25/18 mm · DICT_6X6_250 · IDs 0–69');
+    expect(patternSummary({ ...PAGE, ...leftovers, type: 'ChArUco' })).toBe('ChArUco 7×10 · 25/18 mm · DICT_6X6_250 · IDs 0–34');
+    expect(patternSummary({ ...PAGE, ...leftovers, type: 'ArUco grid' })).toBe('ArUco grid 7×10 · 25/18 mm · DICT_6X6_250 · IDs 0–69');
   });
 });

@@ -3,7 +3,8 @@
  * laid out as ArUco markers with a one-cell border. They were once drawn as solid black squares.
  */
 import { describe, it, expect } from 'vitest';
-import { renderCharucoSvg, renderArucoGridSvg, charucoMarkers, markerCapacity } from './renderCharuco';
+import { renderCharucoSvg, renderArucoGridSvg, charucoMarkers } from './renderCharuco';
+import { markerCapacity } from './idRange';
 import { getMarkerDict, getAprilFamily, decodeAprilBits, decodeMarkerBits, getArUcoDict, largerDictFor } from './dicts/dicts';
 import { CATALOG, specFromEntry } from './catalogPatterns';
 import { GENERATOR_DEFAULT } from './patternLink';
