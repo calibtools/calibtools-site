@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { computeSetBoards, buildSetManifest, setBoardFilename } from './exportSet';
+import { computeSetBoards, buildSetManifest, setBoardFilename, setOverlaps } from './exportSet';
 import type { PatternSpec } from './patterns';
 
 const base: PatternSpec = {
@@ -55,5 +55,18 @@ describe('setBoardFilename', () => {
   it('includes start ID in filename', () => {
     expect(setBoardFilename(base, 35)).toContain('id35');
     expect(setBoardFilename(base, 35)).toMatch(/\.pdf$/);
+  });
+});
+
+describe('setOverlaps', () => {
+  it('none for boards numbered one after the other', () => {
+    expect(setOverlaps(computeSetBoards(base, 4))).toEqual([]);
+  });
+  it('finds boards whose changed start IDs make their ranges share IDs', () => {
+    expect(setOverlaps(computeSetBoards(base, 3, [0, 20, 100]))).toEqual([{ a: 0, b: 1, first: 20, last: 34 }]);
+    expect(setOverlaps(computeSetBoards(base, 2, [0, 0]))).toEqual([{ a: 0, b: 1, first: 0, last: 34 }]);
+  });
+  it('ranges that only touch do not overlap', () => {
+    expect(setOverlaps(computeSetBoards(base, 2, [0, 35]))).toEqual([]);
   });
 });

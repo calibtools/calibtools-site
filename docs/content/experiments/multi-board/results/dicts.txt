@@ -1,0 +1,14 @@
+DICT_4X4_50 markers 50 min_distance 4 correction_bits 1
+DICT_4X4_250 markers 250 min_distance 3 correction_bits 1
+DICT_5X5_100 markers 100 min_distance 7 correction_bits 3
+DICT_5X5_250 markers 250 min_distance 6 correction_bits 2
+DICT_5X5_1000 markers 1000 min_distance 5 correction_bits 2
+DICT_6X6_250 markers 250 min_distance 11 correction_bits 5
+DICT_6X6_1000 markers 1000 min_distance 9 correction_bits 4
+DICT_7X7_250 markers 250 min_distance 17 correction_bits 8
+DICT_7X7_1000 markers 1000 min_distance 14 correction_bits 6
+DICT_APRILTAG_36h11 markers 587 min_distance 11 correction_bits 5
+DICT_4X4_50 is the first 50 markers of DICT_4X4_250: True
+DICT_5X5_100 is the first 100 markers of DICT_5X5_1000: True
+DICT_6X6_250 is the first 250 markers of DICT_6X6_1000: True
+DICT_7X7_250 is the first 250 markers of DICT_7X7_1000: True

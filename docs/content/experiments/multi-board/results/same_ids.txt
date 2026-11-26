@@ -1,0 +1,4 @@
+same IDs    checkMarkers=True   markers found 70  board 1 corners  0
+same IDs    checkMarkers=False  markers found 70  board 1 corners 54  more than 2 px off: 54, up to 700 px
+IDs 35-69   checkMarkers=True   markers found 70  board 1 corners 54  more than 2 px off:  0
+IDs 35-69   checkMarkers=False  markers found 70  board 1 corners 54  more than 2 px off:  0

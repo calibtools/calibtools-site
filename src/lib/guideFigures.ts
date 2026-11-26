@@ -27,7 +27,7 @@ export const PARTIAL_VIEW_CASES: PartialViewCase[] = [
 export interface PartialViewResult { key: string; found: boolean; points: [number, number][] }
 export interface PartialViewData { opencv: string; visible: number; pxPerMm: number; results: PartialViewResult[] }
 
-const INK = '#141414', MUTED = '#4A4A47', RED = '#E60012', LINE = '#A8A59C';
+const INK = '#141414', MUTED = '#4A4A47', RED = '#E60012', LINE = '#A8A59C', OK = '#007A3D';
 
 /**
  * Three boards with their right part outside the camera frame, and the points OpenCV still returns.
@@ -538,4 +538,54 @@ export function coverageMapFigureSvg(grid: readonly (readonly number[])[], label
       : `<rect x="${c * C + 2}" y="${r * C + 2}" width="${C - 4}" height="${C - 4}" fill="none" stroke="${RED}" stroke-width="1.5"/>`;
   }));
   return o + '</svg>';
+}
+
+/** Boards of the same-IDs figure: the 10 × 7 ChArUco board of the multi-board guide, and its twin. */
+export const SAME_IDS_BOARD: PatternSpec = { ...base, type: 'ChArUco', rows: 7, cols: 10, square: 30, marker: 22 };
+
+export interface SameIdsCase { key: 'same' | 'same_check_off' | 'separate'; second_start: number; check_markers: boolean; markers: number; points: [number, number][]; on_board1: boolean[]; on_board2: boolean[] }
+export interface SameIdsData { opencv: string; gap_mm: number; board_mm: [number, number]; cases: SameIdsCase[] }
+
+/**
+ * Two boards side by side, twice: with the same marker IDs and with separate ones, and the corners OpenCV's
+ * CharucoDetector returns for board 1. Corners in the right place on board 1 are green, corners anywhere else red.
+ */
+export function sameIdsFigureSvg(data: SameIdsData): string {
+  const W = 640;
+  const r = (v: number) => +v.toFixed(2);
+  const [bw, bh] = data.board_mm, total = 2 * bw + data.gap_mm;
+  const s = (W - 40) / total, x0 = 20;
+  const rowHeight = (lines: number) => 34 + bh * s + 30 + lines * 22 + 14;
+  const get = (k: SameIdsCase['key']) => data.cases.find((c) => c.key === k)!;
+  const rows: { title: string; second: number; dots: SameIdsCase; lines: [string, boolean][] }[] = [
+    {
+      title: 'Both boards with marker IDs 0–34', second: 0, dots: get('same_check_off'),
+      lines: [[`OpenCV 4.8 and later: ${get('same').points.length} corners, the image is dropped`, false],
+        [`With the check switched off: ${get('same_check_off').points.length} corners, ${get('same_check_off').on_board1.filter((x) => !x).length} on the wrong board`, true]],
+    },
+    {
+      title: 'Board 1 with IDs 0–34, board 2 with IDs 35–69', second: 35, dots: get('separate'),
+      lines: [[`${get('separate').points.length} corners, ${get('separate').on_board1.filter(Boolean).length} on board 1`, false]],
+    },
+  ];
+  let o = '', top = 0;
+  rows.forEach((row, i) => {
+    const y0 = top + 34;
+    o += `<text x="${x0}" y="${top + 22}" font-size="17" font-weight="600" fill="${INK}">${row.title}</text>`;
+    [0, row.second].forEach((start, b) => {
+      const bx = x0 + b * (bw + data.gap_mm) * s;
+      o += `<g transform="translate(${r(bx)} ${y0}) scale(${+s.toFixed(5)})"><rect x="-4" y="-4" width="${bw + 8}" height="${bh + 8}" fill="#fff" stroke="${LINE}" stroke-width="${+(1 / s).toFixed(3)}"/>${renderPatternSvg({ ...SAME_IDS_BOARD, startId: start }, 0, 0)}</g>`;
+      o += `<text x="${r(bx + bw * s / 2)}" y="${r(y0 + bh * s + 18)}" text-anchor="middle" font-size="13" fill="${MUTED}">Board ${b + 1}</text>`;
+    });
+    row.dots.points.forEach(([px, py], k) => {
+      o += `<circle cx="${r(x0 + px * s)}" cy="${r(y0 + py * s)}" r="3.4" fill="${row.dots.on_board1[k] ? OK : RED}" stroke="#fff" stroke-width="0.9"/>`;
+    });
+    row.lines.forEach(([t, red], k) => {
+      o += `<text x="${x0}" y="${r(y0 + bh * s + 48 + k * 22)}" font-size="15" fill="${red ? RED : INK}" ${MONO}>${t}</text>`;
+    });
+    if (i > 0) o += `<line x1="20" y1="${r(top)}" x2="${W - 20}" y2="${r(top)}" stroke="${LINE}" stroke-width="1"/>`;
+    top += rowHeight(row.lines.length);
+  });
+  const H = r(top);
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" font-family="Geist, system-ui, sans-serif" role="img"><rect width="${W}" height="${H}" fill="#fff"/>${o}</svg>`;
 }

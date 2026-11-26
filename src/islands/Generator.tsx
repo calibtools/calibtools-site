@@ -9,7 +9,7 @@ import { matchCatalog, productUrlFor, specFromEntry, quoteSummary } from '@/lib/
 import { kalibrYaml, kalibrSupported, kalibrUnsupported, ros2Yaml, ros2Supported, halconCode, halconSupported, opencvJson } from '@/lib/exportConfig';
 import { exportZip } from '@/lib/exportZip';
 import { patternSummary } from '@/lib/brand';
-import { computeSetBoards, buildSetManifest, setBoardFilename } from '@/lib/exportSet';
+import { computeSetBoards, buildSetManifest, setBoardFilename, setOverlaps } from '@/lib/exportSet';
 import { PAPERS, computeLayout, fitNotice, reductionNotice, smallestFittingPaper, patternExtent, type Orientation } from '@/lib/pageLayout';
 import { LEAD_TIME } from '@/lib/claims';
 import { GENERATOR_DEFAULT, specFromParams, specToParams, patternPath, patternId } from '@/lib/patternLink';
@@ -181,6 +181,8 @@ export default function Generator({ initialSpec, heading = 'Pattern generator' }
     if (boardCount <= 1 || idsListed) return null;
     return computeSetBoards(spec, boardCount, boardStartIds.length >= boardCount ? boardStartIds : undefined);
   }, [spec, boardCount, boardStartIds, idsListed]);
+  // Changed start IDs can make two boards share IDs; a detector cannot tell such boards apart.
+  const overlaps = useMemo(() => (boards ? setOverlaps(boards) : []), [boards]);
 
   // Marker IDs against the dictionary: a marker whose ID the dictionary does not have cannot be drawn.
   const capacity = markerCapacity(spec);
@@ -485,6 +487,11 @@ export default function Generator({ initialSpec, heading = 'Pattern generator' }
                     </tr>
                   ))}</tbody>
                 </table>
+                {overlaps.length > 0 && (
+                  <p className="m-0 mt-2 text-[13px] leading-snug text-brand-dark">
+                    {overlaps.map((o) => `Boards ${o.a + 1} and ${o.b + 1} share IDs ${o.first === o.last ? o.first : `${o.first}\u2013${o.last}`}.`).join(' ')} A detector cannot tell boards with the same IDs apart. Change a start ID to export the set.
+                  </p>
+                )}
               </div>
             )}
           </div>
@@ -526,7 +533,7 @@ export default function Generator({ initialSpec, heading = 'Pattern generator' }
             {boards && boards.length >= 2 && (
               <button type="button"
                 className="col-span-2 rounded bg-brand px-3 py-[11px] text-sm font-semibold text-white disabled:opacity-50"
-                disabled={busy !== null || idsShort}
+                disabled={busy !== null || idsShort || overlaps.length > 0}
                 onClick={async () => {
                   setBusy('pdf');
                   try {
