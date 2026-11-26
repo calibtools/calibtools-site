@@ -62,3 +62,22 @@ export function setBoardFilename(baseSpec: PatternSpec, startId: number): string
   const slug = `${baseSpec.type.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${baseSpec.rows}x${baseSpec.cols}-${baseSpec.square}mm`;
   return `${slug}-id${startId}.pdf`;
 }
+
+/** Two boards of a set whose ID ranges overlap, with the IDs they share. */
+export interface SetOverlap { a: number; b: number; first: number; last: number }
+
+/**
+ * Boards that share marker IDs. A changed start ID can make two ranges overlap, and OpenCV 4.8 and later
+ * return no ChArUco corners at all for an image in which one ID appears twice; the set export stays off.
+ */
+export function setOverlaps(boards: SetBoard[]): SetOverlap[] {
+  const out: SetOverlap[] = [];
+  for (let i = 0; i < boards.length; i++) {
+    for (let j = i + 1; j < boards.length; j++) {
+      const first = Math.max(boards[i].idRange.min, boards[j].idRange.min);
+      const last = Math.min(boards[i].idRange.max, boards[j].idRange.max);
+      if (first <= last) out.push({ a: boards[i].index, b: boards[j].index, first, last });
+    }
+  }
+  return out;
+}

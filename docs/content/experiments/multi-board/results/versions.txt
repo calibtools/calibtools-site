@@ -1,0 +1,30 @@
+4.6.0 full interpolateCornersCharuco: 54 corners, board1 22, board2 19, neither 13, worst off board1 515 px
+4.6.0 part interpolateCornersCharuco: 54 corners, board1 47, board2 3, neither 4, worst off board1 987 px
+4.7.0 full default: 54 corners, board1 22, board2 19, neither 13, worst off board1 515 px
+4.7.0 full: no checkMarkers switch
+4.7.0 part default: 54 corners, board1 47, board2 3, neither 4, worst off board1 987 px
+4.7.0 part: no checkMarkers switch
+4.8.0 full default: no corners
+4.8.0 full: no checkMarkers switch
+4.8.0 part default: no corners
+4.8.0 part: no checkMarkers switch
+4.9.0 full default: no corners
+4.9.0 full: no checkMarkers switch
+4.9.0 part default: no corners
+4.9.0 part: no checkMarkers switch
+4.10.0 full default: no corners
+4.10.0 full: no checkMarkers switch
+4.10.0 part default: no corners
+4.10.0 part: no checkMarkers switch
+4.11.0 full default: no corners
+4.11.0 full: no checkMarkers switch
+4.11.0 part default: no corners
+4.11.0 part: no checkMarkers switch
+4.12.0 full default: no corners
+4.12.0 full checkMarkers off: 54 corners, board1 18, board2 20, neither 16, worst off board1 519 px
+4.12.0 part default: no corners
+4.12.0 part checkMarkers off: 54 corners, board1 54, board2 0, neither 0, worst off board1 1 px
+5.1.0 full default: no corners
+5.1.0 full checkMarkers off: 54 corners, board1 18, board2 20, neither 16, worst off board1 518 px
+5.1.0 part default: no corners
+5.1.0 part checkMarkers off: 54 corners, board1 54, board2 0, neither 0, worst off board1 0 px
