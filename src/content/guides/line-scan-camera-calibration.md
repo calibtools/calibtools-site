@@ -349,7 +349,7 @@ Before you use the model:
 
 - [How big should your target be?](/calibacademy/calibration-target-size/): square size against sensor, lens and field.
 
-- [Composite, ceramic or glass](/calibacademy/composite-ceramic-or-glass/): flatness and thermal expansion of the board materials against one pixel of the system.
+- [Composite, ceramic or glass](/calibacademy/composite-ceramic-or-glass/): what flatness, print tolerance and temperature of each board material do to the camera model.
 
 - [Why a printed target costs half a pixel](/calibacademy/printed-target-costs-half-a-pixel/): what a paper board on a belt does to the fit.
 
