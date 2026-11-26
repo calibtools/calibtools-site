@@ -249,7 +249,11 @@ export const BOARD_MOTION_SCALE = { rmsMax: 0.25, lensMax: 2, barMax: 232 };
 
 /** Same layout as the reprojection-error figure, both scales linear. */
 export function boardMotionFigureSvg(rows: BoardMotionRow[]): string {
-  const { rmsMax, lensMax, barMax } = BOARD_MOTION_SCALE;
+  return rmsBesideLensErrorSvg(rows, BOARD_MOTION_SCALE);
+}
+
+function rmsBesideLensErrorSvg(rows: { label: string; rms: number; lensMax: number; rmsText?: string; lensText?: string }[], scale: { rmsMax: number; lensMax: number; barMax: number }): string {
+  const { rmsMax, lensMax, barMax } = scale;
   const W = 640, x1 = 20, x2 = 336, rowH = 54;
   const w = (v: number, max: number) => Math.max(+(Math.min(v, max) / max * barMax).toFixed(1), 2);
   let o = `<text x="${x1}" y="26" font-size="16" font-weight="600" fill="${INK}">Reprojection error</text><text x="${x1}" y="48" font-size="14" fill="${INK}">RMS in px, what the report shows</text>`;
@@ -258,12 +262,34 @@ export function boardMotionFigureSvg(rows: BoardMotionRow[]): string {
   let y = 74;
   for (const r of rows) {
     o += `<text x="${x1}" y="${y + 14}" font-size="15" fill="${INK}">${r.label[0].toUpperCase() + r.label.slice(1)}</text>`;
-    o += `<rect x="${x1}" y="${y + 22}" width="${w(r.rms, rmsMax)}" height="16" fill="${INK}"/><text x="${x1 + w(r.rms, rmsMax) + 6}" y="${y + 35}" font-size="14" fill="${INK}" ${MONO}>${r.rms}</text>`;
-    o += `<rect x="${x2}" y="${y + 22}" width="${w(r.lensMax, lensMax)}" height="16" fill="${RED}"/><text x="${x2 + w(r.lensMax, lensMax) + 6}" y="${y + 35}" font-size="14" fill="${INK}" ${MONO}>${r.lensMax}</text>`;
+    o += `<rect x="${x1}" y="${y + 22}" width="${w(r.rms, rmsMax)}" height="16" fill="${INK}"/><text x="${x1 + w(r.rms, rmsMax) + 6}" y="${y + 35}" font-size="14" fill="${INK}" ${MONO}>${r.rmsText ?? r.rms}</text>`;
+    o += `<rect x="${x2}" y="${y + 22}" width="${w(r.lensMax, lensMax)}" height="16" fill="${RED}"/><text x="${x2 + w(r.lensMax, lensMax) + 6}" y="${y + 35}" font-size="14" fill="${INK}" ${MONO}>${r.lensText ?? r.lensMax}</text>`;
     y += rowH;
   }
   const H = y + 4;
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" font-family="Geist, system-ui, sans-serif" role="img"><rect width="${W}" height="${H}" fill="#fff"/>${o}</svg>`;
+}
+
+/* ---- Substrate guide: a board at the limit of its tolerance, as the report shows it and as the model is ---- */
+
+export interface SubstrateRow { label: string; rms: number; focal: string; lensMax: number; rmsText: string; lensText: string }
+
+/** The table under "The short answer" in composite-ceramic-or-glass.md. */
+export function substrateRowsFromGuide(markdown: string): SubstrateRow[] {
+  const from = markdown.indexOf('## The short answer');
+  const part = markdown.slice(from, markdown.indexOf('\n## ', from + 1));
+  const rows: SubstrateRow[] = [];
+  for (const line of part.split('\n')) {
+    const r = line.replace(/\u00a0/g, ' ').match(/^\| ([^|]+?) \| ([\d.]+) \| ([+\u2212]?[\d.]+ %) \| ([\d.]+) \|$/);
+    if (r) rows.push({ label: r[1], rms: +r[2], focal: r[3], lensMax: +r[4], rmsText: r[2], lensText: r[4] });
+  }
+  return rows;
+}
+
+export const SUBSTRATE_SCALE = { rmsMax: 0.15, lensMax: 3.5, barMax: 232 };
+
+export function substrateFigureSvg(rows: SubstrateRow[]): string {
+  return rmsBesideLensErrorSvg(rows, SUBSTRATE_SCALE);
 }
 
 /* ---- Camera calibration guide: where the board goes in the frame ---- */

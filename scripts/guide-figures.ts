@@ -9,7 +9,7 @@ import { writeFileSync, mkdirSync, readFileSync } from 'node:fs';
 import { Resvg } from '@resvg/resvg-js';
 import { renderPatternSvg } from '../src/lib/patterns';
 import { patternExtent } from '../src/lib/pageLayout';
-import { PARTIAL_VIEW_CASES, PARTIAL_VIEW_VISIBLE, PARTIAL_VIEW_MARGIN, partialViewFigureSvg, usafFigureSvg, kalibrFrameFigureSvg, multiBoardFigureSvg, fillFigureSvg, fillRowsFromGuide, printDefectFigureSvg, printDefectRowsFromGuide, hiddenErrorFigureSvg, hiddenErrorRowsFromGuide, coverageFigureSvg, handEyeFigureSvg, detectionLimitsFigureSvg, detectionLimitsFromGuide, lidarCameraFigureSvg, boardMotionFigureSvg, boardMotionRowsFromGuide, type PartialViewData } from '../src/lib/guideFigures';
+import { PARTIAL_VIEW_CASES, PARTIAL_VIEW_VISIBLE, PARTIAL_VIEW_MARGIN, partialViewFigureSvg, usafFigureSvg, kalibrFrameFigureSvg, multiBoardFigureSvg, fillFigureSvg, fillRowsFromGuide, printDefectFigureSvg, printDefectRowsFromGuide, hiddenErrorFigureSvg, hiddenErrorRowsFromGuide, coverageFigureSvg, handEyeFigureSvg, detectionLimitsFigureSvg, detectionLimitsFromGuide, lidarCameraFigureSvg, boardMotionFigureSvg, boardMotionRowsFromGuide, substrateFigureSvg, substrateRowsFromGuide, type PartialViewData } from '../src/lib/guideFigures';
 
 if (process.argv.includes('--pngs')) {
   const pxPerMm = 6, m = PARTIAL_VIEW_MARGIN;
@@ -39,5 +39,6 @@ if (process.argv.includes('--pngs')) {
   writeFileSync('src/assets/guides/charuco-detection-limits.svg', detectionLimitsFigureSvg(detectionLimitsFromGuide(readFileSync('src/content/guides/corner-detection-troubleshooting.md', 'utf8'))));
   writeFileSync('src/assets/guides/lidar-camera-target-two-views.svg', lidarCameraFigureSvg());
   writeFileSync('src/assets/guides/board-motion-rms-vs-model-error.svg', boardMotionFigureSvg(boardMotionRowsFromGuide(readFileSync('src/content/guides/how-still-calibration-board.md', 'utf8'))));
+  writeFileSync('src/assets/guides/substrate-rms-vs-model-error.svg', substrateFigureSvg(substrateRowsFromGuide(readFileSync('src/content/guides/composite-ceramic-or-glass.md', 'utf8'))));
   console.log('wrote src/assets/guides/*.svg');
 }
