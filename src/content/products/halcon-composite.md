@@ -19,7 +19,7 @@ relatedTargets:
   - { label: "¼″ mounting fixture", href: "/targets/mounting-fixture/", note: "Clamps any board onto a tripod or lab post." }
 relatedGuides:
   - { label: "How big should your target be?", href: "/calibacademy/calibration-target-size/", note: "The 60 % fill rule." }
-  - { label: "Composite, ceramic or glass", href: "/calibacademy/composite-ceramic-or-glass/", note: "Compare the tolerance with one pixel on the board." }
+  - { label: "Composite, ceramic or glass", href: "/calibacademy/composite-ceramic-or-glass/", note: "What a board at the limit of its tolerance does to the camera model." }
   - { label: "What reprojection error tells you", href: "/calibacademy/reprojection-error/", note: "And what a low value can hide." }
   - { label: "Which software reads which target?", href: "/calibacademy/calibration-software-target-compatibility/", note: "HALCON plates, point objects and the other programs." }
 ---

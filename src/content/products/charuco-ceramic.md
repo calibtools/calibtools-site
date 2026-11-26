@@ -27,7 +27,7 @@ relatedTargets:
   - { label: "¼″ mounting fixture", href: "/targets/mounting-fixture/", note: "Soft jaws that hold a ceramic plate by its edges." }
   - { label: "Hand-eye calibration kit", href: "/targets/hand-eye-calibration-kit/", note: "Board and flange adapter for a camera on a robot." }
 relatedGuides:
-  - { label: "Composite, ceramic or glass", href: "/calibacademy/composite-ceramic-or-glass/", note: "Compare the tolerance with one pixel on the board." }
+  - { label: "Composite, ceramic or glass", href: "/calibacademy/composite-ceramic-or-glass/", note: "What a board at the limit of its tolerance does to the camera model." }
   - { label: "How big should your target be?", href: "/calibacademy/calibration-target-size/", note: "The 60 % fill rule and pixels per marker bit." }
   - { label: "What reprojection error tells you", href: "/calibacademy/reprojection-error/", note: "And what a low value can hide." }
   - { label: "OpenCV camera calibration", href: "/calibacademy/opencv-camera-calibration/", note: "Load the board file and run the calibration." }

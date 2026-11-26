@@ -22,7 +22,7 @@ relatedTargets:
   - { label: "HALCON plate, aluminum", href: "/targets/halcon-composite/", note: "For area cameras on the same line." }
 relatedGuides:
   - { label: "Line-scan camera calibration", href: "/calibacademy/line-scan-camera-calibration/", note: "Strip for the line axis, scanned board for mm per line and skew." }
-  - { label: "Composite, ceramic or glass", href: "/calibacademy/composite-ceramic-or-glass/", note: "Compare the tolerance with one pixel on the target." }
+  - { label: "Composite, ceramic or glass", href: "/calibacademy/composite-ceramic-or-glass/", note: "What a board at the limit of its tolerance does to the camera model." }
   - { label: "USAF 1951 lp/mm table", href: "/calibacademy/usaf-1951-lp-mm-table/", note: "Reading resolution from line pairs." }
   - { label: "How big should your target be?", href: "/calibacademy/calibration-target-size/", note: "Size against field of view." }
 ---

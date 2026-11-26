@@ -22,7 +22,7 @@ relatedTargets:
   - { label: "Backlit target", href: "/targets/backlit-target/", note: "Calibration patterns on a light source." }
   - { label: "Circle grid, aluminum", href: "/targets/circlegrid-composite/", note: "Dot grids for larger fields." }
 relatedGuides:
-  - { label: "Composite, ceramic or glass", href: "/calibacademy/composite-ceramic-or-glass/", note: "Compare the tolerance with one pixel on the target." }
+  - { label: "Composite, ceramic or glass", href: "/calibacademy/composite-ceramic-or-glass/", note: "What a board at the limit of its tolerance does to the camera model." }
   - { label: "What reprojection error tells you", href: "/calibacademy/reprojection-error/", note: "Reading residuals." }
   - { label: "OpenCV camera calibration", href: "/calibacademy/opencv-camera-calibration/", note: "When you need the full camera model." }
 ---

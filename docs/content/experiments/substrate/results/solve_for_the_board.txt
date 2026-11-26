@@ -1,0 +1,3 @@
+calibrateCamera     RMS 0.086 px   focal length -0.175 %
+calibrateCameraRO   RMS 0.067 px   focal length -0.024 %
+board it solved for: bow of 0.076 mm between the corners (0.067 mm in truth)
