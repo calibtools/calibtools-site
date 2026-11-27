@@ -1,0 +1,15 @@
+{
+ "slow": {
+  "turn_deg_per_s": 21.592468195202112,
+  "acceleration_m_s2": 0.16617117661797623
+ },
+ "baseline": {
+  "turn_deg_per_s": 43.79045690585403,
+  "acceleration_m_s2": 0.6738286909170264
+ },
+ "brisk": {
+  "turn_deg_per_s": 88.98606028892921,
+  "acceleration_m_s2": 2.711421768020955
+ },
+ "imu_to_camera_mm": 68.85128902206552
+}

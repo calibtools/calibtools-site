@@ -649,3 +649,42 @@ export function handEyeRotationFigureSvg(rows: HandEyeRotationRow[]): string {
 }
 
 export const HAND_EYE_ROTATION_CASES = ['tilt_2', 'tilt_5', 'tilt_10', 'tilt_20', 'tilt_30', 'tilt_45'];
+
+export interface CameraImuMotionRow { label: string; transMm: number }
+export const CAMERA_IMU_MOTION_CASES: [string, string][] = [
+  ['brisk', 'All axes, twice the pace'],
+  ['baseline', 'All axes, steady pace'],
+  ['slow', 'All axes, half the pace'],
+  ['no_translation', 'Rotation only'],
+  ['one_rotation_axis', 'Rotation about one axis'],
+  ['no_rotation', 'No rotation'],
+];
+
+/** Median translation error of the saved recordings of each motion case of the camera-IMU experiment. */
+export function cameraImuMotionRows(cases: Record<string, { trans_mm?: number }[]>): CameraImuMotionRow[] {
+  const median = (v: number[]) => { const s = [...v].sort((a, b) => a - b), m = s.length >> 1; return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; };
+  return CAMERA_IMU_MOTION_CASES.map(([name, label]) => ({ label, transMm: median(cases[name].filter((r) => r.trans_mm !== undefined).map((r) => r.trans_mm!)) }));
+}
+
+/**
+ * Error of the camera-to-IMU position against how the rig was moved during the recording.
+ * Horizontal bars on a logarithmic scale from 0.5 to 150 mm; bars of 5 mm and more are red.
+ */
+export function cameraImuMotionFigureSvg(rows: CameraImuMotionRow[]): string {
+  const W = 640, left = 232, right = 84, top = 46, rowH = 34, lo = 0.5, hi = 150;
+  const barMax = W - left - right, H = top + rows.length * rowH + 40;
+  const x = (mm: number) => (Math.log(mm / lo) / Math.log(hi / lo)) * barMax;
+  const r = (v: number) => +v.toFixed(1);
+  let o = `<text x="20" y="24" font-size="15.5" font-weight="600" fill="${INK}">How the rig was moved</text><text x="${left}" y="24" font-size="15.5" font-weight="600" fill="${INK}">Error in the IMU position</text>`;
+  for (const tick of [1, 10, 100]) {
+    const tx = r(left + x(tick));
+    o += `<line x1="${tx}" y1="${top - 8}" x2="${tx}" y2="${top + rows.length * rowH}" stroke="${LINE}" stroke-width="1" stroke-dasharray="3 3"/><text x="${tx}" y="${top + rows.length * rowH + 18}" text-anchor="middle" font-size="12.5" fill="${MUTED}" ${MONO}>${tick} mm</text>`;
+  }
+  rows.forEach((row, i) => {
+    const y = top + i * rowH, bad = row.transMm >= 5, w = r(Math.max(2, x(row.transMm)));
+    o += `<text x="20" y="${y + 19}" font-size="14" fill="${INK}">${row.label}</text>`;
+    o += `<rect x="${left}" y="${y + 4}" width="${w}" height="20" fill="${bad ? RED : INK}"/>`;
+    o += `<text x="${r(left + w + 8)}" y="${y + 19}" font-size="14.5" font-weight="${bad ? 600 : 400}" fill="${bad ? RED_TEXT : INK}" ${MONO}>${fmtMm(row.transMm)} mm</text>`;
+  });
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" font-family="Geist, system-ui, sans-serif" role="img"><rect width="${W}" height="${H}" fill="#fff"/>${o}</svg>`;
+}

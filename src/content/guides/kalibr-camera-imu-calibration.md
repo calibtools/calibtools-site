@@ -1,43 +1,141 @@
 ---
-title: "Kalibr camera–IMU calibration: step by step"
-description: "Camera–IMU calibration with Kalibr: AprilGrid and IMU noise files, recording the sequence, running the calibration, and reading T_cam_imu and the time offset."
+title: "Kalibr camera-IMU calibration: what matters?"
+description: "Camera-IMU calibration for Kalibr: file formats checked against its source, and simulated recordings that show what motion and timestamps do to the result."
 date: 2026-11-07
-updated: 2026-11-07
+updated: 2026-11-27
 readingTime: "13 min"
-keyRule: "Calibrate the camera on a static sequence first, then move the sensor, not the board, and judge the result by the report plots rather than by the fact that it converged."
+keyRule: "Move the rig, not the grid, and turn it about all three axes while you move it: without rotation the IMU's position cannot be found. Stamp both sensors from one clock, and let the time offset be estimated."
 related: ["opencv-camera-calibration", "charuco-vs-checkerboard-vs-aprilgrid", "hand-eye-calibration-opencv", "calibration-software-target-compatibility"]
 products: ["aprilgrid-composite", "charuco-composite"]
 sampleFiles: []
 faq:
-  - q: "Which target does Kalibr want for camera–IMU calibration?"
-    a: "An AprilGrid. Every tag has its own ID, so the board can leave the frame or be partly covered during fast motion and the pose is still unambiguous. Checkerboards and circle grids work but can flip the pose estimate at some angles."
+  - q: "Which target does Kalibr want for camera-IMU calibration?"
+    a: "Kalibr's documentation recommends the AprilGrid, because a partly visible grid is still detected. That makes the recording much easier: the rig can swing far enough for the grid to run off the image."
   - q: "What is T_cam_imu?"
-    a: "The transform from IMU coordinates to camera coordinates: p_cam = T_cam_imu · p_imu. Most VIO frameworks want the camera-in-IMU transform instead, which is its inverse."
+    a: "The transform from IMU coordinates to camera coordinates: p_cam = T_cam_imu · p_imu. OpenVINS (T_imu_cam) and VINS-Fusion (body_T_cam0) want the camera pose in the IMU frame instead, which is its inverse."
   - q: "What does timeshift_cam_imu mean?"
-    a: "The time offset in seconds between the two clocks, defined so that t_imu = t_cam + timeshift_cam_imu. A few milliseconds is common on USB cameras; it is estimated by default."
+    a: "The time offset in seconds between the two clocks, defined so that t_imu = t_cam + timeshift_cam_imu. Kalibr estimates it unless you pass --no-time-calibration, and its option --timeoffset-padding, default 0.03 s, limits how far it may move during estimation."
+  - q: "How should I move the rig during the recording?"
+    a: "Turn it about all three axes while moving it along all three. In our simulation that gave the IMU position within 1.3 mm. Rotation about one axis only gave 37.7 mm, and no rotation at all gave 75.4 mm, more than the 69 mm that separate the two sensors."
   - q: "Where do the IMU noise values come from?"
-    a: "From an Allan deviation analysis of a long static recording, or from the datasheet converted to Kalibr's continuous-time units. Low-cost MEMS IMUs usually need the values inflated several times over the datasheet."
+    a: "From the datasheet, or from an Allan deviation plot of a recording with the IMU standing still. The white noise is read at an averaging time of 1 s. The random walk is read where the fitted rising line crosses 3 s, not from the curve itself, which was 4.2 times too high there in our simulation."
   - q: "Does Kalibr work with ROS 2?"
-    a: "Kalibr runs on ROS 1 and reads ROS 1 bags. The repository ships Docker images, and ROS 2 recordings can be converted to the ROS 1 bag format with the rosbags Python package before calibration."
+    a: "Kalibr needs ROS 1 and reads ROS 1 bags. Its repository ships Docker files, and its documentation shows how to convert a ROS 2 recording with the rosbags package first."
 ---
 
-Kalibr's camera–IMU calibration gives you the rigid transform between a camera and an inertial unit and the time offset between their clocks. Visual-inertial odometry (VINS, OpenVINS, ORB-SLAM3, Basalt) cannot run well without both.
+Kalibr's camera-IMU calibration gives the rigid transform between a camera and an inertial unit and the time offset between their clocks. This page covers what goes into it and which parts of the recording decide the result.
 
-This guide walks through the inputs, the recording, the run and the checks, with the exact file formats Kalibr expects.
+![Error in the IMU position by how the rig was moved: all axes at twice the pace 0.93 mm, at a steady pace 1.3 mm, at half the pace 3.0 mm, rotation only 8.8 mm, rotation about one axis 37.7 mm, no rotation 75.4 mm.](../../assets/guides/camera-imu-motion-vs-error.svg)
 
-## What you need
+The IMU sits 69 mm from the camera in this test. Without rotation its position is simply not found.
 
-- A camera and IMU rigidly mounted together, time-stamped from one clock.
+**We did not run Kalibr for this page.** The facts about Kalibr come from reading its source and documentation. The numbers come from simulated recordings solved with a small estimator of our own. The last section says what that leaves out.
 
-- An **AprilGrid** target. ChArUco and checkerboards work for the camera-only step, but the camera–IMU step is built around the AprilGrid.
+## The short answer
 
-- Kalibr, which runs on ROS 1. The repository provides Dockerfiles that bundle ROS, so you do not need a native ROS install.
+- **Rotate about all three axes, and translate too.** All of it: 1.3 mm. Rotation about one axis: 37.7 mm. Rotation with no translation: 8.8 mm.
+- **Move at a firm pace.** Half the pace more than doubled the error, to 3.0 mm. Twice the pace brought it to 0.93 mm.
+- **A minute is enough.** 20 s gave 2.2 mm, 60 s gave 1.3 mm, 120 s gave 0.96 mm.
+- **Let the time offset be estimated.** A 20 ms offset that is ignored cost 13.2 mm and 0.52°. Estimated, it was found to 0.05 ms.
+- **Bad IMU timestamps are worse than bad camera timestamps.** IMU samples delivered in bursts of ten: 6.2 mm, and a time offset wrong by 22.5 ms.
+- **Trim the pick-up.** A jolt in the first second: 3.1 mm. With that second cut: 1.4 mm.
 
-- Noise parameters for your IMU (step 2).
+The millimeters are the error in the IMU's position relative to the camera, median of 30 simulated recordings.
 
-## 1. Set up the target file
+## How we checked
 
-Kalibr reads the grid from a small YAML file. `tagSize` is the black outer edge of one tag in meters and `tagSpacing` is the gap between tags as a fraction of the tag size:
+**Kalibr's files and options.** Read from Kalibr's source at commit `1f60227` and from its wiki. A script in our repository pulls each fact out of those files, and a test compares this page with what it found.
+
+**What the recording has to contain.** A simulated rig: a camera at 20 Hz and an IMU at 200 Hz, 69 mm apart, moved by hand for 60 s in front of a grid 0.55 m away. The IMU has the noise of the example values below, and the camera stamps lag by 4 ms.
+
+At the steady pace the rig swings up to 18° about each axis and 7 cm along each, turning at about 44°/s and accelerating at about 0.7 m/s².
+
+**The estimator.** Ours, not Kalibr's. It fits splines to the camera poses and then solves for the camera-IMU transform, the time offset, the IMU biases and gravity. Kalibr solves everything in one step. The comparisons between cases are what carry over, more than the millimeters.
+
+## How to move the rig
+
+| Motion | Rotation error | IMU position error |
+|---|---|---|
+| All axes, twice the pace | 0.03° | 0.93 mm |
+| All axes, steady pace | 0.03° | 1.3 mm |
+| All axes, half the pace | 0.03° | 3.0 mm |
+| Rotation only, no translation | 0.07° | 8.8 mm |
+| Rotation about one axis, translation along all | 0.14° | 37.7 mm |
+| Translation only, no rotation | 0.14° | 75.4 mm |
+
+The rotation between camera and IMU comes out in every case. It is found by matching the turning the gyroscope feels with the turning the camera sees.
+
+The position is different. The accelerometer only feels where the IMU sits when the rig turns: an IMU off to one side is swung around. No turning, no signal. Turning about one axis leaves the position along that axis open.
+
+Kalibr's documentation says the same in fewer words: "try to excite all IMU axes (rotation and translation)".
+
+| Recording length | IMU position error |
+|---|---|
+| 20 s | 2.2 mm |
+| 60 s | 1.3 mm |
+| 120 s | 0.96 mm |
+
+## Time offset and timestamps
+
+The camera stamps lag by 4 ms in every recording. Kalibr defines the offset so that `t_imu = t_cam + timeshift_cam_imu`.
+
+| Case | Offset found | Rotation error | IMU position error |
+|---|---|---|---|
+| Offset of 4 ms, estimated | 4.0 ms | 0.03° | 1.3 mm |
+| Offset of 20 ms, estimated | 20.0 ms | 0.02° | 1.2 mm |
+| Offset of 4 ms, fixed at zero | not estimated | 0.08° | 1.8 mm |
+| Offset of 20 ms, fixed at zero | not estimated | 0.52° | 13.2 mm |
+| Camera stamped on arrival, 0 to 15 ms late | −3.6 ms | 0.03° | 1.3 mm |
+| IMU delivered in bursts of ten samples | 26.5 ms | 0.03° | 6.2 mm |
+
+An estimated offset costs nothing, whatever its size. An ignored one costs in proportion.
+
+Camera frames stamped late by a random 0 to 15 ms did not hurt the transform. The offset moved by 7.6 ms, the average delay. It is then the offset of that driver on that day, not a property of the hardware.
+
+IMU bursts are the damaging case. Ten samples arrive together and share a stamp, so the IMU signal is smeared over 50 ms.
+
+In Kalibr the offset is estimated unless you pass `--no-time-calibration`. Its option `--timeoffset-padding`, default 0.03 s, is described as the "maximum range in which the timeoffset may change during estimation".
+
+## Jolts, corner noise and the size of the grid
+
+| Case | IMU position error |
+|---|---|
+| Steady pace, nothing wrong | 1.3 mm |
+| A jolt in the first second, kept | 3.1 mm |
+| A jolt in the first second, cut | 1.4 mm |
+| Corner noise 0.3 px instead of 0.1 px | 4.3 mm |
+| Grid entered 1 % too large | 1.6 mm |
+
+Picking the rig up produces accelerations that no smooth path fits. `--bag-from-to 5 110` cuts the start and end of a bag.
+
+Corner noise matters: three times the noise, a little over three times the error. Sharp tags need a short exposure, which is why Kalibr's documentation asks for good light and low shutter times.
+
+A wrong grid size matters less than we expected: 1.6 mm is close to the 1.3 mm of the recordings with nothing wrong. The accelerometer measures real meters, so the IMU position does not simply scale with the grid.
+
+## IMU noise values
+
+Kalibr wants four numbers for the IMU. Its documentation says to read them from an Allan deviation plot: the white noise at an averaging time of 1 s, the random walk where the fitted rising line crosses 3 s.
+
+We simulated a gyroscope standing still with known values, 40 recordings of each length, and read the numbers back.
+
+| Recording | White noise, worst error of 40 | Random walk within 20 % |
+|---|---|---|
+| 6 minutes | 8.0 % | 24 of 40 |
+| 15 minutes | 4.3 % | 31 of 40 |
+| 30 minutes | 3.3 % | 37 of 40 |
+| 1 hour | 1.9 % | 40 of 40 |
+| 2 hours | 2.3 % | 40 of 40 |
+| 5 hours | 1.0 % | 40 of 40 |
+
+The white noise is there after a few minutes. The random walk needs an hour.
+
+One trap: the random walk is read from the fitted line, not from the curve. At 3 s the curve itself is still dominated by white noise, and in our simulation it stood 4.2 times above the true value.
+
+A real sensor is harder than this one. Kalibr's documentation notes that its model leaves out scale errors and temperature drift, and adds: "for lowest-cost sensors, increasing the noise model parameters by a factor of 10x or more may be necessary".
+
+## The workflow
+
+**1. Target file.** `tagSize` is the black outer edge of one tag in meters. `tagSpacing` is the gap between tags divided by the tag size.
 
 ```yaml
 target_type: 'aprilgrid'
@@ -49,15 +147,9 @@ tagSpacing: 0.3       # gap / tagSize
 
 ![A 3 by 4 AprilGrid with tag IDs 0 to 3 in the bottom row and 8 to 11 at the top. The origin is the bottom-left corner of tag 0, x points right, y points up. tagSize is the side of one tag; the gap is tagSpacing times tagSize.](../../assets/guides/kalibr-aprilgrid-frame.svg)
 
-Kalibr finds each tag by its ID and expects ID 0 at the bottom left, IDs running left to right and then upward. A grid numbered from the top is a mirror image of that and will not calibrate. The target frame has its origin at the bottom-left corner of tag 0, with x to the right and y up.
+Kalibr places each tag by its ID: the lowest ID at the bottom left, then left to right, then upward. The [AprilGrid generator](/tools/generator/aprilgrid/) writes this file for the grid you print, and the [AprilGrid board](/targets/aprilgrid-composite/) ships to a stated tag size.
 
-The [AprilGrid generator](/tools/generator/aprilgrid/) writes this file for whatever grid you print, and the [AprilGrid board](/targets/aprilgrid-composite/) ships to a stated tag size so the file matches the physical board.
-
-Tag size matters more than anything else in this file. A 1 % error in `tagSize` is a 1 % error in every distance Kalibr estimates. Measure a printed board with callipers across several tags and divide.
-
-## 2. Write the IMU noise file
-
-The IMU file carries the topic, the rate and four noise parameters, all in continuous-time units:
+**2. IMU file.** Topic, rate and the four noise values, in continuous-time units. These are the example values of Kalibr's documentation and of our simulation.
 
 ```yaml
 rostopic: /imu0
@@ -69,17 +161,7 @@ gyroscope_noise_density:     1.87e-04   # rad/s/√Hz
 gyroscope_random_walk:       2.66e-05   # rad/s²/√Hz
 ```
 
-Two ways to fill these in:
-
-**From the datasheet.** Noise density is usually given as µg/√Hz or °/s/√Hz; convert to m/s²/√Hz and rad/s/√Hz. Random walk is listed as velocity random walk (m/s/√h) and angular random walk (°/√h); convert the time unit to seconds.
-
-**From an Allan deviation plot.** Record the IMU stationary for a few hours, then run `allan_variance_ros` or a similar tool. White noise is read at τ = 1 s on the −½ slope, random walk at τ = 3 s on the +½ slope. This also catches sensors whose datasheet is optimistic.
-
-Inflate the numbers for consumer MEMS parts. Kalibr's model ignores scale error and temperature drift, and its authors suggest a factor of ten or more for the cheapest sensors. Too-large noise loosens the solve a little; too-small noise makes it over-confident and likely to diverge.
-
-## 3. Calibrate the camera first
-
-Record a **static-sensor** sequence: the camera held steady or moved slowly, the grid moved through the frame at many angles and distances. Keep the whole grid visible for most of it. Around a minute at 4 Hz is plenty; a higher rate only adds near-duplicate frames.
+**3. Camera first.** Record the grid at many angles and distances and calibrate the camera alone. Kalibr's documentation suggests about 4 Hz for this recording, since more frames add little.
 
 ```bash
 rosbag record -O static.bag /cam0/image_raw
@@ -89,123 +171,119 @@ rosrun kalibr kalibr_calibrate_cameras \
   --models pinhole-radtan --target aprilgrid.yaml
 ```
 
-Use `pinhole-equi` for fisheye lenses and `omni-radtan` for very wide fields of view. The run writes `camchain-static.yaml` with the intrinsics, which feeds the next step.
+The models are `pinhole-radtan`, `pinhole-equi`, `pinhole-fov`, `omni-none`, `omni-radtan`, `eucm-none` and `ds-none`. The run writes `static-camchain.yaml`, `static-results-cam.txt` and `static-report-cam.pdf`.
 
-Check the reprojection error in the report: 0.1 to 0.3 px is normal for a good lens and a rigid board. Above about 0.5 px, fix the camera calibration before going on; the IMU step inherits every pixel of error.
-
-## 4. Record the dynamic sequence
-
-Now the target stays still and the sensor moves. This is the recording the result depends on, so set it up with care:
-
-- **Rates.** 20 Hz images and 200 Hz IMU are what Kalibr's authors recommend. Faster cameras add frames without adding information.
-
-- **Exposure.** Short shutter times so the tags stay sharp during motion. Add light rather than exposure.
-
-- **Motion.** Excite all three gyro axes and all three accelerometer axes: rotate about each axis in turn and translate along each axis, with the grid in view throughout. Smooth, continuous movements over 60 to 120 s are better than jerky ones.
-
-- **No shocks.** Start recording with the sensor already in hand and the grid in view; stop before you put it down. Picking the rig up produces accelerations that the model cannot fit.
-
-- **Timestamps.** Both streams must be stamped by the same clock with low jitter. Driver-side stamps from a USB camera are often fine; stamps assigned on arrival in ROS are not.
+**4. The moving recording.** Now the grid stays still and the rig moves. Kalibr's documentation reports good results with a camera at 20 Hz and an IMU at 200 Hz, and asks to avoid shocks when the rig is picked up.
 
 ```bash
 rosbag record -O dynamic.bag /cam0/image_raw /imu0
 ```
 
-Before running the calibration, look at the IMU timestamp gaps. Bursts of samples followed by gaps mean the driver is batching, and Kalibr will fail or give a wrong time offset:
-
-```python
-import numpy as np
-
-t = np.loadtxt("imu_stamps.txt")          # one timestamp per line, seconds
-dt = np.diff(t) * 1000
-print("IMU dt ms: median %.2f  min %.2f  max %.2f" % (np.median(dt), dt.min(), dt.max()))
-print("gaps > 2x nominal:", int((dt > 2 * np.median(dt)).sum()))
-```
-
-Export the stamps with `rostopic echo -b dynamic.bag -p /imu0 | cut -d, -f1` or from a ROS 2 bag with the `rosbags` package. A healthy 200 Hz stream shows a median of 5 ms and no gaps.
-
-## 5. Run the calibration
+**5. Run it.**
 
 ```bash
 rosrun kalibr kalibr_calibrate_imu_camera \
   --bag dynamic.bag \
-  --cam camchain-static.yaml \
+  --cams static-camchain.yaml \
   --imu imu.yaml \
   --target aprilgrid.yaml
 ```
 
-Time offset estimation is on by default; add `--no-time-calibration` only if the clocks are hardware-synchronized and you want to lock the offset to zero. Use `--bag-from-to 5 110` to trim the pick-up and put-down seconds if they made it into the bag.
+It writes `dynamic-camchain-imucam.yaml`, `dynamic-imu.yaml`, `dynamic-results-imucam.txt` and `dynamic-report-imucam.pdf` next to the bag.
 
-The run takes a few minutes and writes three files next to the bag:
-
-- `camchain-imucam-dynamic.yaml`: the camera chain with `T_cam_imu` and `timeshift_cam_imu` added per camera.
-
-- `results-imucam-dynamic.txt`: the numbers in plain text.
-
-- `report-imucam-dynamic.pdf`: plots to inspect before you trust anything.
-
-## 6. Read the result
-
-In the output YAML, `T_cam_imu` maps IMU coordinates into camera coordinates, and the time shift is defined so that `t_imu = t_cam + timeshift_cam_imu`:
+**6. Read the result.** `T_cam_imu` takes IMU coordinates to camera coordinates. This is the transform of our simulation in Kalibr's format:
 
 ```yaml
 cam0:
   T_cam_imu:
-  - [0.0148, 0.9998, 0.0121, -0.0215]
-  - [-0.9999, 0.0148, 0.0027, -0.0647]
-  - [0.0025, -0.0122, 0.9999, 0.0096]
-  - [0.0, 0.0, 0.0, 1.0]
-  timeshift_cam_imu: 0.0034
+  - [-0.0149, -0.9993, -0.0345, -0.0215]
+  - [0.9995, -0.0140, -0.0267, -0.0647]
+  - [0.0262, -0.0349, 0.9990, 0.0096]
+  - [0.0000, 0.0000, 0.0000, 1.0000]
+  timeshift_cam_imu: 0.0040
   camera_model: pinhole
-  ...
 ```
 
-Open the report and check, in this order:
+Run the calibration on two separate recordings. If the two results differ by much more than the numbers in the tables above, look at the recordings before the software.
 
-1. **Reprojection error plot.** Should look like the camera-only result, a tight cloud under about 0.5 px with no drift over time.
-
-2. **Predicted vs measured angular velocity and acceleration.** The predicted curves (from the camera trajectory) should sit on top of the IMU measurements. A constant offset is a bias the model absorbs; a lag between the curves means the time offset is wrong or the stamps are bad.
-
-3. **Gyroscope and accelerometer error plots.** Errors should look like noise around zero. Bursts at the start or end are shocks; trim them with `--bag-from-to` and rerun.
-
-4. **The time offset.** A few milliseconds is normal on USB cameras. Tens of milliseconds, or a value that changes a lot between two recordings, points at the timestamp problem from step 4.
-
-Run the calibration twice on two separate recordings. If the two `T_cam_imu` results agree within a few millimeters and a few tenths of a degree, you have a usable calibration. If they do not, the recording, not the solver, is what to improve.
-
-## 7. Use it in your VIO stack
-
-Most frameworks want the **camera pose in the IMU frame**, which is the inverse of what Kalibr writes:
+**7. Use it.** OpenVINS (`T_imu_cam`) and VINS-Fusion (`body_T_cam0`) take the camera pose in the IMU frame, the inverse of what Kalibr writes. VINS-Fusion defines its `td` the same way round as Kalibr: image clock plus `td` is IMU clock.
 
 ```python
+import sys
 import numpy as np, yaml
 
-chain = yaml.safe_load(open("camchain-imucam-dynamic.yaml"))
+chain = yaml.safe_load(open(sys.argv[1]))
 T_cam_imu = np.array(chain["cam0"]["T_cam_imu"])
 T_imu_cam = np.linalg.inv(T_cam_imu)
+np.set_printoptions(precision=4, suppress=True)
 print("camera in IMU frame:\n", T_imu_cam)
 print("time offset (s):", chain["cam0"]["timeshift_cam_imu"])
 ```
 
-Check the convention of the target before pasting: OpenVINS (`T_imu_cam`) and VINS-Fusion (`body_T_cam0`) take the camera-in-IMU form, and each documents how it defines the time offset. Mixing up the direction produces a system that tracks for a few seconds and then drifts.
+On the file above it prints:
 
-Repeat the calibration after any change to the mount, lens focus or driver, and after a drop.
+```text
+camera in IMU frame:
+ [[-0.0149  0.9996  0.0262  0.0641]
+ [-0.9993 -0.014  -0.0349 -0.0221]
+ [-0.0345 -0.0267  0.9991 -0.0121]
+ [ 0.      0.      0.      1.    ]]
+time offset (s): 0.004
+```
 
-## Common problems
+## Check your IMU timestamps
 
-| Symptom | Likely cause | Fix |
-|---|---|---|
-| Optimization diverges or produces NaN | IMU noise values far too small, or a shock in the data | Inflate the noise parameters; trim start and end with `--bag-from-to` |
-| Large time offset, differs between runs | Timestamps assigned on arrival, or batched IMU samples | Use driver timestamps from one clock; check the dt histogram |
-| Predicted and measured curves lag | Wrong time offset, or `--no-time-calibration` with unsynchronized clocks | Enable time calibration |
-| Rotation fine, translation uncertain | Not enough translation, or translation without rotation | Add moves that combine rotation and translation along all axes |
-| Few target detections | Motion blur, dim light, grid too small in the frame | Shorter exposure, more light, move closer or use a larger grid |
-| Pose flips during the sequence | Symmetric target (checkerboard or circle grid) | Use an AprilGrid |
-| Result works in Kalibr, drifts in VIO | Transform direction or time-offset sign mismatched | Invert `T_cam_imu` and check the framework's convention |
+Before calibrating, look at the gaps between IMU stamps. Export them one per line, in seconds, and run this. It needs numpy.
 
-## Next steps
+```python
+import sys
+import numpy as np
 
-- [Calibrate the camera with OpenCV](/calibacademy/opencv-camera-calibration/) if you want to check Kalibr's intrinsics against an independent tool.
+t = np.loadtxt(sys.argv[1])               # one timestamp per line, seconds
+dt = np.diff(t) * 1000
+print("IMU dt ms: median %.2f  min %.2f  max %.2f" % (np.median(dt), dt.min(), dt.max()))
+print("gaps > 2x nominal:", int((dt > 2 * np.median(dt)).sum()), "of", len(dt))
+print("samples with the same stamp as the one before:", int((dt == 0).sum()))
+```
 
-- [Choose a pattern](/calibacademy/charuco-vs-checkerboard-vs-aprilgrid/) when the same rig also needs stereo or hand-eye calibration.
+A steady 200 Hz stream of 60 s prints:
 
-- Robot-mounted sensors also need [hand-eye calibration](/calibacademy/hand-eye-calibration-opencv/) to tie the IMU frame to the robot.
+```text
+IMU dt ms: median 5.00  min 4.89  max 5.11
+gaps > 2x nominal: 0 of 11999
+samples with the same stamp as the one before: 0
+```
+
+The same stream delivered in bursts of ten, each burst stamped on arrival:
+
+```text
+IMU dt ms: median 0.00  min 0.00  max 50.08
+gaps > 2x nominal: 1199 of 11999
+samples with the same stamp as the one before: 10800
+```
+
+The second stream is the one that cost 6.2 mm and 22.5 ms above. Fix the driver before calibrating.
+
+## What we got wrong
+
+The earlier version of this page was written from documentation and memory, with nothing run or checked. Six things in it were wrong or unfounded:
+
+- **The output file names.** It said `camchain-static.yaml` and `camchain-imucam-dynamic.yaml`. Kalibr puts the bag name first: `static-camchain.yaml`, `dynamic-camchain-imucam.yaml`.
+- **The option `--cam`.** It is `--cams`.
+- **"A 1 % error in tagSize is a 1 % error in every distance Kalibr estimates."** Not for the IMU position. In our simulation a grid 1 % too large gave 1.6 mm of error, against 1.3 mm with the right size.
+- **"Random walk at τ = 3 s on the +½ slope."** True of the fitted line. Read from the curve at 3 s, the value is 4.2 times too high.
+- **"Record the IMU stationary for a few hours."** One hour was enough for the simulated sensor.
+- **Numbers with no source.** "0.1 to 0.3 px is normal", "a few milliseconds is common on USB cameras", "60 to 120 s". We took out the first two and measured the third.
+
+The sample `T_cam_imu` on the old page was not a result of anything. The one above is the transform our simulation uses.
+
+## What this test is not
+
+- **Not Kalibr.** No number on this page was produced by Kalibr. Its estimator works differently from ours, and its failure cases may differ.
+- **Simulation.** A smooth motion, a clean grid, an IMU with exactly the noise it claims. A real low-cost IMU has scale errors and temperature drift on top.
+- **Poses, not images.** Camera poses come from grid points with added noise. Motion blur and rolling shutter are not in it.
+- **One rig.** One camera, one IMU, 69 mm apart, one grid distance.
+- **Facts as of one commit.** Kalibr's options and file names were read at commit `1f60227`. Other versions may differ.
+- **Downstream frameworks read, not run.** The OpenVINS and VINS-Fusion conventions come from their example configuration files.
+
+The scripts and the saved results are in our repository under `docs/content/experiments/camera-imu/`.
