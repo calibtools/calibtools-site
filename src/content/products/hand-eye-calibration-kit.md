@@ -31,7 +31,7 @@ relatedGuides:
 
 Hand-eye calibration finds where the camera sits relative to the robot. You move the robot through a set of poses, the camera measures the pose of a target in each one, and a solver works out the fixed transform that makes both sets of poses agree.
 
-The solver only learns from rotation. The [hand-eye guide](/calibacademy/hand-eye-calibration-opencv/) recommends 15 to 25 poses with 30° to 45° of rotation between them, about all three axes.
+The solver only learns from rotation. The [hand-eye guide](/calibacademy/hand-eye-calibration-opencv/) measures it: 15 to 20 poses with 30° or more of rotation between them, about more than one axis.
 
 At those angles a board is often cut off by the image edge or by the gripper. A ChArUco board still returns identified corners when only part of it is visible, so those poses count. With a [checkerboard](/targets/checkerboard-composite/) they would be lost.
 

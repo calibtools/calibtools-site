@@ -1,29 +1,45 @@
 ---
-title: "Hand-eye calibration in OpenCV: step by step"
-description: "Hand-eye calibration with OpenCV and Python: eye-in-hand and eye-to-hand, which robot poses to record, calibrateHandEye code, and how to check the result."
+title: "Hand-eye calibration in OpenCV: what matters?"
+description: "200 simulated hand-eye calibrations per case with cv2.calibrateHandEye: 2° between poses gave 10.7 mm of error, 30° gave 0.16 mm. Poses, methods, checks, code."
 date: 2026-11-07
-updated: 2026-11-07
-readingTime: "14 min"
-keyRule: "Rotate the robot a lot between poses, keep the frame conventions straight, and judge the result by a physical check, not by the solver residual alone."
-related: ["opencv-camera-calibration", "charuco-vs-checkerboard-vs-aprilgrid", "multi-board-marker-ids"]
+updated: 2026-11-27
+readingTime: "13 min"
+keyRule: "Turn the robot 30° or more between poses, about more than one axis, and take 15 to 20 of them. Then check the camera calibration and the square size: an error there does not show in the residual."
+related: ["opencv-camera-calibration", "calibration-target-size", "charuco-vs-checkerboard-vs-aprilgrid", "multi-board-marker-ids"]
 products: ["hand-eye-calibration-kit", "charuco-ceramic", "charuco-composite"]
 sampleFiles: []
 faq:
   - q: "How many robot poses do I need for hand-eye calibration?"
-    a: "Two motions with non-parallel rotation axes is the mathematical minimum. In practice, 15 to 25 poses with large rotations around different axes give a stable result; more poses that only translate add little."
+    a: "In our simulation with a robot good to 0.05 mm, 3 poses left a point 500 mm from the camera off by 0.95 mm, 10 poses by 0.25 mm, 20 poses by 0.16 mm and 50 poses by 0.09 mm. Most of the gain is in by 15 to 20 poses."
+  - q: "How much should the robot rotate between poses?"
+    a: "As much as the cell allows. With 20 poses, about 2° between poses gave 10.7 mm of error at 500 mm, 10° gave 0.94 mm, 31° gave 0.16 mm and 46° gave 0.09 mm. Rotation about a single axis, or translation alone, gave no usable result with any method."
   - q: "Which calibrateHandEye method should I use?"
-    a: "Run Park and Tsai and compare. They should agree to a fraction of a degree and a few millimeters; if they do not, the problem is the data, not the method. Daniilidis and Andreff can fail on some data sets and return NaN."
+    a: "Park or Horaud. With enough rotation Tsai, Park and Horaud gave the same error, Daniilidis was close and Andreff was more than twice as far off. With about 5° between poses Tsai gave up in all 200 runs and still returned a matrix, 123 mm off."
   - q: "Can I use calibrateHandEye for a fixed camera (eye-to-hand)?"
-    a: "Yes. Mount the target on the gripper and pass the inverse robot pose (base-to-gripper) in place of gripper-to-base. The function then returns the camera pose in the robot base frame."
+    a: "Yes. Mount the target on the gripper and pass the inverse robot pose (base-to-gripper) in place of gripper-to-base. The function then returns the camera pose in the robot base frame. In our runs it was a little less accurate than eye-in-hand: 0.21 mm against 0.16 mm."
   - q: "Does cv2.calibrateHandEye exist in OpenCV 5?"
-    a: "The C++ function is in OpenCV 5 (header opencv2/calib.hpp), but the Python wheels for 5.0 do not expose cv2.calibrateHandEye or cv2.calibrateRobotWorldHandEye. For Python, install opencv-contrib-python 4.x (4.1 or later)."
-  - q: "What accuracy can I expect?"
-    a: "With a calibrated camera, a rigid ChArUco target and 20 well-spread poses, rotation errors around 0.1° and translation errors of 1 to 3 mm at a working distance of about 0.5 m are typical. Robot repeatability and camera calibration set the floor."
+    a: "In 5.1, yes. The 5.0.0 Python wheel has only the CALIB_HAND_EYE constants, without cv2.calibrateHandEye or cv2.calibrateRobotWorldHandEye. OpenCV 4.1 and later 4.x releases have both."
+  - q: "Does a small residual mean the hand-eye calibration is good?"
+    a: "No. With the focal length wrong by 0.5 % the target stayed within 0.29 mm from pose to pose while the result was off by 2.5 mm. With the square size wrong by 1 % it was 0.82 mm against 5.0 mm. The residual does catch a single bad robot pose."
 ---
 
-Hand-eye calibration finds the fixed transform between a camera and a robot. Once you have it, anything the camera sees can be expressed in robot coordinates, and the robot can be sent to it.
+Hand-eye calibration finds the fixed transform between a camera and a robot. We simulated a camera on a robot flange looking at a ChArUco board and ran `cv2.calibrateHandEye` 200 times for each way of doing it.
 
-This guide covers both arrangements with OpenCV and Python: what to record, how to call `cv2.calibrateHandEye`, and how to tell a good result from a bad one.
+![Bar chart of hand-eye error at a point 500 mm in front of the camera against the rotation between robot poses: about 2 degrees 10.7 mm, 5 degrees 2.1 mm, 10 degrees 0.94 mm, 21 degrees 0.29 mm, 31 degrees 0.16 mm, 46 degrees 0.09 mm.](../../assets/guides/hand-eye-rotation-vs-error.svg)
+
+Twenty poses each time. The only thing that changes from bar to bar is how far the robot turns between one pose and the next.
+
+Everything in the test sections is simulation, not a real robot. The last section says what that leaves out.
+
+## The short answer
+
+- **Rotation between poses decides the result.** About 2° gave 10.7 mm of error at the work point, 31° gave 0.16 mm.
+- **Rotate about more than one axis.** Rotation about one axis only, or translation only, gave no usable result with any of the five methods.
+- **15 to 20 poses is enough.** 20 poses gave 0.16 mm, 50 poses 0.09 mm. Three poses gave 0.95 mm.
+- **Use Park or Horaud.** Tsai matches them when the rotations are large and fails without raising an error when they are small.
+- **The residual does not see a wrong camera calibration.** Focal length off by 0.5 %: residual 0.29 mm, real error 2.5 mm.
+
+"Error" on this page is how far off a point 500 mm in front of the camera lands when it is carried into the robot's frame with the calibrated transform. The numbers are medians of 200 runs.
 
 ## The two arrangements
 
@@ -31,49 +47,134 @@ This guide covers both arrangements with OpenCV and Python: what to record, how 
 
 **Eye-to-hand.** The camera is fixed (on a stand or the ceiling) and the target is mounted on the gripper. The unknown is the camera pose relative to the robot base, `T_cam2base`.
 
-Both are solved by the same function. The only difference is which robot transform you feed it, and what the result means.
-
 ![Two sketches of a robot arm. Eye-in-hand: the camera sits on the gripper, the target is fixed, and the unknown is T_cam2gripper. Eye-to-hand: the camera is fixed, the target is on the gripper, and the unknown is T_cam2base.](../../assets/guides/hand-eye-arrangements.svg)
 
-## What the solver needs
+Both are solved by the same function. For every robot pose you record two things: the flange pose from the controller, `T_gripper2base`, and the board pose seen by the camera, `T_target2cam`.
 
-For every robot pose you record two transforms:
+## The test
 
-- **Robot pose** `T_gripper2base`: where the flange is, read from the controller.
+- **Cell.** Camera on the flange, 82 mm out and 60 mm to the side. A 250 × 175 mm ChArUco board with 54 inner corners lies in the cell, 420 to 580 mm from the camera.
+- **Camera.** 1920 × 1440 px, focal length 2250 px, radial distortion k1 = −0.12. Each corner gets 0.1 px of noise per axis; the board pose comes from `solvePnP`.
+- **Robot.** The reported flange pose is off by 0.05 mm and 0.01° per axis. A second, rougher robot is off by 0.5 mm and 0.05°.
+- **Poses.** 20 per run unless stated. The camera views the board from up to 30° off its normal and is rolled up to 30° about its own axis, which puts about 31° between poses.
+- **Solver.** `cv2.calibrateHandEye` with `CALIB_HAND_EYE_PARK` unless stated, OpenCV 5.1.
 
-- **Target pose** `T_target2cam`: where the board is as seen by the camera, from `solvePnP` on the detected corners.
+The corner noise is on the cautious side. In our rendered-image tests OpenCV's ChArUco corners were off by 0.02 to 0.04 px at the median.
 
-The camera must be calibrated first (intrinsics and distortion). Follow the [camera calibration guide](/calibacademy/opencv-camera-calibration/) with the lens locked at its production focus; a poor intrinsic calibration shows up directly as hand-eye error.
+## How much rotation
 
-## 1. Choose and mount the target
+| Rotation between poses | Rotation error | Translation error | Error at 500 mm | Worst tenth of runs |
+|---|---|---|---|---|
+| about 2° | 0.77° | 12.2 mm | 10.7 mm | 23.5 mm |
+| about 5° | 0.27° | 3.1 mm | 2.1 mm | 5.3 mm |
+| about 10° | 0.13° | 1.4 mm | 0.94 mm | 2.1 mm |
+| about 21° | 0.05° | 0.51 mm | 0.29 mm | 0.77 mm |
+| about 31° | 0.02° | 0.26 mm | 0.16 mm | 0.30 mm |
+| about 46° | 0.01° | 0.15 mm | 0.09 mm | 0.17 mm |
 
-Use a **ChArUco** board. Hand-eye calibration wants steep tilts and views where the board runs off the image edge, and ChArUco still identifies every visible corner in those views. A plain checkerboard needs the whole board in every image, which fights against the pose diversity you want.
+Every step up in rotation pays. Going from 5° to 31° between poses did more than going from 3 poses to 50.
 
-Size the board so it fills roughly half the frame at your working distance; the [FOV calculator](/tools/fov/) does this from your sensor, lens and distance. Each marker bit should cover at least 3 pixels so the IDs decode at the steepest tilt.
+The solver gets the camera's position on the flange from how the camera moves when the flange turns. With small turns that movement is small, and the 0.05 mm of robot error and the noise in the board pose are large next to it.
 
-The board has to stay put. For eye-in-hand, clamp it to the table or fixture; for eye-to-hand, bolt it to the flange so it cannot shift between poses. A rigid board on a proper mount, such as the [hand-eye calibration kit](/targets/hand-eye-calibration-kit/) with its flange adapter, settles this.
+## How many poses
 
-Generate a test pattern with the free [ChArUco generator](/tools/generator/charuco/) if you want to try the workflow before buying a target, and glue the print to something flat.
+| Poses | Robot good to 0.05 mm | Worst tenth of runs | Robot good to 0.5 mm |
+|---|---|---|---|
+| 3 | 0.95 mm | 4.8 mm | 3.2 mm |
+| 4 | 0.53 mm | 2.1 mm | 2.0 mm |
+| 6 | 0.35 mm | 0.99 mm | 1.3 mm |
+| 10 | 0.25 mm | 0.53 mm | 0.94 mm |
+| 15 | 0.19 mm | 0.39 mm | 0.75 mm |
+| 20 | 0.16 mm | 0.31 mm | 0.64 mm |
+| 30 | 0.13 mm | 0.25 mm | 0.48 mm |
+| 50 | 0.09 mm | 0.22 mm | 0.36 mm |
 
-## 2. Plan the robot poses
+Three poses is the fewest `calibrateHandEye` accepts. It works on the median and fails often: one run in ten was off by 4.8 mm or more.
 
-The solver works from the *motions* between poses, and it only sees rotation. Poses that differ by a translation alone carry no information. Plan for:
+From 15 poses on, each extra pose buys little. The rougher robot is between three and four times worse at every count, so the robot's own error sets the scale and more poses only chip at it.
 
-- **15 to 25 poses.** Two is the minimum; around 20 gives a stable average.
+## Which method
 
-- **Large rotations around different axes.** Aim for 30° to 45° between poses, rotating about all three axes in turn. Two rotations about the same axis cannot determine the translation.
+`calibrateHandEye` has five methods. Same data, error at 500 mm:
 
-- **The board in view at every pose**, with the camera roughly 0.35 to 0.6 m away for a 200 mm board. Let the board touch or cross the image edges in some views.
+| Method | About 31° between poses | About 10° | About 5° |
+|---|---|---|---|
+| `CALIB_HAND_EYE_TSAI` | 0.16 mm | 1.3 mm | 123 mm |
+| `CALIB_HAND_EYE_PARK` | 0.16 mm | 0.94 mm | 2.1 mm |
+| `CALIB_HAND_EYE_HORAUD` | 0.16 mm | 0.94 mm | 2.1 mm |
+| `CALIB_HAND_EYE_ANDREFF` | 0.43 mm | 1.7 mm | 3.1 mm |
+| `CALIB_HAND_EYE_DANIILIDIS` | 0.20 mm | 1.3 mm | 3.3 mm |
 
-- **Settle time.** Wait for the robot to stop before reading the pose and triggering the camera, and record both at the same instant.
+With large rotations Tsai, Park and Horaud are the same. Park and Horaud stay the best as the rotations shrink.
 
-If you teach the poses by hand, teach them once and save them. You will want to repeat the calibration after a crash or a camera swap.
+Tsai at about 5° is the one to know about. In all 200 runs OpenCV wrote "Hand-eye calibration failed! Not enough informative motions" to its error log and returned a matrix anyway, the same one every time, 14.65° and 123 mm off. No exception is raised.
 
-## 3. Record the data
+With rotation about more than one axis, no method returned NaN in any run.
 
-At each pose, save the image and the robot pose together. Most controllers report the flange pose as position plus orientation, in millimeters and either Euler angles or a quaternion. Convert to a 4 × 4 matrix, and settle the units first: everything in meters or everything in millimeters.
+## Motions that cannot work
 
-Euler angles are the usual source of trouble. Check the controller manual for the axis order and whether angles are intrinsic or extrinsic, then confirm with a known move: rotate about one joint and verify that the matrix you build rotates the same way.
+Two sets of 20 poses gave no usable result with any method:
+
+- **Rotation about one axis only.** The camera tilts back and forth about a single axis of the board, about 17° between poses. The best method, Andreff, was off by 133 mm. Park returned NaN or a matrix that is not a rotation in 187 of 200 runs.
+- **Translation only.** The camera slides around with its orientation fixed. Andreff was off by 328 mm. Park failed in 99 of 200 runs.
+
+The position of the camera along the one rotation axis cannot be found from such motion, whatever the number of poses.
+
+## What the camera side adds
+
+The board pose comes from the camera, so the camera's errors go straight in.
+
+| Change | Error at 500 mm |
+|---|---|
+| Corner noise 0.03 px | 0.09 mm |
+| Corner noise 0.1 px | 0.16 mm |
+| Corner noise 0.3 px | 0.41 mm |
+| Corner noise 1 px | 1.3 mm |
+
+Corner noise matters less than rotation. A wrong camera model matters more, and the next section shows why it is hard to see.
+
+## What the residual shows, and what it hides
+
+The usual check: with the result in hand, work out where each pose puts the fixed board in the robot's base frame. The spread of those positions is the residual.
+
+| Case | Residual, mean | Real error at 500 mm |
+|---|---|---|
+| Everything right | 0.18 mm | 0.15 mm |
+| Focal length 0.5 % too long | 0.29 mm | 2.5 mm |
+| Square size entered 1 % too large | 0.82 mm | 5.0 mm |
+| Lens distortion left out | 4.1 mm | 6.2 mm |
+| Robot good to 0.5 mm | 1.0 mm | 0.64 mm |
+
+A focal length that is 0.5 % off moves the result by 2.5 mm and the residual by 0.1 mm. The board is consistently in the wrong place, and consistency is all the residual measures.
+
+It also runs the other way. The rougher robot has more than three times the residual of the good one with the focal length 0.5 % off, and a quarter of its error.
+
+What the residual does catch is one bad pose. We moved one robot reading in 20 by 2, 5 or 20 mm:
+
+| One reading off by | Error at 500 mm | Largest residual | Bad pose had the largest residual | Error after dropping it |
+|---|---|---|---|---|
+| 2 mm | 0.30 mm | 1.8 mm | 200 of 200 runs | 0.16 mm |
+| 5 mm | 0.67 mm | 4.5 mm | 200 of 200 runs | 0.16 mm |
+| 20 mm | 2.7 mm | 18.2 mm | 200 of 200 runs | 0.16 mm |
+
+So use the residual to find a bad pose, and something physical to judge accuracy: touch a known point with the tool, or measure a gauge of known length.
+
+## Eye-to-hand
+
+For a fixed camera the same solver is fed the inverse robot poses. We ran the same cell with the roles swapped.
+
+| Robot | Eye-in-hand | Eye-to-hand |
+|---|---|---|
+| Good to 0.05 mm | 0.16 mm | 0.21 mm |
+| Good to 0.5 mm | 0.64 mm | 0.86 mm |
+
+A little worse, same order. Everything above about rotation and pose count applies to both.
+
+## The code
+
+The blocks below are one script. We ran it as printed on 15 rendered images of a ChArUco board for each arrangement. Eye-in-hand came out 0.01° and 0.13 mm from the truth, eye-to-hand 0.01° and 0.33 mm.
+
+**Robot poses.** Most controllers report the flange pose as position plus Euler angles or a quaternion. Convert to a 4 × 4 matrix, with everything in meters or everything in millimeters. Check the axis order in the controller manual.
 
 ```python
 import json
@@ -89,11 +190,7 @@ def pose_matrix(xyz_mm, rpy_deg, order="xyz"):
     return T
 ```
 
-Save the pose next to the image as JSON, not in the file name. A file name silently loses sign and precision.
-
-## 4. Find the target pose in each image
-
-Set up the board exactly as printed and load the camera calibration:
+**Camera and board.** Load the camera calibration and set up the board exactly as printed. The [camera calibration guide](/calibacademy/opencv-camera-calibration/) covers the first; measure a few squares with calipers for the second.
 
 ```python
 fs = cv2.FileStorage("camera.yaml", cv2.FILE_STORAGE_READ)
@@ -102,11 +199,11 @@ dist = fs.getNode("dist").mat()
 fs.release()
 
 d = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_6X6_250)
-board = cv2.aruco.CharucoBoard((10, 7), 0.025, 0.018, d)  # (cols, rows), square, marker, meters
+board = cv2.aruco.CharucoBoard((10, 7), 0.030, 0.022, d)  # (cols, rows), square, marker, meters
 detector = cv2.aruco.CharucoDetector(board)
 ```
 
-Then for every image, detect the corners and solve the board pose. Skip views with too few corners rather than keeping a shaky pose:
+**Board pose in each image.**
 
 ```python
 def target_pose(gray):
@@ -121,7 +218,7 @@ def target_pose(gray):
     return R, tvec.ravel()
 ```
 
-Collect the four lists the solver takes, keeping the two sides aligned pose by pose:
+**The four lists the solver takes,** aligned pose by pose:
 
 ```python
 R_g2b, t_g2b, R_t2c, t_t2c = [], [], [], []
@@ -137,9 +234,7 @@ for rec in json.load(open("poses.json")):
 print(len(R_g2b), "poses")
 ```
 
-## 5. Eye-in-hand: camera on the robot
-
-Pass the robot poses as recorded. The result is the camera in the gripper frame:
+**Eye-in-hand.** Pass the robot poses as recorded. The result is the camera in the gripper frame.
 
 ```python
 R, t = cv2.calibrateHandEye(R_g2b, t_g2b, R_t2c, t_t2c,
@@ -150,11 +245,9 @@ T_cam2gripper[:3, 3] = t.ravel()
 print(T_cam2gripper)
 ```
 
-A point seen by the camera is then mapped into the base frame with `T_gripper2base @ T_cam2gripper @ p_cam`, using the robot pose at the moment of the image.
+A point seen by the camera maps into the base frame with `T_gripper2base @ T_cam2gripper @ p_cam`, using the robot pose at the moment of the image.
 
-## 6. Eye-to-hand: fixed camera, target on the robot
-
-Here the fixed pair is camera and base, and the moving pair is target and gripper. The same equation applies if you swap the roles of base and gripper, so feed the **inverse** robot pose, base-to-gripper:
+**Eye-to-hand.** Feed the inverse robot pose, base-to-gripper. The result is the camera in the base frame, and a point maps with `T_cam2base @ p_cam`.
 
 ```python
 R_b2g = [R.T for R in R_g2b]
@@ -167,17 +260,7 @@ T_cam2base[:3, :3] = R
 T_cam2base[:3, 3] = t.ravel()
 ```
 
-Now a point seen by the camera maps straight into the base frame with `T_cam2base @ p_cam`, independent of the robot pose.
-
-Both paths above were run on synthetic images rendered through the real ChArUco detector: with 15 poses, 40° tilts and a little encoder noise, the recovered transform was within 0.2° and 3 mm of the truth in both arrangements.
-
-## 7. Check the result
-
-The solver always returns a matrix. Three checks tell you whether to trust it.
-
-**Compare methods.** Run `CALIB_HAND_EYE_PARK` and `CALIB_HAND_EYE_TSAI` on the same data. With good data they agree to about 0.1° and a couple of millimeters. If they disagree by centimeters, go back to the data: a pose with the wrong sign, a swapped Euler order, or units mixed between millimeters and meters.
-
-**Check the target is fixed.** For eye-in-hand, the target pose in the base frame should be the same at every robot pose. Compute it for each pose and look at the spread:
+**The residual,** for eye-in-hand. For eye-to-hand use `np.linalg.inv(Tg) @ T_cam2base @ Tt`.
 
 ```python
 X = T_cam2gripper
@@ -191,15 +274,7 @@ dev = np.linalg.norm(spread - spread.mean(axis=0), axis=1) * 1000
 print("target position spread, mm: mean %.2f max %.2f" % (dev.mean(), dev.max()))
 ```
 
-For eye-to-hand, use `inv(Tg) @ T_cam2base @ Tt` instead; the target should be fixed in the gripper frame. One pose with a much larger deviation than the rest is a bad reading; drop it and solve again.
-
-This residual is a consistency check, not an accuracy figure. In the synthetic test above the spread was about 1 mm while the true error was 3 mm, so a small spread does not by itself prove a small error.
-
-**Touch a known point.** The test that counts is physical. Put a marker or a sharp feature in view, locate it with the camera, transform it into base coordinates, and jog the robot tool there. The gap you see is your real accuracy, and it includes robot and camera errors the solver cannot see.
-
-## 8. Save and use the calibration
-
-Store the result with the camera intrinsics it was computed with, and the date. A hand-eye calibration is only valid for that camera, that lens setting and that mounting.
+**Save it** with the camera calibration it was computed with. It holds for that camera, that lens setting and that mounting.
 
 ```python
 fs = cv2.FileStorage("hand_eye.yaml", cv2.FILE_STORAGE_WRITE)
@@ -209,31 +284,76 @@ fs.write("dist", dist)
 fs.release()
 ```
 
-Repeat the calibration after any change to the camera mount, lens focus or robot tool definition, and after a collision.
+The board has to stay put for all of this: clamped in the cell for eye-in-hand, bolted to the flange for eye-to-hand. The [hand-eye calibration kit](/targets/hand-eye-calibration-kit/) has a flange adapter for the second case.
 
 ## Software versions
 
 `calibrateHandEye` arrived in OpenCV 4.1. The ChArUco code above uses the `CharucoDetector` API from OpenCV 4.7 onward.
 
-In OpenCV 5.0 the C++ function moved to `opencv2/calib.hpp`, but the 5.0 Python wheels do not expose `cv2.calibrateHandEye` or `cv2.calibrateRobotWorldHandEye`; only the `CALIB_HAND_EYE_*` constants are present. For Python, pin `opencv-contrib-python<5` until the binding returns.
+The 5.0.0 Python wheel does not have `cv2.calibrateHandEye` or `cv2.calibrateRobotWorldHandEye`, only the `CALIB_HAND_EYE_*` constants. The 5.1.0 wheel has both functions. We checked 4.6, 4.11, 4.12, 5.0.0 and 5.1.0.
 
-HALCON users have the same workflow in `calibrate_hand_eye` with a point-based calibration object, and ROS users can wrap the same OpenCV call through MoveIt's hand-eye calibration tools or `easy_handeye`.
+## What we got wrong
 
-## Common problems
+The earlier version of this page had no measurements beyond one run. Five things in it do not hold:
 
-| Symptom | Likely cause | Fix |
-|---|---|---|
-| Methods disagree by centimeters | Wrong Euler order, sign or units in the robot pose | Build one pose by hand from a known move and compare |
-| Translation off, rotation fine | Robot pose and image not taken at the same instant | Wait for the robot to settle; trigger both together |
-| Result changes a lot when one pose is dropped | Too few distinct rotations | Add poses rotated about other axes |
-| `NaN` in the result | Andreff or Daniilidis on an ill-conditioned set | Use Park or Tsai; check the motions are not all about one axis |
-| Good residual, poor touch test | Camera intrinsics stale or target not rigid | Recalibrate the camera; fix the board to its mount |
-| Eye-to-hand result looks like the gripper pose | Robot pose not inverted | Pass base-to-gripper (see step 6) |
+- **"Aim for 30° to 45° between poses."** Right, but it gave no reason and no cost. The cost of 10° instead of 31° is six times the error.
+- **"Daniilidis and Andreff can fail and return NaN."** Neither did, on any of our data. The NaN we saw came from Park, on poses rotated about one axis. The method that fails without saying so is Tsai, at small rotations.
+- **"Pin opencv-contrib-python below 5."** Only 5.0.0 lacks the function. 5.1 has it.
+- **"Rotation errors around 0.1° and translation errors of 1 to 3 mm are typical."** We had not measured that. With a robot good to 0.05 mm we get 0.03° and 0.29 mm, with one good to 0.5 mm, 0.06° and 0.66 mm.
+- **"Methods that disagree point to bad data."** Partly. Disagreement does show up when the rotations are too small, because Tsai gives up first. A wrong camera calibration moves all methods together.
 
-## Next steps
+The page also pointed to HALCON and ROS tools for the same workflow. We have not run those and took the pointers out.
 
-- [Calibrate the camera](/calibacademy/opencv-camera-calibration/) before the hand-eye run, and keep the two calibrations together.
+## Try it yourself
 
-- [Choose a pattern](/calibacademy/charuco-vs-checkerboard-vs-aprilgrid/) if the cell also needs stereo or camera–IMU calibration.
+This script builds a small cell in numbers, no images, and calibrates it 200 times with poses turned by up to 3, 10 and 30°. It needs numpy and opencv-python 4.1 or later, but not 5.0.
 
-- For a cell with several cameras, [give each board its own marker IDs](/calibacademy/multi-board-marker-ids/).
+```python
+import numpy as np, cv2
+
+def T(rvec_deg, t):                                   # 4x4 pose from a rotation vector in degrees and a translation in mm
+    M = np.eye(4); M[:3, :3] = cv2.Rodrigues(np.radians(np.array(rvec_deg, float)))[0]; M[:3, 3] = t; return M
+
+X_true = T([4, -7, 12], [35, -48, 82])                # camera in the flange frame: what calibration should find
+board_in_base = T([178, 3, 25], [620, -90, 15])       # the board lying in the cell
+
+def calibrate(max_turn_deg, rng, poses=20):
+    R_g2b, t_g2b, R_t2c, t_t2c = [], [], [], []
+    for _ in range(poses):
+        # where the camera sees the board: about 500 mm away, turned by up to max_turn_deg about a random axis
+        board_in_cam = T(rng.uniform(-max_turn_deg, max_turn_deg, 3), [rng.uniform(-60, 60), rng.uniform(-40, 40), rng.uniform(420, 580)])
+        flange_in_base = board_in_base @ np.linalg.inv(board_in_cam) @ np.linalg.inv(X_true)
+        # what gets recorded: the robot is off by 0.05 mm, the camera's board pose by 0.1 mm and 0.02 degrees
+        seen = T(rng.normal(0, 0.02, 3), rng.normal(0, 0.1, 3)) @ board_in_cam
+        R_g2b.append(flange_in_base[:3, :3]); t_g2b.append(flange_in_base[:3, 3] + rng.normal(0, 0.05, 3))
+        R_t2c.append(seen[:3, :3]); t_t2c.append(seen[:3, 3])
+    R, t = cv2.calibrateHandEye(R_g2b, t_g2b, R_t2c, t_t2c, method=cv2.CALIB_HAND_EYE_PARK)
+    X = np.eye(4); X[:3, :3] = R; X[:3, 3] = t.ravel()
+    p = np.array([0, 0, 500, 1.0])                    # a point 500 mm in front of the camera
+    return np.linalg.norm((X @ p - X_true @ p)[:3])
+
+for turn in (3, 10, 30):
+    errors = [calibrate(turn, np.random.default_rng(seed)) for seed in range(200)]
+    print(f"poses turned up to {turn:2d} degrees: point 500 mm ahead is off by {np.median(errors):5.2f} mm (median of 200 runs), {np.percentile(errors, 90):5.2f} mm in the worst tenth")
+```
+
+With OpenCV 4.12 and 5.1 it prints:
+
+```text
+poses turned up to  3 degrees: point 500 mm ahead is off by  1.29 mm (median of 200 runs),  2.18 mm in the worst tenth
+poses turned up to 10 degrees: point 500 mm ahead is off by  0.35 mm (median of 200 runs),  0.54 mm in the worst tenth
+poses turned up to 30 degrees: point 500 mm ahead is off by  0.12 mm (median of 200 runs),  0.20 mm in the worst tenth
+```
+
+Change `method=` to `cv2.CALIB_HAND_EYE_TSAI` and the first line jumps, with an error message from OpenCV for each run.
+
+## What this test is not
+
+- **Simulation.** The robot's error here is random and the same everywhere. A real arm's error depends on its pose, its load and its temperature, and part of it repeats.
+- **Points, not images.** The board pose comes from corner positions with added noise. Only the code section ran on rendered images, and only 15 for each arrangement.
+- **One cell.** One camera, one board, one working distance of about 500 mm. The millimeters scale with distance and with the robot.
+- **No timing.** Robot pose and image are taken at the same instant here. On a real cell, wait for the robot to settle.
+- **One wrong thing at a time.** The camera errors were added singly. A real setup can have several.
+- **Not run on a robot.** No number on this page comes from hardware.
+
+The scripts and the saved results are in our repository under `docs/content/experiments/hand-eye/`.

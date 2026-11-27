@@ -613,3 +613,39 @@ export const IMAGE_COUNT_SCALE = { rmsMax: 0.15, lensMax: 7, barMax: 232 };
 export function imageCountFigureSvg(rows: ImageCountRow[]): string {
   return rmsBesideLensErrorSvg(rows, IMAGE_COUNT_SCALE);
 }
+
+export interface HandEyeRotationRow { stepDeg: number; pointMm: number }
+
+/** Median of the saved sessions of one case of the hand-eye experiment: rotation between poses and error at the work point. */
+export function handEyeRotationRows(cases: Record<string, { step_deg: number | null; Park: number[] | null }[]>, names: string[]): HandEyeRotationRow[] {
+  const median = (v: number[]) => { const s = [...v].sort((a, b) => a - b), m = s.length >> 1; return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; };
+  return names.map((n) => ({ stepDeg: median(cases[n].map((r) => r.step_deg!)), pointMm: median(cases[n].filter((r) => r.Park).map((r) => r.Park![2])) }));
+}
+
+/** Millimeters as the hand-eye guide prints them: whole from 100 mm, one decimal from 1 mm, two below. */
+export const fmtMm = (v: number) => (v >= 100 ? v.toFixed(0) : v >= 1 ? v.toFixed(1) : v.toFixed(2));
+
+/**
+ * Hand-eye error at a point 500 mm in front of the camera against how far the robot rotates between poses.
+ * Horizontal bars on a logarithmic scale from 0.05 to 20 mm; bars of 1 mm and more are red.
+ */
+export function handEyeRotationFigureSvg(rows: HandEyeRotationRow[]): string {
+  const W = 640, left = 215, right = 80, top = 46, rowH = 34, lo = 0.05, hi = 20;
+  const barMax = W - left - right, H = top + rows.length * rowH + 40;
+  const x = (mm: number) => (Math.log(mm / lo) / Math.log(hi / lo)) * barMax;
+  const r = (v: number) => +v.toFixed(1);
+  let o = `<text x="20" y="24" font-size="15.5" font-weight="600" fill="${INK}">Rotation between poses</text><text x="${left}" y="24" font-size="15.5" font-weight="600" fill="${INK}">Error 500 mm in front of the camera</text>`;
+  for (const tick of [0.1, 1, 10]) {
+    const tx = r(left + x(tick));
+    o += `<line x1="${tx}" y1="${top - 8}" x2="${tx}" y2="${top + rows.length * rowH}" stroke="${LINE}" stroke-width="1" stroke-dasharray="3 3"/><text x="${tx}" y="${top + rows.length * rowH + 18}" text-anchor="middle" font-size="12.5" fill="${MUTED}" ${MONO}>${tick} mm</text>`;
+  }
+  rows.forEach((row, i) => {
+    const y = top + i * rowH, bad = row.pointMm >= 1, w = r(Math.max(2, x(row.pointMm)));
+    o += `<text x="20" y="${y + 19}" font-size="14.5" fill="${INK}" ${MONO}>about ${row.stepDeg.toFixed(0)}°</text>`;
+    o += `<rect x="${left}" y="${y + 4}" width="${w}" height="20" fill="${bad ? RED : INK}"/>`;
+    o += `<text x="${r(left + w + 8)}" y="${y + 19}" font-size="14.5" font-weight="${bad ? 600 : 400}" fill="${bad ? RED_TEXT : INK}" ${MONO}>${fmtMm(row.pointMm)} mm</text>`;
+  });
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" font-family="Geist, system-ui, sans-serif" role="img"><rect width="${W}" height="${H}" fill="#fff"/>${o}</svg>`;
+}
+
+export const HAND_EYE_ROTATION_CASES = ['tilt_2', 'tilt_5', 'tilt_10', 'tilt_20', 'tilt_30', 'tilt_45'];
