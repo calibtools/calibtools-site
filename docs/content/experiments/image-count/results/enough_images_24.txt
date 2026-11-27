@@ -1,0 +1,4 @@
+24 images with corners
+all 24 images: RMS 0.109 px, fx 1499.7, cx 638.0, cy 480.5
+10 random halves: fx 1498.1 to 1501.6, undistortion map moved by up to 2.54 px
+If the halves disagree by more than you can accept, take more images, in the places the current ones do not cover.

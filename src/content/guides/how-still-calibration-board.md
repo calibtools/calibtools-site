@@ -5,7 +5,7 @@ date: 2026-11-23
 updated: 2026-11-23
 readingTime: "9 min"
 keyRule: "Blur you can see is not the motion to worry about. A board that moves while a rolling shutter reads the frame gives a sharp image and a shifted principal point. Hold the board still, and check whether the result changes when the two worst views are left out."
-related: ["reprojection-error", "corner-detection-troubleshooting", "opencv-camera-calibration"]
+related: ["reprojection-error", "corner-detection-troubleshooting", "opencv-camera-calibration", "how-many-calibration-images"]
 products: ["charuco-composite"]
 sampleFiles: []
 faq:

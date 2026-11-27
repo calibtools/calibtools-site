@@ -5,7 +5,7 @@ date: 2026-11-07
 updated: 2026-11-23
 readingTime: "12 min"
 keyRule: "RMS is measured only where the board was. Look at the error per view and per image radius, and verify the model where it will be used, not where it was fitted."
-related: ["calibration-target-size", "opencv-camera-calibration", "printed-target-costs-half-a-pixel", "how-still-calibration-board"]
+related: ["calibration-target-size", "opencv-camera-calibration", "printed-target-costs-half-a-pixel", "how-still-calibration-board", "how-many-calibration-images"]
 products: ["charuco-composite", "charuco-ceramic"]
 sampleFiles: []
 faq:
