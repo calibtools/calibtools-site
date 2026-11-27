@@ -1,31 +1,46 @@
 ---
-title: "Camera calibration with OpenCV: step by step"
-description: "Calibrate a camera with OpenCV and Python: pick and size a target, capture good images, detect corners, run calibrateCamera and check the result."
+title: "How do you calibrate a camera with OpenCV?"
+description: "A complete OpenCV calibration script in Python, run on rendered images with a known camera, and a test of which capture advice changes the result."
 date: 2026-11-07
-updated: 2026-11-23
+updated: 2026-11-28
 readingTime: "12 min"
-keyRule: "Fill the image corners with board views, keep focus and zoom fixed, and judge the result by per-view error, not the overall RMS alone."
+keyRule: "Put the board in every part of the frame and tilt it 15 to 25°. In simulation that gave a lens model within 0.2 px. Twenty views with the board always in the middle were 2.9 px off at the corners, with the same RMS."
 related: ["calibration-target-size", "reprojection-error", "how-still-calibration-board", "charuco-vs-checkerboard-vs-aprilgrid", "corner-detection-troubleshooting", "thermal-camera-geometric-calibration", "tof-depth-camera-calibration", "line-scan-camera-calibration", "in-cabin-850-940nm-camera-calibration", "calibration-software-target-compatibility", "how-many-calibration-images"]
 products: ["charuco-composite", "charuco-ceramic", "checkerboard-composite"]
 sampleFiles: []
 faq:
   - q: "How many images do I need for camera calibration?"
-    a: "15 to 30 sharp views is a good range. Coverage matters more than count: the board should appear in every part of the image, including the corners, at several tilts and distances."
+    a: "About twenty that reach every part of the frame. In our test of image count, twenty well-spread images gave a lens model within 0.5 px, ten about 1 px, and more than thirty did not help. Where the board is matters more than how many images there are."
   - q: "What is a good reprojection error?"
-    a: "With a rigid board and a sharp lens, an RMS well under 0.5 px is common. Above 1 px usually points to blur, a bent or mis-sized target, or a few bad views. Check the per-view errors before trusting the number."
+    a: "There is no single number. On our rendered images the RMS was 0.02 to 0.03 px for good and bad sets alike: twenty views in the middle of the frame had an RMS of 0.022 px and a lens model 2.9 px off at the corners. Real images give a higher RMS. Compare views with each other, and check coverage."
   - q: "Why does calibrateCamera return bad results with my images?"
-    a: "Most often the views do not cover the frame: every board sits in the middle and faces the camera, so the corners of the image are never measured. The other usual causes are blurred or glary images, a board that is bent or whose square size was entered wrong, and one or two bad views. Look at the error of each view, not only the overall RMS."
+    a: "Most often the views do not cover the frame, or the board faces the camera in every view. In our test, views tilted under 5° raised the focal length error from 0.007 % to 0.108 %. Other causes are a bent board, a square size entered wrong, and one or two bad views."
   - q: "Should I use a checkerboard or ChArUco?"
-    a: "ChArUco if the board will not always be fully in view, or for stereo and multi-camera rigs. A plain checkerboard works when every view shows the whole board."
+    a: "ChArUco if the board will not always be fully in view, or for stereo and multi-camera rigs. A plain checkerboard works when every view shows the whole board. With the whole board in view, both gave the same accuracy in our test."
+  - q: "findChessboardCorners or findChessboardCornersSB?"
+    a: "On our rendered images both found all 400 views. The corners from findChessboardCorners with cornerSubPix were 0.023 px from the truth at the median, those from findChessboardCornersSB 0.038 px. We did not test blurred or unevenly lit images."
   - q: "Can I calibrate with a board printed on paper?"
-    a: "For a first test, yes. Measure the printed square size and glue the sheet to something flat. Paper stretches and bends, so for repeatable results a rigid board is the better choice."
+    a: "For a first test, yes. Measure the printed square size and glue the sheet to something flat. In our test with a printed board, a bow of 1 mm made the focal length 2.2 % short."
   - q: "Does this work for fisheye lenses?"
-    a: "The standard model handles most machine-vision lenses. For very wide lenses (roughly 120° and up), use the cv2.fisheye module, which uses an equidistant model with four distortion coefficients."
+    a: "We have not tested one. The script here uses OpenCV's standard model. For very wide lenses OpenCV has a separate cv2.fisheye module with its own model."
 ---
 
-Camera calibration finds the numbers that describe how your camera maps the 3D world onto pixels. OpenCV does the math; the quality of the result depends almost entirely on the target and the images you give it.
+Camera calibration finds the numbers that describe how your camera maps the world onto pixels. This page gives a complete script for OpenCV in Python, and tests the usual advice on how to take the images.
 
-This guide walks through the whole job in OpenCV with Python: choosing and sizing a target, capturing images, detecting corners, calibrating and checking the result.
+![Lens model error by how 20 views were taken. Across the frame, tilted 15 to 25°: 0.12 px. Tilted 5 to 45°: 0.17 px. Same at one distance: 0.16 px. Tilted 40 to 60°: 0.56 px. Tilted under 5°: 1.10 px. Always in the middle: 2.85 px.](../../assets/guides/opencv-steps-views-vs-model-error.svg)
+
+Each bar is the median of 20 sessions of 20 views. The error is how far the solved camera model is from the true one at its worst pixel.
+
+The numbers on this page come from rendered images of a board seen through a camera we defined, so the true answer is known. No real camera was used. The last section says what that leaves out.
+
+## The short answer
+
+- **The script is under forty lines** and is printed below. On 20 rendered views it recovered the focal length within 0.002 % and the lens model within 0.20 px everywhere.
+- **Put the board in every part of the frame.** With the board always in the middle, the model was 2.85 px off at the image corners. The RMS did not show it: 0.022 px against 0.026 px.
+- **Tilt the board, about 15 to 25°.** Tilted under 5°, the focal length error rose from 0.007 % to 0.108 %. Tilted 40 to 60°, the corners got worse and the model was 0.56 px off.
+- **Changing the distance did not matter here.** 0.16 px at one distance, 0.17 px with distance varied.
+- **About twenty views.** That number comes from our [test of image count](/calibacademy/how-many-calibration-images/).
+- **More distortion terms did not help**, and with poor coverage they made the result worse.
 
 ## What calibration gives you
 
@@ -41,49 +56,51 @@ With `K` and the distortion coefficients you can undistort images, measure in mi
 
 ## 1. Choose a pattern
 
-For most OpenCV work, use a **ChArUco** board. The ArUco markers tell the detector which corner is which, so a view still counts when part of the board is outside the image. That lets you put corners right at the image edge, where distortion is strongest.
+For most OpenCV work, use a **ChArUco** board. The ArUco markers tell the detector which corner is which, so a view still counts when part of the board is outside the image.
 
-A plain **checkerboard** gives the same corner accuracy but needs every inner corner visible in every view. For camera–IMU calibration with Kalibr, use an **AprilGrid**. The [pattern comparison](/calibacademy/charuco-vs-checkerboard-vs-aprilgrid/) covers the trade-offs.
+A plain **checkerboard** needs every inner corner visible in every view. For camera–IMU calibration with Kalibr, use an **AprilGrid**. The [pattern comparison](/calibacademy/charuco-vs-checkerboard-vs-aprilgrid/) has the test behind this.
 
 ## 2. Size the board
 
-A board that fills about half to two thirds of the frame at your working distance is a good start: big enough for sharp corners, small enough to tilt and move into the image corners.
+Each marker bit should be 3 px or more in the image so the IDs decode. A board about 60 % of the frame width is a starting point. What decides the result is whether corners reach every part of the frame across the whole set.
 
-Each square should span at least 20 pixels or so, and for ChArUco each marker bit at least 3 pixels so the IDs decode. The [FOV calculator](/tools/fov/) works this out from your sensor, lens and distance, and recommends a board.
+Both numbers come from our [test of board size](/calibacademy/calibration-target-size/). The [FOV calculator](/tools/fov/) works out the pixel sizes from your sensor, lens and distance.
 
 ## 3. Make or get the target
 
-Generate the pattern with the free [ChArUco generator](/tools/generator/charuco/) or [checkerboard generator](/tools/generator/checkerboard/). Print at 100 % ("actual size"), then measure the 100 mm scale bar and one square with a ruler or calliper.
+Generate the pattern with the [ChArUco generator](/tools/generator/charuco/) or [checkerboard generator](/tools/generator/checkerboard/). Print at 100 % ("actual size"), then measure the 100 mm scale bar and one square with a ruler or caliper.
 
-Use the **measured** square size in your code. Glue the print to something flat and stiff; a bent target adds error that no amount of images will remove.
+Use the **measured** square size in your code. Glue the print to something flat and stiff. In [our test with a printed board](/calibacademy/printed-target-costs-half-a-pixel/) a bow of 1 mm made the focal length 2.2 % short.
 
-For repeatable results, especially below 0.2 px, use a rigid board made to known dimensions, such as an [aluminum composite](/targets/charuco-composite/) or [ceramic](/targets/charuco-ceramic/) ChArUco target.
+For repeatable results use a rigid board made to known dimensions, such as an [aluminum composite](/targets/charuco-composite/) or [ceramic](/targets/charuco-ceramic/) ChArUco target.
 
-## 4. Capture good images
+## 4. Take the images
 
-The images decide the result. Before you start, fix the camera settings you will use in production:
+Fix the camera settings you will use later: focus and zoom locked, autofocus off, full resolution. Keep the board still while the frame is taken. With a rolling shutter a moving board gives a sharp but sheared image; see [how still the board has to be](/calibacademy/how-still-calibration-board/).
 
-- **Focus and zoom fixed**: turn autofocus off. Any change afterwards invalidates the calibration.
+Then take about twenty views. We tested what to vary. Each row is 20 sessions of 20 views of a 10 × 7 ChArUco board at about half the frame width. "Lens model error" is the largest difference between the solved and the true camera model over the image:
 
-- **Full resolution**: calibrate at the resolution you will run at, or rescale `K` correctly.
+| How the views were taken | RMS, px | Focal length error | Lens model error |
+|---|---|---|---|
+| Across the frame, tilted 5 to 45°, distance varied | 0.026 | 0.007 % | 0.17 px |
+| Tilted 15 to 25° | 0.020 | 0.005 % | 0.12 px |
+| All at one distance | 0.024 | 0.011 % | 0.16 px |
+| Tilted 40 to 60° | 0.120 | 0.022 % | 0.56 px |
+| Tilted under 5° | 0.019 | 0.108 % | 1.10 px |
+| Tilted under 5°, all at one distance | 0.019 | 0.082 % | 0.90 px |
+| Board always in the middle of the frame | 0.022 | 0.006 % | 2.85 px |
 
-- **Sharp, evenly lit images, board at rest**: short exposure, no glare, and a board that is not moving when the frame is taken. With a rolling shutter a moving board gives a sharp but sheared image; see [how still the board has to be](/calibacademy/how-still-calibration-board/).
+Three things follow:
 
-Then take 15 to 30 views and vary them deliberately:
-
-- Move the board into all four image corners and along the edges, not only the center.
-
-- Tilt it up to about 45° around both axes. Tilt is what pins down the focal length.
-
-- Change the distance a little between views.
-
-- For ChArUco, let the board run off the image edge in some views.
+- **Coverage first.** The board in the middle gives a fine focal length and a lens model that is wrong where it never looked.
+- **Tilt, but not steeply.** A board that faces the camera in every view leaves the focal length poorly fixed. Past 40° the corners are found less exactly, 7 of the 400 views were not found at all, and the RMS shows it.
+- **RMS does not rank these.** The two worst sets for the lens model have a lower RMS than the first row.
 
 ![Two camera frames with board outlines. Left: five views that all sit in the middle of the frame. Right: seven views that reach the four corners and the edges, tilted, one running off the frame.](../../assets/guides/view-coverage.svg)
 
-## 5. Detect the corners
+## 5. The script
 
-For a **ChArUco** board (OpenCV 4.7 and later), set up the board with the same geometry you printed. The board size is (columns, rows) in squares; sizes are in meters or millimeters, as long as you stay consistent:
+For a ChArUco board, with OpenCV 4.7 or later. Set up the board with the geometry you printed: squares across and down, then square and marker size.
 
 ```python
 import glob
@@ -91,13 +108,9 @@ import cv2
 import numpy as np
 
 d = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_6X6_250)
-board = cv2.aruco.CharucoBoard((10, 7), 0.025, 0.018, d)
+board = cv2.aruco.CharucoBoard((10, 7), 0.025, 0.018, d)   # squares across, squares down, square and marker size in meters
 detector = cv2.aruco.CharucoDetector(board)
-```
 
-Then collect object and image points from every image:
-
-```python
 obj_all, img_all = [], []
 for path in sorted(glob.glob("images/*.png")):
     gray = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
@@ -107,66 +120,23 @@ for path in sorted(glob.glob("images/*.png")):
     obj, img = board.matchImagePoints(corners, ids)
     obj_all.append(obj)
     img_all.append(img)
-```
+print(len(obj_all), "views used")
 
-For a **checkerboard**, the pattern size is the number of inner corners, (columns − 1, rows − 1). `findChessboardCornersSB` is more accurate and more robust than the older `findChessboardCorners`:
-
-```python
-cols, rows, square = 10, 7, 0.025
-pattern = (cols - 1, rows - 1)
-objp = np.zeros((pattern[0] * pattern[1], 3), np.float32)
-objp[:, :2] = np.mgrid[0:pattern[0], 0:pattern[1]].T.reshape(-1, 2) * square
-```
-
-```python
-ok, corners = cv2.findChessboardCornersSB(gray, pattern)
-if ok:
-    obj_all.append(objp)
-    img_all.append(corners)
-```
-
-## 6. Calibrate
-
-```python
 size = gray.shape[::-1]  # (width, height)
-rms, K, dist, rvecs, tvecs = cv2.calibrateCamera(
-    obj_all, img_all, size, None, None)
-print("RMS reprojection error:", rms)
+rms, K, dist, rvecs, tvecs = cv2.calibrateCamera(obj_all, img_all, size, None, None)
+np.set_printoptions(precision=4, suppress=True)
+print("RMS reprojection error: %.3f px" % rms)
 print("K =\n", K)
 print("dist =", dist.ravel())
-```
 
-If strong distortion leaves residual error, try `cv2.CALIB_RATIONAL_MODEL` (eight coefficients). Add flags one at a time and keep them only if the per-view error drops on images you did not calibrate with.
-
-## 7. Check the result
-
-The overall RMS is an average and can hide problems. Look at the error per view:
-
-```python
-for i, (o, p) in enumerate(zip(obj_all, img_all)):
-    proj, _ = cv2.projectPoints(o, rvecs[i], tvecs[i], K, dist)
+per_view = []
+for o, p, r, t in zip(obj_all, img_all, rvecs, tvecs):
+    proj, _ = cv2.projectPoints(o, r, t, K, dist)
     diff = p.reshape(-1, 2) - proj.reshape(-1, 2)
-    err = np.sqrt((diff ** 2).sum(axis=1).mean())
-    print(i, round(float(err), 3))
-```
+    per_view.append(float(np.sqrt((diff ** 2).sum(axis=1).mean())))
+print("per-view error, px:", np.round(per_view, 2))
+print("worst view: %.2f px, median view: %.2f px" % (max(per_view), np.median(per_view)))
 
-Then run a few sanity checks:
-
-- **A few views much worse than the rest**: usually a bad detection, glare, or a board that moved during the frame. Remove them and calibrate again.
-
-- **Principal point**: `cx`, `cy` should sit near the image center, typically within a few percent of the width.
-
-- **fx and fy**: nearly equal for square pixels.
-
-- **Straight lines**: undistort an image of a straight edge and check it is straight right out to the corners.
-
-With a rigid board and a sharp lens, an RMS well under 0.5 px is common. Above 1 px, look for blur, a bent or mis-measured target, or poor coverage of the image corners.
-
-## 8. Save and use the calibration
-
-Save the results with `cv2.FileStorage` so other tools, including C++, can read them:
-
-```python
 fs = cv2.FileStorage("camera.yaml", cv2.FILE_STORAGE_WRITE)
 fs.write("K", K)
 fs.write("dist", dist)
@@ -174,33 +144,140 @@ fs.write("image_size", np.array(size))
 fs.release()
 ```
 
-To undistort a video stream, build the maps once with `cv2.getOptimalNewCameraMatrix` and `cv2.initUndistortRectifyMap`, then call `cv2.remap` on each frame.
+We rendered 20 views of that board, tilted 5 to 45° across the frame, saved them to `images/` and ran the script. It printed:
 
-## When calibrateCamera returns bad results
+```text
+20 views used
+RMS reprojection error: 0.023 px
+K =
+ [[2249.9451    0.      959.905 ]
+ [   0.     2249.9404  720.0243]
+ [   0.        0.        1.    ]]
+dist = [-0.1202  0.0029  0.     -0.     -0.014 ]
+per-view error, px: [0.02 0.02 0.02 0.02 0.02 0.02 0.02 0.02 0.04 0.02 0.02 0.02 0.03 0.02
+ 0.02 0.02 0.02 0.02 0.04 0.02]
+worst view: 0.04 px, median view: 0.02 px
+```
 
-A calibration that runs without an error can still be wrong. Work through these in order; each one is quick to check.
+The images were made with a focal length of 2250 px, the principal point at (960, 720) and one distortion term, k1 = −0.12. The script's result is 0.002 % off in focal length and its lens model is within 0.20 px at every pixel.
 
-1. **Coverage.** Plot where the detected corners fall in the image. If the corners of the frame are empty, the distortion there is a guess. Add views at the edges and corners, tilted.
+## 6. With a checkerboard
 
-2. **Sharpness.** Open the images at 100 %. Glare moves the detected corners and heavy blur loses them; drop those views. A sharp image does not prove the board was still: with a rolling shutter, [motion during readout](/calibacademy/how-still-calibration-board/) leaves no blur.
+The pattern size is the number of inner corners, (columns − 1, rows − 1), and the whole board has to be in every view.
 
-3. **The board.** Measure one printed square and compare it with the size in your code. Lay a straightedge across the board: in [our test with a printed board](/calibacademy/printed-target-costs-half-a-pixel/) a bow of 1 mm made the focal length 2.2 % short.
+```python
+import glob
+import cv2
+import numpy as np
 
-4. **Per-view error.** Compute the reprojection error of each view. One view at three times the others is a bad view; remove it and calibrate again.
+cols, rows, square = 10, 7, 0.025            # squares across, squares down, square size in meters
+pattern = (cols - 1, rows - 1)               # inner corners
+objp = np.zeros((pattern[0] * pattern[1], 3), np.float32)
+objp[:, :2] = np.mgrid[0:pattern[0], 0:pattern[1]].T.reshape(-1, 2) * square
+stop = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
 
-5. **The model.** Stay with the five standard distortion coefficients unless the error grows toward the image edge with good coverage. More terms fit the same corners and extrapolate worse.
+obj_all, img_all = [], []
+for path in sorted(glob.glob("images/*.png")):
+    gray = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
+    ok, corners = cv2.findChessboardCorners(gray, pattern)
+    if not ok:
+        continue  # the whole board has to be in view
+    corners = cv2.cornerSubPix(gray, corners, (5, 5), (-1, -1), stop)
+    obj_all.append(objp)
+    img_all.append(corners)
+print(len(obj_all), "views used")
 
-The [reprojection error guide](/calibacademy/reprojection-error/) shows how to do checks 4 and 5, and what a low RMS can hide.
+rms, K, dist, rvecs, tvecs = cv2.calibrateCamera(obj_all, img_all, gray.shape[::-1], None, None)
+np.set_printoptions(precision=4, suppress=True)
+print("RMS reprojection error: %.3f px" % rms)
+print("K =\n", K)
+print("dist =", dist.ravel())
+fs = cv2.FileStorage("camera.yaml", cv2.FILE_STORAGE_WRITE)
+fs.write("K", K)
+fs.write("dist", dist)
+fs.release()
+```
+
+On the same 20 views rendered as a checkerboard:
+
+```text
+20 views used
+RMS reprojection error: 0.026 px
+K =
+ [[2249.3439    0.      959.8331]
+ [   0.     2249.3536  720.0506]
+ [   0.        0.        1.    ]]
+dist = [-0.12   -0.0003  0.     -0.      0.0034]
+```
+
+That is 0.029 % off in focal length and within 0.30 px at every pixel.
+
+OpenCV has two checkerboard detectors. We rendered 400 views both ways and compared the corners with their true positions:
+
+| Detector | Views found, of 400 | Corner error, median | 95 % of corners within | Lens model error |
+|---|---|---|---|---|
+| ChArUco, `CharucoDetector` | 400 | 0.018 px | 0.046 px | 0.15 px |
+| Checkerboard, `findChessboardCorners` + `cornerSubPix` | 400 | 0.023 px | 0.047 px | 0.15 px |
+| Checkerboard, `findChessboardCornersSB` | 400 | 0.038 px | 0.134 px | 0.18 px |
+
+The last column is the median of 20 sessions of 20 views. All three are good enough here. The older detector with `cornerSubPix` was the more exact of the two checkerboard ones on these images.
+
+## 7. Check the result
+
+The script prints the error of each view. One view well above the rest is a bad detection, glare, or a board that moved: remove it and run again. The [reprojection error guide](/calibacademy/reprojection-error/) goes further.
+
+Two checks often suggested are that `cx`, `cy` sit near the image center and that `fx` and `fy` are nearly equal. They catch a result that is badly broken. They do not catch poor coverage:
+
+| Session | Principal point off by, at most | fx and fy apart by, at most | Lens model error |
+|---|---|---|---|
+| Across the frame, tilted 5 to 45° | 0.4 px | 0.05 px | 0.17 px |
+| Board always in the middle | 0.4 px | 0.03 px | 2.85 px |
+
+So also look at where the corners fell. If parts of the frame have none, the model there is a guess.
+
+## 8. More distortion terms?
+
+`cv2.CALIB_RATIONAL_MODEL` adds three radial terms. `cv2.CALIB_FIX_K3 | cv2.CALIB_ZERO_TANGENT_DIST` removes three. The same corners, solved three ways:
+
+| Session | Default, 5 terms | Rational, 8 terms | 2 terms |
+|---|---|---|---|
+| Across the frame, tilted 5 to 45° | 0.17 px | 0.17 px | 0.10 px |
+| Board always in the middle | 2.85 px | 4.84 px | 0.29 px |
+
+The simulated lens has one distortion term, so extra terms have nothing to fit but noise. With good coverage that costs little. With poor coverage the extra terms run off where there are no corners. A lens with strong distortion may need them; this test cannot say.
 
 ## Common problems
 
 | Symptom | Likely cause | Fix |
 |---|---|---|
 | No corners found | Wrong board size, or columns and rows swapped | Board size is (columns, rows) in squares for ChArUco, inner corners for a checkerboard |
-| ChArUco markers found but no corners | Board made with the pre-4.6 layout | Call `board.setLegacyPattern(True)`; see the [detection troubleshooting guide](/calibacademy/corner-detection-troubleshooting/) |
-| RMS above 1 px | Blur, glare, bent target, few corner views | Re-shoot sharper views that cover the image corners |
+| ChArUco markers found but no corners | Board made with the pre-4.6 layout | Call `board.setLegacyPattern(True)`, in OpenCV 4.8 or later; see the [detection troubleshooting guide](/calibacademy/corner-detection-troubleshooting/) |
+| Good RMS, wrong at the image corners | The board never went there | Add views at the edges and corners |
 | Good RMS, wrong distances | Square size mis-entered or printer scaling | Measure the printed square and use that value |
 | Calibration drifts between sessions | Focus or zoom moved | Lock the lens, recalibrate after any change |
+
+## What we got wrong
+
+The earlier version of this page had the same steps, with advice we had not tested. Run against a known camera, six points did not hold up:
+
+- **"findChessboardCornersSB is more accurate and more robust."** On our images its corners were less exact: 0.038 px against 0.023 px at the median. We have not tested robustness.
+- **"Tilt it up to about 45°."** 15 to 25° was best. From 40° on the result got worse.
+- **"Change the distance a little between views."** It made no measurable difference.
+- **"cx, cy near the center and fx, fy nearly equal" as checks.** Both held in sessions whose lens model was 2.85 px off.
+- **"An RMS well under 0.5 px is common, above 1 px look for blur."** We had not measured either number, and RMS did not separate good sets from bad ones here.
+- **"Call board.setLegacyPattern(True)."** That method exists from OpenCV 4.8. Version 4.7.0 does not have it.
+
+The line on fisheye lenses "from roughly 120°" is gone. We have not tested a fisheye lens.
+
+## What this test is not
+
+- **Simulation.** Rendered images of a flat board, evenly lit, with 0.8 px of blur and a little noise. Real images have glare, uneven focus and a board that is not perfectly flat. Their RMS is higher than the 0.02 px here.
+- **One lens, a simple one.** 46° across, one radial distortion term, principal point exactly at the center. The checks in step 7 and the extra terms in step 8 may behave differently on a wide or decentered lens.
+- **One board at one size.** 10 × 7 squares of 25 mm at about half the frame width, always fully in view.
+- **OpenCV 5.1.** We checked on 4.6.0, 4.7.0 and 4.8.0 only which of the functions named here exist.
+- **Not run:** undistorting images with the result, and the two checkerboard detectors on blurred or unevenly lit images.
+
+The scripts and the saved results are in our repository under `docs/content/experiments/opencv-steps/`.
 
 ## Next steps
 

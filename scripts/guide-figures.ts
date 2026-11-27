@@ -9,7 +9,7 @@ import { writeFileSync, mkdirSync, readFileSync } from 'node:fs';
 import { Resvg } from '@resvg/resvg-js';
 import { renderPatternSvg } from '../src/lib/patterns';
 import { patternExtent } from '../src/lib/pageLayout';
-import { PARTIAL_VIEW_CASES, PARTIAL_VIEW_VISIBLE, PARTIAL_VIEW_MARGIN, partialViewFigureSvg, usafFigureSvg, usafThreeBarsFigureSvg, kalibrFrameFigureSvg, multiBoardFigureSvg, boardPlacementFigureSvg, type PlacementData, handEyeRotationFigureSvg, handEyeRotationRows, HAND_EYE_ROTATION_CASES, cameraImuMotionFigureSvg, cameraImuMotionRows, lidarUsableFigureSvg, printDefectFigureSvg, printDefectRowsFromGuide, hiddenErrorFigureSvg, hiddenErrorRowsFromGuide, coverageFigureSvg, handEyeFigureSvg, detectionLimitsFigureSvg, detectionLimitsFromGuide, lidarCameraFigureSvg, boardMotionFigureSvg, boardMotionRowsFromGuide, substrateFigureSvg, substrateRowsFromGuide, sameIdsFigureSvg, imageCountFigureSvg, imageCountRowsFromGuide, type PartialViewData, type SameIdsData } from '../src/lib/guideFigures';
+import { PARTIAL_VIEW_CASES, PARTIAL_VIEW_VISIBLE, PARTIAL_VIEW_MARGIN, partialViewFigureSvg, usafFigureSvg, usafThreeBarsFigureSvg, opencvStepsFigureSvg, kalibrFrameFigureSvg, multiBoardFigureSvg, boardPlacementFigureSvg, type PlacementData, handEyeRotationFigureSvg, handEyeRotationRows, HAND_EYE_ROTATION_CASES, cameraImuMotionFigureSvg, cameraImuMotionRows, lidarUsableFigureSvg, printDefectFigureSvg, printDefectRowsFromGuide, hiddenErrorFigureSvg, hiddenErrorRowsFromGuide, coverageFigureSvg, handEyeFigureSvg, detectionLimitsFigureSvg, detectionLimitsFromGuide, lidarCameraFigureSvg, boardMotionFigureSvg, boardMotionRowsFromGuide, substrateFigureSvg, substrateRowsFromGuide, sameIdsFigureSvg, imageCountFigureSvg, imageCountRowsFromGuide, type PartialViewData, type SameIdsData } from '../src/lib/guideFigures';
 
 if (process.argv.includes('--pngs')) {
   const pxPerMm = 6, m = PARTIAL_VIEW_MARGIN;
@@ -41,6 +41,7 @@ if (process.argv.includes('--pngs')) {
   writeFileSync('src/assets/guides/lidar-holes-found-by-distance.svg', lidarUsableFigureSvg(JSON.parse(readFileSync('docs/content/experiments/lidar-camera/results/detect.json', 'utf8')).rows));
   writeFileSync('src/assets/guides/charuco-detection-limits.svg', detectionLimitsFigureSvg(detectionLimitsFromGuide(readFileSync('src/content/guides/corner-detection-troubleshooting.md', 'utf8'))));
   writeFileSync('src/assets/guides/lidar-camera-target-two-views.svg', lidarCameraFigureSvg());
+  writeFileSync('src/assets/guides/opencv-steps-views-vs-model-error.svg', opencvStepsFigureSvg(JSON.parse(readFileSync('docs/content/experiments/opencv-steps/results/sessions.json', 'utf8')).results));
   writeFileSync('src/assets/guides/usaf-three-bars-by-bar-width.svg', usafThreeBarsFigureSvg(JSON.parse(readFileSync('docs/content/experiments/usaf-reading/results/looks.json', 'utf8'))));
   writeFileSync('src/assets/guides/board-motion-rms-vs-model-error.svg', boardMotionFigureSvg(boardMotionRowsFromGuide(readFileSync('src/content/guides/how-still-calibration-board.md', 'utf8'))));
   writeFileSync('src/assets/guides/substrate-rms-vs-model-error.svg', substrateFigureSvg(substrateRowsFromGuide(readFileSync('src/content/guides/composite-ceramic-or-glass.md', 'utf8'))));

@@ -739,3 +739,37 @@ export function usafThreeBarsFigureSvg(d: UsafLooks): string {
   });
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" font-family="Geist, system-ui, sans-serif" role="img"><rect width="${W}" height="${H}" fill="#fff"/>${o}</svg>`;
 }
+
+/* OpenCV step-by-step guide: how far the solved lens model is off, by how the 20 views were taken. */
+export interface OpencvStepsSession { default: { model_worst: number } | null }
+export const OPENCV_STEPS_ARMS: [string, string][] = [
+  ['tilt_15_to_25', 'Across the frame, tilted 15 to 25°'],
+  ['as_in_the_guide', 'Across the frame, tilted 5 to 45°'],
+  ['one_distance', 'Same, all at one distance'],
+  ['tilt_40_to_60', 'Tilted 40 to 60°'],
+  ['tilt_under_5', 'Tilted under 5°'],
+  ['middle_only', 'Always in the middle of the frame'],
+];
+export const opencvStepsWorst = (results: Record<string, OpencvStepsSession[]>, arm: string): number => {
+  const v = results[arm].filter((s) => s.default).map((s) => s.default!.model_worst).sort((a, b) => a - b), m = v.length >> 1;
+  return v.length % 2 ? v[m] : (v[m - 1] + v[m]) / 2;
+};
+export function opencvStepsFigureSvg(results: Record<string, OpencvStepsSession[]>): string {
+  const W = 640, left = 286, right = 84, top = 46, rowH = 34, lo = 0.05, hi = 5;
+  const barMax = W - left - right, H = top + OPENCV_STEPS_ARMS.length * rowH + 40;
+  const x = (px: number) => (Math.log(px / lo) / Math.log(hi / lo)) * barMax;
+  const r = (v: number) => +v.toFixed(1);
+  let o = `<text x="20" y="24" font-size="15.5" font-weight="600" fill="${INK}">How the 20 views were taken</text><text x="${left}" y="24" font-size="15.5" font-weight="600" fill="${INK}">Largest error of the lens model</text>`;
+  for (const tick of [0.1, 1]) {
+    const tx = r(left + x(tick));
+    o += `<line x1="${tx}" y1="${top - 8}" x2="${tx}" y2="${top + OPENCV_STEPS_ARMS.length * rowH}" stroke="${LINE}" stroke-width="1" stroke-dasharray="3 3"/><text x="${tx}" y="${top + OPENCV_STEPS_ARMS.length * rowH + 18}" text-anchor="middle" font-size="12.5" fill="${MUTED}" ${MONO}>${tick} px</text>`;
+  }
+  OPENCV_STEPS_ARMS.forEach(([arm, label], i) => {
+    const v = opencvStepsWorst(results, arm), y = top + i * rowH, bad = v >= 0.5, w = r(Math.max(2, x(v)));
+    o += `<text x="20" y="${y + 19}" font-size="14" fill="${INK}">${label}</text>`;
+    o += `<rect x="${left}" y="${y + 4}" width="${w}" height="20" fill="${bad ? RED : INK}"/>`;
+    o += `<rect x="${r(left + w + 4)}" y="${y + 4}" width="72" height="20" fill="#fff"/>`;
+    o += `<text x="${r(left + w + 8)}" y="${y + 19}" font-size="14.5" font-weight="${bad ? 600 : 400}" fill="${bad ? RED_TEXT : INK}" ${MONO}>${v.toFixed(2)} px</text>`;
+  });
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" font-family="Geist, system-ui, sans-serif" role="img"><rect width="${W}" height="${H}" fill="#fff"/>${o}</svg>`;
+}
