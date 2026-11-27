@@ -274,7 +274,7 @@ describe('LiDAR-camera figure', () => {
     const turned = holes.map(([x, y]) => [panel.w - x, panel.h - y]);
     const same = turned.every(([x, y]) => holes.some(([hx, hy]) => Math.hypot(x - hx, y - hy) < 1));
     expect(same).toBe(false);
-    expect(readFileSync('src/content/guides/lidar-camera-calibration.md', 'utf8')).toContain('An asymmetric hole layout');
+    expect(readFileSync('src/content/guides/lidar-camera-calibration.md', 'utf8')).toContain('Does the hole layout have to be asymmetric?');
   });
 
   it('holes stay clear of the markers and of the panel edge', () => {

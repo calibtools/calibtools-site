@@ -688,3 +688,30 @@ export function cameraImuMotionFigureSvg(rows: CameraImuMotionRow[]): string {
   });
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" font-family="Geist, system-ui, sans-serif" role="img"><rect width="${W}" height="${H}" fill="#fff"/>${o}</svg>`;
 }
+
+export interface LidarUsableRow { lidar: string; distance: [number, number]; placements: number; usable: number; hole_diameter_mm: number }
+export const LIDAR_FIGURE_LIDARS = ['16 lines', '32 lines', '64 lines', '128 lines', 'dense'];
+export const LIDAR_FIGURE_DISTANCES: [number, number][] = [[1.5, 2.5], [2.5, 4], [4, 6], [6, 8]];
+
+/**
+ * A grid of LiDAR patterns against distance bands: the share of panel placements in which all four 120 mm holes were found.
+ * Cells under 50 % are red, cells under 95 % gray.
+ */
+export function lidarUsableFigureSvg(rows: LidarUsableRow[]): string {
+  const W = 640, left = 150, top = 64, cw = (W - left - 20) / LIDAR_FIGURE_DISTANCES.length, ch = 40;
+  const H = top + LIDAR_FIGURE_LIDARS.length * ch + 16;
+  const label: Record<string, string> = { dense: 'Dense cloud' };
+  let o = `<text x="20" y="24" font-size="15.5" font-weight="600" fill="${INK}">Placements with all four holes found</text>`;
+  LIDAR_FIGURE_DISTANCES.forEach(([a, b], j) => { o += `<text x="${left + j * cw + cw / 2}" y="${top - 12}" text-anchor="middle" font-size="13.5" fill="${MUTED}" ${MONO}>${a} to ${b} m</text>`; });
+  LIDAR_FIGURE_LIDARS.forEach((lidar, i) => {
+    const y = top + i * ch;
+    o += `<text x="20" y="${y + 25}" font-size="14.5" fill="${INK}">${label[lidar] ?? lidar}</text>`;
+    LIDAR_FIGURE_DISTANCES.forEach(([a, b], j) => {
+      const r = rows.find((x) => x.lidar === lidar && x.hole_diameter_mm === 120 && x.distance[0] === a && x.distance[1] === b)!;
+      const pct = Math.round((100 * r.usable) / r.placements), bad = pct < 50, mid = pct < 95;
+      o += `<rect x="${left + j * cw + 2}" y="${y + 2}" width="${cw - 4}" height="${ch - 4}" fill="${bad ? RED : mid ? '#E7E5DE' : '#fff'}" stroke="${LINE}" stroke-width="1"/>`;
+      o += `<text x="${left + j * cw + cw / 2}" y="${y + 26}" text-anchor="middle" font-size="15" font-weight="${bad ? 600 : 400}" fill="${bad ? '#fff' : INK}" ${MONO}>${pct} %</text>`;
+    });
+  });
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" font-family="Geist, system-ui, sans-serif" role="img"><rect width="${W}" height="${H}" fill="#fff"/>${o}</svg>`;
+}

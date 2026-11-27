@@ -1,0 +1,6 @@
+327 points on 8 lines
+hole at [3.058 0.09  0.1  ]  found [3.058 0.09  0.102]  off by 2.0 mm
+hole at [ 3.147 -0.154  0.1  ]  found [ 3.147 -0.154  0.101]  off by 1.4 mm
+hole at [ 3.058  0.09  -0.06 ]  found [ 3.058  0.091 -0.058]  off by 2.1 mm
+hole at [ 3.137 -0.126 -0.08 ]  found [ 3.137 -0.125 -0.079]  off by 1.6 mm
+rim misfit 3.2 mm

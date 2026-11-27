@@ -9,7 +9,7 @@ import { writeFileSync, mkdirSync, readFileSync } from 'node:fs';
 import { Resvg } from '@resvg/resvg-js';
 import { renderPatternSvg } from '../src/lib/patterns';
 import { patternExtent } from '../src/lib/pageLayout';
-import { PARTIAL_VIEW_CASES, PARTIAL_VIEW_VISIBLE, PARTIAL_VIEW_MARGIN, partialViewFigureSvg, usafFigureSvg, kalibrFrameFigureSvg, multiBoardFigureSvg, boardPlacementFigureSvg, type PlacementData, handEyeRotationFigureSvg, handEyeRotationRows, HAND_EYE_ROTATION_CASES, cameraImuMotionFigureSvg, cameraImuMotionRows, printDefectFigureSvg, printDefectRowsFromGuide, hiddenErrorFigureSvg, hiddenErrorRowsFromGuide, coverageFigureSvg, handEyeFigureSvg, detectionLimitsFigureSvg, detectionLimitsFromGuide, lidarCameraFigureSvg, boardMotionFigureSvg, boardMotionRowsFromGuide, substrateFigureSvg, substrateRowsFromGuide, sameIdsFigureSvg, imageCountFigureSvg, imageCountRowsFromGuide, type PartialViewData, type SameIdsData } from '../src/lib/guideFigures';
+import { PARTIAL_VIEW_CASES, PARTIAL_VIEW_VISIBLE, PARTIAL_VIEW_MARGIN, partialViewFigureSvg, usafFigureSvg, kalibrFrameFigureSvg, multiBoardFigureSvg, boardPlacementFigureSvg, type PlacementData, handEyeRotationFigureSvg, handEyeRotationRows, HAND_EYE_ROTATION_CASES, cameraImuMotionFigureSvg, cameraImuMotionRows, lidarUsableFigureSvg, printDefectFigureSvg, printDefectRowsFromGuide, hiddenErrorFigureSvg, hiddenErrorRowsFromGuide, coverageFigureSvg, handEyeFigureSvg, detectionLimitsFigureSvg, detectionLimitsFromGuide, lidarCameraFigureSvg, boardMotionFigureSvg, boardMotionRowsFromGuide, substrateFigureSvg, substrateRowsFromGuide, sameIdsFigureSvg, imageCountFigureSvg, imageCountRowsFromGuide, type PartialViewData, type SameIdsData } from '../src/lib/guideFigures';
 
 if (process.argv.includes('--pngs')) {
   const pxPerMm = 6, m = PARTIAL_VIEW_MARGIN;
@@ -38,6 +38,7 @@ if (process.argv.includes('--pngs')) {
   writeFileSync('src/assets/guides/hand-eye-arrangements.svg', handEyeFigureSvg());
   writeFileSync('src/assets/guides/hand-eye-rotation-vs-error.svg', handEyeRotationFigureSvg(handEyeRotationRows(JSON.parse(readFileSync('docs/content/experiments/hand-eye/results/sessions.json', 'utf8')).cases, HAND_EYE_ROTATION_CASES)));
   writeFileSync('src/assets/guides/camera-imu-motion-vs-error.svg', cameraImuMotionFigureSvg(cameraImuMotionRows(JSON.parse(readFileSync('docs/content/experiments/camera-imu/results/recordings.json', 'utf8')).cases)));
+  writeFileSync('src/assets/guides/lidar-holes-found-by-distance.svg', lidarUsableFigureSvg(JSON.parse(readFileSync('docs/content/experiments/lidar-camera/results/detect.json', 'utf8')).rows));
   writeFileSync('src/assets/guides/charuco-detection-limits.svg', detectionLimitsFigureSvg(detectionLimitsFromGuide(readFileSync('src/content/guides/corner-detection-troubleshooting.md', 'utf8'))));
   writeFileSync('src/assets/guides/lidar-camera-target-two-views.svg', lidarCameraFigureSvg());
   writeFileSync('src/assets/guides/board-motion-rms-vs-model-error.svg', boardMotionFigureSvg(boardMotionRowsFromGuide(readFileSync('src/content/guides/how-still-calibration-board.md', 'utf8'))));
