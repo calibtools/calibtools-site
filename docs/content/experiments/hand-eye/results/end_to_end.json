@@ -1,0 +1,24 @@
+{
+ "opencv": "5.1.0",
+ "poses": 15,
+ "robot_noise": {
+  "mm": 0.05,
+  "deg": 0.01
+ },
+ "results": {
+  "in": {
+   "script": "eye_in_hand.py",
+   "poses_used": 15,
+   "rotation_error_deg": 0.00890576296393274,
+   "translation_error_mm": 0.12796475790301334,
+   "spread_line": "target position spread, mm: mean 0.26 max 0.54"
+  },
+  "to": {
+   "script": "eye_to_hand.py",
+   "poses_used": 15,
+   "rotation_error_deg": 0.006284508868342174,
+   "translation_error_mm": 0.33155353446657193,
+   "spread_line": "target position spread, mm: mean 0.19 max 0.30"
+  }
+ }
+}
