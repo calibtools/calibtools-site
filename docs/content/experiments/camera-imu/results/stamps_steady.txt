@@ -1,0 +1,3 @@
+IMU dt ms: median 5.00  min 4.89  max 5.11
+gaps > 2x nominal: 0 of 11999
+samples with the same stamp as the one before: 0
