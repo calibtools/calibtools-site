@@ -715,3 +715,27 @@ export function lidarUsableFigureSvg(rows: LidarUsableRow[]): string {
   });
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" font-family="Geist, system-ui, sans-serif" role="img"><rect width="${W}" height="${H}" fill="#fff"/>${o}</svg>`;
 }
+
+/* USAF guide: in how many looks three bars are counted, by lens blur and bar width on the sensor. */
+export interface UsafLooks { freqs_cycles_per_pixel: number[]; nyquist_index: number; looks: number; cases: Record<string, { blur: number; threshold: number; noise: number; chart_contrast: number; counts: number[][] }> }
+export const USAF_FIGURE_CASES: [string, string][] = [['pixels only', 'No lens blur'], ['blur 0.3', 'Blur 0.3 px'], ['blur 0.5', 'Blur 0.5 px'], ['blur 0.8', 'Blur 0.8 px'], ['blur 1.2', 'Blur 1.2 px']];
+export const USAF_FIGURE_ELEMENTS = [9, 10, 11, 12, 13, 14, 15, 16, 17];
+export const usafThreeBarsPct = (d: UsafLooks, name: string, element: number): number => Math.round((100 * d.cases[name].counts.filter((c) => c[element] === 3).length) / d.looks);
+export const usafBarWidthPx = (d: UsafLooks, element: number): string => (0.5 / d.freqs_cycles_per_pixel[element]).toFixed(2);
+export function usafThreeBarsFigureSvg(d: UsafLooks): string {
+  const W = 640, left = 128, top = 86, cw = (W - left - 16) / USAF_FIGURE_ELEMENTS.length, ch = 40;
+  const H = top + USAF_FIGURE_CASES.length * ch + 16;
+  let o = `<text x="20" y="24" font-size="15.5" font-weight="600" fill="${INK}">Looks in which three bars were counted, %</text>`;
+  o += `<text x="${left}" y="50" font-size="13" fill="${MUTED}">Width of one bar on the sensor, px</text>`;
+  USAF_FIGURE_ELEMENTS.forEach((e, j) => { o += `<text x="${left + j * cw + cw / 2}" y="${top - 12}" text-anchor="middle" font-size="13.5" fill="${e === d.nyquist_index ? INK : MUTED}" font-weight="${e === d.nyquist_index ? 600 : 400}" ${MONO}>${usafBarWidthPx(d, e)}</text>`; });
+  USAF_FIGURE_CASES.forEach(([name, label], i) => {
+    const y = top + i * ch;
+    o += `<text x="20" y="${y + 25}" font-size="14.5" fill="${INK}">${label}</text>`;
+    USAF_FIGURE_ELEMENTS.forEach((e, j) => {
+      const pct = usafThreeBarsPct(d, name, e), luck = pct > 0 && pct < 100;
+      o += `<rect x="${left + j * cw + 2}" y="${y + 2}" width="${cw - 4}" height="${ch - 4}" fill="${luck ? RED : pct === 100 ? '#fff' : '#E7E5DE'}" stroke="${LINE}" stroke-width="1"/>`;
+      o += `<text x="${left + j * cw + cw / 2}" y="${y + 26}" text-anchor="middle" font-size="15" font-weight="${luck ? 600 : 400}" fill="${luck ? '#fff' : pct === 100 ? INK : MUTED}" ${MONO}>${pct}</text>`;
+    });
+  });
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" font-family="Geist, system-ui, sans-serif" role="img"><rect width="${W}" height="${H}" fill="#fff"/>${o}</svg>`;
+}

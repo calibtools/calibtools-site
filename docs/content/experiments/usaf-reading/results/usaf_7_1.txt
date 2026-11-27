@@ -1,0 +1,4 @@
+group 7, element 1 on the chart: 128 lp/mm, bars 3.91 um wide
+on the sensor at 1x: 128 lp/mm, bars 1.13 px wide
+that is 0.88 of the sensor's Nyquist limit (144.9 lp/mm)
+bars under 1.3 px: move the chart a little and read again, this reading can change by itself

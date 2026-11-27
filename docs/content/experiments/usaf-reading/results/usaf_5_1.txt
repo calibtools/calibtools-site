@@ -1,0 +1,4 @@
+group 5, element 1 on the chart: 32 lp/mm, bars 15.6 um wide
+on the sensor at 0.5x: 64 lp/mm, bars 2.26 px wide
+that is 0.44 of the sensor's Nyquist limit (144.9 lp/mm)
+bars over 1.3 px: the lens or the focus sets this reading, not the pixels
