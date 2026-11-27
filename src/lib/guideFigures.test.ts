@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
-import { PARTIAL_VIEW_CASES, PARTIAL_VIEW_VISIBLE, partialViewFigureSvg, usafFigureSvg, kalibrFrameFigureSvg, multiBoardFigureSvg, KALIBR_FIGURE_SPEC, MULTI_BOARD_SPECS, fillFigureSvg, fillRowsFromGuide, FILL_FIGURE_SPEC, printDefectFigureSvg, printDefectRowsFromGuide, PRINT_DEFECT_SCALE, detectionLimitsFigureSvg, detectionLimitsFromGuide, lidarCameraFigureSvg, LIDAR_SKETCH, hiddenErrorFigureSvg, hiddenErrorRowsFromGuide, HIDDEN_ERROR_SCALE, coverageFigureSvg, COVERAGE_VIEWS, handEyeFigureSvg, HAND_EYE_PANELS, type PartialViewData } from './guideFigures';
+import { PARTIAL_VIEW_CASES, PARTIAL_VIEW_VISIBLE, partialViewFigureSvg, usafFigureSvg, kalibrFrameFigureSvg, multiBoardFigureSvg, KALIBR_FIGURE_SPEC, MULTI_BOARD_SPECS, printDefectFigureSvg, printDefectRowsFromGuide, PRINT_DEFECT_SCALE, detectionLimitsFigureSvg, detectionLimitsFromGuide, lidarCameraFigureSvg, LIDAR_SKETCH, hiddenErrorFigureSvg, hiddenErrorRowsFromGuide, HIDDEN_ERROR_SCALE, coverageFigureSvg, COVERAGE_VIEWS, handEyeFigureSvg, HAND_EYE_PANELS, type PartialViewData } from './guideFigures';
 import { idRange } from './idRange';
 import { patternExtent } from './pageLayout';
 import { charucoMarkers } from './renderCharuco';
@@ -100,37 +100,6 @@ describe('multi-board figure', () => {
     expect(next).toBeLessThanOrEqual(250); // fits DICT_6X6_250
     const md = readFileSync('src/content/guides/multi-board-marker-ids.md', 'utf8');
     expect(md).toContain('board 4 uses 105 to 139');
-  });
-});
-
-describe('board fill figure', () => {
-  const md = readFileSync('src/content/guides/calibration-target-size.md', 'utf8');
-  const rows = fillRowsFromGuide(md);
-  const pair: [typeof rows[0], typeof rows[0]] = [rows.find((r) => r.fill === 20)!, rows.find((r) => r.fill === 60)!];
-  it('reads the five rows of the guide\'s table', () => {
-    expect(rows.map((r) => r.fill)).toEqual([20, 30, 45, 60, 80]);
-    expect(pair[0]).toEqual({ fill: 20, pxPerSquare: 28, cornerErrorPx: 13 });
-    expect(pair[1]).toEqual({ fill: 60, pxPerSquare: 83, cornerErrorPx: 1.4 });
-  });
-  it('is the file this code writes, with the table\'s numbers', () => {
-    const svg = fillFigureSvg(pair);
-    expect(readFileSync('src/assets/guides/board-fill-20-vs-60.svg', 'utf8')).toBe(svg);
-    for (const t of ['>28 px per square<', '>13 px error at the frame corners<', '>83 px per square<', '>1.4 px error at the frame corners<']) expect(svg).toContain(t);
-  });
-  it('draws the board at the stated share of the frame width', () => {
-    const svg = fillFigureSvg(pair);
-    const frames = [...svg.matchAll(/<rect x="([\d.]+)" y="14" width="([\d.]+)" height="[\d.]+" fill="#F4F3EF"/g)].map((m) => +m[2]);
-    const scales = [...svg.matchAll(/scale\(([\d.]+)\)/g)].map((m) => +m[1]);
-    const boardW = FILL_FIGURE_SPEC.cols * FILL_FIGURE_SPEC.square;
-    expect((boardW * scales[0]) / frames[0]).toBeCloseTo(0.2, 3);
-    expect((boardW * scales[1]) / frames[1]).toBeCloseTo(0.6, 3);
-  });
-  it('the table itself is consistent with fill as a share of width: pixels per square scale with fill', () => {
-    // 14 squares across: frame width implied by each row = 14 × px per square / fill. The rows agree within 3 %.
-    const implied = rows.map((r) => (14 * r.pxPerSquare) / (r.fill / 100));
-    const mean = implied.reduce((a, b) => a + b, 0) / implied.length;
-    for (const w of implied) expect(Math.abs(w - mean) / mean).toBeLessThan(0.03);
-    expect(md).toContain("Fill here means the board's width as a share of the frame width.");
   });
 });
 
@@ -323,7 +292,7 @@ describe('LiDAR-camera figure', () => {
 
 describe('guide figures stay readable on a phone', () => {
   // A guide column on a phone is about 340 px wide; text below 6.5 px there is hard to read.
-  const narrow = ['partial-view-detection', 'board-fill-20-vs-60', 'print-defects-rms-vs-model-error', 'rms-vs-true-error', 'view-coverage', 'hand-eye-arrangements', 'charuco-detection-limits', 'lidar-camera-target-two-views'];
+  const narrow = ['partial-view-detection', 'board-middle-vs-moved', 'print-defects-rms-vs-model-error', 'rms-vs-true-error', 'view-coverage', 'hand-eye-arrangements', 'charuco-detection-limits', 'lidar-camera-target-two-views'];
   for (const name of narrow) {
     it(name, () => {
       const svg = readFileSync(`src/assets/guides/${name}.svg`, 'utf8');

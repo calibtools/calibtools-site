@@ -118,39 +118,34 @@ export function multiBoardFigureSvg(): string {
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" font-family="Geist, system-ui, sans-serif" role="img"><rect width="${W}" height="${H}" fill="#fff"/>${o}</svg>`;
 }
 
-/** Board of the fill figure: the 14 × 9 board of the guide's test. */
-export const FILL_FIGURE_SPEC: PatternSpec = { ...base, type: 'ChArUco', rows: 9, cols: 14, square: 25, marker: 18 };
+export interface PlacementCase { key: 'middle' | 'moved'; arm: string; fill_pct: number; outlines: [number, number][][]; rms: number; model_worst: number }
+export interface PlacementData { image: [number, number]; cases: PlacementCase[] }
 
-export interface FillRow { fill: number; pxPerSquare: number; cornerErrorPx: number }
+/** Pixel errors as the target-size guide prints them: whole pixels from 100, one decimal from 10, two below. */
+export const fmtPx = (v: number) => (v >= 100 ? v.toFixed(0) : v >= 10 ? v.toFixed(1) : v.toFixed(2));
 
 /**
- * Two camera frames with the board at a small and at the recommended share of the frame width.
- * The numbers under each frame are rows of the guide's results table, passed in by the caller.
- * The frame is drawn 16:10; only the board's share of the width is to scale.
+ * Two camera frames with the outline of the same small board in each of the 20 images of one session:
+ * held near the middle, and moved around the frame. The numbers under each frame are the medians of the
+ * 20 sessions, passed in by the caller.
  */
-export function fillFigureSvg(rows: [FillRow, FillRow]): string {
-  const fw = 290, fh = fw / 1.6, gap = 20, W = 2 * fw + gap + 40, H = fh + 104, top = 14; // 640 wide, readable on a phone
-  const { bw, bh } = patternExtent(FILL_FIGURE_SPEC);
+export function boardPlacementFigureSvg(data: PlacementData): string {
+  const [iw, ih] = data.image;
+  const fw = 290, fh = (fw * ih) / iw, gap = 20, W = 2 * fw + gap + 40, top = 14, H = top + fh + 92; // 640 wide, readable on a phone
+  const k = fw / iw, r = (v: number) => +v.toFixed(1);
+  const titles = { middle: 'Board held in the middle', moved: 'Same board, moved around' };
   let o = '';
-  rows.forEach((row, i) => {
-    const fx = 20 + i * (fw + gap), k = (fw * row.fill) / 100 / bw;
-    const bx = fx + (fw - bw * k) / 2, by = top + (fh - bh * k) / 2;
-    o += `<rect x="${fx}" y="${top}" width="${fw}" height="${fh}" fill="#F4F3EF" stroke="${INK}" stroke-width="1.5"/>`;
-    o += `<g transform="translate(${+bx.toFixed(2)} ${+by.toFixed(2)}) scale(${+k.toFixed(5)})"><rect x="-10" y="-10" width="${bw + 20}" height="${bh + 20}" fill="#fff"/>${renderPatternSvg(FILL_FIGURE_SPEC, 0, 0)}</g>`;
-    // width bracket under the board
-    const y = top + fh - 16;
-    o += `<line x1="${+bx.toFixed(2)}" y1="${y}" x2="${+(bx + bw * k).toFixed(2)}" y2="${y}" stroke="${RED_TEXT}" stroke-width="1.2"/><line x1="${+bx.toFixed(2)}" y1="${y - 5}" x2="${+bx.toFixed(2)}" y2="${y + 5}" stroke="${RED_TEXT}" stroke-width="1.2"/><line x1="${+(bx + bw * k).toFixed(2)}" y1="${y - 5}" x2="${+(bx + bw * k).toFixed(2)}" y2="${y + 5}" stroke="${RED_TEXT}" stroke-width="1.2"/>`;
-    const ty = top + fh + 28;
-    o += `<text x="${fx}" y="${ty}" font-size="15.5" font-weight="600" fill="${INK}">Board fills ${row.fill} % of the frame width</text>`;
-    o += `<text x="${fx}" y="${ty + 24}" font-size="13.5" fill="${INK}" ${MONO}>${row.pxPerSquare} px per square</text>`;
-    o += `<text x="${fx}" y="${ty + 44}" font-size="13.5" fill="${INK}" ${MONO}>${row.cornerErrorPx} px error at the frame corners</text>`;
+  (['middle', 'moved'] as const).forEach((key, i) => {
+    const c = data.cases.find((x) => x.key === key)!;
+    const fx = 20 + i * (fw + gap);
+    o += `<rect x="${fx}" y="${top}" width="${fw}" height="${r(fh)}" fill="#F4F3EF" stroke="${INK}" stroke-width="1.5"/>`;
+    for (const q of c.outlines) o += `<path d="M${q.map(([x, y]) => `${r(fx + x * k)} ${r(top + y * k)}`).join('L')}Z" fill="#fff" fill-opacity="0.55" stroke="${INK}" stroke-width="0.9"/>`;
+    const ty = top + fh + 26, bad = c.model_worst >= 2;
+    o += `<text x="${fx}" y="${r(ty)}" font-size="15.5" font-weight="600" fill="${INK}">${titles[key]}</text>`;
+    o += `<text x="${fx}" y="${r(ty + 24)}" font-size="13.5" fill="${INK}" ${MONO}>reprojection error ${c.rms.toFixed(3)} px</text>`;
+    o += `<text x="${fx}" y="${r(ty + 44)}" font-size="13.5" font-weight="${bad ? 600 : 400}" fill="${bad ? RED_TEXT : INK}" ${MONO}>camera model off by ${fmtPx(c.model_worst)} px</text>`;
   });
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${+H.toFixed(1)}" viewBox="0 0 ${W} ${+H.toFixed(1)}" font-family="Geist, system-ui, sans-serif" role="img"><rect width="${W}" height="${+H.toFixed(1)}" fill="#fff"/>${o}</svg>`;
-}
-
-/** Rows of the "Board fill" table in the target-size guide. */
-export function fillRowsFromGuide(markdown: string): FillRow[] {
-  return [...markdown.matchAll(/^\| (\d+) % \| (\d+) \| [\d.]+ px \| [\d.]+ % \| ([\d.]+) px \|$/gm)].map((m) => ({ fill: +m[1], pxPerSquare: +m[2], cornerErrorPx: +m[3] }));
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${r(H)}" viewBox="0 0 ${W} ${r(H)}" font-family="Geist, system-ui, sans-serif" role="img"><rect width="${W}" height="${r(H)}" fill="#fff"/>${o}</svg>`;
 }
 
 export interface PrintDefectRow { label: string; rms: number; edge: number }
