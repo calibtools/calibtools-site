@@ -1,82 +1,138 @@
 ---
 title: "How big should your calibration target be?"
-description: "Size a calibration board from your field of view: the 60 % fill rule, pixels per square, when a small board close up beats a large one, and what the data shows."
+description: "One small board, 20 simulated sessions: held mid-frame the camera model was off by 534 px, moved around by 0.74 px. Same reprojection error. How to pick a size."
 date: 2026-11-07
-updated: 2026-11-07
-readingTime: "11 min"
-keyRule: "Size the board to fill about 60 % of the frame at your working distance, then check that each square is at least 25 px and each marker bit at least 3 px."
-related: ["opencv-camera-calibration", "charuco-vs-checkerboard-vs-aprilgrid", "corner-detection-troubleshooting", "multi-board-marker-ids", "line-scan-camera-calibration", "how-many-calibration-images"]
+updated: 2026-11-27
+readingTime: "10 min"
+keyRule: "Big enough that every marker bit is 3 px or more in the image, and about 60 % of the frame width as a starting point. Then move it: what decides the result is whether corners reach every part of the frame across the whole set."
+related: ["how-many-calibration-images", "opencv-camera-calibration", "charuco-vs-checkerboard-vs-aprilgrid", "reprojection-error", "multi-board-marker-ids", "composite-ceramic-or-glass"]
 products: ["charuco-composite", "charuco-ceramic", "checkerboard-composite"]
 sampleFiles: []
 faq:
   - q: "Is a bigger calibration board always better?"
-    a: "No. What matters is how much of the frame the board fills and how many corners it puts in the image. A 200 mm board at 0.5 m and an 800 mm board at 2 m give the same geometry; pick by working distance and by what you can keep flat."
-  - q: "Can I calibrate with the board filling only a quarter of the frame?"
-    a: "You can, and the reprojection error will look fine, but the distortion model is only constrained where corners were seen. In our test the undistortion error at the frame corners was 13 px at 20 % fill against 1.4 px at 60 %."
-  - q: "How many pixels per square do I need?"
-    a: "About 25 px as a floor and 30 to 40 px comfortable. More corners help more than bigger squares: at the same fill, a 28 × 18 board at 42 px per square beat a 14 × 9 board at 83 px per square."
-  - q: "What about wide-angle and fisheye lenses?"
-    a: "Coverage grows fast with distance, so either use a large board or bring a smaller one close and take more views at the edges, where the distortion is. Fill still applies, measured in the distorted image."
-  - q: "Does the board size change the accuracy I can expect?"
-    a: "Only through pixels: larger squares at the same fill mean fewer corners, not better ones. Flatness is the other side: a larger board is harder to keep flat, which is why big boards use rigid substrates."
+    a: "In our test a bigger share of the frame was better every time: with the board moved around the frame, the camera model was within 0.74 px at 20 % of the frame width, 0.13 px at 60 % and 0.07 px at 80 %. Size in millimeters does not enter; share of the frame does. A larger board is also harder to keep flat, which this test did not include."
+  - q: "Can I calibrate with a board that fills only a fifth of the frame?"
+    a: "Yes, if you move it. At 20 % of the frame width, 20 images spread over the frame gave a model within 0.74 px. The same board held near the middle gave 534 px with OpenCV's standard model, and the reprojection error looked the same in both cases: 0.064 and 0.055 px."
+  - q: "How many pixels per square does a ChArUco board need?"
+    a: "The markers give up before the corners do. With markers 0.75 of the square, OpenCV decoded 99 % of the markers at 33 px per square (3.1 px per marker bit), 88 % at 27 px and 36 % at 23 px. Below 20 px it found nothing. Plan for 3 px per marker bit."
+  - q: "Can the board be bigger than the image?"
+    a: "A ChArUco board can. With the board as wide as the frame and partly outside it in most images, the model was within 0.04 px, the best result of the test. A plain checkerboard has to be fully visible, so it has to stay smaller than the frame."
+  - q: "Is a board with more, smaller squares better?"
+    a: "A little, while its markers still decode. At 60 % of the frame width a 28 × 18 board gave 0.09 px against 0.13 px for a 14 × 9 board of the same size. At 30 % of the frame width its marker bits were 1.9 px and 1 image in 400 was detected."
 ---
 
-The right size for a calibration target is set by your camera, lens and working distance, not by the target catalog. This guide gives the rule, the reasoning, and the numbers from a controlled test, so you can pick a board in a few minutes.
+We rendered one ChArUco board at five sizes in the frame, held near the middle or moved around, and calibrated a camera whose true parameters we know. Twenty sessions of 20 images for each case.
 
-## The rule
+![Two camera frames with the outlines of the same small board in 20 images. Held in the middle: reprojection error 0.055 px, camera model off by 534 px. Moved around the frame: reprojection error 0.064 px, camera model off by 0.74 px.](../../assets/guides/board-middle-vs-moved.svg)
 
-In a typical calibration view the board should fill **about 60 % of the frame**, with some views pushing it to the edges and corners. At that size, each checker square should be at least **25 px** across and each marker bit at least **3 px**.
+Both frames show a board that is 20 % of the frame wide. The reprojection error is the same. The camera model is not: 534 px off at its worst pixel in one case, 0.74 px in the other.
 
-Fill here means the board's width as a share of the frame width.
+Everything on this page comes from rendered images, not from a real camera. The last section says what that leaves out.
 
-![The same 14 by 9 ChArUco board in two camera frames: filling 20 % of the frame width, with 13 px undistortion error at the frame corners, and filling 60 %, with 1.4 px.](../../assets/guides/board-fill-20-vs-60.svg)
+## The short answer
 
-Fill is what matters because the camera model is only constrained where the board puts corners. Distortion is strongest at the edges of the image, so a board that never reaches them leaves the distortion coefficients guessing out there.
+- **The board's size in the frame matters less than where the corners land.** Corners in every part of the frame across the set of images is what the camera model needs.
+- **About 60 % of the frame width is a good size to start from.** It reaches most of the frame in 20 images without much planning, and the model came out within 0.13 px.
+- **Bigger kept getting better.** 80 % gave 0.07 px. A ChArUco board as wide as the frame, partly outside it, gave 0.04 px.
+- **The floor is 3 px per marker bit.** Below that the markers stop decoding and a ChArUco board gives nothing.
 
-## What the data shows
+Size here means the board's width as a share of the frame width, with the board square to the camera.
 
-We rendered a ChArUco board through a synthetic camera with known intrinsics and distortion, detected it with OpenCV's `CharucoDetector`, calibrated with `calibrateCamera`, and compared the result with the truth.
+## The test
 
-Fifteen views, tilts up to 35°, image noise added, the same camera every time; only the board's share of the frame changed.
+- **Camera.** 1920 × 1440 px, focal length 2250 px (46° across), radial distortion k1 = −0.12.
+- **Board.** ChArUco, 14 × 9 squares of 20 mm, markers of 15 mm, DICT_6X6_250, 280 × 180 mm.
+- **Images.** Tilt of 5 to 35°, blur of 0.8 px, noise of 2 gray levels. The distance sets the board's share of the frame.
+- **Session.** 20 images, solved with `calibrateCamera` and OpenCV's standard five distortion terms. 20 sessions per case, OpenCV 5.1.
+- **Model error.** The true camera and the solved one are compared over the whole frame after the best rotation between them is removed. We report the worst pixel.
 
-| Board fill | Pixels per square | RMS reprojection | Focal error | Undistortion error at frame corners |
+Each number in the tables is the median of 20 sessions unless it says otherwise.
+
+## The board moved around the frame
+
+The whole board is in every image, and its center can be anywhere in the frame.
+
+| Board width in the frame | Pixels per square | Frame cells with corners, of 48 | Reprojection error (px) | Model, worst pixel (px) | Worst session (px) |
+|---|---|---|---|---|---|
+| 20 % | 27 | 37 | 0.064 | 0.74 | 3.81 |
+| 30 % | 41 | 41 | 0.046 | 0.38 | 0.76 |
+| 45 % | 62 | 42 | 0.056 | 0.28 | 0.92 |
+| 60 % | 82 | 44 | 0.036 | 0.13 | 0.50 |
+| 80 % | 110 | 45.5 | 0.022 | 0.07 | 0.27 |
+
+"Frame cells" cuts the frame into 8 × 6 cells and counts the ones where at least one corner was found in the session.
+
+Every size works. A bigger board is better, steadily, and the improvement does not stop at 60 %. The small board is also the least even from session to session: its worst one was off by 3.81 px, against 0.50 px for the worst session at 60 %.
+
+## The board held in the middle
+
+Same boards, same tilts, but the board's center stays within 6 % of the frame center.
+
+| Board width in the frame | Frame cells with corners, of 48 | Reprojection error (px) | Model, worst pixel (px) | Same, k3 and tangential terms fixed (px) |
 |---|---|---|---|---|
-| 20 % | 28 | 0.29 px | 0.55 % | 13 px |
-| 30 % | 41 | 0.30 px | 0.34 % | 7 px |
-| 45 % | 62 | 0.23 px | 0.07 % | 5 px |
-| 60 % | 83 | 0.14 px | 0.06 % | 1.4 px |
-| 80 % | 112 | 0.10 px | 0.01 % | 1.9 px |
+| 20 % | 8 | 0.055 | 534 | 19.6 |
+| 30 % | 12 | 0.046 | 117 | 3.52 |
+| 45 % | 20 | 0.055 | 17.0 | 1.20 |
+| 60 % | 24 | 0.032 | 0.68 | 0.17 |
 
-Two things stand out. The reprojection error never looks bad, even when the model is wrong by 13 px at the corners: it is measured only where corners were found. And the gain flattens above 60 %, where the whole board becomes hard to keep in frame at steep tilts.
+The reprojection error does not move. It is measured only where corners were found, and there the fit is fine. Outside that area nothing holds the distortion terms, and they run off.
 
-A few more runs from the same setup:
+A model with fewer terms runs off less. The last column fixes k3 and the tangential terms with `CALIB_FIX_K3 | CALIB_ZERO_TANGENT_DIST`. Our simulated lens has only k1, so nothing is lost by fixing the others here. A real lens may need them.
 
-- **Same fill, more corners.** A 28 × 18 board at 42 px per square gave 0.24 px maximum undistortion error; a 14 × 9 board of the same physical size at 83 px per square gave 1.4 px. Denser patterns win.
+At 60 % of the frame width, even a board that never leaves the middle reaches half the cells, and the model is within 0.68 px. That is the practical case for a big board: it covers the frame when you do not plan your views.
 
-- **Small board close vs large board far.** A 200 × 150 mm board at 60 % fill matched the 600 × 400 mm board at 60 % fill. Size in millimeters did not matter; share of the frame did.
+## A board bigger than the image
 
-- **Tilt.** With the same board at 60 % fill but tilts limited to 10°, focal error rose from 0.06 % to 0.34 % and the corner error from 1.4 px to 9 px. Fill does not substitute for angles.
+A ChArUco board is detected when part of it is outside the image. So it can be as wide as the frame, or wider. Here at least half of its corners are in each image.
 
-- **More views.** Going from 15 to 30 views at 60 % fill cut the corner error from 1.4 px to 0.15 px.
+| Board width in the frame | Whole board in the image (px) | Board partly outside (px) |
+|---|---|---|
+| 60 % | 0.13 | 0.15 |
+| 80 % | 0.07 | 0.06 |
+| 100 % | does not fit tilted | 0.04 |
 
-## Step 1: find your coverage
+Both columns are the model's worst pixel. The board as wide as the frame gave the best result of the whole test. Its corners reached 47 or all 48 cells of the frame in every session.
 
-Coverage at the working distance is the sensor dimension scaled by distance over focal length:
+This holds for patterns with markers. A plain checkerboard has to be fully visible to be detected at all, so it has to stay smaller than the frame; see [ChArUco, checkerboard or AprilGrid](/calibacademy/charuco-vs-checkerboard-vs-aprilgrid/).
+
+## How small the squares can get
+
+We moved the same board away from the camera, 40 images per step, and counted what OpenCV found.
+
+| Pixels per square | Pixels per marker bit | Markers decoded | Corners found | Corner error, median (px) |
+|---|---|---|---|---|
+| 41 | 3.8 | 100 % | 100 % | 0.03 |
+| 33 | 3.1 | 99 % | 99 % | 0.04 |
+| 27 | 2.5 | 88 % | 77 % | 0.04 |
+| 23 | 2.2 | 36 % | 16 % | 0.06 |
+| 20 | 1.9 | 3 % | 0 % | 0.14 |
+| 18 | 1.7 | 0 % | 0 % | none |
+
+A 6 × 6 marker is 8 cells across with its border, so a marker bit is the marker's width in pixels divided by 8. On this board the markers are 0.75 of the square.
+
+The markers give up first. The corners that are found stay accurate down to the point where none are found. So the number to check is pixels per marker bit, and 3 is a safe floor at this blur.
+
+## More squares, or less tilt
+
+**More squares.** A 28 × 18 board on the same 280 × 180 mm, at 60 % of the frame width, gave 0.09 px at the worst pixel against 0.13 px for the 14 × 9 board. Four times the corners, a modest gain.
+
+At 30 % of the frame width the same dense board had squares of 21 px and marker bits of 1.9 px. Of 400 images, 1 was detected, with 10 corners. A denser pattern is only better while its markers decode. (With 252 markers it also needs DICT_6X6_1000.)
+
+**Less tilt.** With tilts held to 0 to 10° at 60 % of the frame width, the worst pixel was 0.18 px against 0.13 px, and the focal length error 0.017 % against 0.007 %. Worse, but not by much, as long as the board still moves across the frame.
+
+## Sizing a board, step by step
+
+**1. Find the width your camera sees at the working distance.**
 
 ```
-coverage width  = sensor width  × distance / focal length
-coverage height = sensor height × distance / focal length
+width seen = sensor width × distance / focal length
 ```
 
-For a 2/3″ sensor (8.8 × 6.6 mm) with a 12 mm lens at 800 mm, that is 587 × 440 mm. The [FOV calculator](/tools/fov/) does this from a sensor list and also reports pixels per millimeter, which you need for step 3.
+A sensor 8.8 mm wide behind a 12 mm lens at 800 mm sees 587 mm. The [FOV calculator](/tools/fov/) does this from a sensor list.
 
-Use the distance at which the camera will actually work. Calibrating at a different distance means a different focus, and a lens's intrinsics change with focus.
+**2. Start from 60 % of that width.** 0.6 × 587 = 352 mm, so a board 300 to 400 mm wide. Bigger is fine for a ChArUco board, as long as you can hold it flat and move it.
 
-## Step 2: pick the board size
-
-Multiply the coverage long side by 0.6 and pick the nearest board. Rounding **down** is better than up: a slightly small board can be moved closer for some views, while a board that does not fit in the frame at 30° tilt costs you views.
-
-| Board (mm) | Fills 60 % of a frame about | Substrate |
+| Board (mm) | Is 60 % of a view about | Substrate |
 |---|---|---|
 | 110 × 85 | 180 mm wide | ceramic |
 | 150 × 100 | 250 mm wide | ceramic |
@@ -88,63 +144,94 @@ Multiply the coverage long side by 0.6 and pick the nearest board. Rounding **do
 | 600 × 400 | 1000 mm wide | composite |
 | 800 × 600 | 1330 mm wide | composite |
 
-For the 587 mm coverage above, 0.6 × 587 = 352 mm, so the [300 × 200 composite board](/targets/charuco-composite/) is the pick, with the 400 × 300 as the alternative if you can move it a little further away.
+**3. Check the marker bits.** Pixels per millimeter is the image width in pixels over the width seen. With a 2448 px image, 2448 / 587 = 4.2 px per mm. A 15 mm marker is then 63 px wide, or 7.8 px per bit. Anything from 3 up decodes.
 
-Ceramic boards are for small fields of view and for when position accuracy below a few micrometers matters; see the [ceramic ChArUco target](/targets/charuco-ceramic/), and [composite, ceramic or glass](/calibacademy/composite-ceramic-or-glass/) for how the three substrates compare.
+**4. If the board has to be small, plan where it goes.** A board at 20 % of the frame width works when the images put it in every part of the frame, edges and corners included. It needs more care, and more images help: see [how many images](/calibacademy/how-many-calibration-images/).
 
-For fields wider than about 1.3 m, use two or more boards with distinct marker IDs instead of one huge panel; the [multi-board guide](/calibacademy/multi-board-marker-ids/) covers the setup.
+For views wider than about 1.3 m, two or more boards with separate marker IDs can stand in for one huge panel; see [the multi-board guide](/calibacademy/multi-board-marker-ids/). For how flat each substrate stays, see [composite, ceramic or glass](/calibacademy/composite-ceramic-or-glass/).
 
-## Step 3: check the pixels
+## What we got wrong
 
-At the working distance, pixels per millimeter is `image width / coverage width`. Multiply by the square size:
+The earlier version of this page had a results table from single runs. Six of its claims do not hold up over 20 sessions:
 
-- **Square ≥ 25 px.** Below that, corner refinement loses accuracy and detections become unstable at tilt. 30 to 40 px is comfortable.
+- **"13 px at 20 % fill, 1.4 px at 60 %."** That table did not separate how big the board was from where it sat. Moved around the frame, the small board gives 0.74 px. Held in the middle, 534 px.
+- **"The gain flattens above 60 %."** It kept going: 0.13 px at 60 %, 0.07 px at 80 %, 0.04 px at 100 %.
+- **"Rounding down is better than up."** For a ChArUco board, the bigger board did better even when it did not fit in the frame.
+- **"Denser patterns win: 0.24 px against 1.4 px."** We measured 0.09 px against 0.13 px, and at 1.9 px per marker bit the dense board was detected in 1 image of 400.
+- **"With tilts limited to 10° the error rose from 1.4 px to 9 px."** We measured 0.18 px against 0.13 px.
+- **"Squares of at least 25 px."** For a ChArUco board the markers decide. At 27 px per square 23 % of the corners were already lost.
 
-- **Marker bit ≥ 3 px.** A 6 × 6 marker has 8 cells including its border; divide the marker size in pixels by 8. Below 3 px per bit the IDs stop decoding and ChArUco falls back to nothing.
+## Check your own images
 
-- **Prefer more squares over bigger ones** when both pass. Twice the corners at half the pixels each gave the better calibration above.
+This script reads a folder of calibration images, finds the ChArUco board, and prints which parts of the frame got corners. Set the board at the top to match yours. It needs numpy and opencv-python 4.8 or later.
 
-The [FOV calculator](/tools/fov/) reports both numbers for each board it suggests and flags boards whose markers would not decode.
+```python
+import sys, glob, numpy as np, cv2
 
-## When you cannot reach 60 %
+COLS, ROWS, SQUARE, MARKER = 14, 9, 20.0, 15.0               # squares across, squares down, sizes in mm
+DICTIONARY = cv2.aruco.DICT_6X6_250
 
-**Working distance is long and the board would be enormous.** Bring a smaller board closer for the calibration, as long as the lens stays at the working focus. Infinity-focused outdoor cameras tolerate this; macro setups do not.
+board = cv2.aruco.CharucoBoard((COLS, ROWS), SQUARE, MARKER, cv2.aruco.getPredefinedDictionary(DICTIONARY))
+detector = cv2.aruco.CharucoDetector(board)
+grid = np.zeros((6, 8), int)                                 # the frame cut into 8 x 6 cells
+obj, img, square_px, size = [], [], [], None
+for path in sorted(glob.glob(sys.argv[1] + "/*")):
+    image = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
+    if image is None: continue
+    size = image.shape[::-1]
+    corners, ids, _, _ = detector.detectBoard(image)
+    if ids is None or len(ids) < 6: continue
+    pts, ids = corners.reshape(-1, 2), ids.ravel()
+    obj.append(board.getChessboardCorners()[ids]); img.append(corners)
+    np.add.at(grid, ((pts[:, 1] * 6 / size[1]).astype(int).clip(0, 5), (pts[:, 0] * 8 / size[0]).astype(int).clip(0, 7)), 1)
+    where = {i: p for i, p in zip(ids, pts)}                 # distance between neighbors in a row = one square
+    square_px += [np.linalg.norm(where[i + 1] - p) for i, p in where.items() if i + 1 in where and (i + 1) % (COLS - 1)]
 
-**The lens is wide or fisheye.** Coverage grows quickly with distance, and distortion sits at the edges. Use the largest board you can keep flat, bring it close, and take extra views with the board in each corner of the frame. Fill is judged in the distorted image, so a board that looks bent at the edge is doing its job.
+print(f"{len(obj)} images with corners, squares about {np.median(square_px):.0f} px, marker bits about {np.median(square_px) * MARKER / SQUARE / 8:.1f} px")
+for row in grid:
+    print("  " + " ".join("##" if n >= 20 else "+ " if n else ". " for n in row))
+print(f"cells of the frame with corners: {(grid > 0).sum()} of 48   (## 20 corners or more, + fewer, . none)")
+rms = cv2.calibrateCamera(obj, img, size, None, None)[0]
+print(f"reprojection error {rms:.3f} px")
+```
 
-**Stereo or multi-camera.** The board must be visible in both cameras at once, so size it for the shared field of view, which is narrower than either camera's. Expect to need more views to cover each camera's edges.
+On one of our sessions with the small board moved around the frame it prints:
 
-**The board has to stay put (hand-eye, robot cells).** Fill applies to the camera's view at each robot pose; the [hand-eye guide](/calibacademy/hand-eye-calibration-opencv/) explains how the poses are chosen.
+```text
+20 images with corners, squares about 27 px, marker bits about 2.5 px
+  .  ## ## .  .  .  .  . 
+  .  +  ## ## ## ## +  . 
+  .  +  +  +  +  ## ## . 
+  +  ## ## ## ## ## ## + 
+  +  ## ## ## ## ## ## + 
+  +  ## ## ## ## ## ## + 
+cells of the frame with corners: 38 of 48   (## 20 corners or more, + fewer, . none)
+reprojection error 0.078 px
+```
 
-**Line-scan, telecentric and thermal cameras** each break one assumption above and have their own guides: [line-scan](/calibacademy/line-scan-camera-calibration/) and [thermal](/calibacademy/thermal-camera-geometric-calibration/) are written.
+And on a session with the same board held in the middle:
 
-## Views and tilt
+```text
+20 images with corners, squares about 27 px, marker bits about 2.5 px
+  .  .  .  .  .  .  .  . 
+  .  .  .  .  .  .  .  . 
+  .  .  +  ## ## +  .  . 
+  .  .  +  ## ## +  .  . 
+  .  .  .  .  .  .  .  . 
+  .  .  .  .  .  .  .  . 
+cells of the frame with corners: 8 of 48   (## 20 corners or more, + fewer, . none)
+reprojection error 0.058 px
+```
 
-Size gets the board into the frame; the views do the rest. Plan for:
+The reprojection error is lower for the second session. Its camera model was off by 213 px at the worst pixel; the first session's by 0.57 px. The map shows what the error number cannot.
 
-- 15 to 30 views, with the board reaching every edge and corner of the frame across the set
+## What this test is not
 
-- tilts of 30° to 45° about both axes, not just one
+- **Simulation.** Rendered images of a flat board. A real large board bends more than a small one, and that works against the gain from size; [composite, ceramic or glass](/calibacademy/composite-ceramic-or-glass/) measures it.
+- **No focus.** In the model a small board close up and a large board far away are the same picture. A real lens is focused at one distance, and a board far from it is blurred.
+- **One lens.** 46° across with mild distortion. Wide-angle and fisheye lenses were not tested.
+- **One blur level.** The pixel sizes at which markers stop decoding move with focus, contrast and detector settings.
+- **ChArUco only.** Checkerboards and circle grids were not run here.
+- **One camera.** Stereo and hand-eye setups add their own limits on where the board can go.
 
-- a few near and far views to spread the depth
-
-The [OpenCV calibration guide](/calibacademy/opencv-camera-calibration/) walks through capture and the per-view error check that catches a bad frame.
-
-## Common problems
-
-| Symptom | Likely cause | Fix |
-|---|---|---|
-| Good RMS, straight lines still bend after undistortion | Board never reached the frame edges | Add views with the board in each corner; check fill |
-| Markers not detected at tilt | Fewer than 3 px per marker bit | Larger board, closer, or a pattern with larger markers |
-| Corners detected but jitter between frames | Squares under 25 px, or motion blur | Bigger squares or more light and a shorter exposure |
-| Board does not fit at 30° tilt | Board sized for a frontal view | Go one size down |
-| Results differ between calibrations | Lens focus or aperture changed | Lock focus and aperture; calibrate at the working settings |
-| Large board, poor flatness | Foam or paper substrate at 600 mm and above | Rigid composite or multiple smaller boards |
-
-## Next steps
-
-- Open the [FOV calculator](/tools/fov/) with your sensor, lens and distance and read off the recommended board.
-
-- [Choose a pattern](/calibacademy/charuco-vs-checkerboard-vs-aprilgrid/) for your software and lens.
-
-- Then follow the [OpenCV calibration guide](/calibacademy/opencv-camera-calibration/) for capture and checks.
+The scripts and the saved results are in our repository under `docs/content/experiments/target-size/`.
