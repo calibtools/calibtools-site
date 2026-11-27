@@ -589,3 +589,32 @@ export function sameIdsFigureSvg(data: SameIdsData): string {
   const H = r(top);
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" font-family="Geist, system-ui, sans-serif" role="img"><rect width="${W}" height="${H}" fill="#fff"/>${o}</svg>`;
 }
+
+/* ---- Image-count guide: the report beside the model error, for a few counts and for images that all look alike ---- */
+
+export interface ImageCountRow { label: string; rms: number; lensMax: number; rmsText: string; lensText: string }
+
+/** The counts shown in the first figure of how-many-calibration-images.md, read from its two tables. */
+export const IMAGE_COUNT_FIGURE_COUNTS = [3, 5, 10, 20, 40];
+export const IMAGE_COUNT_FIGURE_MIDDLE = 20;
+
+export function imageCountRowsFromGuide(markdown: string): ImageCountRow[] {
+  const section = (heading: string) => { const from = markdown.indexOf(heading); return markdown.slice(from, markdown.indexOf('\n## ', from + 1)); };
+  const rows: ImageCountRow[] = [];
+  for (const line of section('## The numbers').split('\n')) {
+    const r = line.match(/^\| (\d+) \| ([\d.]+) \| ([\d.]+) \| ([\d.]+) \| /);
+    if (r && IMAGE_COUNT_FIGURE_COUNTS.includes(+r[1])) rows.push({ label: `${r[1]} images, spread over the frame`, rms: +r[2], lensMax: +r[4], rmsText: r[2], lensText: r[4] });
+  }
+  for (const line of section('## More of the same image does not help').split('\n')) {
+    const r = line.match(/^\| (\d+) \| ([\d.]+) \| ([\d.]+) \| /);
+    if (r && +r[1] === IMAGE_COUNT_FIGURE_MIDDLE) rows.push({ label: `${r[1]} images, all near the middle`, rms: +r[2], lensMax: +r[3], rmsText: r[2], lensText: r[3] });
+  }
+  return rows;
+}
+
+export const IMAGE_COUNT_SCALE = { rmsMax: 0.15, lensMax: 7, barMax: 232 };
+
+/** The middle-of-the-frame row runs off the scale on purpose; its bar is clipped and the number says how far. */
+export function imageCountFigureSvg(rows: ImageCountRow[]): string {
+  return rmsBesideLensErrorSvg(rows, IMAGE_COUNT_SCALE);
+}
