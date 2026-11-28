@@ -1,0 +1,25 @@
+20 views, RMS 0.076 px
+images/00.png  0.029 px
+images/01.png  0.039 px
+images/02.png  0.031 px
+images/03.png  0.024 px
+images/04.png  0.043 px
+images/05.png  0.045 px
+images/06.png  0.034 px
+images/07.png  0.047 px
+images/08.png  0.041 px
+images/09.png  0.032 px
+images/10.png  0.039 px
+images/11.png  0.048 px
+images/12.png  0.037 px
+images/13.png  0.299 px   <-- 7.7 times the median
+images/14.png  0.041 px
+images/15.png  0.021 px
+images/16.png  0.027 px
+images/17.png  0.039 px
+images/18.png  0.036 px
+images/19.png  0.047 px
+   0 to  300 px from the center:  324 corners, mean error 0.038 px
+ 300 to  600 px from the center:  487 corners, mean error 0.050 px
+ 600 to  900 px from the center:  254 corners, mean error 0.035 px
+ 900 to 1200 px from the center:   15 corners, mean error 0.036 px

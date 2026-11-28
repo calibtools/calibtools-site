@@ -9,7 +9,7 @@ import { writeFileSync, mkdirSync, readFileSync } from 'node:fs';
 import { Resvg } from '@resvg/resvg-js';
 import { renderPatternSvg } from '../src/lib/patterns';
 import { patternExtent } from '../src/lib/pageLayout';
-import { PARTIAL_VIEW_CASES, PARTIAL_VIEW_VISIBLE, PARTIAL_VIEW_MARGIN, partialViewFigureSvg, usafFigureSvg, usafThreeBarsFigureSvg, opencvStepsFigureSvg, kalibrFrameFigureSvg, multiBoardFigureSvg, boardPlacementFigureSvg, type PlacementData, handEyeRotationFigureSvg, handEyeRotationRows, HAND_EYE_ROTATION_CASES, cameraImuMotionFigureSvg, cameraImuMotionRows, lidarUsableFigureSvg, printDefectFigureSvg, printDefectRowsFromGuide, hiddenErrorFigureSvg, hiddenErrorRowsFromGuide, coverageFigureSvg, handEyeFigureSvg, detectionLimitsFigureSvg, detectionLimitsFromGuide, lidarCameraFigureSvg, boardMotionFigureSvg, boardMotionRowsFromGuide, substrateFigureSvg, substrateRowsFromGuide, sameIdsFigureSvg, imageCountFigureSvg, imageCountRowsFromGuide, type PartialViewData, type SameIdsData } from '../src/lib/guideFigures';
+import { PARTIAL_VIEW_CASES, PARTIAL_VIEW_VISIBLE, PARTIAL_VIEW_MARGIN, partialViewFigureSvg, usafFigureSvg, usafThreeBarsFigureSvg, opencvStepsFigureSvg, kalibrFrameFigureSvg, multiBoardFigureSvg, boardPlacementFigureSvg, type PlacementData, handEyeRotationFigureSvg, handEyeRotationRows, HAND_EYE_ROTATION_CASES, cameraImuMotionFigureSvg, cameraImuMotionRows, lidarUsableFigureSvg, printDefectFigureSvg, printDefectRowsFromGuide, hiddenErrorFigureSvg, reprojectionRows, coverageFigureSvg, handEyeFigureSvg, detectionLimitsFigureSvg, detectionLimitsFromGuide, lidarCameraFigureSvg, boardMotionFigureSvg, boardMotionRowsFromGuide, substrateFigureSvg, substrateRowsFromGuide, sameIdsFigureSvg, imageCountFigureSvg, imageCountRowsFromGuide, type PartialViewData, type SameIdsData } from '../src/lib/guideFigures';
 
 if (process.argv.includes('--pngs')) {
   const pxPerMm = 6, m = PARTIAL_VIEW_MARGIN;
@@ -33,7 +33,7 @@ if (process.argv.includes('--pngs')) {
   writeFileSync('src/assets/guides/same-ids-detection.svg', sameIdsFigureSvg(JSON.parse(readFileSync('src/data/same-ids-detection.json', 'utf8')) as SameIdsData));
   writeFileSync('src/assets/guides/board-middle-vs-moved.svg', boardPlacementFigureSvg(JSON.parse(readFileSync('src/data/target-size-placement.json', 'utf8')) as PlacementData));
   writeFileSync('src/assets/guides/print-defects-rms-vs-model-error.svg', printDefectFigureSvg(printDefectRowsFromGuide(readFileSync('src/content/guides/printed-target-costs-half-a-pixel.md', 'utf8'))));
-  writeFileSync('src/assets/guides/rms-vs-true-error.svg', hiddenErrorFigureSvg(hiddenErrorRowsFromGuide(readFileSync('src/content/guides/reprojection-error.md', 'utf8'))));
+  writeFileSync('src/assets/guides/rms-vs-true-error.svg', hiddenErrorFigureSvg(reprojectionRows(JSON.parse(readFileSync('docs/content/experiments/reprojection-error/results/sessions.json', 'utf8')).results)));
   writeFileSync('src/assets/guides/view-coverage.svg', coverageFigureSvg());
   writeFileSync('src/assets/guides/hand-eye-arrangements.svg', handEyeFigureSvg());
   writeFileSync('src/assets/guides/hand-eye-rotation-vs-error.svg', handEyeRotationFigureSvg(handEyeRotationRows(JSON.parse(readFileSync('docs/content/experiments/hand-eye/results/sessions.json', 'utf8')).cases, HAND_EYE_ROTATION_CASES)));

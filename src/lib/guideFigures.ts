@@ -185,21 +185,26 @@ export function printDefectFigureSvg(rows: PrintDefectRow[]): string {
 
 export interface HiddenErrorRow { group: string; label: string; rms: number; edge: number }
 
-/** The three small tables under "What it hides": coverage, model complexity, one bad view. */
-export function hiddenErrorRowsFromGuide(markdown: string): HiddenErrorRow[] {
-  const part = markdown.slice(markdown.indexOf('## What it hides'), markdown.indexOf('## Check 1'));
-  const rows: HiddenErrorRow[] = [];
-  let group = '';
-  for (const line of part.split('\n')) {
-    const g = line.match(/^\*\*([^.*]+)\.\*\*/);
-    if (g) group = g[1];
-    const r = line.match(/^\| ([^|]+?) \| ([\d.]+) px \| ([\d.]+) px \|$/);
-    if (r) rows.push({ group, label: /^\d+ %$/.test(r[1]) ? `Board fills ${r[1]}` : /^k\d/.test(r[1]) ? r[1] : r[1][0].toUpperCase() + r[1].slice(1), rms: +r[2], edge: +r[3] });
-  }
-  return rows;
+/** Rows of the reprojection-error figure, from the saved sessions: median RMS and median largest model error per case. */
+export interface ReprojSession { default: { rms: number; model_worst: number } | null }
+export const REPROJECTION_FIGURE_ROWS: [string, string, string][] = [
+  ['Good set', 'good', '20 views across the frame, tilted'],
+  ['RMS no higher than the good set', 'middle_only', 'Board always in the middle'],
+  ['RMS no higher than the good set', 'tilt_under_5', 'Board never tilted'],
+  ['RMS higher, still small', 'one_view_shear_5px', 'One view sheared by 5 px'],
+  ['RMS higher, still small', 'stretched_0.3pct', 'Print stretched by 0.3 %'],
+  ['RMS higher, still small', 'bowed_1mm', 'Board bowed by 1 mm'],
+];
+export function reprojectionRows(results: Record<string, ReprojSession[]>): HiddenErrorRow[] {
+  const med = (v: number[]) => { const a = [...v].sort((x, y) => x - y), m = a.length >> 1; return a.length % 2 ? a[m] : (a[m - 1] + a[m]) / 2; };
+  return REPROJECTION_FIGURE_ROWS.map(([group, key, label]) => {
+    const ok = results[key].filter((r) => r.default).map((r) => r.default!);
+    const edge = med(ok.map((r) => r.model_worst));
+    return { group, label, rms: +med(ok.map((r) => r.rms)).toFixed(3), edge: +edge.toFixed(edge >= 10 ? 1 : 2) };
+  });
 }
 
-export const HIDDEN_ERROR_SCALE = { rmsMax: 0.3, edgeMin: 0.5, edgeMax: 30, barMax: 232 };
+export const HIDDEN_ERROR_SCALE = { rmsMax: 0.25, edgeMin: 0.1, edgeMax: 30, barMax: 232 };
 
 /** Same layout as the printed-target figure: RMS on the left, true error at the frame corners on the right. */
 export function hiddenErrorFigureSvg(rows: HiddenErrorRow[]): string {
@@ -208,7 +213,7 @@ export function hiddenErrorFigureSvg(rows: HiddenErrorRow[]): string {
   const rmsW = (v: number) => +(Math.min(v, rmsMax) / rmsMax * barMax).toFixed(1);
   const edgeW = (v: number) => +(Math.log(Math.max(v, edgeMin) / edgeMin) / Math.log(edgeMax / edgeMin) * barMax).toFixed(1);
   let o = `<text x="${x1}" y="26" font-size="16" font-weight="600" fill="${INK}">Reprojection error</text><text x="${x1}" y="48" font-size="14" fill="${INK}">RMS in px, what you see</text>`;
-  o += `<text x="${x2}" y="26" font-size="16" font-weight="600" fill="${INK}">True error at the frame corners</text><text x="${x2}" y="48" font-size="14" fill="${INK}">px, logarithmic scale, what you get</text>`;
+  o += `<text x="${x2}" y="26" font-size="16" font-weight="600" fill="${INK}">Largest error of the lens model</text><text x="${x2}" y="48" font-size="14" fill="${INK}">px, logarithmic scale, what you get</text>`;
   let y = 64, last = '';
   for (const r of rows) {
     if (r.group !== last) {
@@ -216,8 +221,8 @@ export function hiddenErrorFigureSvg(rows: HiddenErrorRow[]): string {
       y += groupH; last = r.group;
     }
     o += `<text x="${x1}" y="${y + 14}" font-size="15" fill="${INK}">${r.label}</text>`;
-    o += `<rect x="${x1}" y="${y + 22}" width="${Math.max(rmsW(r.rms), 2)}" height="16" fill="${INK}"/><text x="${x1 + Math.max(rmsW(r.rms), 2) + 6}" y="${y + 35}" font-size="14" fill="${INK}" ${MONO}>${r.rms}</text>`;
-    o += `<rect x="${x2}" y="${y + 22}" width="${Math.max(edgeW(r.edge), 2)}" height="16" fill="${RED}"/><text x="${x2 + Math.max(edgeW(r.edge), 2) + 6}" y="${y + 35}" font-size="14" fill="${INK}" ${MONO}>${r.edge}</text>`;
+    o += `<rect x="${x1}" y="${y + 22}" width="${Math.max(rmsW(r.rms), 2)}" height="16" fill="${INK}"/><text x="${x1 + Math.max(rmsW(r.rms), 2) + 6}" y="${y + 35}" font-size="14" fill="${INK}" ${MONO}>${r.rms.toFixed(3)}</text>`;
+    o += `<rect x="${x2}" y="${y + 22}" width="${Math.max(edgeW(r.edge), 2)}" height="16" fill="${RED}"/><text x="${x2 + Math.max(edgeW(r.edge), 2) + 6}" y="${y + 35}" font-size="14" fill="${INK}" ${MONO}>${r.edge.toFixed(r.edge >= 10 ? 1 : 2)}</text>`;
     y += rowH;
   }
   const H = y + 4;

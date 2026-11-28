@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
-import { PARTIAL_VIEW_CASES, PARTIAL_VIEW_VISIBLE, partialViewFigureSvg, usafFigureSvg, kalibrFrameFigureSvg, multiBoardFigureSvg, KALIBR_FIGURE_SPEC, MULTI_BOARD_SPECS, printDefectFigureSvg, printDefectRowsFromGuide, PRINT_DEFECT_SCALE, detectionLimitsFigureSvg, detectionLimitsFromGuide, lidarCameraFigureSvg, LIDAR_SKETCH, hiddenErrorFigureSvg, hiddenErrorRowsFromGuide, HIDDEN_ERROR_SCALE, coverageFigureSvg, COVERAGE_VIEWS, handEyeFigureSvg, HAND_EYE_PANELS, type PartialViewData } from './guideFigures';
+import { PARTIAL_VIEW_CASES, PARTIAL_VIEW_VISIBLE, partialViewFigureSvg, usafFigureSvg, kalibrFrameFigureSvg, multiBoardFigureSvg, KALIBR_FIGURE_SPEC, MULTI_BOARD_SPECS, printDefectFigureSvg, printDefectRowsFromGuide, PRINT_DEFECT_SCALE, detectionLimitsFigureSvg, detectionLimitsFromGuide, lidarCameraFigureSvg, LIDAR_SKETCH, hiddenErrorFigureSvg, reprojectionRows, HIDDEN_ERROR_SCALE, coverageFigureSvg, COVERAGE_VIEWS, handEyeFigureSvg, HAND_EYE_PANELS, type PartialViewData } from './guideFigures';
 import { idRange } from './idRange';
 import { patternExtent } from './pageLayout';
 import { charucoMarkers } from './renderCharuco';
@@ -146,35 +146,21 @@ describe('printed-target defects figure', () => {
   });
 });
 
-describe('reprojection error figure: what the RMS hides', () => {
-  const md = readFileSync('src/content/guides/reprojection-error.md', 'utf8');
-  const rows = hiddenErrorRowsFromGuide(md);
+describe('reprojection-error figure', () => {
+  const results = JSON.parse(readFileSync('docs/content/experiments/reprojection-error/results/sessions.json', 'utf8')).results;
+  const rows = reprojectionRows(results);
 
-  it('reads the six rows of the three tables, with their group', () => {
-    expect(rows).toEqual([
-      { group: 'Coverage', label: 'Board fills 20 %', rms: 0.29, edge: 13 },
-      { group: 'Coverage', label: 'Board fills 60 %', rms: 0.14, edge: 1.4 },
-      { group: 'Model complexity', label: 'k1 k2 p1 p2 k3', rms: 0.144, edge: 0.8 },
-      { group: 'Model complexity', label: 'Rational + thin prism', rms: 0.143, edge: 25 },
-      { group: 'One bad view', label: 'All 15 views', rms: 0.22, edge: 3.6 },
-      { group: 'One bad view', label: 'Bad view removed', rms: 0.15, edge: 0.8 },
-    ]);
-  });
-
-  it('the committed SVG is what the generator produces from the tables', () => {
+  it('the committed SVG is what the generator produces from the saved sessions', () => {
     expect(readFileSync('src/assets/guides/rms-vs-true-error.svg', 'utf8')).toBe(hiddenErrorFigureSvg(rows));
   });
 
-  it('every value fits its scale and the alt text states the real ranges', () => {
+  it('every value fits its scale', () => {
+    expect(rows).toHaveLength(6);
     for (const r of rows) {
       expect(r.rms).toBeLessThanOrEqual(HIDDEN_ERROR_SCALE.rmsMax);
       expect(r.edge).toBeGreaterThanOrEqual(HIDDEN_ERROR_SCALE.edgeMin);
       expect(r.edge).toBeLessThanOrEqual(HIDDEN_ERROR_SCALE.edgeMax);
     }
-    const alt = md.match(/!\[([^\]]+)\]\(\.\.\/\.\.\/assets\/guides\/rms-vs-true-error/)![1];
-    const rms = rows.map((r) => r.rms), edge = rows.map((r) => r.edge);
-    expect(alt).toContain(`between ${Math.min(...rms).toFixed(2)} and ${Math.max(...rms)} px`);
-    expect(alt).toContain(`from ${Math.min(...edge)} to ${Math.max(...edge)} px`);
   });
 });
 
